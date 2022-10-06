@@ -23,6 +23,9 @@ data Label : Set where
   ⋆ : Label
   l : StaticLabel → Label
 
+infix 4 _=?_
+infix 4 _==?_
+
 _=?_ : ∀ (ℓ₁ ℓ₂ : StaticLabel) → Dec (ℓ₁ ≡ ℓ₂)
 low  =? low  = yes refl
 high =? high = yes refl

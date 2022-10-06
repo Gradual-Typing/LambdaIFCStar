@@ -41,6 +41,9 @@ data RawType where
 data Type where
   _of_ : RawType → Label → Type
 
+infix 4 _≡ᵣ?_
+infix 4 _≡?_
+
 _≡ᵣ?_ : (S T : RawType) → Dec (S ≡ T)
 _≡?_ : (A B : Type) → Dec (A ≡ B)
 
