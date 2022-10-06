@@ -3,9 +3,18 @@ module Examples where
 open import Data.List
 open import Data.Bool renaming (Bool to 𝔹)
 
+open import Utils
 open import Types
 open import BlameLabels
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+
+module TypeExamples where
+
+_ : Type
+_ =  [ ⋆ ] (` Bool of ⋆) ⇒ (` Bool of l high) of l low
+
+_ : Type
+_ = Ref (` Unit of ⋆) of l high
 
 
 module StaticExamples where
@@ -114,8 +123,36 @@ M*′ =
 module DynamicExamples where
 
 open import SurfaceLang
-  renaming (`_ to `ᴳ_;
-            $_of_ to $ᴳ_of_;
-            ƛ[_]_˙_of_ to ƛᴳ[_]_˙_of_;
-            !_ to !ᴳ_)
-open import CC renaming (Term to CCTerm)
+open import CC renaming (Term to CCTerm;
+  `_ to var; $_of_ to const_of_; ƛ[_]_˙_of_ to lam[_]_˙_of_; !_ to deref)
+
+open import Compile
+
+publish-cc : CCTerm
+publish-cc = compile publish ⊢publish
+
+M*⇒ : CCTerm
+M*⇒ = compile M*′ ⊢M*′
+
+open import Reduction
+open import Heap
+open import TypeBasedCast
+
+{- Note the 2 casts inserted: -}
+_ :
+  let c~₁ = ~-ty ~ₗ-refl (~-fun ~ₗ-refl ~-refl (~-ty ~⋆ ~ᵣ-refl)) in
+  let c₁ = cast ([ l low ] (` Bool of l high) ⇒ (` Bool of l high) of l low)
+                ([ l low ] (` Bool of l high) ⇒ (` Bool of ⋆     ) of l low)
+                (pos 1) c~₁ in
+  let c~₂ = ~-ty ⋆~ ~ᵣ-refl in
+  let c₂ = cast (` Bool of ⋆) (` Bool of l low) (pos 3) c~₂ in
+  M*⇒ ≡
+  `let publish-cc
+  (`let (lam[ low ] ` Bool of l high ˙ if (var 0) (` Bool of l low) (const false of low) (const true of low) of low ⟨ c₁ ⟩)
+  (`let (const true of high)
+  (`let (var 1 · var 0)
+  (var 3 · var 0 ⟨ c₂ ⟩))))
+_ = refl
+
+_ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 3)) ∣ ∅
+_ = {!!}
