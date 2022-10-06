@@ -41,10 +41,11 @@ compile (if L then M else N at p) (⊢if {A = A} {B} {C} ⊢L ⊢M ⊢N A∨̃B�
       if (compile L ⊢L) C
          (compile M ⊢M ⟨ cast A A′ p A~A′ ⟩)
          (compile N ⊢N ⟨ cast B B′ p B~B′ ⟩)
-compile (M ꞉ A at p) (⊢ann {A′ = A′} ⊢M A′≲A) =
+compile (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A) =
   case ≲-prop A′≲A of λ where
   ⟨ B , A′~B , B<:A ⟩ →
     compile M ⊢M ⟨ cast A′ B p A′~B ⟩
+compile (`let M ∶ A `in N) (⊢let ⊢M ⊢N) = `let (compile M ⊢M) (compile N ⊢N)
 compile (ref[ ℓ ] M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ) =
   case ≲-prop Tg≲Tℓ of λ where
   ⟨ A , Tg~A , A<:Tℓ ⟩ →
@@ -86,9 +87,11 @@ compile-preserve (if L then M else N at p) (⊢if {A = A} {B} {C} ⊢L ⊢M ⊢N
   ⊢if (compile-preserve L ⊢L)
       (⊢sub (⊢cast (compile-preserve M ⊢M)) A′<:C)
       (⊢sub (⊢cast (compile-preserve N ⊢N)) B′<:C)
-compile-preserve {Γ} {Σ} {A = A} (M ꞉ A at p) (⊢ann {A′ = A′} ⊢M A′≲A)
+compile-preserve {Γ} {Σ} {A = A} (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A)
   with ≲-prop A′≲A
 ... | ⟨ B , A′~B , B<:A ⟩ = ⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A
+compile-preserve (`let M ∶ A `in N) (⊢let ⊢M ⊢N) =
+  ⊢let (compile-preserve M ⊢M) (compile-preserve N ⊢N)
 compile-preserve (ref[ ℓ ] M at p) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ)
   with ≲-prop Tg≲Tℓ
 ... | ⟨ A , Tg~A , A<:Tℓ ⟩

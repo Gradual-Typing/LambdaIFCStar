@@ -49,7 +49,13 @@ data _;_⊢ᴳ_⦂_ : Context → Label → Term → Type → Set where
     → Γ ; gc ⊢ᴳ M ⦂ A′
     → A′ ≲ A
       ---------------------------- Ann
-    → Γ ; gc ⊢ᴳ M ꞉ A at p ⦂ A
+    → Γ ; gc ⊢ᴳ M ∶ A at p ⦂ A
+
+  ⊢let : ∀ {Γ gc A B M N}
+    → Γ     ; gc ⊢ᴳ M ⦂ A
+    → A ∷ Γ ; gc ⊢ᴳ N ⦂ B
+      ------------------------------- Let
+    → Γ ; gc ⊢ᴳ `let M ∶ A `in N ⦂ B
 
   ⊢ref : ∀ {Γ gc M T g ℓ p}
     → Γ ; gc ⊢ᴳ M ⦂ T of g
