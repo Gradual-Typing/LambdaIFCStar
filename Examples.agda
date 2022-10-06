@@ -56,8 +56,8 @@ M =
   -- input   : 𝔹 of high
   `let $ true of high `in
   -- result  : 𝔹 of high
-  `let ` 1 · ` 0 at pos 1 `in
-    (` 3 · ` 0 at pos 2)
+  `let ` 1 {- flip -} · ` 0 {- input -} at pos 1 `in
+    (` 3 {- publish -} · ` 0 {- result -} at pos 2)
 
 -- ⊢M : [] ; l low ⊢ᴳ M ⦂ ` Unit of l low
 -- ⊢M =
@@ -77,8 +77,8 @@ M* =
   -- input   : 𝔹 of high
   `let $ true of high `in
   -- result  : 𝔹 of ⋆
-  `let (` 1 · ` 0 at pos 1) ∶ ` Bool of ⋆ at pos 2 `in
-    (` 3 · ` 0 at pos 3)
+  `let (` 1 {- flip -} · ` 0 {- input -} at pos 1) ∶ ` Bool of ⋆ at pos 2 `in
+    (` 3 {- publish -} · ` 0 {- result -} at pos 3)
 
 ⊢M* : [] ; l low ⊢ᴳ M* ⦂ ` Unit of l low
 ⊢M* =
@@ -99,8 +99,8 @@ M*′ =
   -- input   : 𝔹 of high
   `let $ true of high `in
   -- result  : 𝔹 of ⋆
-  `let ` 1 · ` 0 at pos 2 `in
-    (` 3 · ` 0 at pos 3)
+  `let ` 1 {- flip -} · ` 0 {- input -} at pos 2 `in
+    (` 3 {- publish -} · ` 0 {- result -} at pos 3)
 
 ⊢M*′ : [] ; l low ⊢ᴳ M*′ ⦂ ` Unit of l low
 ⊢M*′ =
