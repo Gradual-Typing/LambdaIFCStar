@@ -7,6 +7,7 @@ open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_�
 open import Data.List using (List)
 open import Function using (case_of_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality
   using (_≡_; _≢_; refl; trans; sym; subst; cong; cong₂)
 
@@ -40,12 +41,36 @@ data RawType where
 data Type where
   _of_ : RawType → Label → Type
 
--- Type examples
-_ : Type
-_ =  [ ⋆ ] (` Bool of ⋆) ⇒ (` Bool of l high) of l low
+_≡ᵣ?_ : (S T : RawType) → Dec (S ≡ T)
+_≡?_ : (A B : Type) → Dec (A ≡ B)
 
-_ : Type
-_ = Ref (` Unit of ⋆ ) of l high
+(` Bool) ≡ᵣ? (` Bool) = yes refl
+(` Unit) ≡ᵣ? (` Unit) = yes refl
+(` Bool) ≡ᵣ? (` Unit) = no λ ()
+(` Unit) ≡ᵣ? (` Bool) = no λ ()
+(` _) ≡ᵣ? (Ref _) = no λ ()
+(` _) ≡ᵣ? ([ _ ] _ ⇒ _) = no λ ()
+(Ref A) ≡ᵣ? (Ref B) with A ≡? B
+... | yes refl = yes refl
+... | no  neq = no (λ { refl → contradiction refl neq })
+(Ref _) ≡ᵣ? (` _) = no λ ()
+(Ref _) ≡ᵣ? ([ _ ] x₂ ⇒ _) = no λ ()
+([ gc₁ ] A ⇒ B) ≡ᵣ? ([ gc₂ ] C ⇒ D)
+  with gc₁ ==? gc₂
+... | no  neq = no (λ { refl → contradiction refl neq })
+... | yes refl with A ≡? C
+... | no  neq = no (λ { refl → contradiction refl neq })
+... | yes refl with B ≡? D
+... | no neq  = no (λ { refl → contradiction refl neq })
+... | yes refl = yes refl
+([ _ ] _ ⇒ _) ≡ᵣ? (` _) = no λ ()
+([ _ ] _ ⇒ _) ≡ᵣ? (Ref _) = no λ ()
+
+(S of g₁) ≡? (T of g₂) with S ≡ᵣ? T
+... | no  neq = no (λ { refl → contradiction refl neq })
+... | yes refl with g₁ ==? g₂
+... | no  neq = no (λ { refl → contradiction refl neq })
+... | yes refl = yes refl
 
 
 {- **** Subtyping **** -}

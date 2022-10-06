@@ -7,6 +7,7 @@ open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_�
 open import Data.List using (List)
 open import Function using (case_of_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality
   using (_≡_; _≢_; refl; trans; sym; subst; cong; cong₂)
 
@@ -27,6 +28,14 @@ low  =? low  = yes refl
 high =? high = yes refl
 low  =? high = no λ ()
 high =? low  = no λ ()
+
+_==?_ : ∀ (g₁ g₂ : Label) → Dec (g₁ ≡ g₂)
+⋆ ==? ⋆ = yes refl
+⋆ ==? l ℓ = no λ ()
+l ℓ ==? ⋆ = no λ ()
+l ℓ₁ ==? l ℓ₂ with ℓ₁ =? ℓ₂
+... | yes refl = yes refl
+... | no  neq = no (λ { refl → contradiction refl neq })
 
 
 {- **** Label partial order **** -}
