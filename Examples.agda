@@ -174,4 +174,4 @@ _ =
   _    ∣ ∅ ∣ low —→⟨ β-let (V-cast V-const (I-base-inj _)) ⟩
   _    ∣ ∅ ∣ low —→⟨ ξ {F = (_ ·□) v-pub} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()))) ⟩
   _    ∣ ∅ ∣ low —→⟨ ξ-err {F = (_ ·□) v-pub} ⟩
-  _ ∣ _ ∣ _ ∎
+  _    ∣ _ ∣ _ ∎  {- We're done -}
