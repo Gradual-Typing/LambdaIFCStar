@@ -4,6 +4,7 @@ open import Data.Nat
 open import Data.List
 open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
 open import Data.Maybe
+open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
 open import Function using (case_of_)
 
@@ -24,15 +25,24 @@ open import Utils
 
 compile : ∀ {Γ gc A} (M : Term) → Γ ; gc ⊢ᴳ M ⦂ A → CCTerm
 compile ($ᴳ k of ℓ) ⊢const = $ k of ℓ
-compile (`ᴳ x) (⊢var x∈Γ) = ` x
-compile (ƛᴳ[ pc ] A ˙ N of ℓ) (⊢lam ⊢N) = ƛ[ pc ] A ˙ compile N ⊢N of ℓ
+compile (`ᴳ x) (⊢var x∈Γ)  = ` x
+compile (ƛᴳ[ pc ] A ˙ N of ℓ) (⊢lam ⊢N) =
+  let N′ = compile N ⊢N in
+  ƛ[ pc ] A ˙ N′ of ℓ
 compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′) =
   case ⟨ ≲-prop A′≲A , ≾-prop′ gc≾gc′ , ≾-prop′ g≾gc′ ⟩ of λ where
   ⟨ ⟨ C , A′~C , C<:A ⟩ , ⟨ g₁ , gc<:g₁ , g₁~gc′ ⟩ , ⟨ g₂ , g<:g₂ , g₂~gc′ ⟩ ⟩ →
     let g₁⋎g₂~gc′ = subst (λ □ → _ ~ₗ □) g⋎̃g≡g (consis-join-~ₗ g₁~gc′ g₂~gc′)
         c~ = ~-ty ~ₗ-refl (~-fun (~ₗ-sym g₁⋎g₂~gc′) ~-refl ~-refl)
-        c = cast ([ gc′ ] A ⇒ B of g) ([ g₁ ⋎̃ g₂ ] A ⇒ B of g) p c~ in
-    (compile L ⊢L ⟨ c ⟩) · (compile M ⊢M ⟨ cast A′ C p A′~C ⟩)
+        c₁ = cast ([ gc′ ] A ⇒ B of g) ([ g₁ ⋎̃ g₂ ] A ⇒ B of g) p c~
+        c₂ = cast A′ C p A′~C in
+    let L′ = case gc′ ==? g₁ ⋎̃ g₂ of λ where
+             (yes refl) → compile L ⊢L  {- skip id cast -}
+             (no  _   ) → compile L ⊢L ⟨ c₁ ⟩ in
+    let M′ = case A′ ≡? C of λ where
+             (yes refl) → compile M ⊢M  {- skip id cast -}
+             (no  _   ) → compile M ⊢M ⟨ c₂ ⟩ in
+    L′ · M′
 compile (if L then M else N at p) (⊢if {A = A} {B} {C} ⊢L ⊢M ⊢N A∨̃B≡C) =
   case consis-join-≲-inv {A} {B} A∨̃B≡C of λ where
   ⟨ A≲C , B≲C ⟩ →
@@ -73,9 +83,23 @@ compile-preserve : ∀ {Γ gc A} (M : Term)
 compile-preserve ($ᴳ k of ℓ) ⊢const = ⊢const
 compile-preserve (`ᴳ x) (⊢var Γ∋x) = ⊢var Γ∋x
 compile-preserve (ƛᴳ[ pc ] A ˙ N of ℓ) (⊢lam ⊢N) = ⊢lam (compile-preserve N ⊢N)
-compile-preserve (L · M at p) (⊢app {gc = gc} {gc′} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′)
+compile-preserve (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′)
   with ≲-prop A′≲A | ≾-prop′ gc≾gc′ | ≾-prop′ g≾gc′
-... | ⟨ B , A′~B , B<:A ⟩ | ⟨ g₁ , gc<:g₁ , g₁~gc′ ⟩ | ⟨ g₂ , g<:g₂ , g₂~gc′ ⟩ =
+... | ⟨ B , A′~B , B<:A ⟩ | ⟨ g₁ , gc<:g₁ , g₁~gc′ ⟩ | ⟨ g₂ , g<:g₂ , g₂~gc′ ⟩
+  with gc′ ==? g₁ ⋎̃ g₂ | A′ ≡? B
+... | yes refl | yes refl =
+  ⊢app (⊢sub (compile-preserve L ⊢L)
+             (<:-ty <:ₗ-refl (<:-fun (consis-join-<:ₗ gc<:g₁ g<:g₂) <:-refl <:-refl)))
+       (⊢sub (compile-preserve M ⊢M) B<:A)
+... | yes refl | no _ =
+  ⊢app (⊢sub (compile-preserve L ⊢L)
+             (<:-ty <:ₗ-refl (<:-fun (consis-join-<:ₗ gc<:g₁ g<:g₂) <:-refl <:-refl)))
+       (⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A)
+... | no _ | yes refl =
+  ⊢app (⊢sub (⊢cast (compile-preserve L ⊢L))
+             (<:-ty <:ₗ-refl (<:-fun (consis-join-<:ₗ gc<:g₁ g<:g₂) <:-refl <:-refl)))
+       (⊢sub (compile-preserve M ⊢M) B<:A)
+... | no _ | no _ =
   ⊢app (⊢sub (⊢cast (compile-preserve L ⊢L))
              (<:-ty <:ₗ-refl (<:-fun (consis-join-<:ₗ gc<:g₁ g<:g₂) <:-refl <:-refl)))
        (⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A)
