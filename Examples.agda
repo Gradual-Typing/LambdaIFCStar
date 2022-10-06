@@ -1,5 +1,6 @@
 module Examples where
 
+open import Data.Unit
 open import Data.List
 open import Data.Bool renaming (Bool to 𝔹)
 
@@ -30,9 +31,11 @@ _ =
   `let ($ true of high) ∶ ` Bool of ⋆ at pos 0 `in
   (` 0)
 
-postulate
-  publish : Term
-  ⊢publish : [] ; l low ⊢ᴳ publish ⦂ [ l low ] ` Bool of l low ⇒ (` Unit of l low) of l low
+publish : Term
+publish = ƛ[ low ] ` Bool of l low ˙ $ tt of low of low
+
+⊢publish : [] ; l low ⊢ᴳ publish ⦂ [ l low ] ` Bool of l low ⇒ (` Unit of l low) of l low
+⊢publish = ⊢lam ⊢const
 
 {- Statically accepted: -}
 N : Term
@@ -139,7 +142,7 @@ open import Heap
 open import TypeBasedCast
 
 {- Note the 2 casts inserted: -}
-_ :
+eq :
   let c~₁ = ~-ty ~ₗ-refl (~-fun ~ₗ-refl ~-refl (~-ty ~⋆ ~ᵣ-refl)) in
   let c₁ = cast ([ l low ] (` Bool of l high) ⇒ (` Bool of l high) of l low)
                 ([ l low ] (` Bool of l high) ⇒ (` Bool of ⋆     ) of l low)
@@ -152,7 +155,23 @@ _ :
   (`let (const true of high)
   (`let (var 1 · var 0)
   (var 3 · var 0 ⟨ c₂ ⟩))))
-_ = refl
+eq = refl
+
+v-pub : Value publish-cc
+v-pub = V-ƛ
 
 _ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 3)) ∣ ∅
-_ = {!!}
+_ =
+  M*⇒ ∣ ∅ ∣ low —→⟨ β-let v-pub ⟩
+  _    ∣ ∅ ∣ low —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ β-let V-const ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (fun-cast V-ƛ V-const (I-fun _ I-label I-label)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (ξ {F = (_ ·□) V-ƛ} (cast V-const (A-base-id _) cast-base-id))) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (β V-const)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx β-if-true)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (prot-val V-const))) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-val V-const)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ β-let (V-cast V-const (I-base-inj _)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = (_ ·□) v-pub} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()))) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ-err {F = (_ ·□) v-pub} ⟩
+  _ ∣ _ ∣ _ ∎
