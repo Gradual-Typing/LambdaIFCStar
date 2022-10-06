@@ -14,7 +14,7 @@ data Op : Set where
   op-const  : ∀ {ι} → rep ι → StaticLabel → Op
   op-if     : BlameLabel → Op
   op-ann    : Type → BlameLabel → Op
-  op-let    : Type → Op
+  op-let    : Op
   op-ref    : StaticLabel → BlameLabel → Op
   op-deref  : Op
   op-assign : BlameLabel → Op
@@ -26,7 +26,7 @@ sig (op-app p)         = ■ ∷ ■ ∷ []
 sig (op-const k ℓ)     = []
 sig (op-if p)          = ■ ∷ ■ ∷ ■ ∷ []
 sig (op-ann A p)       = ■ ∷ []
-sig (op-let A)         = ■ ∷ (ν ■) ∷ []
+sig op-let             = ■ ∷ (ν ■) ∷ []
 sig (op-ref ℓ p)       = ■ ∷ []
 sig op-deref           = ■ ∷ []
 sig (op-assign p)      = ■ ∷ ■ ∷ []
@@ -41,7 +41,7 @@ pattern _·_at_ L M p             = (op-app p) ⦅ cons (ast L) (cons (ast M) ni
 pattern $_of_ k ℓ                = (op-const k ℓ) ⦅ nil ⦆
 pattern if_then_else_at_ L M N p = (op-if p) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
 pattern _∶_at_ M A p             = (op-ann A p) ⦅ cons (ast M) nil ⦆
-pattern `let_∶_`in_ M A N        = (op-let A) ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
+pattern `let_`in_ M N            = op-let ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
 pattern ref[_]_at_ ℓ M p         = (op-ref ℓ p) ⦅ cons (ast M) nil ⦆
 pattern !_ M                     = op-deref ⦅ cons (ast M) nil ⦆
 pattern _:=_at_ L M p            = (op-assign p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
