@@ -34,93 +34,89 @@ _ =
 publish : Term
 publish = ƛ[ low ] ` Bool of l low ˙ $ tt of low of low
 
-⊢publish : [] ; l low ⊢ᴳ publish ⦂ [ l low ] ` Bool of l low ⇒ (` Unit of l low) of l low
+-- publish : 𝔹 of low → ⊤
+⊢publish : ∀ {Γ} → Γ ; l low ⊢ᴳ publish ⦂ [ l low ] (` Bool of l low) ⇒ (` Unit of l low) of l low
 ⊢publish = ⊢lam ⊢const
+
+-- user-input : ⊤ → 𝔹 of high
+user-input : Term
+user-input = ƛ[ low ] ` Unit of l low ˙ $ true of high {- let's hard-code this for now -} of low
+
+⊢input : ∀ {Γ} → Γ ; l low ⊢ᴳ user-input ⦂ [ l low ] (` Unit of l low) ⇒ (` Bool of l high) of l low
+⊢input = ⊢lam ⊢const
 
 {- Statically accepted: -}
 N : Term
 N =
-  -- publish : 𝔹 of low → ⊤
-  `let publish `in
   -- dumb    : 𝔹 of high → 𝔹 of low
   `let ƛ[ low ] ` Bool of l high ˙ $ false of low of low `in
   -- input   : 𝔹 of high
-  `let $ true of high `in
+  `let (user-input · $ tt of low at pos 0) `in
   -- result  : 𝔹 of low
-  `let ` 1 {- dumb -} · ` 0 {- input -} at pos 0 `in
-    (` 3 {- publish -} · ` 0 {- result -} at pos 1)
+  `let ` 1 {- dumb -} · ` 0 {- input -} at pos 1 `in
+    (publish {- publish -} · ` 0 {- result -} at pos 2)
 
 ⊢N : [] ; l low ⊢ᴳ N ⦂ ` Unit of l low
 ⊢N =
-  ⊢let ⊢publish
   (⊢let (⊢lam ⊢const)
-  (⊢let ⊢const
+  (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
-    (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl))))
+    (⊢app ⊢publish (⊢var refl) ≲-refl ≾-refl ≾-refl))))
 
 {- Statically rejected: -}
 M : Term
 M =
-  -- publish : 𝔹 of low → ⊤
-  `let publish `in
   -- flip    : 𝔹 of high → 𝔹 of high
   `let ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low `in
   -- input   : 𝔹 of high
-  `let $ true of high `in
+  `let (user-input · $ tt of low at pos 1) `in
   -- result  : 𝔹 of high
-  `let ` 1 {- flip -} · ` 0 {- input -} at pos 1 `in
-    (` 3 {- publish -} · ` 0 {- result -} at pos 2)
+  `let ` 1 {- flip -} · ` 0 {- input -} at pos 2 `in
+    (publish · ` 0 {- result -} at pos 3)
 
 -- ⊢M : [] ; l low ⊢ᴳ M ⦂ ` Unit of l low
 -- ⊢M =
---   ⊢let ⊢publish
 --   (⊢let (⊢lam (⊢if (⊢var {!!}) ⊢const ⊢const refl))
---   (⊢let ⊢const
+--   (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
 --   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
---     (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl))))
+--     (⊢app ⊢publish (⊢var refl) ≲-refl ≾-refl ≾-refl))))
 
 {- Give `result` an extra annotation: -}
 M* : Term
 M* =
-  -- publish : 𝔹 of low → ⊤
-  `let publish `in
   -- flip    : 𝔹 of high → 𝔹 of high
   `let ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low `in
   -- input   : 𝔹 of high
-  `let $ true of high `in
+  `let (user-input · $ tt of low at pos 1) `in
   -- result  : 𝔹 of ⋆
-  `let (` 1 {- flip -} · ` 0 {- input -} at pos 1) ∶ ` Bool of ⋆ at pos 2 `in
-    (` 3 {- publish -} · ` 0 {- result -} at pos 3)
+  `let (` 1 {- flip -} · ` 0 {- input -} at pos 2) ∶ ` Bool of ⋆ at pos 3 `in
+    (publish · ` 0 {- result -} at pos 4)
 
 ⊢M* : [] ; l low ⊢ᴳ M* ⦂ ` Unit of l low
 ⊢M* =
-  ⊢let ⊢publish
   (⊢let (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl))
-  (⊢let ⊢const
+  (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
   (⊢let (⊢ann (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl) (≲-ty ≾-⋆r ≲ᵣ-refl))
-    (⊢app (⊢var refl) (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
+    (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
 
 {- Alternatively we can annotation function `flip`: -}
 M*′ : Term
 M*′ =
-  -- publish : 𝔹 of low → ⊤
-  `let publish `in
   -- flip    : 𝔹 of high → 𝔹 of ⋆
   `let (ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low) ∶
        [ l low ] (` Bool of l high) ⇒ (` Bool of ⋆) of l low at pos 1 `in
   -- input   : 𝔹 of high
-  `let $ true of high `in
+  `let (user-input · $ tt of low at pos 2) `in
   -- result  : 𝔹 of ⋆
-  `let ` 1 {- flip -} · ` 0 {- input -} at pos 2 `in
-    (` 3 {- publish -} · ` 0 {- result -} at pos 3)
+  `let ` 1 {- flip -} · ` 0 {- input -} at pos 3 `in
+    (publish · ` 0 {- result -} at pos 4)
 
 ⊢M*′ : [] ; l low ⊢ᴳ M*′ ⦂ ` Unit of l low
 ⊢M*′ =
-  ⊢let ⊢publish
   (⊢let (⊢ann (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl)) (≲-ty ≾-refl (≲-fun ≾-refl ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl))))
-  (⊢let ⊢const
+  (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
-    (⊢app (⊢var refl) (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
+    (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
 
 
 module DynamicExamples where
@@ -130,9 +126,6 @@ open import CC renaming (Term to CCTerm;
   `_ to var; $_of_ to const_of_; ƛ[_]_˙_of_ to lam[_]_˙_of_; !_ to deref)
 
 open import Compile
-
-publish-cc : CCTerm
-publish-cc = compile publish ⊢publish
 
 M*⇒ : CCTerm
 M*⇒ = compile M*′ ⊢M*′
@@ -144,26 +137,23 @@ open import TypeBasedCast
 {- Note the 2 casts inserted: -}
 eq :
   let c~₁ = ~-ty ~ₗ-refl (~-fun ~ₗ-refl ~-refl (~-ty ~⋆ ~ᵣ-refl)) in
-  let c₁ = cast ([ l low ] (` Bool of l high) ⇒ (` Bool of l high) of l low)
+  let c₁  = cast ([ l low ] (` Bool of l high) ⇒ (` Bool of l high) of l low)
                 ([ l low ] (` Bool of l high) ⇒ (` Bool of ⋆     ) of l low)
                 (pos 1) c~₁ in
   let c~₂ = ~-ty ⋆~ ~ᵣ-refl in
-  let c₂ = cast (` Bool of ⋆) (` Bool of l low) (pos 3) c~₂ in
+  let c₂  = cast (` Bool of ⋆) (` Bool of l low) (pos 4) c~₂ in
   M*⇒ ≡
-  `let publish-cc
   (`let (lam[ low ] ` Bool of l high ˙ if (var 0) (` Bool of l low) (const false of low) (const true of low) of low ⟨ c₁ ⟩)
-  (`let (const true of high)
+  (`let (_ {- user-input -} · const tt of low)
   (`let (var 1 · var 0)
-  (var 3 · var 0 ⟨ c₂ ⟩))))
+  (_ {- publish -} · var 0 ⟨ c₂ ⟩))))
 eq = refl
 
-v-pub : Value publish-cc
-v-pub = V-ƛ
-
-_ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 3)) ∣ ∅
+_ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 4)) ∣ ∅
 _ =
-  M*⇒ ∣ ∅ ∣ low —→⟨ β-let v-pub ⟩
-  _    ∣ ∅ ∣ low —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
+  M*⇒ ∣ ∅ ∣ low —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (β V-const) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (prot-val V-const) ⟩
   _    ∣ ∅ ∣ low —→⟨ β-let V-const ⟩
   _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (fun-cast V-ƛ V-const (I-fun _ I-label I-label)) ⟩
   _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (ξ {F = (_ ·□) V-ƛ} (cast V-const (A-base-id _) cast-base-id))) ⟩
@@ -172,6 +162,6 @@ _ =
   _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (prot-val V-const))) ⟩
   _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-val V-const)) ⟩
   _    ∣ ∅ ∣ low —→⟨ β-let (V-cast V-const (I-base-inj _)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = (_ ·□) v-pub} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()))) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ-err {F = (_ ·□) v-pub} ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ {F = (_ ·□) V-ƛ} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()))) ⟩
+  _    ∣ ∅ ∣ low —→⟨ ξ-err {F = (_ ·□) V-ƛ} ⟩
   _    ∣ _ ∣ _ ∎  {- We're done -}
