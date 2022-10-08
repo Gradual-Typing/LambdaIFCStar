@@ -22,6 +22,7 @@ module StaticExamples where
 
 open import SurfaceLang
 
+
 _ : Term
 _ = (ƛ[ low ] (` Bool of ⋆ ) ˙ (` 0) of high) · (` 0) at pos 0
 
@@ -31,10 +32,11 @@ _ =
   `let ($ true of high) ∶ ` Bool of ⋆ at pos 0 `in
   (` 0)
 
+
+-- publish : 𝔹 of low → ⊤
 publish : Term
 publish = ƛ[ low ] ` Bool of l low ˙ $ tt of low of low
 
--- publish : 𝔹 of low → ⊤
 ⊢publish : ∀ {Γ} → Γ ; l low ⊢ᴳ publish ⦂ [ l low ] (` Bool of l low) ⇒ (` Unit of l low) of l low
 ⊢publish = ⊢lam ⊢const
 
@@ -42,8 +44,8 @@ publish = ƛ[ low ] ` Bool of l low ˙ $ tt of low of low
 user-input : Term
 user-input = ƛ[ low ] ` Unit of l low ˙ $ true of high {- let's hard-code this for now -} of low
 
-⊢input : ∀ {Γ} → Γ ; l low ⊢ᴳ user-input ⦂ [ l low ] (` Unit of l low) ⇒ (` Bool of l high) of l low
-⊢input = ⊢lam ⊢const
+⊢user-input : ∀ {Γ} → Γ ; l low ⊢ᴳ user-input ⦂ [ l low ] (` Unit of l low) ⇒ (` Bool of l high) of l low
+⊢user-input = ⊢lam ⊢const
 
 {- Statically accepted: -}
 N : Term
@@ -59,7 +61,7 @@ N =
 ⊢N : [] ; l low ⊢ᴳ N ⦂ ` Unit of l low
 ⊢N =
   (⊢let (⊢lam ⊢const)
-  (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
+  (⊢let (⊢app ⊢user-input ⊢const ≲-refl ≾-refl ≾-refl)
   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
     (⊢app ⊢publish (⊢var refl) ≲-refl ≾-refl ≾-refl))))
 
@@ -67,41 +69,25 @@ N =
 M : Term
 M =
   -- flip    : 𝔹 of high → 𝔹 of high
-  `let ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low `in
+  `let (ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low) ∶
+       [ l low ] (` Bool of l high) ⇒ (` Bool of l high) of l low at pos 1 `in
   -- input   : 𝔹 of high
   `let (user-input · $ tt of low at pos 1) `in
   -- result  : 𝔹 of high
   `let ` 1 {- flip -} · ` 0 {- input -} at pos 2 `in
     (publish · ` 0 {- result -} at pos 3)
+{- In fact, if we annotation `flip` as `𝔹 of high → 𝔹 of low` it will be rejected too. -}
 
 -- ⊢M : [] ; l low ⊢ᴳ M ⦂ ` Unit of l low
 -- ⊢M =
---   (⊢let (⊢lam (⊢if (⊢var {!!}) ⊢const ⊢const refl))
---   (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
+--   (⊢let (⊢ann (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl)) {!!} {- 𝔹 of high → 𝔹 of high ⋦ 𝔹 of high → 𝔹 of low-})
+--   (⊢let (⊢app ⊢user-input ⊢const ≲-refl ≾-refl ≾-refl)
 --   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
 --     (⊢app ⊢publish (⊢var refl) ≲-refl ≾-refl ≾-refl))))
 
-{- Give `result` an extra annotation: -}
+{- We can make the type annotation of `flip` to be more dynamic and defer the checking until runtime: -}
 M* : Term
 M* =
-  -- flip    : 𝔹 of high → 𝔹 of high
-  `let ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low `in
-  -- input   : 𝔹 of high
-  `let (user-input · $ tt of low at pos 1) `in
-  -- result  : 𝔹 of ⋆
-  `let (` 1 {- flip -} · ` 0 {- input -} at pos 2) ∶ ` Bool of ⋆ at pos 3 `in
-    (publish · ` 0 {- result -} at pos 4)
-
-⊢M* : [] ; l low ⊢ᴳ M* ⦂ ` Unit of l low
-⊢M* =
-  (⊢let (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl))
-  (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
-  (⊢let (⊢ann (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl) (≲-ty ≾-⋆r ≲ᵣ-refl))
-    (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
-
-{- Alternatively we can annotation function `flip`: -}
-M*′ : Term
-M*′ =
   -- flip    : 𝔹 of high → 𝔹 of ⋆
   `let (ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low) ∶
        [ l low ] (` Bool of l high) ⇒ (` Bool of ⋆) of l low at pos 1 `in
@@ -111,11 +97,29 @@ M*′ =
   `let ` 1 {- flip -} · ` 0 {- input -} at pos 3 `in
     (publish · ` 0 {- result -} at pos 4)
 
+⊢M* : [] ; l low ⊢ᴳ M* ⦂ ` Unit of l low
+⊢M* =
+  (⊢let (⊢ann (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl)) (≲-ty ≾-refl (≲-fun ≾-refl ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl))))
+  (⊢let (⊢app ⊢user-input ⊢const ≲-refl ≾-refl ≾-refl)
+  (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
+    (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
+
+{- Alternatively, we can give `result` an extra annotation: -}
+M*′ : Term
+M*′ =
+  -- flip    : 𝔹 of high → 𝔹 of high
+  `let ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low `in
+  -- input   : 𝔹 of high
+  `let (user-input · $ tt of low at pos 1) `in
+  -- result  : 𝔹 of ⋆
+  `let (` 1 {- flip -} · ` 0 {- input -} at pos 2) ∶ ` Bool of ⋆ at pos 3 `in
+    (publish · ` 0 {- result -} at pos 4)
+
 ⊢M*′ : [] ; l low ⊢ᴳ M*′ ⦂ ` Unit of l low
 ⊢M*′ =
-  (⊢let (⊢ann (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl)) (≲-ty ≾-refl (≲-fun ≾-refl ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl))))
-  (⊢let (⊢app ⊢input ⊢const ≲-refl ≾-refl ≾-refl)
-  (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
+  (⊢let (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl))
+  (⊢let (⊢app ⊢user-input ⊢const ≲-refl ≾-refl ≾-refl)
+  (⊢let (⊢ann (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl) (≲-ty ≾-⋆r ≲ᵣ-refl))
     (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
 
 
@@ -128,7 +132,7 @@ open import CC renaming (Term to CCTerm;
 open import Compile
 
 M*⇒ : CCTerm
-M*⇒ = compile M*′ ⊢M*′
+M*⇒ = compile M* ⊢M*
 
 open import Reduction
 open import Heap
