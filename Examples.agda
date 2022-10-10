@@ -135,8 +135,16 @@ M*⇒ : CCTerm
 M*⇒ = compile M* ⊢M*
 
 open import Reduction
+open import BigStep
 open import Heap
 open import TypeBasedCast
+
+{- `N` evaluates to `tt` -}
+_ : ∅ ∣ low ⊢ compile N ⊢N ⇓ const tt of low ∣ ∅
+_ = ⇓-let (⇓-val V-ƛ)
+           (⇓-let (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))
+                   (⇓-let (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))
+                           (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))))
 
 {- Note the 2 casts inserted: -}
 eq :
