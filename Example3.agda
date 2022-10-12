@@ -1,4 +1,4 @@
-module Example2 where
+module Example3 where
 
 open import Data.Unit
 open import Data.List
