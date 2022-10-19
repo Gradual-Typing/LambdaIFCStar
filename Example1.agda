@@ -100,21 +100,21 @@ M =
 {- We can make the type annotation of `flip` to be more dynamic and defer the checking until runtime: -}
 M* : Term
 M* =
-  -- flip    : 𝔹 of high → 𝔹 of ⋆
-  `let (ƛ[ low ] ` Bool of l high ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low) ∶
-       [ l low ] (` Bool of l high) ⇒ (` Bool of ⋆) of l low at pos 1 `in
+  -- flip    : 𝔹 of high → 𝔹 of low
+  `let (ƛ[ low ] ` Bool of ⋆ ˙ if (` 0) then $ false of low else $ true of low at (pos 0) of low) ∶
+       [ l low ] (` Bool of l high) ⇒ (` Bool of l low) of l low at pos 1 `in
   -- input   : 𝔹 of high
   `let (user-input · $ tt of low at pos 2) `in
-  -- result  : 𝔹 of ⋆
+  -- result  : 𝔹 of low
   `let ` 1 {- flip -} · ` 0 {- input -} at pos 3 `in
     (publish · ` 0 {- result -} at pos 4)
 
 ⊢M* : [] ; l low ⊢ᴳ M* ⦂ ` Unit of l low
 ⊢M* =
-  (⊢let (⊢ann (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl)) (≲-ty ≾-refl (≲-fun ≾-refl ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl))))
+  (⊢let (⊢ann (⊢lam (⊢if (⊢var refl) ⊢const ⊢const refl)) (≲-ty ≾-refl (≲-fun ≾-refl (≲-ty ≾-⋆r ≲ᵣ-refl) (≲-ty ≾-⋆l ≲ᵣ-refl))))
   (⊢let (⊢app ⊢user-input ⊢const ≲-refl ≾-refl ≾-refl)
   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
-    (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
+    (⊢app ⊢publish (⊢var refl) (≲-ty ≾-refl ≲ᵣ-refl) ≾-refl ≾-refl))))
 
 
 {- Alternatively, we can give `result` an extra annotation: -}
@@ -141,34 +141,46 @@ M*′ =
 M*⇒ : CCTerm
 M*⇒ = compile M* ⊢M*
 
-{- Take a look at the compiled CC term. Note the 2 casts inserted: -}
+{- Take a look at the compiled CC term. Note the cast inserted: -}
 eq :
-  let c~₁ = ~-ty ~ₗ-refl (~-fun ~ₗ-refl ~-refl (~-ty ~⋆ ~ᵣ-refl)) in
-  let c₁  = cast ([ l low ] (` Bool of l high) ⇒ (` Bool of l high) of l low)
-                ([ l low ] (` Bool of l high) ⇒ (` Bool of ⋆     ) of l low)
-                (pos 1) c~₁ in
-  let c~₂ = ~-ty ⋆~ ~ᵣ-refl in
-  let c₂  = cast (` Bool of ⋆) (` Bool of l low) (pos 4) c~₂ in
+  let c~ = ~-ty ~ₗ-refl (~-fun ~ₗ-refl (~-ty ⋆~ ~-ι) (~-ty ⋆~ ~-ι)) in
+  let c  = cast ([ l low ] (` Bool of ⋆) ⇒ (` Bool of ⋆) of l low)
+                ([ l low ] (` Bool of l high) ⇒ (` Bool of l low) of l low)
+                (pos 1) c~ in
   M*⇒ ≡
-  (`let (lam[ low ] ` Bool of l high ˙ if (var 0) (` Bool of l low) (const false of low) (const true of low) of low ⟨ c₁ ⟩)
+  (`let (lam[ low ] ` Bool of ⋆ ˙ if (var 0) (` Bool of l low) (const false of low) (const true of low) of low ⟨ c ⟩)
   (`let (_ {- user-input -} · const tt of low)
   (`let (var 1 · var 0)
-  (_ {- publish -} · var 0 ⟨ c₂ ⟩))))
+  (_ {- publish -} · var 0))))
 eq = refl
 
-_ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 4)) ∣ ∅
+_ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 1)) ∣ ∅
 _ =
-  M*⇒ ∣ ∅ ∣ low —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (β V-const) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (prot-val V-const) ⟩
-  _    ∣ ∅ ∣ low —→⟨ β-let V-const ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (fun-cast V-ƛ V-const (I-fun _ I-label I-label)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (ξ {F = (_ ·□) V-ƛ} (cast V-const (A-base-id _) cast-base-id))) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (β V-const)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx β-if-true)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (prot-val V-const))) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-val V-const)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ β-let (V-cast V-const (I-base-inj _)) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ {F = (_ ·□) V-ƛ} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()))) ⟩
-  _    ∣ ∅ ∣ low —→⟨ ξ-err {F = (_ ·□) V-ƛ} ⟩
-  _    ∣ _ ∣ _ ∎  {- We're done -}
+  M*⇒ ∣ ∅ ∣ low
+    —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (β V-const) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (prot-val V-const) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ β-let V-const ⟩
+  let c = cast ([ _ ] (` Bool of ⋆) ⇒ (` Bool of ⋆) of _) ([ _ ] (` Bool of l high) ⇒ (` Bool of l low) of _ ) (pos 1) _ in
+  `let (lam[ low ] _ ˙ _ of low ⟨ c ⟩ · const true of high) _ ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (fun-cast V-ƛ V-const (I-fun _ I-label I-label)) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (β (V-cast V-const (I-base-inj _)))) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (if-cast-true (I-base-inj _)))) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = □⟨ _ ⟩} (prot-ctx (β-cast-pc V-const))))) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = □⟨ _ ⟩} (prot-val V-const)))) ⟩
+  _    ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-val (V-cast V-const (I-base-inj _)))) ⟩
+  let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 1) _
+      c₂ = cast (` Bool of ⋆) (` Bool of l low) (pos 1) _ in
+  `let (((const false of high) ⟨ c₁ ⟩) ⟨ c₂ ⟩) _ ∣ ∅ ∣ low
+    —→⟨ ξ {F = let□ _} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()) {- high ⋠ low -})) ⟩
+  `let (error (blame (pos 1))) _ ∣ ∅ ∣ low
+    —→⟨ ξ-err {F = let□ _} ⟩
+  error (blame (pos 1)) ∣ ∅ ∣ _   ∎
