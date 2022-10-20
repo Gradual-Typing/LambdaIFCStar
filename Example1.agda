@@ -168,7 +168,10 @@ _ =
   let c₂ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) _ in
   `let (lam[ low ] _ ˙ _ of low ⟨ c₁ ⟩ · const true of high ⟨ c₂ ⟩) _ ∣ ∅ ∣ low
     —→⟨ ξ {F = let□ _} (fun-cast V-ƛ (V-cast V-const (I-base-inj _)) (I-fun _ I-label I-label)) ⟩
-  _    ∣ ∅ ∣ low
+  let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) _ in
+  let c₂ = cast (` Bool of ⋆) (` Bool of ⋆) (pos 1) _      in
+  let c₃ = cast (` Bool of ⋆) (` Bool of l low) (pos 1) _  in
+  `let ((lam[ low ] _ ˙ _ of low · const true of high ⟨ c₁ ⟩ ⟨ c₂ ⟩) ⟨ c₃ ⟩) _ ∣ ∅ ∣ low
     —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (ξ {F = (_ ·□) V-ƛ} (cast (V-cast V-const (I-base-inj _)) (A-base-id _) cast-base-id))) ⟩
   _    ∣ ∅ ∣ low
     —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (β (V-cast V-const (I-base-inj _)))) ⟩
@@ -180,7 +183,9 @@ _ =
     —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = □⟨ _ ⟩} (prot-val V-const)))) ⟩
   _ ∣ ∅ ∣ low
     —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-val (V-cast V-const (I-base-inj _)))) ⟩
-  `let (const false of high ⟨ _ {- high ⇒ ⋆ -} ⟩ ⟨ _ {- ⋆ ⇒ low -} ⟩) _ ∣ ∅ ∣ low
+  let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) _ in
+  let c₂ = cast (` Bool of ⋆) (` Bool of l low) (pos 1) _ in
+  `let (const false of high ⟨ c₁ {- high ⇒ ⋆ -} ⟩ ⟨ c₂ {- ⋆ ⇒ low -} ⟩) _ ∣ ∅ ∣ low
     —→⟨ ξ {F = let□ _} (cast (V-cast V-const (I-base-inj _)) (A-base-proj _) (cast-base-proj-blame (λ ()) {- high ⋠ low -})) ⟩
   `let (error (blame (pos 1))) _ ∣ ∅ ∣ low
     —→⟨ ξ-err {F = let□ _} ⟩
