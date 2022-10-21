@@ -88,24 +88,30 @@ heap-relate (⊢cast ⊢M) ⊢μ pc≾gc (⇓-cast a M⇓V V⟨c⟩↝N N⇓W) =
   let ϵμ≡ϵμ₁  = heap-relate ⊢M ⊢μ pc≾gc M⇓V in
   let ϵμ₁≡ϵμ′ = heap-relate (applycast-pres (⊢value-pc ⊢V v) v a V⟨c⟩↝N) ⊢μ₁ pc≾gc N⇓W in
   trans ϵμ≡ϵμ₁ ϵμ₁≡ϵμ′
-heap-relate (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc (⇓-if-cast-true  i L⇓true⟨c⟩  M⇓V V⋎ℓ⟨bc⟩⇓W) =
+heap-relate (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc (⇓-if-cast-true (I-base-inj _) L⇓true⟨c⟩  M⇓V V⋎ℓ⟨bc⟩⇓W) =
   let high≾gc⋎g = consis-join-≾ pc≾gc (low≾ _) in
   let v = ⇓-value M⇓V in
   let ⟨ Σ₁ , Σ₁⊇Σ  , ⊢true⟨c⟩ , ⊢μ₁ ⟩ = ⇓-preserve ⊢L ⊢μ pc≾gc L⇓true⟨c⟩ in
   let ⟨ Σ₂ , Σ₂⊇Σ₁ , ⊢V  , ⊢μ₂ ⟩ = ⇓-preserve (relax-Σ ⊢M Σ₁⊇Σ) ⊢μ₁ high≾gc⋎g M⇓V in
   let ϵμ≡ϵμ₁  = heap-relate ⊢L ⊢μ pc≾gc L⇓true⟨c⟩ in
   let ϵμ₁≡ϵμ₂ = heap-relate (relax-Σ ⊢M Σ₁⊇Σ) ⊢μ₁ high≾gc⋎g M⇓V in
-  let ϵμ₂≡ϵμ′ = heap-relate (⊢cast (stamp-val-wt (⊢value-pc ⊢V v) v)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W in
-  trans ϵμ≡ϵμ₁ (trans ϵμ₁≡ϵμ₂ ϵμ₂≡ϵμ′)
-heap-relate (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc (⇓-if-cast-false i L⇓false⟨c⟩ N⇓V V⋎ℓ⟨bc⟩⇓W) =
+  case canonical-const ⊢true⟨c⟩ (⇓-value L⇓true⟨c⟩) of λ where
+  (Const-inj ℓ≼ℓ′) →
+    let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
+    let ϵμ₂≡ϵμ′ = heap-relate (⊢cast (⊢sub (stamp-val-wt (⊢value-pc ⊢V v) v) A⋎ℓ<:A⋎ℓ′)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W in
+    trans ϵμ≡ϵμ₁ (trans ϵμ₁≡ϵμ₂ ϵμ₂≡ϵμ′)
+heap-relate (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc (⇓-if-cast-false (I-base-inj _) L⇓false⟨c⟩ N⇓V V⋎ℓ⟨bc⟩⇓W) =
   let high≾gc⋎g = consis-join-≾ pc≾gc (low≾ _) in
   let v = ⇓-value N⇓V in
   let ⟨ Σ₁ , Σ₁⊇Σ  , ⊢false⟨c⟩ , ⊢μ₁ ⟩ = ⇓-preserve ⊢L ⊢μ pc≾gc L⇓false⟨c⟩ in
   let ⟨ Σ₂ , Σ₂⊇Σ₁ , ⊢V  , ⊢μ₂ ⟩ = ⇓-preserve (relax-Σ ⊢N Σ₁⊇Σ) ⊢μ₁ high≾gc⋎g N⇓V in
   let ϵμ≡ϵμ₁  = heap-relate ⊢L ⊢μ pc≾gc L⇓false⟨c⟩ in
   let ϵμ₁≡ϵμ₂ = heap-relate (relax-Σ ⊢N Σ₁⊇Σ) ⊢μ₁ high≾gc⋎g N⇓V in
-  let ϵμ₂≡ϵμ′ = heap-relate (⊢cast (stamp-val-wt (⊢value-pc ⊢V v) v)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W in
-  trans ϵμ≡ϵμ₁ (trans ϵμ₁≡ϵμ₂ ϵμ₂≡ϵμ′)
+  case canonical-const ⊢false⟨c⟩ (⇓-value L⇓false⟨c⟩) of λ where
+  (Const-inj ℓ≼ℓ′) →
+    let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
+    let ϵμ₂≡ϵμ′ = heap-relate (⊢cast (⊢sub (stamp-val-wt (⊢value-pc ⊢V v) v) A⋎ℓ<:A⋎ℓ′)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W in
+    trans ϵμ≡ϵμ₁ (trans ϵμ₁≡ϵμ₂ ϵμ₂≡ϵμ′)
 heap-relate (⊢app ⊢L ⊢M) ⊢μ pc≾gc (⇓-fun-cast i L⇓V⟨c⟩ M⇓W elim⇓V′) =
   case ⇓-value L⇓V⟨c⟩ of λ where
   (V-cast v _) →

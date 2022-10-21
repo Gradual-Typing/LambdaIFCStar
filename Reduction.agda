@@ -117,12 +117,12 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   if-cast-true : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
     → Inert c
       --------------------------------------------------------------------------------------------- IfCastTrue
-    → if ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ M) ⟨ branch/c A ℓ c ⟩ ∣ μ
+    → if ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ M) ⟨ branch/c A c ⟩ ∣ μ
 
   if-cast-false : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
     → Inert c
       --------------------------------------------------------------------------------------------- IfCastFalse
-    → if ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ N) ⟨ branch/c A ℓ c ⟩ ∣ μ
+    → if ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ N) ⟨ branch/c A c ⟩ ∣ μ
 
   fun-cast : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂} {c : Cast ([ gc₁ ] A ⇒ B of g₁) ⇒ ([ gc₂ ] C ⇒ D of g₂)}
     → Value V → Value W

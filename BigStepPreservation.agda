@@ -121,22 +121,24 @@ open import Preservation public
   let v = ⇓-value M⇓V in
   let ⟨ Σ₁ , Σ₁⊇Σ , ⊢true⟨c⟩ , ⊢μ₁ ⟩ = ⇓-preserve ⊢L ⊢μ pc≾gc L⇓true⟨c⟩ in
   case canonical-const ⊢true⟨c⟩ (⇓-value L⇓true⟨c⟩) of λ where
-  (Const-inj _) →  {- g = ⋆ -}
+  (Const-inj ℓ≼ℓ′) →  {- g = ⋆ -}
     let pc⋎ℓ≾gc⋎g : l (pc ⋎ ℓ) ≾ (gc ⋎̃ ⋆)
         pc⋎ℓ≾gc⋎g = subst (λ □ → _ ≾ □) (sym (g⋎̃⋆≡⋆ {gc})) ≾-⋆r in
     let ⟨ Σ₂ , Σ₂⊇Σ₁ , ⊢V , ⊢μ₂ ⟩ = ⇓-preserve (relax-Σ ⊢M Σ₁⊇Σ) ⊢μ₁ pc⋎ℓ≾gc⋎g M⇓V in
-    let ⊢V⋎ℓ⟨bc⟩ = ⊢cast (stamp-val-wt (⊢value-pc ⊢V v) v) in
+    let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
+    let ⊢V⋎ℓ⟨bc⟩ = ⊢cast (⊢sub (stamp-val-wt (⊢value-pc ⊢V v) v) A⋎ℓ<:A⋎ℓ′) in
     let ⟨ Σ₃ , Σ₃⊇Σ₂ , ⊢W , ⊢μ₃ ⟩ = ⇓-preserve ⊢V⋎ℓ⟨bc⟩ ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W in
     ⟨ Σ₃ , ⊇-trans Σ₃⊇Σ₂ (⊇-trans Σ₂⊇Σ₁ Σ₁⊇Σ) , ⊢W , ⊢μ₃ ⟩
 ⇓-preserve {gc = gc} {pc} (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc (⇓-if-cast-false {ℓ = ℓ} i L⇓false⟨c⟩ N⇓V V⋎ℓ⟨bc⟩⇓W) =
   let v = ⇓-value N⇓V in
   let ⟨ Σ₁ , Σ₁⊇Σ , ⊢false⟨c⟩ , ⊢μ₁ ⟩ = ⇓-preserve ⊢L ⊢μ pc≾gc L⇓false⟨c⟩ in
   case canonical-const ⊢false⟨c⟩ (⇓-value L⇓false⟨c⟩) of λ where
-  (Const-inj _) →  {- g = ⋆ -}
+  (Const-inj ℓ≼ℓ′) →  {- g = ⋆ -}
     let pc⋎ℓ≾gc⋎g : l (pc ⋎ ℓ) ≾ (gc ⋎̃ ⋆)
         pc⋎ℓ≾gc⋎g = subst (λ □ → _ ≾ □) (sym (g⋎̃⋆≡⋆ {gc})) ≾-⋆r in
     let ⟨ Σ₂ , Σ₂⊇Σ₁ , ⊢V , ⊢μ₂ ⟩ = ⇓-preserve (relax-Σ ⊢N Σ₁⊇Σ) ⊢μ₁ pc⋎ℓ≾gc⋎g N⇓V in
-    let ⊢V⋎ℓ⟨bc⟩ = ⊢cast (stamp-val-wt (⊢value-pc ⊢V v) v) in
+    let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
+    let ⊢V⋎ℓ⟨bc⟩ = ⊢cast (⊢sub (stamp-val-wt (⊢value-pc ⊢V v) v) A⋎ℓ<:A⋎ℓ′) in
     let ⟨ Σ₃ , Σ₃⊇Σ₂ , ⊢W , ⊢μ₃ ⟩ = ⇓-preserve ⊢V⋎ℓ⟨bc⟩ ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W in
     ⟨ Σ₃ , ⊇-trans Σ₃⊇Σ₂ (⊇-trans Σ₂⊇Σ₁ Σ₁⊇Σ) , ⊢W , ⊢μ₃ ⟩
 ⇓-preserve (⊢app ⊢L ⊢M) ⊢μ pc≾gc (⇓-fun-cast i L⇓V⟨c⟩ M⇓W elim⇓V′) =

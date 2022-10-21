@@ -99,7 +99,7 @@ data _∣_⊢_⇓_∣_ where
     → μ  ∣ pc     ⊢ L                    ⇓ $ true of ℓ ⟨ c ⟩ ∣ μ₁
     → (⇓V : μ₁ ∣ pc ⋎ ℓ ⊢ M ⇓ V ∣ μ₂)
       {- don't need casting PC to ⋆ in big step -}
-    → μ₂ ∣ pc     ⊢ stamp-val V (⇓-value ⇓V) ℓ ⟨ branch/c A ℓ c ⟩ ⇓ W ∣ μ₃
+    → μ₂ ∣ pc     ⊢ stamp-val V (⇓-value ⇓V) ℓ ⟨ branch/c A c ⟩ ⇓ W ∣ μ₃
       --------------------------------------------------------- IfCastTrue
     → μ  ∣ pc     ⊢ if L A M N           ⇓ W ∣ μ₃
 
@@ -108,7 +108,7 @@ data _∣_⊢_⇓_∣_ where
     → Inert c
     → μ  ∣ pc     ⊢ L                    ⇓ $ false of ℓ ⟨ c ⟩ ∣ μ₁
     → (⇓V : μ₁ ∣ pc ⋎ ℓ ⊢ N ⇓ V ∣ μ₂)
-    → μ₂ ∣ pc     ⊢ stamp-val V (⇓-value ⇓V) ℓ ⟨ branch/c A ℓ c ⟩ ⇓ W ∣ μ₃
+    → μ₂ ∣ pc     ⊢ stamp-val V (⇓-value ⇓V) ℓ ⟨ branch/c A c ⟩ ⇓ W ∣ μ₃
       --------------------------------------------------------- IfCastFalse
     → μ  ∣ pc     ⊢ if L A M N           ⇓ W ∣ μ₃
 

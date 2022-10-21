@@ -229,14 +229,16 @@ preserve {Σ} {gc} {pc} (⊢if {A = A} {L} {M} {N} ⊢L ⊢M ⊢N) ⊢μ pc≾gc
   (Const-inj {ℓ = ℓ} ℓ≼ℓ′) →
     let ⊢M† : [] ; Σ ; ⋆ ; pc ⋎ ℓ ⊢ M ⦂ A
         ⊢M† = subst (λ □ → [] ; Σ ; □ ; pc ⋎ ℓ ⊢ M ⦂ A) g⋎̃⋆≡⋆ ⊢M in
-    ⟨ Σ , ⊇-refl Σ , ⊢cast (⊢prot (⊢cast-pc ⊢M† ~⋆)) , ⊢μ ⟩
+    let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
+    ⟨ Σ , ⊇-refl Σ , ⊢cast (⊢sub (⊢prot (⊢cast-pc ⊢M† ~⋆)) A⋎ℓ<:A⋎ℓ′), ⊢μ ⟩
 preserve {Σ} {gc} {pc} (⊢if {A = A} {L} {M} {N} ⊢L ⊢M ⊢N) ⊢μ pc≾gc (if-cast-false i) with i
 ... | (I-base-inj (cast (` Bool of l ℓ′) (` Bool of ⋆) p _)) =
   case canonical-const ⊢L (V-cast V-const i) of λ where
   (Const-inj {ℓ = ℓ} ℓ≼ℓ′) →
     let ⊢N† : [] ; Σ ; ⋆ ; pc ⋎ ℓ ⊢ N ⦂ A
         ⊢N† = subst (λ □ → [] ; Σ ; □ ; pc ⋎ ℓ ⊢ N ⦂ A) g⋎̃⋆≡⋆ (⊢N {pc ⋎ ℓ}) in
-    ⟨ Σ , ⊇-refl Σ , ⊢cast (⊢prot (⊢cast-pc ⊢N† ~⋆)) , ⊢μ ⟩
+    let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
+    ⟨ Σ , ⊇-refl Σ , ⊢cast (⊢sub (⊢prot (⊢cast-pc ⊢N† ~⋆)) A⋎ℓ<:A⋎ℓ′) , ⊢μ ⟩
 preserve {Σ} {gc} {pc} ⊢M ⊢μ pc≾gc (fun-cast {V} {W} {pc = pc} v w i) =
   ⟨ Σ , ⊇-refl Σ , elim-fun-proxy-wt ⊢M v w i , ⊢μ ⟩
 preserve {Σ} (⊢deref {A = A′} ⊢M) ⊢μ pc≾gc (deref-cast v i) =

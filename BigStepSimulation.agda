@@ -190,7 +190,7 @@ sim {gc = gc} {pc} {μ = μ} {μ′} (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc
   with ⇓-preserve ⊢L ⊢μ pc≾gc L⇓true⟨c⟩
 ... | ⟨ Σ₁ , Σ₁⊇Σ , ⊢true⟨c⟩ , ⊢μ₁ ⟩
   with canonical-const ⊢true⟨c⟩ (⇓-value L⇓true⟨c⟩)
-... | Const-inj _
+... | Const-inj ℓ≼ℓ′
   rewrite g⋎̃⋆≡⋆ {gc}
   with ⇓-preserve (relax-Σ ⊢M Σ₁⊇Σ) ⊢μ₁ ≾-⋆r M⇓V
 ... | ⟨ Σ₂ , Σ₂⊇Σ₁ , ⊢V , ⊢μ₂ ⟩
@@ -200,22 +200,24 @@ sim {gc = gc} {pc} {μ = μ} {μ′} (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc
   ⇓ₑ-if-true ϵL⇓true (⇓ₑ-trans ϵM⇓ϵV ϵV⇓ϵW)
   where
   v = ⇓-value M⇓V
+  A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′)
   ϵL⇓true : _ ∣ pc ⊢ erase L ⇓ₑ $ true of low ∣ _
   ϵL⇓true = sim ⊢L ⊢μ pc≾gc L⇓true⟨c⟩
   ϵM⇓ϵV : erase-μ μ₁ ∣ pc ⊢ erase M ⇓ₑ erase V ∣ erase-μ μ₂
   ϵM⇓ϵV = subst (λ □ → _ ∣ □ ⊢ _ ⇓ₑ _ ∣ _) (ℓ⋎low≡ℓ {pc})
                  (sim (relax-Σ ⊢M Σ₁⊇Σ) ⊢μ₁ ≾-⋆r M⇓V)
   ϵV⇓ϵW : erase-μ μ₂ ∣ pc ⊢ erase V ⇓ₑ erase W ∣ erase-μ μ′
-  ϵV⇓ϵW = sim (⊢cast (⊢value-pc (subst (λ □ → [] ; _ ; _ ; _ ⊢ V ⦂ □)
-              (sym (stamp-low A)) ⊢V) v)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
+  ϵV⇓ϵW = sim (⊢cast (⊢sub (⊢value-pc (subst (λ □ → [] ; _ ; _ ; _ ⊢ V ⦂ □)
+                  (sym (stamp-low A)) ⊢V) v) A⋎ℓ<:A⋎ℓ′)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
 ...   | high = ϵif⇓ϵW
   where
   v = ⇓-value M⇓V
+  A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′)
   ϵL⇓● : erase-μ μ ∣ pc ⊢ erase L ⇓ₑ ● ∣ erase-μ μ₁
   ϵL⇓● = sim ⊢L ⊢μ pc≾gc L⇓true⟨c⟩
   ●⇓ϵW : _ ∣ pc ⊢ ● ⇓ₑ erase W ∣ _
   ●⇓ϵW rewrite sym (erase-stamp-high v) =
-    sim (⊢cast (stamp-val-wt (⊢value-pc ⊢V v) v)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
+    sim (⊢cast (⊢sub (stamp-val-wt (⊢value-pc ⊢V v) v) A⋎ℓ<:A⋎ℓ′)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
   ϵμ₁≡ϵμ₂ : erase-μ μ₁ ≡ erase-μ μ₂
   ϵμ₁≡ϵμ₂ rewrite ℓ⋎high≡high {pc} = heap-relate (relax-Σ ⊢M Σ₁⊇Σ) ⊢μ₁ ≾-⋆r M⇓V
   ϵif⇓ϵW : erase-μ μ ∣ pc ⊢ erase (if L _ M N) ⇓ₑ erase W ∣ erase-μ μ′
@@ -228,7 +230,7 @@ sim {gc = gc} {pc} {μ = μ} {μ′} (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc
   with ⇓-preserve ⊢L ⊢μ pc≾gc L⇓false⟨c⟩
 ... | ⟨ Σ₁ , Σ₁⊇Σ , ⊢false⟨c⟩ , ⊢μ₁ ⟩
   with canonical-const ⊢false⟨c⟩ (⇓-value L⇓false⟨c⟩)
-... | Const-inj _
+... | Const-inj ℓ≼ℓ′
   rewrite g⋎̃⋆≡⋆ {gc}
   with ⇓-preserve (relax-Σ ⊢N Σ₁⊇Σ) ⊢μ₁ ≾-⋆r N⇓V
 ... | ⟨ Σ₂ , Σ₂⊇Σ₁ , ⊢V , ⊢μ₂ ⟩
@@ -238,22 +240,24 @@ sim {gc = gc} {pc} {μ = μ} {μ′} (⊢if ⊢L ⊢M ⊢N) ⊢μ pc≾gc
   ⇓ₑ-if-false ϵL⇓false (⇓ₑ-trans ϵN⇓ϵV ϵV⇓ϵW)
   where
   v = ⇓-value N⇓V
+  A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′)
   ϵL⇓false : _ ∣ pc ⊢ erase L ⇓ₑ $ false of low ∣ _
   ϵL⇓false = sim ⊢L ⊢μ pc≾gc L⇓false⟨c⟩
   ϵN⇓ϵV : erase-μ μ₁ ∣ pc ⊢ erase N ⇓ₑ erase V ∣ erase-μ μ₂
   ϵN⇓ϵV = subst (λ □ → _ ∣ □ ⊢ _ ⇓ₑ _ ∣ _) (ℓ⋎low≡ℓ {pc})
                  (sim (relax-Σ ⊢N Σ₁⊇Σ) ⊢μ₁ ≾-⋆r N⇓V)
   ϵV⇓ϵW : erase-μ μ₂ ∣ pc ⊢ erase V ⇓ₑ erase W ∣ erase-μ μ′
-  ϵV⇓ϵW = sim (⊢cast (⊢value-pc (subst (λ □ → [] ; _ ; _ ; _ ⊢ V ⦂ □)
-              (sym (stamp-low A)) ⊢V) v)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
+  ϵV⇓ϵW = sim (⊢cast (⊢sub (⊢value-pc (subst (λ □ → [] ; _ ; _ ; _ ⊢ V ⦂ □)
+              (sym (stamp-low A)) ⊢V) v) A⋎ℓ<:A⋎ℓ′)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
 ...   | high = ϵif⇓ϵW
   where
   v = ⇓-value N⇓V
+  A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′)
   ϵL⇓● : erase-μ μ ∣ pc ⊢ erase L ⇓ₑ ● ∣ erase-μ μ₁
   ϵL⇓● = sim ⊢L ⊢μ pc≾gc L⇓false⟨c⟩
   ●⇓ϵW : _ ∣ pc ⊢ ● ⇓ₑ erase W ∣ _
   ●⇓ϵW rewrite sym (erase-stamp-high v) =
-    sim (⊢cast (stamp-val-wt (⊢value-pc ⊢V v) v)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
+    sim (⊢cast (⊢sub (stamp-val-wt (⊢value-pc ⊢V v) v) A⋎ℓ<:A⋎ℓ′)) ⊢μ₂ pc≾gc V⋎ℓ⟨bc⟩⇓W
   ϵμ₁≡ϵμ₂ : erase-μ μ₁ ≡ erase-μ μ₂
   ϵμ₁≡ϵμ₂ rewrite ℓ⋎high≡high {pc} = heap-relate (relax-Σ ⊢N Σ₁⊇Σ) ⊢μ₁ ≾-⋆r N⇓V
   ϵif⇓ϵW : erase-μ μ ∣ pc ⊢ erase (if L _ M N) ⇓ₑ erase W ∣ erase-μ μ′

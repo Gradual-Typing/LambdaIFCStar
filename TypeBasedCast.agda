@@ -129,8 +129,8 @@ out/c : ∀ {A B g₁ g₂}
 out/c (cast (Ref A of g₁) (Ref B of g₂) p (~-ty g₁~g₂ (~-ref A~B))) =
   cast (stamp A g₁) (stamp B g₂) p (stamp-~ A~B g₁~g₂)
 
-branch/c : ∀ {g} A ℓ
+branch/c : ∀ {g} A
   → Cast ` Bool of g ⇒ ` Bool of ⋆
-  → Cast stamp A (l ℓ) ⇒ stamp A ⋆
-branch/c A ℓ (cast _ _ p _) =
-  cast (stamp A (l ℓ)) (stamp A ⋆) p (stamp-~ ~-refl ~⋆)
+  → Cast stamp A g ⇒ stamp A ⋆
+branch/c {g} A (cast .(` Bool of g) .(` Bool of ⋆) p _) =
+  cast (stamp A g) (stamp A ⋆) p (stamp-~ ~-refl ~⋆)
