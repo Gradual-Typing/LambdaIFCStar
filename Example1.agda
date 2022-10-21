@@ -75,8 +75,26 @@ _ = ⇓-let (⇓-val V-ƛ)
                    (⇓-let (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))
                            (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))))
 
+{- Statically rejected because of explicit flow -}
+N′ : Term
+N′ =
+  -- id      : 𝔹 of low → 𝔹 of low
+  `let ƛ[ low ] ` Bool of l low ˙ ` 0 of low `in
+  -- input   : 𝔹 of high
+  `let (user-input · $ tt of low at pos 0) `in
+  -- result  : 𝔹 of low
+  `let ` 1 {- dumb -} · ` 0 {- input -} at pos 1 `in
+    (publish {- publish -} · ` 0 {- result -} at pos 2)
 
-{- Statically rejected: -}
+-- ⊢N′ : [] ; l low ⊢ᴳ N′ ⦂ ` Unit of l low
+-- ⊢N′ =
+--   (⊢let (⊢lam (⊢var refl))
+--   (⊢let (⊢app ⊢user-input ⊢const ≲-refl ≾-refl ≾-refl)
+--   (⊢let (⊢app (⊢var refl) (⊢var refl) (≲-ty (≾-l {!!} {- high ⋠ low -}) ≲-ι) ≾-refl ≾-refl)
+--     (⊢app ⊢publish (⊢var refl) ≲-refl ≾-refl ≾-refl))))
+
+
+{- Statically rejected because of implicit flow -}
 M : Term
 M =
   -- flip    : 𝔹 of high → 𝔹 of low
