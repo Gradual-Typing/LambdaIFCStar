@@ -184,12 +184,12 @@ _ =
     —→⟨ β-let V-const ⟩
   let c₁ = cast ([ _ ] (` Bool of ⋆) ⇒ (` Bool of ⋆) of _) ([ _ ] (` Bool of ⋆) ⇒ (` Bool of l low) of _ ) (pos 1) _ in
   let c₂ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) _ in
-  `let (lam[ low ] _ ˙ _ of low ⟨ c₁ ⟩ · const true of high ⟨ c₂ ⟩) _ ∣ ∅ ∣ low  {- 1 -}
+  `let (lam[ low ] _ ˙ if (var 0) _ _ _ of low ⟨ c₁ ⟩ · const true of high ⟨ c₂ ⟩) _ ∣ ∅ ∣ low  {- 1 -}
     —→⟨ ξ {F = let□ _} (fun-cast V-ƛ (V-cast V-const (I-base-inj _)) (I-fun _ I-label I-label)) ⟩  {- ξ fun-cast -}
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) _ in
   let c₂ = cast (` Bool of ⋆) (` Bool of ⋆) (pos 1) _      in
   let c₃ = cast (` Bool of ⋆) (` Bool of l low) (pos 1) _  in
-  `let ((lam[ low ] _ ˙ _ of low · const true of high ⟨ c₁ ⟩ ⟨ c₂ ⟩) ⟨ c₃ ⟩) _ ∣ ∅ ∣ low  {- 2 -}
+  `let ((lam[ low ] _ ˙ if (var 0) _ _ _ of low · const true of high ⟨ c₁ ⟩ ⟨ c₂ ⟩) ⟨ c₃ ⟩) _ ∣ ∅ ∣ low  {- 2 -}
     —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (ξ {F = (_ ·□) V-ƛ} (cast (V-cast V-const (I-base-inj _)) (A-base-id _) cast-base-id))) ⟩
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) _ in
   let c₂ = cast (` Bool of ⋆) (` Bool of l low) (pos 1) _  in
