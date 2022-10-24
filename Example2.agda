@@ -3,7 +3,7 @@ module Example2 where
 open import Data.Unit
 open import Data.List
 open import Data.Bool renaming (Bool to 𝔹)
-open import Data.Product using (_×_) renaming (_,_ to ⟨_,_⟩)
+open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import Utils
@@ -11,12 +11,111 @@ open import Types
 open import BlameLabels
 open import SurfaceLang
 open import CC renaming (Term to CCTerm;
-  `_ to var; $_of_ to const_of_; ƛ[_]_˙_of_ to lam[_]_˙_of_; !_ to deref)
+  `_ to var; $_of_ to const_of_; ƛ[_]_˙_of_ to lam[_]_˙_of_; !_ to *_)
 open import Compile
 open import Reduction
 open import BigStep
 open import Heap
 open import TypeBasedCast
+
+{- Input is `true` in N₁ and `false` in N₂ -}
+N₁ N₂ : Term
+N₁ =
+  `let ref[ low ] ($ true of low) at pos 0 `in
+  `let if ($ true of high) ∶ ` Bool of ⋆ at pos 1
+         then (` 0) := $ false of low at pos 2
+         else (` 0) := $ true  of low at pos 3
+         at pos 4 `in
+  ! (` 1)
+N₂ =
+  `let ref[ low ] ($ true of low) at pos 0 `in
+  `let if ($ false of high) ∶ ` Bool of ⋆ at pos 1
+         then (` 0) := $ false of low at pos 2
+         else (` 0) := $ true  of low at pos 3
+         at pos 4 `in
+  ! (` 1)
+
+⊢N₁ : [] ; l low ⊢ᴳ N₁ ⦂ ` Bool of l low
+⊢N₁ =
+  ⊢let (⊢ref ⊢const ≲-refl ≾-refl)
+       (⊢let (⊢if (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι))
+                  (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
+                  (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
+                  refl)
+             (⊢deref (⊢var refl)))
+⊢N₂ : [] ; l low ⊢ᴳ N₂ ⦂ ` Bool of l low
+⊢N₂ =
+  ⊢let (⊢ref ⊢const ≲-refl ≾-refl)
+       (⊢let (⊢if (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι))
+                  (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
+                  (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
+                  refl)
+             (⊢deref (⊢var refl)))
+
+N⇒₁ N⇒₂ : CCTerm
+N⇒₁ = compile N₁ ⊢N₁; N⇒₂ = compile N₂ ⊢N₂
+
+_ :
+  let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
+  N⇒₁ ≡
+  (`let (ref[ low ] (const true of low))
+  (`let (if (const true of high ⟨ c₁ ⟩) _ (var 0 :=? (const false of low)) (var 0 :=? (const true of low)))
+  (* var 1)))
+_ = refl
+
+{- Both N₁ and N₂ evaluate to `nsu-error` -}
+_ : ∃[ μ ] ( N⇒₁ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
+_ = ⟨ _ , R* ⟩
+  where
+  R* =
+    N⇒₁ ∣ ∅ ∣ low
+      —→⟨ ξ {F = let□ _} ref-static ⟩
+    _ ∣ ∅ ∣ low
+      —→⟨ ξ {F = let□ _} (ref V-const refl) ⟩
+    _ ∣ ⟨ [ ⟨ 0 , (const true of low) & V-const ⟩ ] , [] ⟩ ∣ low
+      —→⟨ β-let V-addr ⟩
+    _ ∣ _ ∣ low
+      —→⟨ ξ {F = let□ _} (if-cast-true (I-base-inj _)) ⟩
+    let a = addr a[ low ] 0 of low in
+    let c = cast (` Unit of l high) (` Unit of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
+    `let (prot high (cast-pc ⋆ (a :=? (const false of low))) ⟨ c ⟩) (* a) ∣ _ ∣ low
+      —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = cast-pc ⋆ □} (assign?-fail (λ ()) {- high ⋠ low -})))) ⟩
+    `let (prot high (cast-pc ⋆ (error nsu-error)) ⟨ c ⟩) (* a) ∣ _ ∣ low
+      —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ-err {F = cast-pc ⋆ □}))) ⟩
+    `let (prot high (error nsu-error) ⟨ c ⟩) (* a) ∣ _ ∣ low
+       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} prot-err) ⟩
+    `let (error nsu-error ⟨ c ⟩) (* a) ∣ _ ∣ low
+       —→⟨ ξ {F = let□ _} (ξ-err {F = □⟨ _ ⟩}) ⟩
+    `let (error nsu-error) (* a) ∣ _ ∣ low
+       —→⟨ ξ-err {F = let□ _} ⟩
+    error nsu-error ∣ _ ∣ low ∎
+
+_ : ∃[ μ ] ( N⇒₂ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
+_ = ⟨ _ , R* ⟩
+  where
+  R* =
+    N⇒₂ ∣ ∅ ∣ low
+      —→⟨ ξ {F = let□ _} ref-static ⟩
+    _ ∣ ∅ ∣ low
+      —→⟨ ξ {F = let□ _} (ref V-const refl) ⟩
+    _ ∣ ⟨ [ ⟨ 0 , (const true of low) & V-const ⟩ ] , [] ⟩ ∣ low
+      —→⟨ β-let V-addr ⟩
+    _ ∣ _ ∣ low
+      —→⟨ ξ {F = let□ _} (if-cast-false (I-base-inj _)) ⟩
+    let a = addr a[ low ] 0 of low in
+    let c = cast (` Unit of l high) (` Unit of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
+    `let (prot high (cast-pc ⋆ (a :=? (const true of low))) ⟨ c ⟩) (* a) ∣ _ ∣ low
+      —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = cast-pc ⋆ □} (assign?-fail (λ ()) {- high ⋠ low -})))) ⟩
+    `let (prot high (cast-pc ⋆ (error nsu-error)) ⟨ c ⟩) (* a) ∣ _ ∣ low
+      —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ-err {F = cast-pc ⋆ □}))) ⟩
+    `let (prot high (error nsu-error) ⟨ c ⟩) (* a) ∣ _ ∣ low
+       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} prot-err) ⟩
+    `let (error nsu-error ⟨ c ⟩) (* a) ∣ _ ∣ low
+       —→⟨ ξ {F = let□ _} (ξ-err {F = □⟨ _ ⟩}) ⟩
+    `let (error nsu-error) (* a) ∣ _ ∣ low
+       —→⟨ ξ-err {F = let□ _} ⟩
+    error nsu-error ∣ _ ∣ low ∎
+
 
 {- Fully static. Input (branch condition) is `true` in M₁ `false` in M₂ -}
 M₁ M₂ : Term
