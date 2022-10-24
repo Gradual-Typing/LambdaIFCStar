@@ -18,6 +18,13 @@ open import BigStep
 open import Heap
 open import TypeBasedCast
 
+-- publish : 𝔹 of low → ⊤
+publish : Term
+publish = ƛ[ low ] ` Bool of l low ˙ $ tt of low of low
+
+⊢publish : ∀ {Γ} → Γ ; l low ⊢ᴳ publish ⦂ [ l low ] (` Bool of l low) ⇒ (` Unit of l low) of l low
+⊢publish = ⊢lam ⊢const
+
 {- Input is `true` in N₁ and `false` in N₂ -}
 N₁ N₂ : Term
 N₁ =
@@ -26,31 +33,31 @@ N₁ =
          then (` 0) := $ false of low at pos 2
          else (` 0) := $ true  of low at pos 3
          at pos 4 `in
-  ! (` 1)
+  (publish · (! (` 1)) at pos 5)
 N₂ =
   `let ref[ low ] ($ true of low) at pos 0 `in
   `let if ($ false of high) ∶ ` Bool of ⋆ at pos 1
          then (` 0) := $ false of low at pos 2
          else (` 0) := $ true  of low at pos 3
          at pos 4 `in
-  ! (` 1)
+  (publish · (! (` 1)) at pos 5)
 
-⊢N₁ : [] ; l low ⊢ᴳ N₁ ⦂ ` Bool of l low
+⊢N₁ : [] ; l low ⊢ᴳ N₁ ⦂ ` Unit of l low
 ⊢N₁ =
   ⊢let (⊢ref ⊢const ≲-refl ≾-refl)
        (⊢let (⊢if (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι))
                   (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
                   (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
                   refl)
-             (⊢deref (⊢var refl)))
-⊢N₂ : [] ; l low ⊢ᴳ N₂ ⦂ ` Bool of l low
+             (⊢app ⊢publish (⊢deref (⊢var refl)) ≲-refl ≾-refl ≾-refl))
+⊢N₂ : [] ; l low ⊢ᴳ N₂ ⦂ ` Unit of l low
 ⊢N₂ =
   ⊢let (⊢ref ⊢const ≲-refl ≾-refl)
        (⊢let (⊢if (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι))
                   (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
                   (⊢assign (⊢var refl) ⊢const ≲-refl ≾-refl ≾-⋆l)
                   refl)
-             (⊢deref (⊢var refl)))
+             (⊢app ⊢publish (⊢deref (⊢var refl)) ≲-refl ≾-refl ≾-refl))
 
 N⇒₁ N⇒₂ : CCTerm
 N⇒₁ = compile N₁ ⊢N₁; N⇒₂ = compile N₂ ⊢N₂
@@ -60,7 +67,7 @@ _ :
   N⇒₁ ≡
   (`let (ref[ low ] (const true of low))
   (`let (if (const true of high ⟨ c₁ ⟩) _ (var 0 :=? (const false of low)) (var 0 :=? (const true of low)))
-  (* var 1)))
+  (compile {[]} publish ⊢publish · (* var 1))))
 _ = refl
 
 {- Both N₁ and N₂ evaluate to `nsu-error` -}
@@ -78,15 +85,15 @@ _ = ⟨ _ , R* ⟩
       —→⟨ ξ {F = let□ _} (if-cast-true (I-base-inj _)) ⟩
     let a = addr a[ low ] 0 of low in
     let c = cast (` Unit of l high) (` Unit of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
-    `let (prot high (cast-pc ⋆ (a :=? (const false of low))) ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (prot high (cast-pc ⋆ (a :=? (const false of low))) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = cast-pc ⋆ □} (assign?-fail (λ ()) {- high ⋠ low -})))) ⟩
-    `let (prot high (cast-pc ⋆ (error nsu-error)) ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (prot high (cast-pc ⋆ (error nsu-error)) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ-err {F = cast-pc ⋆ □}))) ⟩
-    `let (prot high (error nsu-error) ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (prot high (error nsu-error) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
        —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} prot-err) ⟩
-    `let (error nsu-error ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (error nsu-error ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
        —→⟨ ξ {F = let□ _} (ξ-err {F = □⟨ _ ⟩}) ⟩
-    `let (error nsu-error) (* a) ∣ _ ∣ low
+    `let (error nsu-error) (_ · (* a)) ∣ _ ∣ low
        —→⟨ ξ-err {F = let□ _} ⟩
     error nsu-error ∣ _ ∣ low ∎
 
@@ -104,15 +111,15 @@ _ = ⟨ _ , R* ⟩
       —→⟨ ξ {F = let□ _} (if-cast-false (I-base-inj _)) ⟩
     let a = addr a[ low ] 0 of low in
     let c = cast (` Unit of l high) (` Unit of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
-    `let (prot high (cast-pc ⋆ (a :=? (const true of low))) ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (prot high (cast-pc ⋆ (a :=? (const true of low))) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = cast-pc ⋆ □} (assign?-fail (λ ()) {- high ⋠ low -})))) ⟩
-    `let (prot high (cast-pc ⋆ (error nsu-error)) ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (prot high (cast-pc ⋆ (error nsu-error)) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ-err {F = cast-pc ⋆ □}))) ⟩
-    `let (prot high (error nsu-error) ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (prot high (error nsu-error) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
        —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} prot-err) ⟩
-    `let (error nsu-error ⟨ c ⟩) (* a) ∣ _ ∣ low
+    `let (error nsu-error ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
        —→⟨ ξ {F = let□ _} (ξ-err {F = □⟨ _ ⟩}) ⟩
-    `let (error nsu-error) (* a) ∣ _ ∣ low
+    `let (error nsu-error) (_ · (* a)) ∣ _ ∣ low
        —→⟨ ξ-err {F = let□ _} ⟩
     error nsu-error ∣ _ ∣ low ∎
 
