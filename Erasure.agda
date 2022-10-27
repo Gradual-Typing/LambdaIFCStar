@@ -60,13 +60,8 @@ erase (L := M) = erase L := erase M
 erase (L :=? M) = erase L :=? erase M
 erase (L :=✓ M) = erase L :=✓ erase M
 erase (M ⟨ c ⟩) = erase M
-erase (prot ℓ M) =
-  case ℓ of λ where
-  low  → erase M
-  high → ●
 erase (cast-pc g M) = erase M
-erase (error e) = error e
-erase ● = ●
+erase _ = ●
 
 erase-val-value : ∀ {V} (v : Value V) → Value (erase V)
 erase-val-value (V-addr {a[ ℓ₁ ] n} {low}) with ℓ₁
@@ -106,12 +101,10 @@ erase-idem (L := M) = cong₂ _:=_ (erase-idem L) (erase-idem M)
 erase-idem (L :=? M) = cong₂ _:=?_ (erase-idem L) (erase-idem M)
 erase-idem (L :=✓ M) = cong₂ _:=✓_ (erase-idem L) (erase-idem M)
 erase-idem (M ⟨ c ⟩) = erase-idem M
-erase-idem (prot ℓ M) with ℓ
-... | low  = erase-idem M
-... | high = refl
 erase-idem (cast-pc g M) = erase-idem M
-erase-idem (error e) = refl
-erase-idem ● = refl
+erase-idem (prot ℓ M) = refl
+erase-idem (error e)  = refl
+erase-idem ●          = refl
 
 erase-stamp-high : ∀ {V} (v : Value V) → erase (stamp-val V v high) ≡ ●
 erase-stamp-high (V-addr {a[ ℓ₁ ] n} {ℓ}) rewrite ℓ⋎high≡high {ℓ} = refl
@@ -190,10 +183,9 @@ erase-is-erased (L := M) = e-assign (erase-is-erased L) (erase-is-erased M)
 erase-is-erased (L :=? M) = e-assign? (erase-is-erased L) (erase-is-erased M)
 erase-is-erased (L :=✓ M) = e-assign✓ (erase-is-erased L) (erase-is-erased M)
 erase-is-erased (M ⟨ c ⟩) = erase-is-erased M
-erase-is-erased (prot low M) = erase-is-erased M
-erase-is-erased (prot high M) = e-●
 erase-is-erased (cast-pc g M) = erase-is-erased M
-erase-is-erased (error e) = e-error
+erase-is-erased (prot _ M) = e-●
+erase-is-erased (error _) = e-●
 erase-is-erased ● = e-●
 
 -- {- Erased value does not reduce -}
