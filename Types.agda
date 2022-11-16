@@ -320,17 +320,6 @@ data _≲_ where
       ⟨ ≲-ty g₁≾g₂ S≲T , ≲-ty g₂≾g₁ T≲S ⟩
 
 
-{- **** Precision join **** -}
-⨆ᵣ : ∀ {S T} → S ~ᵣ T → RawType
-⨆ : ∀ {A B} → A ~ B → Type
-
-⨆ᵣ {` ι} {` ι} ~-ι = ` ι
-⨆ᵣ (~-ref A~B) = Ref (⨆ A~B)
-⨆ᵣ (~-fun gc₁~gc₂ A~C B~D) = [ ⨆ₗ gc₁~gc₂ ] ⨆ A~C ⇒ ⨆ B~D
-
-⨆ (~-ty g₁~g₂ S~T) = ⨆ᵣ S~T of ⨆ₗ g₁~g₂
-
-
 {- **** Gradual meet **** -}
 infix 5 _⊓ᵣ_
 infix 5 _⊓_

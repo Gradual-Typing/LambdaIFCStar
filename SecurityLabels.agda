@@ -313,14 +313,6 @@ consis-join-<:ₗ-inv {l ℓ₁} {l ℓ₂} (<:-l ℓ₁⋎ℓ₂≼ℓ) =
 ≾-<: {l ℓ₁} {l ℓ₂} {l ℓ} (≾-l ℓ₁≼ℓ₂) (<:-l ℓ₂≼ℓ) = ≾-l (≼-trans ℓ₁≼ℓ₂ ℓ₂≼ℓ)
 
 
-{- **** Label precision join **** -}
-⨆ₗ : ∀ {g₁ g₂} → g₁ ~ₗ g₂ → Label -- of labels
-
-⨆ₗ {⋆} {g}     ⋆~ = g
-⨆ₗ {g} {⋆}     ~⋆ = g
-⨆ₗ {l ℓ} {l ℓ} l~ = l ℓ
-
-
 {- **** Label gradual meet **** -}
 infix 5 _⊓ₗ_
 

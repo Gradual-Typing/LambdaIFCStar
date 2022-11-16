@@ -34,7 +34,6 @@ data Op : Set where
   op-error        : Error → Op
   {- Terms that only appear in erasure -}
   op-opaque       : Op
-  -- op-discard      : Op
 
 sig : Op → List Sig
 sig (op-addr a ℓ)      = []
@@ -55,7 +54,6 @@ sig (op-prot ℓ)        = ■ ∷ []
 sig (op-cast-pc g)     = ■ ∷ []
 sig (op-error e)       = []
 sig op-opaque          = []
--- sig op-discard         = ■ ∷ []
 
 open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug) public
 
@@ -79,5 +77,4 @@ pattern _⟨_⟩ M c                 = (op-cast c) ⦅ cons (ast M) nil ⦆
 pattern prot ℓ M                 = (op-prot ℓ) ⦅ cons (ast M) nil ⦆      {- protection term -}
 pattern cast-pc g M              = (op-cast-pc g) ⦅ cons (ast M) nil ⦆
 pattern error e                  = (op-error e) ⦅ nil ⦆                  {- blame / nsu error -}
--- pattern discard M                = op-discard ⦅ cons (ast M) nil ⦆       {- discarding value as ● -}
-pattern ●                        = op-opaque ⦅ nil ⦆                     {- opaque value -}
+pattern ●                        = op-opaque ⦅ nil ⦆                    {- opaque value -}
