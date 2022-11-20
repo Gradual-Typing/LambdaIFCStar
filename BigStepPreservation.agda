@@ -3,7 +3,7 @@ module BigStepPreservation where
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (true; false) renaming (Bool to 𝔹)
-open import Data.List hiding ([_])
+open import Data.List
 open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
@@ -73,13 +73,13 @@ open import Preservation public
 ⇓-preserve (⊢ref? {T = T} ⊢M) ⊢μ pc≾gc (⇓-ref? {n = n} {ℓ} M⇓V fresh pc≼ℓ) =
   let v = ⇓-value M⇓V in
   let ⟨ Σ₁ , Σ₁⊇Σ , ⊢V , ⊢μ₁ ⟩ = ⇓-preserve ⊢M ⊢μ pc≾gc M⇓V in
-  ⟨ cons-Σ (a[ ℓ ] n) T Σ₁ , ⊇-trans (⊇-fresh (a[ ℓ ] n) T ⊢μ₁ fresh) Σ₁⊇Σ ,
-    ⊢addr (lookup-Σ-cons (a[ ℓ ] n) Σ₁) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ₁ fresh ⟩
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ₁ , ⊇-trans (⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ₁ fresh) Σ₁⊇Σ ,
+    ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ₁) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ₁ fresh ⟩
 ⇓-preserve (⊢ref {T = T} ⊢M pc′≼ℓ) ⊢μ pc≾gc (⇓-ref {n = n} {ℓ} M⇓V fresh) =
   let v = ⇓-value M⇓V in
   let ⟨ Σ₁ , Σ₁⊇Σ , ⊢V , ⊢μ₁ ⟩ = ⇓-preserve ⊢M ⊢μ pc≾gc M⇓V in
-  ⟨ cons-Σ (a[ ℓ ] n) T Σ₁ , ⊇-trans (⊇-fresh (a[ ℓ ] n) T ⊢μ₁ fresh) Σ₁⊇Σ ,
-    ⊢addr (lookup-Σ-cons (a[ ℓ ] n) Σ₁) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ₁ fresh ⟩
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ₁ , ⊇-trans (⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ₁ fresh) Σ₁⊇Σ ,
+    ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ₁) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ₁ fresh ⟩
 ⇓-preserve (⊢deref ⊢M) ⊢μ pc≾gc (⇓-deref {v = v†} {ℓ = ℓ} {ℓ₁} M⇓a eq) =
   let ⟨ Σ₁ , Σ₁⊇Σ , ⊢a , ⊢μ₁ ⟩ = ⇓-preserve ⊢M ⊢μ pc≾gc M⇓a in
   case canonical-ref ⊢a V-addr of λ where
@@ -100,7 +100,7 @@ open import Preservation public
   (Ref-addr eq (<:-ty (<:-l ℓ≼ℓ′) (<:-ref A′<:A A<:A′))) →
     case <:-antisym A′<:A A<:A′ of λ where
     refl →
-      let eq′ = Σ₂⊇Σ₁ (a[ ℓ₁ ] n) eq in
+      let eq′ = Σ₂⊇Σ₁ (a⟦ ℓ₁ ⟧ n) eq in
       ⟨ Σ₂ , ⊇-trans Σ₂⊇Σ₁ Σ₁⊇Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢V v) v ⊢μ₂ eq′ ⟩
 ⇓-preserve (⊢assign ⊢L ⊢M pc′≼ℓ) ⊢μ pc≾gc (⇓-assign {n = n} {ℓ} {ℓ₁} L⇓a M⇓V) =
   let v = ⇓-value M⇓V in
@@ -110,7 +110,7 @@ open import Preservation public
   (Ref-addr eq (<:-ty (<:-l ℓ≼ℓ′) (<:-ref A′<:A A<:A′))) →
     case <:-antisym A′<:A A<:A′ of λ where
     refl →
-      let eq′ = Σ₂⊇Σ₁ (a[ ℓ₁ ] n) eq in
+      let eq′ = Σ₂⊇Σ₁ (a⟦ ℓ₁ ⟧ n) eq in
       ⟨ Σ₂ , ⊇-trans Σ₂⊇Σ₁ Σ₁⊇Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢V v) v ⊢μ₂ eq′ ⟩
 ⇓-preserve (⊢cast ⊢M) ⊢μ pc≾gc (⇓-cast a M⇓V V⟨c⟩↝N N⇓W) =
   let v = ⇓-value M⇓V in

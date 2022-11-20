@@ -33,7 +33,7 @@ data Inert : ∀ {A B} → Cast A ⇒ B → Set where
     → Inert c
 
   I-fun : ∀ {A B C D gc₁ gc₂ g₁ g₂}
-    → (c : Cast [ gc₁ ] A ⇒ B of g₁ ⇒ [ gc₂ ] C ⇒ D of g₂)
+    → (c : Cast ⟦ gc₁ ⟧ A ⇒ B of g₁ ⇒ ⟦ gc₂ ⟧ C ⇒ D of g₂)
     → Inert gc₁ ⇒ gc₂ → Inert g₁ ⇒ g₂
       ------------------------------------- InertFun
     → Inert c
@@ -56,13 +56,13 @@ data Active : ∀ {A B} → Cast A ⇒ B → Set where
     → Active c
 
   A-fun : ∀ {A B C D gc₁ gc₂ g₁ g₂}
-    → (c : Cast [ gc₁ ] A ⇒ B of g₁ ⇒ [ gc₂ ] C ⇒ D of g₂)
+    → (c : Cast ⟦ gc₁ ⟧ A ⇒ B of g₁ ⇒ ⟦ gc₂ ⟧ C ⇒ D of g₂)
     → Active g₁ ⇒ g₂
       ------------------------------------- ActiveFun
     → Active c
 
   A-fun-pc : ∀ {A B C D gc₁ gc₂ g₁ g₂}
-    → (c : Cast [ gc₁ ] A ⇒ B of g₁ ⇒ [ gc₂ ] C ⇒ D of g₂)
+    → (c : Cast ⟦ gc₁ ⟧ A ⇒ B of g₁ ⇒ ⟦ gc₂ ⟧ C ⇒ D of g₂)
     → Active gc₁ ⇒ gc₂ → Inert g₁ ⇒ g₂
       ------------------------------------- ActiveFunPC
     → Active c
@@ -97,24 +97,24 @@ active-or-inert (cast (Ref (S of ⋆) of l ℓ₁) (Ref (T of g₂₁) of g₂) 
 active-or-inert (cast (Ref (S of l _) of l ℓ₁) (Ref (T of g₂₁) of g₂) p (~-ty _ (~-ref _))) =
   inj₂ (I-ref _ I-label I-label)
 {- Fun -}
-active-or-inert (cast ([ _ ] A ⇒ B of ⋆) ([ _ ] C ⇒ D of g) p (~-ty _ (~-fun _ _ _))) =
+active-or-inert (cast (⟦ _ ⟧ A ⇒ B of ⋆) (⟦ _ ⟧ C ⇒ D of g) p (~-ty _ (~-fun _ _ _))) =
   inj₁ (A-fun _ active-⋆)
-active-or-inert (cast ([ ⋆ ] A ⇒ B of l ℓ) ([ gc ] C ⇒ D of _) p (~-ty _ (~-fun _ _ _))) =
+active-or-inert (cast (⟦ ⋆ ⟧ A ⇒ B of l ℓ) (⟦ gc ⟧ C ⇒ D of _) p (~-ty _ (~-fun _ _ _))) =
   inj₁ (A-fun-pc _ active-⋆ I-label)
-active-or-inert (cast ([ l pc ] A ⇒ B of l _) C→D p (~-ty _ (~-fun _ _ _))) =
+active-or-inert (cast (⟦ l pc ⟧ A ⇒ B of l _) C→D p (~-ty _ (~-fun _ _ _))) =
   inj₂ (I-fun _ I-label I-label)
 
 
 dom/c : ∀ {A B C D gc₁ gc₂ g₁ g₂}
-  → Cast [ gc₁ ] A ⇒ B of g₁ ⇒ [ gc₂ ] C ⇒ D of g₂
+  → Cast ⟦ gc₁ ⟧ A ⇒ B of g₁ ⇒ ⟦ gc₂ ⟧ C ⇒ D of g₂
   → Cast C ⇒ A
-dom/c (cast ([ gc₁ ] A ⇒ B of g₁) ([ gc₂ ] C ⇒ D of g₂) p (~-ty _ (~-fun _ A~C B~D))) =
+dom/c (cast (⟦ gc₁ ⟧ A ⇒ B of g₁) (⟦ gc₂ ⟧ C ⇒ D of g₂) p (~-ty _ (~-fun _ A~C B~D))) =
   cast C A p (~-sym A~C)
 
 cod/c : ∀ {A B C D gc₁ gc₂ g₁ g₂}
-  → Cast [ gc₁ ] A ⇒ B of g₁ ⇒ [ gc₂ ] C ⇒ D of g₂
+  → Cast ⟦ gc₁ ⟧ A ⇒ B of g₁ ⇒ ⟦ gc₂ ⟧ C ⇒ D of g₂
   → Cast stamp B g₁ ⇒ stamp D g₂
-cod/c (cast ([ gc₁ ] A ⇒ B of g₁) ([ gc₂ ] C ⇒ D of g₂) p (~-ty g₁~g₂ (~-fun _ A~C B~D))) =
+cod/c (cast (⟦ gc₁ ⟧ A ⇒ B of g₁) (⟦ gc₂ ⟧ C ⇒ D of g₂) p (~-ty g₁~g₂ (~-fun _ A~C B~D))) =
   cast (stamp B g₁) (stamp D g₂) p (stamp-~ B~D g₁~g₂)
 
 in/c : ∀ {A B g₁ g₂}

@@ -29,55 +29,55 @@ apply-cast V ⊢V v c (A-base-proj (cast (` ι of ⋆) (` ι of l ℓ) p (~-ty �
         (yes _) → W
         (no  _) → error (blame p)
 {- Order of reduction: propagate label first and then the security effect
-        V ⟨ [ pc′ ] A₁ → A₂ of ℓ′ ⇒ [ ⋆ ] B₁ → B₂ of ⋆ ⟩ ⟨ [ ⋆ ] C₁ → C₂ of ⋆ ⇒ [ pc ] D₁ → D₂ of ℓ ⟩
-   —→ V ⟨ [ pc′ ] A₁ → A₂ of ℓ  ⇒ [ ⋆ ] B₁ → B₂ of ℓ ⟩ ⟨ [ ⋆ ] C₁ → C₂ of ℓ ⇒ [ pc ] D₁ → D₂ of ℓ ⟩   , if ℓ′ ≼ ℓ
-   —→ V ⟨ [ pc  ] A₁ → A₂ of ℓ  ⇒ [ pc ] B₁ → B₂ of ℓ ⟩ ⟨ [ pc ] C₁ → C₂ of ℓ ⇒ [ pc ] D₁ → D₂ of ℓ ⟩ , if pc ≼ pc′
+        V ⟨ ⟦ pc′ ⟧ A₁ → A₂ of ℓ′ ⇒ ⟦ ⋆ ⟧ B₁ → B₂ of ⋆ ⟩ ⟨ ⟦ ⋆ ⟧ C₁ → C₂ of ⋆ ⇒ ⟦ pc ⟧ D₁ → D₂ of ℓ ⟩
+   —→ V ⟨ ⟦ pc′ ⟧ A₁ → A₂ of ℓ  ⇒ ⟦ ⋆ ⟧ B₁ → B₂ of ℓ ⟩ ⟨ ⟦ ⋆ ⟧ C₁ → C₂ of ℓ ⇒ ⟦ pc ⟧ D₁ → D₂ of ℓ ⟩   , if ℓ′ ≼ ℓ
+   —→ V ⟨ ⟦ pc  ⟧ A₁ → A₂ of ℓ  ⇒ ⟦ pc ⟧ B₁ → B₂ of ℓ ⟩ ⟨ ⟦ pc ⟧ C₁ → C₂ of ℓ ⇒ ⟦ pc ⟧ D₁ → D₂ of ℓ ⟩ , if pc ≼ pc′
    -}
-apply-cast V ⊢V v c (A-fun (cast ([ gc₁ ] C₁ ⇒ C₂ of ⋆) ([ gc₂ ] D₁ ⇒ D₂ of g) p (~-ty _ C~D)) a) =
+apply-cast V ⊢V v c (A-fun (cast (⟦ gc₁ ⟧ C₁ ⇒ C₂ of ⋆) (⟦ gc₂ ⟧ D₁ ⇒ D₂ of g) p (~-ty _ C~D)) a) =
   case canonical⋆ ⊢V v of λ where
-    ⟨ _ , _ , cast ([ gc₁′ ] A₁ ⇒ A₂ of l ℓ′) ([ gc₂′ ] B₁ ⇒ B₂ of ⋆) q (~-ty _ A~B) ,
+    ⟨ _ , _ , cast (⟦ gc₁′ ⟧ A₁ ⇒ A₂ of l ℓ′) (⟦ gc₂′ ⟧ B₁ ⇒ B₂ of ⋆) q (~-ty _ A~B) ,
       W , refl , I-fun _ I-label I-label , _ , <:-ty <:-⋆ _ ⟩ →
       case a of λ where
-        --      W ⟨ [ gc₁′ ] A₁ → A₂ of ℓ′ ⇒ [ gc₂′ ] B₁ → B₂ of ⋆  ⟩ ⟨ [ gc₁ ] C₁ → C₂ of ⋆  ⇒ [ gc₂ ] D₁ → D₂ of ⋆ ⟩
-        -- —→ W ⟨ [ gc₁′ ] A₁ → A₂ of ℓ′ ⇒ [ gc₂′ ] B₁ → B₂ of ℓ′ ⟩ ⟨ [ gc₁ ] C₁ → C₂ of ℓ′ ⇒ [ gc₂ ] D₁ → D₂ of ⋆ ⟩
+        --      W ⟨ ⟦ gc₁′ ⟧ A₁ → A₂ of ℓ′ ⇒ ⟦ gc₂′ ⟧ B₁ → B₂ of ⋆  ⟩ ⟨ ⟦ gc₁ ⟧ C₁ → C₂ of ⋆  ⇒ ⟦ gc₂ ⟧ D₁ → D₂ of ⋆ ⟩
+        -- —→ W ⟨ ⟦ gc₁′ ⟧ A₁ → A₂ of ℓ′ ⇒ ⟦ gc₂′ ⟧ B₁ → B₂ of ℓ′ ⟩ ⟨ ⟦ gc₁ ⟧ C₁ → C₂ of ℓ′ ⇒ ⟦ gc₂ ⟧ D₁ → D₂ of ⋆ ⟩
         A-id⋆ →
           let c~₁ = ~-ty ~ₗ-refl A~B
               c~₂ = ~-ty ~⋆      C~D in
-            W ⟨ cast ([ gc₁′ ] A₁ ⇒ A₂ of l ℓ′) ([ gc₂′ ] B₁ ⇒ B₂ of l ℓ′) q c~₁ ⟩
-              ⟨ cast ([ gc₁  ] C₁ ⇒ C₂ of l ℓ′) ([ gc₂  ] D₁ ⇒ D₂ of ⋆   ) p c~₂ ⟩
-        --      W ⟨ [ gc₁′ ] A₁ → A₂ of ℓ′ ⇒ [ gc₂′ ] B₁ → B₂ of ⋆ ⟩ ⟨ [ gc₁ ] C₁ → C₂ of ⋆ ⇒ [ gc₂ ] D₁ → D₂ of ℓ ⟩
-        -- —→ W ⟨ [ gc₁′ ] A₁ → A₂ of ℓ  ⇒ [ gc₂′ ] B₁ → B₂ of ℓ ⟩ ⟨ [ gc₁ ] C₁ → C₂ of ℓ ⇒ [ gc₂ ] D₁ → D₂ of ℓ ⟩  , if ℓ′ ≼ ℓ
+            W ⟨ cast (⟦ gc₁′ ⟧ A₁ ⇒ A₂ of l ℓ′) (⟦ gc₂′ ⟧ B₁ ⇒ B₂ of l ℓ′) q c~₁ ⟩
+              ⟨ cast (⟦ gc₁  ⟧ C₁ ⇒ C₂ of l ℓ′) (⟦ gc₂  ⟧ D₁ ⇒ D₂ of ⋆   ) p c~₂ ⟩
+        --      W ⟨ ⟦ gc₁′ ⟧ A₁ → A₂ of ℓ′ ⇒ ⟦ gc₂′ ⟧ B₁ → B₂ of ⋆ ⟩ ⟨ ⟦ gc₁ ⟧ C₁ → C₂ of ⋆ ⇒ ⟦ gc₂ ⟧ D₁ → D₂ of ℓ ⟩
+        -- —→ W ⟨ ⟦ gc₁′ ⟧ A₁ → A₂ of ℓ  ⇒ ⟦ gc₂′ ⟧ B₁ → B₂ of ℓ ⟩ ⟨ ⟦ gc₁ ⟧ C₁ → C₂ of ℓ ⇒ ⟦ gc₂ ⟧ D₁ → D₂ of ℓ ⟩  , if ℓ′ ≼ ℓ
         --      blame p  , otherwise
         (A-proj {ℓ}) →
           case ℓ′ ≼? ℓ of λ where
             (yes _) →
               let c~₁ = ~-ty ~ₗ-refl A~B
                   c~₂ = ~-ty ~ₗ-refl C~D in
-                W ⟨ cast ([ gc₁′ ] A₁ ⇒ A₂ of l ℓ) ([ gc₂′ ] B₁ ⇒ B₂ of l ℓ) q c~₁ ⟩
-                  ⟨ cast ([ gc₁  ] C₁ ⇒ C₂ of l ℓ) ([ gc₂  ] D₁ ⇒ D₂ of l ℓ) p c~₂ ⟩
+                W ⟨ cast (⟦ gc₁′ ⟧ A₁ ⇒ A₂ of l ℓ) (⟦ gc₂′ ⟧ B₁ ⇒ B₂ of l ℓ) q c~₁ ⟩
+                  ⟨ cast (⟦ gc₁  ⟧ C₁ ⇒ C₂ of l ℓ) (⟦ gc₂  ⟧ D₁ ⇒ D₂ of l ℓ) p c~₂ ⟩
             (no _) → error (blame p)
-apply-cast V ⊢V v c (A-fun-pc (cast ([ ⋆ ] C₁ ⇒ C₂ of g₁) ([ gc ] D₁ ⇒ D₂ of g₂) p (~-ty g₁~g₂ (~-fun _ C₁~D₁ C₂~D₂))) a I-label) =
+apply-cast V ⊢V v c (A-fun-pc (cast (⟦ ⋆ ⟧ C₁ ⇒ C₂ of g₁) (⟦ gc ⟧ D₁ ⇒ D₂ of g₂) p (~-ty g₁~g₂ (~-fun _ C₁~D₁ C₂~D₂))) a I-label) =
   case canonical-pc⋆ ⊢V v of λ where
-    ⟨ _ , _ , cast ([ l pc′ ] A₁ ⇒ A₂ of g₁′) ([ ⋆ ] B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
+    ⟨ _ , _ , cast (⟦ l pc′ ⟧ A₁ ⇒ A₂ of g₁′) (⟦ ⋆ ⟧ B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
       W , refl , I-fun _ I-label I-label , _ , <:-ty _ (<:-fun <:-⋆ _ _) ⟩ →
       case a of λ where
-        --      W ⟨ [ pc′ ] A₁ → A₂ of g₁′ ⇒ [ ⋆   ] B₁ → B₂ of g₂′ ⟩ ⟨ [ ⋆   ] C₁ → C₂ of g₁ ⇒ [ ⋆ ] D₁ → D₂ of g₂ ⟩
-        -- —→ W ⟨ [ pc′ ] A₁ → A₂ of g₁′ ⇒ [ pc′ ] B₁ → B₂ of g₂′ ⟩ ⟨ [ pc′ ] C₁ → C₂ of g₁ ⇒ [ ⋆ ] D₁ → D₂ of g₂ ⟩
+        --      W ⟨ ⟦ pc′ ⟧ A₁ → A₂ of g₁′ ⇒ ⟦ ⋆   ⟧ B₁ → B₂ of g₂′ ⟩ ⟨ ⟦ ⋆   ⟧ C₁ → C₂ of g₁ ⇒ ⟦ ⋆ ⟧ D₁ → D₂ of g₂ ⟩
+        -- —→ W ⟨ ⟦ pc′ ⟧ A₁ → A₂ of g₁′ ⇒ ⟦ pc′ ⟧ B₁ → B₂ of g₂′ ⟩ ⟨ ⟦ pc′ ⟧ C₁ → C₂ of g₁ ⇒ ⟦ ⋆ ⟧ D₁ → D₂ of g₂ ⟩
         A-id⋆ →
           let c~₁ = ~-ty g₁′~g₂′ (~-fun ~ₗ-refl A₁~B₁ A₂~B₂)
               c~₂ = ~-ty g₁~g₂   (~-fun ~⋆ C₁~D₁ C₂~D₂) in
-            W ⟨ cast ([ l pc′ ] A₁ ⇒ A₂ of g₁′) ([ l pc′ ] B₁ ⇒ B₂ of g₂′) q c~₁ ⟩
-              ⟨ cast ([ l pc′ ] C₁ ⇒ C₂ of g₁)  ([ ⋆ ] D₁ ⇒ D₂ of g₂) p c~₂ ⟩
-        --      W ⟨ [ pc′ ] A₁ → A₂ of g₁′ ⇒ [ ⋆  ] B₁ → B₂ of g₂′ ⟩ ⟨ [ ⋆  ] C₁ → C₂ of g₁ ⇒ [ pc ] D₁ → D₂ of g₂ ⟩
-        -- —→ W ⟨ [ pc  ] A₁ → A₂ of g₁′ ⇒ [ pc ] B₁ → B₂ of g₂′ ⟩ ⟨ [ pc ] C₁ → C₂ of g₁ ⇒ [ pc ] D₁ → D₂ of g₂ ⟩  , if pc ≼ pc′
+            W ⟨ cast (⟦ l pc′ ⟧ A₁ ⇒ A₂ of g₁′) (⟦ l pc′ ⟧ B₁ ⇒ B₂ of g₂′) q c~₁ ⟩
+              ⟨ cast (⟦ l pc′ ⟧ C₁ ⇒ C₂ of g₁)  (⟦ ⋆ ⟧ D₁ ⇒ D₂ of g₂) p c~₂ ⟩
+        --      W ⟨ ⟦ pc′ ⟧ A₁ → A₂ of g₁′ ⇒ ⟦ ⋆  ⟧ B₁ → B₂ of g₂′ ⟩ ⟨ ⟦ ⋆  ⟧ C₁ → C₂ of g₁ ⇒ ⟦ pc ⟧ D₁ → D₂ of g₂ ⟩
+        -- —→ W ⟨ ⟦ pc  ⟧ A₁ → A₂ of g₁′ ⇒ ⟦ pc ⟧ B₁ → B₂ of g₂′ ⟩ ⟨ ⟦ pc ⟧ C₁ → C₂ of g₁ ⇒ ⟦ pc ⟧ D₁ → D₂ of g₂ ⟩  , if pc ≼ pc′
         --      blame p  , otherwise
         (A-proj {pc}) →
           case pc ≼? pc′ of λ where
             (yes _) →
               let c~₁ = ~-ty g₁′~g₂′ (~-fun ~ₗ-refl A₁~B₁ A₂~B₂)
                   c~₂ = ~-ty g₁~g₂   (~-fun ~ₗ-refl C₁~D₁ C₂~D₂) in
-              W ⟨ cast ([ l pc ] A₁ ⇒ A₂ of g₁′) ([ l pc ] B₁ ⇒ B₂ of g₂′) q c~₁ ⟩
-                ⟨ cast ([ l pc ] C₁ ⇒ C₂ of g₁ ) ([ l pc ] D₁ ⇒ D₂ of g₂ ) p c~₂ ⟩
+              W ⟨ cast (⟦ l pc ⟧ A₁ ⇒ A₂ of g₁′) (⟦ l pc ⟧ B₁ ⇒ B₂ of g₂′) q c~₁ ⟩
+                ⟨ cast (⟦ l pc ⟧ C₁ ⇒ C₂ of g₁ ) (⟦ l pc ⟧ D₁ ⇒ D₂ of g₂ ) p c~₂ ⟩
             (no _) → error (blame p)
 apply-cast V ⊢V v c (A-ref (cast (Ref C of ⋆) (Ref D of g) p (~-ty _ RefC~RefD)) a) =
   case canonical⋆ ⊢V v of λ where

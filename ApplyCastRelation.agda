@@ -34,45 +34,45 @@ data ApplyCast_,_↝_ : ∀ {A B} (V : Term) → (c : Cast A ⇒ B) → Term →
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
 
   cast-fun-id⋆ : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ gc₁ gc₂ gc₃ gc₄ ℓ p q c~ d~ c~′ d~′}
-    → let c₁  = cast ([ gc₁ ] A₁ ⇒ B₁ of l ℓ) ([ gc₂ ] A₂ ⇒ B₂ of ⋆   ) p c~  in
-       let c₂  = cast ([ gc₃ ] A₃ ⇒ B₃ of ⋆   ) ([ gc₄ ] A₄ ⇒ B₄ of ⋆   ) q d~  in
-       let c₁′ = cast ([ gc₁ ] A₁ ⇒ B₁ of l ℓ) ([ gc₂ ] A₂ ⇒ B₂ of l ℓ) p c~′ in
-       let c₂′ = cast ([ gc₃ ] A₃ ⇒ B₃ of l ℓ) ([ gc₄ ] A₄ ⇒ B₄ of ⋆   ) q d~′ in
+    → let c₁  = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of ⋆   ) p c~  in
+       let c₂  = cast (⟦ gc₃ ⟧ A₃ ⇒ B₃ of ⋆   ) (⟦ gc₄ ⟧ A₄ ⇒ B₄ of ⋆   ) q d~  in
+       let c₁′ = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of l ℓ) p c~′ in
+       let c₂′ = cast (⟦ gc₃ ⟧ A₃ ⇒ B₃ of l ℓ) (⟦ gc₄ ⟧ A₄ ⇒ B₄ of ⋆   ) q d~′ in
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ V ⟨ c₁′ ⟩ ⟨ c₂′ ⟩
 
   cast-fun-proj : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ gc₁ gc₂ gc₃ gc₄ ℓ₁ ℓ₄ p q c~ d~ c~′ d~′}
     → ℓ₁ ≼ ℓ₄
-    → let c₁  = cast ([ gc₁ ] A₁ ⇒ B₁ of l ℓ₁) ([ gc₂ ] A₂ ⇒ B₂ of ⋆   ) p c~  in
-       let c₂  = cast ([ gc₃ ] A₃ ⇒ B₃ of ⋆   ) ([ gc₄ ] A₄ ⇒ B₄ of l ℓ₄) q d~  in
-       let c₁′ = cast ([ gc₁ ] A₁ ⇒ B₁ of l ℓ₄) ([ gc₂ ] A₂ ⇒ B₂ of l ℓ₄) p c~′ in
-       let c₂′ = cast ([ gc₃ ] A₃ ⇒ B₃ of l ℓ₄) ([ gc₄ ] A₄ ⇒ B₄ of l ℓ₄) q d~′ in
+    → let c₁  = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ₁) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of ⋆   ) p c~  in
+       let c₂  = cast (⟦ gc₃ ⟧ A₃ ⇒ B₃ of ⋆   ) (⟦ gc₄ ⟧ A₄ ⇒ B₄ of l ℓ₄) q d~  in
+       let c₁′ = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ₄) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of l ℓ₄) p c~′ in
+       let c₂′ = cast (⟦ gc₃ ⟧ A₃ ⇒ B₃ of l ℓ₄) (⟦ gc₄ ⟧ A₄ ⇒ B₄ of l ℓ₄) q d~′ in
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ V ⟨ c₁′ ⟩ ⟨ c₂′ ⟩
 
   cast-fun-proj-blame : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ gc₁ gc₂ gc₃ gc₄ ℓ₁ ℓ₄ p q c~ d~}
     → ¬ ℓ₁ ≼ ℓ₄
-    → let c₁  = cast ([ gc₁ ] A₁ ⇒ B₁ of l ℓ₁) ([ gc₂ ] A₂ ⇒ B₂ of ⋆   ) p c~  in
-       let c₂  = cast ([ gc₃ ] A₃ ⇒ B₃ of ⋆   ) ([ gc₄ ] A₄ ⇒ B₄ of l ℓ₄) q d~  in
+    → let c₁  = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ₁) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of ⋆   ) p c~  in
+       let c₂  = cast (⟦ gc₃ ⟧ A₃ ⇒ B₃ of ⋆   ) (⟦ gc₄ ⟧ A₄ ⇒ B₄ of l ℓ₄) q d~  in
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
 
   cast-fun-pc-id⋆ : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ g₁ g₂ ℓ₃ g₄ pc p q c~ d~ c~′ d~′}
-    → let c₁  = cast ([ l pc ] A₁ ⇒ B₁ of g₁  ) ([ ⋆    ] A₂ ⇒ B₂ of g₂) p c~  in
-       let c₂  = cast ([ ⋆    ] A₃ ⇒ B₃ of l ℓ₃) ([ ⋆    ] A₄ ⇒ B₄ of g₄) q d~  in
-       let c₁′ = cast ([ l pc ] A₁ ⇒ B₁ of g₁  ) ([ l pc ] A₂ ⇒ B₂ of g₂) p c~′ in
-       let c₂′ = cast ([ l pc ] A₃ ⇒ B₃ of l ℓ₃) ([ ⋆    ] A₄ ⇒ B₄ of g₄) q d~′ in
+    → let c₁  = cast (⟦ l pc ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ ⋆    ⟧ A₂ ⇒ B₂ of g₂) p c~  in
+       let c₂  = cast (⟦ ⋆    ⟧ A₃ ⇒ B₃ of l ℓ₃) (⟦ ⋆    ⟧ A₄ ⇒ B₄ of g₄) q d~  in
+       let c₁′ = cast (⟦ l pc ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ l pc ⟧ A₂ ⇒ B₂ of g₂) p c~′ in
+       let c₂′ = cast (⟦ l pc ⟧ A₃ ⇒ B₃ of l ℓ₃) (⟦ ⋆    ⟧ A₄ ⇒ B₄ of g₄) q d~′ in
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ V ⟨ c₁′ ⟩ ⟨ c₂′ ⟩
 
   cast-fun-pc-proj : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ g₁ g₂ ℓ₃ g₄ pc₁ pc₄ p q c~ d~ c~′ d~′}
     → pc₄ ≼ pc₁
-    → let c₁  = cast ([ l pc₁ ] A₁ ⇒ B₁ of g₁  ) ([ ⋆     ] A₂ ⇒ B₂ of g₂) p c~  in
-       let c₂  = cast ([ ⋆     ] A₃ ⇒ B₃ of l ℓ₃) ([ l pc₄ ] A₄ ⇒ B₄ of g₄) q d~  in
-       let c₁′ = cast ([ l pc₄ ] A₁ ⇒ B₁ of g₁  ) ([ l pc₄ ] A₂ ⇒ B₂ of g₂) p c~′ in
-       let c₂′ = cast ([ l pc₄ ] A₃ ⇒ B₃ of l ℓ₃) ([ l pc₄ ] A₄ ⇒ B₄ of g₄) q d~′ in
+    → let c₁  = cast (⟦ l pc₁ ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ ⋆     ⟧ A₂ ⇒ B₂ of g₂) p c~  in
+       let c₂  = cast (⟦ ⋆     ⟧ A₃ ⇒ B₃ of l ℓ₃) (⟦ l pc₄ ⟧ A₄ ⇒ B₄ of g₄) q d~  in
+       let c₁′ = cast (⟦ l pc₄ ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ l pc₄ ⟧ A₂ ⇒ B₂ of g₂) p c~′ in
+       let c₂′ = cast (⟦ l pc₄ ⟧ A₃ ⇒ B₃ of l ℓ₃) (⟦ l pc₄ ⟧ A₄ ⇒ B₄ of g₄) q d~′ in
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ V ⟨ c₁′ ⟩ ⟨ c₂′ ⟩
 
   cast-fun-pc-proj-blame : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ g₁ g₂ ℓ₃ g₄ pc₁ pc₄ p q c~ d~}
     → ¬ pc₄ ≼ pc₁
-    → let c₁  = cast ([ l pc₁ ] A₁ ⇒ B₁ of g₁  ) ([ ⋆     ] A₂ ⇒ B₂ of g₂) p c~  in
-       let c₂  = cast ([ ⋆     ] A₃ ⇒ B₃ of l ℓ₃) ([ l pc₄ ] A₄ ⇒ B₄ of g₄) q d~  in
+    → let c₁  = cast (⟦ l pc₁ ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ ⋆     ⟧ A₂ ⇒ B₂ of g₂) p c~  in
+       let c₂  = cast (⟦ ⋆     ⟧ A₃ ⇒ B₃ of l ℓ₃) (⟦ l pc₄ ⟧ A₄ ⇒ B₄ of g₄) q d~  in
          ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
 
   cast-ref-id⋆ : ∀ {V A B C D ℓ p q c~ d~ c~′ d~′}

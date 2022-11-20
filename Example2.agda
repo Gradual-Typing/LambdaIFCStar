@@ -11,7 +11,7 @@ open import Types
 open import BlameLabels
 open import SurfaceLang
 open import CC renaming (Term to CCTerm;
-  `_ to var; $_of_ to const_of_; ƛ[_]_˙_of_ to lam[_]_˙_of_; !_ to *_)
+  `_ to var; $_of_ to const_of_; ƛ⟦_⟧_˙_of_ to lam⟦_⟧_˙_of_; !_ to *_)
 open import Compile
 open import Reduction
 open import BigStep
@@ -20,22 +20,22 @@ open import TypeBasedCast
 
 -- publish : 𝔹 of low → ⊤
 publish : Term
-publish = ƛ[ low ] ` Bool of l low ˙ $ tt of low of low
+publish = ƛ⟦ low ⟧ ` Bool of l low ˙ $ tt of low of low
 
-⊢publish : ∀ {Γ} → Γ ; l low ⊢ᴳ publish ⦂ [ l low ] (` Bool of l low) ⇒ (` Unit of l low) of l low
+⊢publish : ∀ {Γ} → Γ ; l low ⊢ᴳ publish ⦂ ⟦ l low ⟧ (` Bool of l low) ⇒ (` Unit of l low) of l low
 ⊢publish = ⊢lam ⊢const
 
 {- Input is `true` in N₁ and `false` in N₂ -}
 N₁ N₂ : Term
 N₁ =
-  `let ref[ low ] ($ true of low) at pos 0 `in
+  `let ref⟦ low ⟧ ($ true of low) at pos 0 `in
   `let if ($ true of high) ∶ ` Bool of ⋆ at pos 1
          then (` 0) := $ false of low at pos 2
          else (` 0) := $ true  of low at pos 3
          at pos 4 `in
   (publish · (! (` 1)) at pos 5)
 N₂ =
-  `let ref[ low ] ($ true of low) at pos 0 `in
+  `let ref⟦ low ⟧ ($ true of low) at pos 0 `in
   `let if ($ false of high) ∶ ` Bool of ⋆ at pos 1
          then (` 0) := $ false of low at pos 2
          else (` 0) := $ true  of low at pos 3
@@ -65,7 +65,7 @@ N⇒₁ = compile N₁ ⊢N₁; N⇒₂ = compile N₂ ⊢N₂
 _ :
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
   N⇒₁ ≡
-  (`let (ref[ low ] (const true of low))
+  (`let (ref⟦ low ⟧ (const true of low))
   (`let (if (const true of high ⟨ c₁ ⟩) _ (var 0 :=? (const false of low)) (var 0 :=? (const true of low)))
   (compile {[]} publish ⊢publish · (* var 1))))
 _ = refl
@@ -83,7 +83,7 @@ _ = ⟨ _ , R* ⟩
       —→⟨ β-let V-addr ⟩
     _ ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (if-cast-true (I-base-inj _)) ⟩
-    let a = addr a[ low ] 0 of low in
+    let a = addr a⟦ low ⟧ 0 of low in
     let c = cast (` Unit of l high) (` Unit of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
     `let (prot high (cast-pc ⋆ (a :=? (const false of low))) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = cast-pc ⋆ □} (assign?-fail (λ ()) {- high ⋠ low -})))) ⟩
@@ -109,7 +109,7 @@ _ = ⟨ _ , R* ⟩
       —→⟨ β-let V-addr ⟩
     _ ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (if-cast-false (I-base-inj _)) ⟩
-    let a = addr a[ low ] 0 of low in
+    let a = addr a⟦ low ⟧ 0 of low in
     let c = cast (` Unit of l high) (` Unit of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
     `let (prot high (cast-pc ⋆ (a :=? (const true of low))) ⟨ c ⟩) (_ · (* a)) ∣ _ ∣ low
       —→⟨ ξ {F = let□ _} (ξ {F = □⟨ _ ⟩} (prot-ctx (ξ {F = cast-pc ⋆ □} (assign?-fail (λ ()) {- high ⋠ low -})))) ⟩
@@ -128,12 +128,12 @@ _ = ⟨ _ , R* ⟩
 M₁ M₂ : Term
 M₁ =
   `let ($ true of high) `in
-  `let (ref[ high ] $ true of high at pos 0) `in
+  `let (ref⟦ high ⟧ $ true of high at pos 0) `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
            else $ tt of low at pos 2
 M₂ =
   `let ($ false of high) `in
-  `let (ref[ high ] $ true of high at pos 0) `in
+  `let (ref⟦ high ⟧ $ true of high at pos 0) `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
            else $ tt of low at pos 2
 
@@ -172,12 +172,12 @@ M₂⇓tt = ⇓-let (⇓-val V-const)
 M*₁ M*₂ : Term
 M*₁ =
   `let ($ true of high) `in
-  `let (ref[ high ] ($ true of high) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
+  `let (ref⟦ high ⟧ ($ true of high) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
            else $ tt of low at pos 2
 M*₂ =
   `let ($ false of high) `in
-  `let (ref[ high ] ($ true of high) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
+  `let (ref⟦ high ⟧ ($ true of high) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
            else $ tt of low at pos 2
 
@@ -201,7 +201,7 @@ M*₁⇒ =
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) (~-ty ~⋆ ~-ι) in
   let c₂ = cast (` Bool of ⋆) (` Bool of l high) (pos 0) (~-ty ⋆~ ~-ι) in
   `let (const true of high)
-       (`let (ref[ high ] ((const true of high ⟨ c₁ ⟩) ⟨ c₂ ⟩))
+       (`let (ref⟦ high ⟧ ((const true of high ⟨ c₁ ⟩) ⟨ c₂ ⟩))
              (if (var 1) (` Unit of l low) (var 0 := (const false of high)) (const tt of low)))
 
 _ : compile M*₁ ⊢M*₁ ≡ M*₁⇒
@@ -225,12 +225,12 @@ M*₂⇓tt = ⇓-let (⇓-val V-const)
 M*₁′ M*₂′ : Term
 M*₁′ =
   `let ($ true of high) `in
-  `let (ref[ high ] ($ true of low {- here -}) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
+  `let (ref⟦ high ⟧ ($ true of low {- here -}) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
            else $ tt of low at pos 2
 M*₂′ =
   `let ($ false of high) `in
-  `let (ref[ high ] ($ true of low) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
+  `let (ref⟦ high ⟧ ($ true of low) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
            else $ tt of low at pos 2
 

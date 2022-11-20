@@ -26,10 +26,10 @@ data _;_⊢ᴳ_⦂_ : Context → Label → Term → Type → Set where
   ⊢lam : ∀ {Γ gc pc A B N ℓ}
     → (A ∷ Γ) ; l pc ⊢ᴳ N ⦂ B
       --------------------------------------------------------- Lam
-    → Γ ; gc ⊢ᴳ ƛ[ pc ] A ˙ N of ℓ ⦂ [ l pc ] A ⇒ B of l ℓ
+    → Γ ; gc ⊢ᴳ ƛ⟦ pc ⟧ A ˙ N of ℓ ⦂ ⟦ l pc ⟧ A ⇒ B of l ℓ
 
   ⊢app : ∀ {Γ gc gc′ A A′ B L M g p}
-    → Γ ; gc ⊢ᴳ L ⦂ [ gc′ ] A ⇒ B of g
+    → Γ ; gc ⊢ᴳ L ⦂ ⟦ gc′ ⟧ A ⇒ B of g
     → Γ ; gc ⊢ᴳ M ⦂ A′
     → A′ ≲ A
     → g ≾ gc′
@@ -62,7 +62,7 @@ data _;_⊢ᴳ_⦂_ : Context → Label → Term → Type → Set where
     → T of g ≲ T of l ℓ
     → gc ≾ l ℓ
       --------------------------------------------------------- Ref
-    → Γ ; gc ⊢ᴳ ref[ ℓ ] M at p ⦂ Ref (T of l ℓ) of l low
+    → Γ ; gc ⊢ᴳ ref⟦ ℓ ⟧ M at p ⦂ Ref (T of l ℓ) of l low
 
   ⊢deref : ∀ {Γ gc M A g}
     → Γ ; gc ⊢ᴳ M ⦂ (Ref A) of g

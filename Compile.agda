@@ -16,7 +16,7 @@ open import TypeBasedCast
 open import SurfaceLang
   renaming (`_ to `ᴳ_;
             $_of_ to $ᴳ_of_;
-            ƛ[_]_˙_of_ to ƛᴳ[_]_˙_of_;
+            ƛ⟦_⟧_˙_of_ to ƛᴳ⟦_⟧_˙_of_;
             !_ to !ᴳ_)
 open import CC renaming (Term to CCTerm)
 open import Preservation using (rename-↑1-pres)
@@ -26,15 +26,15 @@ open import Utils
 compile : ∀ {Γ gc A} (M : Term) → Γ ; gc ⊢ᴳ M ⦂ A → CCTerm
 compile ($ᴳ k of ℓ) ⊢const = $ k of ℓ
 compile (`ᴳ x) (⊢var x∈Γ)  = ` x
-compile (ƛᴳ[ pc ] A ˙ N of ℓ) (⊢lam ⊢N) =
+compile (ƛᴳ⟦ pc ⟧ A ˙ N of ℓ) (⊢lam ⊢N) =
   let N′ = compile N ⊢N in
-  ƛ[ pc ] A ˙ N′ of ℓ
+  ƛ⟦ pc ⟧ A ˙ N′ of ℓ
 compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′) =
   case ⟨ ≲-prop A′≲A , ≾-prop′ gc≾gc′ , ≾-prop′ g≾gc′ ⟩ of λ where
   ⟨ ⟨ C , A′~C , C<:A ⟩ , ⟨ g₁ , gc<:g₁ , g₁~gc′ ⟩ , ⟨ g₂ , g<:g₂ , g₂~gc′ ⟩ ⟩ →
     let g₁⋎g₂~gc′ = subst (λ □ → _ ~ₗ □) g⋎̃g≡g (consis-join-~ₗ g₁~gc′ g₂~gc′)
         c~ = ~-ty ~ₗ-refl (~-fun (~ₗ-sym g₁⋎g₂~gc′) ~-refl ~-refl)
-        c = cast ([ gc′ ] A ⇒ B of g) ([ g₁ ⋎̃ g₂ ] A ⇒ B of g) p c~ in
+        c = cast (⟦ gc′ ⟧ A ⇒ B of g) (⟦ g₁ ⋎̃ g₂ ⟧ A ⇒ B of g) p c~ in
     let L′ = case gc′ ==? g₁ ⋎̃ g₂ of λ where
              (yes refl) → compile L ⊢L {- skip id cast -}
              (no  _   ) → compile L ⊢L ⟨ c ⟩ in
@@ -65,15 +65,15 @@ compile (`let M `in N) (⊢let ⊢M ⊢N) =
   let M′ = compile M ⊢M in
   let N′ = compile N ⊢N in
   `let M′ N′
-compile (ref[ ℓ ] M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ) =
+compile (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ) =
   case ≲-prop Tg≲Tℓ of λ where
   ⟨ A , Tg~A , A<:Tℓ ⟩ →
     let M′ = case (T of g) ≡? A of λ where
              (yes refl) → compile M ⊢M {- skip id cast -}
              (no  _   ) → compile M ⊢M ⟨ cast (T of g) A p Tg~A ⟩ in
     case gc≾ℓ of λ where
-    ≾-⋆l       → ref?[ ℓ ] M′
-    (≾-l ℓᶜ≼ℓ) →  ref[ ℓ ] M′
+    ≾-⋆l       → ref?⟦ ℓ ⟧ M′
+    (≾-l ℓᶜ≼ℓ) →  ref⟦ ℓ ⟧ M′
 compile (!ᴳ M) (⊢deref ⊢M) =
   let M′ = compile M ⊢M in ! M′
 compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {g₁} ⊢L ⊢M A≲Tg1 g≾g1 gc≾g1) =
@@ -98,7 +98,7 @@ compile-preserve : ∀ {Γ gc A} (M : Term)
   → (∀ {pc} → Γ ; ∅ ; gc ; pc ⊢ compile M ⊢M ⦂ A)
 compile-preserve ($ᴳ k of ℓ) ⊢const = ⊢const
 compile-preserve (`ᴳ x) (⊢var Γ∋x) = ⊢var Γ∋x
-compile-preserve (ƛᴳ[ pc ] A ˙ N of ℓ) (⊢lam ⊢N) = ⊢lam (compile-preserve N ⊢N)
+compile-preserve (ƛᴳ⟦ pc ⟧ A ˙ N of ℓ) (⊢lam ⊢N) = ⊢lam (compile-preserve N ⊢N)
 compile-preserve (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′)
   with ≲-prop A′≲A | ≾-prop′ gc≾gc′ | ≾-prop′ g≾gc′
 ... | ⟨ B , A′~B , B<:A ⟩ | ⟨ g₁ , gc<:g₁ , g₁~gc′ ⟩ | ⟨ g₂ , g<:g₂ , g₂~gc′ ⟩
@@ -149,7 +149,7 @@ compile-preserve {Γ} {Σ} {A = A} (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A�
 ... | no  _    = ⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A
 compile-preserve (`let M `in N) (⊢let ⊢M ⊢N) =
   ⊢let (compile-preserve M ⊢M) (compile-preserve N ⊢N)
-compile-preserve (ref[ ℓ ] M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ)
+compile-preserve (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ)
   with ≲-prop Tg≲Tℓ
 ... | ⟨ A , Tg~A , A<:Tℓ ⟩
   with gc≾ℓ
@@ -157,7 +157,7 @@ compile-preserve (ref[ ℓ ] M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲T�
   with (T of g) ≡? A
 ... | yes refl = ⊢ref? (⊢sub (compile-preserve M ⊢M) A<:Tℓ)
 ... | no  _    = ⊢ref? (⊢sub (⊢cast (compile-preserve M ⊢M)) A<:Tℓ)
-compile-preserve (ref[ ℓ ] M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ)
+compile-preserve (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg≲Tℓ gc≾ℓ)
   | ⟨ A , Tg~A , A<:Tℓ ⟩ | ≾-l ℓᶜ≼ℓ {- gc = ℓᶜ -}
   with (T of g) ≡? A
 ... | yes refl = ⊢ref (⊢sub (compile-preserve M ⊢M) A<:Tℓ) ℓᶜ≼ℓ

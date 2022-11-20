@@ -29,7 +29,7 @@ data _∣_⊢_⇓_∣_ where
     → μ ∣ pc ⊢ V ⇓ V ∣ μ
 
   ⇓-app : ∀ {μ μ₁ μ₂ μ₃ pc pc′ L M N V W A ℓ}
-    → μ  ∣ pc     ⊢ L       ⇓ ƛ[ pc′ ] A ˙ N of ℓ ∣ μ₁
+    → μ  ∣ pc     ⊢ L       ⇓ ƛ⟦ pc′ ⟧ A ˙ N of ℓ ∣ μ₁
     → μ₁ ∣ pc     ⊢ M       ⇓ V ∣ μ₂
     → (⇓W : μ₂ ∣ pc ⋎ ℓ ⊢ N [ V ] ⇓ W ∣ μ₃)
       ---------------------------------------------------------------------- Application
@@ -55,35 +55,35 @@ data _∣_⊢_⇓_∣_ where
 
   ⇓-ref? : ∀ {μ μ₁ pc M V n ℓ}
     → (⇓V : μ ∣ pc ⊢ M ⇓ V ∣ μ₁)
-    → a[ ℓ ] n FreshIn μ₁
+    → a⟦ ℓ ⟧ n FreshIn μ₁
     → pc ≼ ℓ
       -------------------------------------------------------------------------------------- RefNSU
-    → μ ∣ pc ⊢ ref?[ ℓ ] M ⇓ addr (a[ ℓ ] n) of low ∣ cons-μ (a[ ℓ ] n) V (⇓-value ⇓V) μ₁
+    → μ ∣ pc ⊢ ref?⟦ ℓ ⟧ M ⇓ addr a⟦ ℓ ⟧ n of low ∣ cons-μ (a⟦ ℓ ⟧ n) V (⇓-value ⇓V) μ₁
 
   ⇓-ref : ∀ {μ μ₁ pc M V n ℓ}
     → (⇓V : μ ∣ pc ⊢ M ⇓ V ∣ μ₁)
-    → a[ ℓ ] n FreshIn μ₁
+    → a⟦ ℓ ⟧ n FreshIn μ₁
       -------------------------------------------------------------------------------------- Ref
-    → μ ∣ pc ⊢ ref[ ℓ ] M ⇓ addr (a[ ℓ ] n) of low ∣ cons-μ (a[ ℓ ] n) V (⇓-value ⇓V) μ₁
+    → μ ∣ pc ⊢ ref⟦ ℓ ⟧ M ⇓ addr a⟦ ℓ ⟧ n of low ∣ cons-μ (a⟦ ℓ ⟧ n) V (⇓-value ⇓V) μ₁
 
-  ⇓-deref : ∀ {μ μ₁ pc M V v n ℓ ℓ₁}
-    → μ ∣ pc ⊢ M ⇓ addr (a[ ℓ₁ ] n) of ℓ ∣ μ₁
-    → lookup-μ μ₁ (a[ ℓ₁ ] n) ≡ just (V & v)
+  ⇓-deref : ∀ {μ μ₁ pc M V v n ℓ ℓ̂}
+    → μ ∣ pc ⊢ M ⇓ addr a⟦ ℓ̂ ⟧ n of ℓ ∣ μ₁
+    → lookup-μ μ₁ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
       ---------------------------------------------------------------------------- Deref
-    → μ ∣ pc ⊢ ! M ⇓ stamp-val V v (ℓ₁ ⋎ ℓ) ∣ μ₁
+    → μ ∣ pc ⊢ ! M ⇓ stamp-val V v (ℓ̂ ⋎ ℓ) ∣ μ₁
 
-  ⇓-assign? : ∀ {μ μ₁ μ₂ pc L M V n ℓ ℓ₁}
-    → μ  ∣ pc ⊢ L ⇓ addr (a[ ℓ₁ ] n) of ℓ ∣ μ₁
+  ⇓-assign? : ∀ {μ μ₁ μ₂ pc L M V n ℓ ℓ̂}
+    → μ  ∣ pc ⊢ L ⇓ addr a⟦ ℓ̂ ⟧ n of ℓ ∣ μ₁
     → (⇓V : μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂)
-    → pc ≼ ℓ₁
+    → pc ≼ ℓ̂
       -------------------------------------------------------------------------- AssignNSU
-    → μ ∣ pc ⊢ L :=? M ⇓ $ tt of low ∣ cons-μ (a[ ℓ₁ ] n) V (⇓-value ⇓V) μ₂
+    → μ ∣ pc ⊢ L :=? M ⇓ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V (⇓-value ⇓V) μ₂
 
-  ⇓-assign : ∀ {μ μ₁ μ₂ pc L M V n ℓ ℓ₁}
-    → μ  ∣ pc ⊢ L ⇓ addr (a[ ℓ₁ ] n) of ℓ ∣ μ₁
+  ⇓-assign : ∀ {μ μ₁ μ₂ pc L M V n ℓ ℓ̂}
+    → μ  ∣ pc ⊢ L ⇓ addr a⟦ ℓ̂ ⟧ n of ℓ ∣ μ₁
     → (⇓V : μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂)
       -------------------------------------------------------------------------- Assign
-    → μ  ∣ pc ⊢ L := M ⇓ $ tt of low ∣ cons-μ (a[ ℓ₁ ] n) V (⇓-value ⇓V) μ₂
+    → μ  ∣ pc ⊢ L := M ⇓ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V (⇓-value ⇓V) μ₂
 
   ⇓-cast : ∀ {μ μ₁ μ₂ pc M N V W A B} {c : Cast A ⇒ B}
     → Active c
@@ -113,7 +113,7 @@ data _∣_⊢_⇓_∣_ where
     → μ  ∣ pc     ⊢ if L A M N           ⇓ W ∣ μ₃
 
   ⇓-fun-cast : ∀ {μ μ₁ μ₂ μ₃ pc L M V V′ W A B C D gc₁ gc₂ g₁ g₂}
-                  {c : Cast ([ gc₁ ] A ⇒ B of g₁) ⇒ ([ gc₂ ] C ⇒ D of g₂)}
+                  {c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂)}
     → (i : Inert c)
     → μ  ∣ pc ⊢ L                       ⇓ V ⟨ c ⟩ ∣ μ₁
     → μ₁ ∣ pc ⊢ M                       ⇓ W  ∣ μ₂

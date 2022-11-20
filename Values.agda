@@ -21,7 +21,7 @@ data Err : Term → Set where
 
 data Value : Term → Set where
   V-addr : ∀ {a ℓ} → Value (addr a of ℓ)
-  V-ƛ : ∀ {pc A N ℓ} → Value (ƛ[ pc ] A ˙ N of ℓ)
+  V-ƛ : ∀ {pc A N ℓ} → Value (ƛ⟦ pc ⟧ A ˙ N of ℓ)
   V-const : ∀ {ι} {k : rep ι} {ℓ} → Value ($ k of ℓ)
   V-cast : ∀ {A B V} {c : Cast A ⇒ B}
     → Value V → Inert c → Value (V ⟨ c ⟩)
@@ -30,30 +30,30 @@ data Value : Term → Set where
 data Fun : Term → HeapContext → Type → Set where
   Fun-ƛ : ∀ {Σ gc pc′ A A′ B B′ g N ℓ}
     → (∀ {pc} → A′ ∷ [] ; Σ ; l pc′ ; pc ⊢ N ⦂ B′)
-    → [ l pc′ ] A′ ⇒ B′ of l ℓ <: [ gc ] A ⇒ B of g
+    → ⟦ l pc′ ⟧ A′ ⇒ B′ of l ℓ <: ⟦ gc ⟧ A ⇒ B of g
       ----------------------------------------------------- Lambda
-    → Fun (ƛ[ pc′ ] A′ ˙ N of ℓ) Σ ([ gc ] A ⇒ B of g)
+    → Fun (ƛ⟦ pc′ ⟧ A′ ˙ N of ℓ) Σ (⟦ gc ⟧ A ⇒ B of g)
 
   Fun-proxy : ∀ {Σ gc gc₁ gc₂ A A₁ A₂ B B₁ B₂ g g₁ g₂ V}
-                {c : Cast ([ gc₁ ] A₁ ⇒ B₁ of g₁) ⇒ ([ gc₂ ] A₂ ⇒ B₂ of g₂)}
-    → Fun V Σ ([ gc₁ ] A₁ ⇒ B₁ of g₁)
+                {c : Cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁) ⇒ (⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂)}
+    → Fun V Σ (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁)
     → Inert c
-    → [ gc₂ ] A₂ ⇒ B₂ of g₂ <: [ gc ] A ⇒ B of g
+    → ⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂ <: ⟦ gc ⟧ A ⇒ B of g
       ----------------------------------------------------- Function Proxy
-    → Fun (V ⟨ c ⟩) Σ ([ gc ] A ⇒ B of g)
+    → Fun (V ⟨ c ⟩) Σ (⟦ gc ⟧ A ⇒ B of g)
 
 -- Sanity checks
 fun-is-value : ∀ {Σ V gc A B g}
-  → Fun V Σ ([ gc ] A ⇒ B of g)
+  → Fun V Σ (⟦ gc ⟧ A ⇒ B of g)
   → Value V
 fun-is-value (Fun-ƛ _ sub) = V-ƛ
 fun-is-value (Fun-proxy fun i _) = V-cast (fun-is-value fun) i
 
 -- Canonical form of value of function type
 canonical-fun : ∀ {Σ gc gc′ pc A B g V}
-  → [] ; Σ ; gc ; pc ⊢ V ⦂ [ gc′ ] A ⇒ B of g
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ ⟦ gc′ ⟧ A ⇒ B of g
   → Value V
-  → Fun V Σ ([ gc′ ] A ⇒ B of g)
+  → Fun V Σ (⟦ gc′ ⟧ A ⇒ B of g)
 canonical-fun (⊢lam ⊢N) V-ƛ = Fun-ƛ ⊢N <:-refl
 canonical-fun (⊢cast ⊢V) (V-cast v (I-fun c i₁ i₂)) =
   Fun-proxy (canonical-fun ⊢V v) (I-fun c i₁ i₂) <:-refl
@@ -67,10 +67,10 @@ canonical-fun (⊢sub-pc ⊢V gc<:gc′) v = canonical-fun ⊢V v
 
 data Reference : Term → HeapContext → Type → Set where
   Ref-addr : ∀ {Σ A n T g ℓ ℓ₁}
-    → lookup-Σ Σ (a[ ℓ₁ ] n) ≡ just T
+    → lookup-Σ Σ (a⟦ ℓ₁ ⟧ n) ≡ just T
     → Ref (T of l ℓ₁) of l ℓ <: Ref A of g
       ---------------------------------------- Reference
-    → Reference (addr (a[ ℓ₁ ] n) of ℓ) Σ (Ref A of g)
+    → Reference (addr (a⟦ ℓ₁ ⟧ n) of ℓ) Σ (Ref A of g)
 
   Ref-proxy : ∀ {Σ A A₁ A₂ g g₁ g₂ V} {c : Cast (Ref A₁ of g₁) ⇒ (Ref A₂ of g₂)}
     → Reference V Σ (Ref A₁ of g₁)
@@ -83,7 +83,7 @@ ref-is-value : ∀ {Σ V A g}
   → Reference V Σ (Ref A of g)
   → Value V
 ref-is-value (Ref-addr _ _) = V-addr
-ref-is-value (Ref-proxy ref i _) = V-cast (ref-is-value ref) i
+ref-is-value (Ref-proxy r i _) = V-cast (ref-is-value r) i
 
 canonical-ref : ∀ {Σ gc pc A g V}
   → [] ; Σ ; gc ; pc ⊢ V ⦂ Ref A of g
@@ -97,7 +97,7 @@ canonical-ref (⊢sub ⊢V sub) v =
     (<:-ty _ (<:-ref _ _)) →
       case canonical-ref ⊢V v of λ where
         (Ref-addr eq sub₁) → Ref-addr eq (<:-trans sub₁ sub)
-        (Ref-proxy ref i sub₁) → Ref-proxy ref i (<:-trans sub₁ sub)
+        (Ref-proxy r i sub₁) → Ref-proxy r i (<:-trans sub₁ sub)
 canonical-ref (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref ⊢V v
 
 data Constant : Term → Type → Set where
@@ -157,10 +157,10 @@ canonical⋆ (⊢sub-pc ⊢V gc<:gc′) v =
       ⟨ A , B , c , W , refl , i , ⊢sub-pc ⊢W gc<:gc′ , B<:T⋆ ⟩
 
 canonical-pc⋆ : ∀ {Γ Σ gc pc V A B g}
-  → Γ ; Σ ; gc ; pc ⊢ V ⦂ [ ⋆ ] A ⇒ B of g
+  → Γ ; Σ ; gc ; pc ⊢ V ⦂ ⟦ ⋆ ⟧ A ⇒ B of g
   → Value V
   → ∃[ C ] ∃[ D ] Σ[ c ∈ Cast C ⇒ D ] ∃[ W ]
-       (V ≡ W ⟨ c ⟩) × (Inert c) × (Γ ; Σ ; gc ; pc ⊢ W ⦂ C) × (D <: [ ⋆ ] A ⇒ B of g)
+       (V ≡ W ⟨ c ⟩) × (Inert c) × (Γ ; Σ ; gc ; pc ⊢ W ⦂ C) × (D <: ⟦ ⋆ ⟧ A ⇒ B of g)
 canonical-pc⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) =
   ⟨ _ , _ , c , W , refl , i , ⊢W , <:-refl ⟩
 canonical-pc⋆ (⊢sub ⊢V (<:-ty g′<:g (<:-fun <:-⋆ A<:A′ B′<:B))) v =
@@ -198,10 +198,10 @@ stamp-inert : ∀ {A B} → (c : Cast A ⇒ B) → Inert c → ∀ ℓ
 stamp-inert (cast (` ι of l ℓ₁) (` ι of ⋆) p (~-ty ~⋆ ~-ι))
             (I-base-inj _) ℓ =
   cast (` ι of l (ℓ₁ ⋎ ℓ)) (` ι of ⋆) p (~-ty ~⋆ ~-ι)
-stamp-inert (cast ([ gc₁ ] A ⇒ B of g₁) ([ gc₂ ] C ⇒ D of g₂) p (~-ty g₁~g₂ A→B~C→D))
+stamp-inert (cast (⟦ gc₁ ⟧ A ⇒ B of g₁) (⟦ gc₂ ⟧ C ⇒ D of g₂) p (~-ty g₁~g₂ A→B~C→D))
             (I-fun _ I-label I-label) ℓ =
   let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) A→B~C→D in
-    cast ([ gc₁ ] A ⇒ B of (g₁ ⋎̃ l ℓ)) ([ gc₂ ] C ⇒ D of (g₂ ⋎̃ l ℓ)) p c~
+    cast (⟦ gc₁ ⟧ A ⇒ B of (g₁ ⋎̃ l ℓ)) (⟦ gc₂ ⟧ C ⇒ D of (g₂ ⋎̃ l ℓ)) p c~
 stamp-inert (cast (Ref A of g₁) (Ref B of g₂) p (~-ty g₁~g₂ RefA~RefB))
             (I-ref _ I-label I-label) ℓ =
   let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) RefA~RefB in
@@ -216,7 +216,7 @@ stamp-inert-inert (I-ref c I-label I-label) =
 
 stamp-val : ∀ V → Value V → StaticLabel → Term
 stamp-val (addr a of ℓ₁) V-addr ℓ = addr a of (ℓ₁ ⋎ ℓ)
-stamp-val (ƛ[ pc ] A ˙ N of ℓ₁) V-ƛ ℓ = ƛ[ pc ] A ˙ N of (ℓ₁ ⋎ ℓ)
+stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁) V-ƛ ℓ = ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ)
 stamp-val ($ k of ℓ₁) V-const ℓ = $ k of (ℓ₁ ⋎ ℓ)
 stamp-val (V ⟨ c ⟩) (V-cast v i) ℓ = stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩
 stamp-val ● V-● ℓ = ●

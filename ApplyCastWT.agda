@@ -28,9 +28,9 @@ applycast-progress ⊢V v (A-base-proj (cast (` ι of ⋆) (` ι of l ℓ) p _))
         ⟨ _ , cast-base-proj ℓ′≼ℓ ⟩
       (no  ℓ′⋠ℓ) →
         ⟨ _ , cast-base-proj-blame ℓ′⋠ℓ ⟩
-applycast-progress ⊢V v (A-fun (cast ([ _ ] C₁ ⇒ D₁ of ⋆) ([ _ ] C₂ ⇒ D₂ of g) p (~-ty _ d~)) a) =
+applycast-progress ⊢V v (A-fun (cast (⟦ _ ⟧ C₁ ⇒ D₁ of ⋆) (⟦ _ ⟧ C₂ ⇒ D₂ of g) p (~-ty _ d~)) a) =
   case ⟨ v , canonical⋆ ⊢V v ⟩ of λ where
-  ⟨ V-cast w _ , _ , _ , cast ([ gc₁′ ] A₁ ⇒ A₂ of l ℓ′) ([ gc₂′ ] B₁ ⇒ B₂ of ⋆) q (~-ty ~⋆ A~B) ,
+  ⟨ V-cast w _ , _ , _ , cast (⟦ gc₁′ ⟧ A₁ ⇒ A₂ of l ℓ′) (⟦ gc₂′ ⟧ B₁ ⇒ B₂ of ⋆) q (~-ty ~⋆ A~B) ,
     W , refl , I-fun _ I-label I-label , ⊢W , <:-ty <:-⋆ B<:C ⟩ →
       case a of λ where
       A-id⋆ →
@@ -45,9 +45,9 @@ applycast-progress ⊢V v (A-fun (cast ([ _ ] C₁ ⇒ D₁ of ⋆) ([ _ ] C₂ 
           ⟨ _ , cast-fun-proj {c~′ = c~′} {d~′} ℓ′≼ℓ ⟩
         (no  ℓ′⋠ℓ) →
           ⟨ _ , cast-fun-proj-blame ℓ′⋠ℓ ⟩
-applycast-progress ⊢V v (A-fun-pc (cast ([ ⋆ ] C₁ ⇒ C₂ of l ℓ₁) ([ gc ] D₁ ⇒ D₂ of g₂) p (~-ty ℓ₁~g₂ (~-fun _ C₁~C₂ D₁~D₂))) a I-label) =
+applycast-progress ⊢V v (A-fun-pc (cast (⟦ ⋆ ⟧ C₁ ⇒ C₂ of l ℓ₁) (⟦ gc ⟧ D₁ ⇒ D₂ of g₂) p (~-ty ℓ₁~g₂ (~-fun _ C₁~C₂ D₁~D₂))) a I-label) =
   case ⟨ v , canonical-pc⋆ ⊢V v ⟩ of λ where
-  ⟨ V-cast w _ , _ , _ , cast ([ l pc′ ] A₁ ⇒ A₂ of g₁′) ([ ⋆ ] B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
+  ⟨ V-cast w _ , _ , _ , cast (⟦ l pc′ ⟧ A₁ ⇒ A₂ of g₁′) (⟦ ⋆ ⟧ B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
     W , refl , I-fun _ I-label I-label , ⊢W , <:-ty g₂′<:g₁ (<:-fun <:-⋆ C₁<:B₁ B₂<:C₂) ⟩ →
       case a of λ where
       A-id⋆ →
@@ -109,25 +109,25 @@ applycast-pres ⊢V v (A-base-proj _) (cast-base-proj ℓ₁≼ℓ₂) =
     W , refl , I-base-inj _ , ⊢W , <:-ty <:-⋆ <:-ι ⟩ →
       ⊢sub (⊢value-pc ⊢W w) (<:-ty (<:-l ℓ₁≼ℓ₂) <:-ι)
 applycast-pres ⊢V v (A-base-proj _) (cast-base-proj-blame _) = ⊢err
-applycast-pres ⊢V v (A-fun (cast ([ _ ] C₁ ⇒ D₁ of ⋆) ([ _ ] C₂ ⇒ D₂ of ⋆) p _) A-id⋆) cast-fun-id⋆ =
+applycast-pres ⊢V v (A-fun (cast (⟦ _ ⟧ C₁ ⇒ D₁ of ⋆) (⟦ _ ⟧ C₂ ⇒ D₂ of ⋆) p _) A-id⋆) cast-fun-id⋆ =
   case ⟨ v , canonical⋆ ⊢V v ⟩ of λ where
-  ⟨ V-cast w _ , _ , _ , cast ([ gc₁′ ] A₁ ⇒ A₂ of l ℓ′) ([ gc₂′ ] B₁ ⇒ B₂ of ⋆) q (~-ty ~⋆ A~B) ,
+  ⟨ V-cast w _ , _ , _ , cast (⟦ gc₁′ ⟧ A₁ ⇒ A₂ of l ℓ′) (⟦ gc₂′ ⟧ B₁ ⇒ B₂ of ⋆) q (~-ty ~⋆ A~B) ,
     W , refl , I-fun _ I-label I-label , ⊢W , <:-ty <:-⋆ B<:C ⟩ →
       ⊢cast (⊢sub (⊢cast (⊢value-pc ⊢W w)) (<:-ty <:ₗ-refl B<:C))
-applycast-pres ⊢V v (A-fun (cast ([ _ ] C₁ ⇒ D₁ of ⋆) ([ _ ] C₂ ⇒ D₂ of l _) p _) A-proj) (cast-fun-proj ℓ′≼ℓ) =
+applycast-pres ⊢V v (A-fun (cast (⟦ _ ⟧ C₁ ⇒ D₁ of ⋆) (⟦ _ ⟧ C₂ ⇒ D₂ of l _) p _) A-proj) (cast-fun-proj ℓ′≼ℓ) =
   case ⟨ v , canonical⋆ ⊢V v ⟩ of λ where
-  ⟨ V-cast w _ , _ , _ , cast ([ gc₁′ ] A₁ ⇒ A₂ of l ℓ′) ([ gc₂′ ] B₁ ⇒ B₂ of ⋆) q (~-ty ~⋆ A~B) ,
+  ⟨ V-cast w _ , _ , _ , cast (⟦ gc₁′ ⟧ A₁ ⇒ A₂ of l ℓ′) (⟦ gc₂′ ⟧ B₁ ⇒ B₂ of ⋆) q (~-ty ~⋆ A~B) ,
     W , refl , I-fun _ I-label I-label , ⊢W , <:-ty <:-⋆ B<:C ⟩ →
       ⊢cast (⊢sub (⊢cast (⊢sub (⊢value-pc ⊢W w) (<:-ty (<:-l ℓ′≼ℓ) <:ᵣ-refl))) (<:-ty <:ₗ-refl B<:C))
 applycast-pres ⊢V v a (cast-fun-proj-blame _) = ⊢err
-applycast-pres ⊢V v (A-fun-pc (cast ([ ⋆ ] C₁ ⇒ C₂ of l ℓ₁) ([ ⋆ ] D₁ ⇒ D₂ of g₂) p _) A-id⋆ I-label) cast-fun-pc-id⋆ =
+applycast-pres ⊢V v (A-fun-pc (cast (⟦ ⋆ ⟧ C₁ ⇒ C₂ of l ℓ₁) (⟦ ⋆ ⟧ D₁ ⇒ D₂ of g₂) p _) A-id⋆ I-label) cast-fun-pc-id⋆ =
   case ⟨ v , canonical-pc⋆ ⊢V v ⟩ of λ where
-  ⟨ V-cast w _ , _ , _ , cast ([ l pc′ ] A₁ ⇒ A₂ of g₁′) ([ ⋆ ] B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
+  ⟨ V-cast w _ , _ , _ , cast (⟦ l pc′ ⟧ A₁ ⇒ A₂ of g₁′) (⟦ ⋆ ⟧ B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
     W , refl , I-fun _ I-label I-label , ⊢W , <:-ty g₂′<:g₁ (<:-fun <:-⋆ C₁<:B₁ B₂<:C₂) ⟩ →
       ⊢cast (⊢sub (⊢cast (⊢value-pc ⊢W w)) (<:-ty g₂′<:g₁ (<:-fun <:ₗ-refl C₁<:B₁ B₂<:C₂)))
-applycast-pres ⊢V v (A-fun-pc (cast ([ ⋆ ] C₁ ⇒ C₂ of g₁) ([ l _ ] D₁ ⇒ D₂ of g₂) p _) A-proj I-label) (cast-fun-pc-proj pc≼pc′) =
+applycast-pres ⊢V v (A-fun-pc (cast (⟦ ⋆ ⟧ C₁ ⇒ C₂ of g₁) (⟦ l _ ⟧ D₁ ⇒ D₂ of g₂) p _) A-proj I-label) (cast-fun-pc-proj pc≼pc′) =
   case ⟨ v , canonical-pc⋆ ⊢V v ⟩ of λ where
-  ⟨ V-cast w _ , _ , _ , cast ([ l pc′ ] A₁ ⇒ A₂ of g₁′) ([ ⋆ ] B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
+  ⟨ V-cast w _ , _ , _ , cast (⟦ l pc′ ⟧ A₁ ⇒ A₂ of g₁′) (⟦ ⋆ ⟧ B₁ ⇒ B₂ of g₂′) q (~-ty g₁′~g₂′ (~-fun _ A₁~B₁ A₂~B₂)) ,
     W , refl , I-fun _ I-label I-label , ⊢W , <:-ty g₂′<:g₁ (<:-fun <:-⋆ C₁<:B₁ B₂<:C₂) ⟩ →
       ⊢cast (⊢sub (⊢cast (⊢sub (⊢value-pc ⊢W w) (<:-ty <:ₗ-refl (<:-fun (<:-l pc≼pc′) <:-refl <:-refl))))
                   (<:-ty g₂′<:g₁ (<:-fun <:ₗ-refl C₁<:B₁ B₂<:C₂)))

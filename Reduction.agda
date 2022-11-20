@@ -48,7 +48,7 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   β : ∀ {V N μ pc pc′ A ℓ}
     → Value V
       ------------------------------------------------------------------- β
-    → (ƛ[ pc′ ] A ˙ N of ℓ) · V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
+    → (ƛ⟦ pc′ ⟧ A ˙ N of ℓ) · V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
 
   β-if-true : ∀ {M N μ pc A ℓ}
       ----------------------------------------------------------------------- IfTrue
@@ -65,28 +65,28 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
 
   ref-static : ∀ {M μ pc ℓ}
       ------------------------------------------------- RefStatic
-    → ref[ ℓ ] M ∣ μ ∣ pc —→ ref✓[ ℓ ] M ∣ μ
+    → ref⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
   ref?-ok : ∀ {M μ pc ℓ}
     → pc ≼ ℓ
       ------------------------------------------------- RefNSUSuccess
-    → ref?[ ℓ ] M ∣ μ ∣ pc —→ ref✓[ ℓ ] M ∣ μ
+    → ref?⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
   ref?-fail : ∀ {M μ pc ℓ}
     → ¬ pc ≼ ℓ
       ------------------------------------------------- RefNSUFail
-    → ref?[ ℓ ] M ∣ μ ∣ pc —→ error nsu-error ∣ μ
+    → ref?⟦ ℓ ⟧ M ∣ μ ∣ pc —→ error nsu-error ∣ μ
 
   ref : ∀ {V μ pc n ℓ}
     → (v : Value V)
-    → a[ ℓ ] n FreshIn μ  {- address is fresh -}
+    → a⟦ ℓ ⟧ n FreshIn μ  {- address is fresh -}
       -------------------------------------------------------------------------------- Ref
-    → ref✓[ ℓ ] V ∣ μ ∣ pc —→ addr (a[ ℓ ] n) of low ∣ cons-μ (a[ ℓ ] n) V v μ
+    → ref✓⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr (a⟦ ℓ ⟧ n) of low ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
 
   deref : ∀ {V μ pc v n ℓ ℓ₁}
-    → lookup-μ μ (a[ ℓ₁ ] n) ≡ just (V & v)
+    → lookup-μ μ (a⟦ ℓ₁ ⟧ n) ≡ just (V & v)
       --------------------------------------------------------------------- Deref
-    → ! (addr (a[ ℓ₁ ] n) of ℓ) ∣ μ ∣ pc —→ prot (ℓ₁ ⋎ ℓ) V ∣ μ
+    → ! (addr (a⟦ ℓ₁ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (ℓ₁ ⋎ ℓ) V ∣ μ
 
   assign-static : ∀ {L M μ pc}
       ------------------------------------------------------- AssignStatic
@@ -95,17 +95,17 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   assign?-ok : ∀ {M μ pc n ℓ ℓ₁}
     → pc ≼ ℓ₁
       ----------------------------------------------------------------------------- AssignNSUSuccess
-    → (addr (a[ ℓ₁ ] n) of ℓ) :=? M ∣ μ ∣ pc —→ (addr (a[ ℓ₁ ] n) of ℓ) :=✓ M ∣ μ
+    → (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=? M ∣ μ ∣ pc —→ (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=✓ M ∣ μ
 
   assign?-fail : ∀ {M μ pc n ℓ ℓ₁}
     → ¬ pc ≼ ℓ₁
       ----------------------------------------------------------------------------- AssignNSUFail
-    → (addr (a[ ℓ₁ ] n) of ℓ) :=? M ∣ μ ∣ pc —→ error nsu-error ∣ μ
+    → (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=? M ∣ μ ∣ pc —→ error nsu-error ∣ μ
 
   assign : ∀ {V μ pc n ℓ ℓ₁}
     → (v : Value V)
       ---------------------------------------------------------------------------------------------- Assign
-    → (addr (a[ ℓ₁ ] n) of ℓ) :=✓ V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a[ ℓ₁ ] n) V v μ
+    → (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=✓ V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ₁ ⟧ n) V v μ
 
   {- Reduction rules about casts, active and inert: -}
   cast : ∀ {A B V M μ pc} {c : Cast A ⇒ B}
@@ -124,7 +124,7 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       --------------------------------------------------------------------------------------------- IfCastFalse
     → if ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ N) ⟨ branch/c A c ⟩ ∣ μ
 
-  fun-cast : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂} {c : Cast ([ gc₁ ] A ⇒ B of g₁) ⇒ ([ gc₂ ] C ⇒ D of g₂)}
+  fun-cast : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂} {c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂)}
     → Value V → Value W
     → (i : Inert c)
       ---------------------------------------------------------------- FunCast

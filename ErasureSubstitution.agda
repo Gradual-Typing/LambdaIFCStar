@@ -26,14 +26,14 @@ erase-σ σ = λ x → erase (σ x)
 rename-erase : ∀ ρ M → erase (rename ρ M) ≡ rename ρ (erase M)
 rename-erase ρ (` x) = refl
 {- values -}
-rename-erase ρ (addr a[ low ] n of low) = refl
-rename-erase ρ (addr a[ low ] n of high) = refl
-rename-erase ρ (addr a[ high ] n of low) = refl
-rename-erase ρ (addr a[ high ] n of high) = refl
-rename-erase ρ (ƛ[ pc ] A ˙ N of low)
+rename-erase ρ (addr a⟦ low  ⟧ n of low)  = refl
+rename-erase ρ (addr a⟦ low  ⟧ n of high) = refl
+rename-erase ρ (addr a⟦ high ⟧ n of low)  = refl
+rename-erase ρ (addr a⟦ high ⟧ n of high) = refl
+rename-erase ρ (ƛ⟦ pc ⟧ A ˙ N of low)
   rewrite rename-erase (ext ρ) N = refl
-rename-erase ρ (ƛ[ pc ] A ˙ N of high) = refl
-rename-erase ρ ($ k of low) = refl
+rename-erase ρ (ƛ⟦ pc ⟧ A ˙ N of high) = refl
+rename-erase ρ ($ k of low)  = refl
 rename-erase ρ ($ k of high) = refl
 {- -- -}
 rename-erase ρ (M · N)
@@ -43,9 +43,9 @@ rename-erase ρ (`let M N)
 rename-erase ρ (if L A M N)
   rewrite rename-erase ρ L | rename-erase ρ M | rename-erase ρ N =
   refl
-rename-erase ρ (ref[ ℓ ] M) rewrite rename-erase ρ M = refl
-rename-erase ρ (ref?[ ℓ ] M) rewrite rename-erase ρ M = refl
-rename-erase ρ (ref✓[ ℓ ] M) rewrite rename-erase ρ M = refl
+rename-erase ρ (ref⟦ ℓ ⟧ M) rewrite rename-erase ρ M = refl
+rename-erase ρ (ref?⟦ ℓ ⟧ M) rewrite rename-erase ρ M = refl
+rename-erase ρ (ref✓⟦ ℓ ⟧ M) rewrite rename-erase ρ M = refl
 rename-erase ρ (! M) rewrite rename-erase ρ M = refl
 rename-erase ρ (L := M)
   rewrite rename-erase ρ L | rename-erase ρ M = refl
@@ -73,13 +73,13 @@ ext-erase σ = extensionality (ext-erase-x σ)
 subst-erase : ∀ σ M → erase (⟪ σ ⟫ M) ≡ ⟪ erase-σ σ ⟫ (erase M)
 subst-erase σ (` x) = refl
 {- values -}
-subst-erase σ (addr a[ low ] n of low) = refl
-subst-erase σ (addr a[ low ] n of high) = refl
-subst-erase σ (addr a[ high ] n of low) = refl
-subst-erase σ (addr a[ high ] n of high) = refl
-subst-erase σ (ƛ[ pc ] A ˙ N of low)
+subst-erase σ (addr a⟦ low ⟧ n of low) = refl
+subst-erase σ (addr a⟦ low ⟧ n of high) = refl
+subst-erase σ (addr a⟦ high ⟧ n of low) = refl
+subst-erase σ (addr a⟦ high ⟧ n of high) = refl
+subst-erase σ (ƛ⟦ pc ⟧ A ˙ N of low)
   rewrite subst-erase (ext σ) N | ext-erase σ = refl
-subst-erase σ (ƛ[ pc ] A ˙ N of high) = refl
+subst-erase σ (ƛ⟦ pc ⟧ A ˙ N of high) = refl
 subst-erase σ ($ k of low) = refl
 subst-erase σ ($ k of high) = refl
 {- -- -}
@@ -90,9 +90,9 @@ subst-erase σ (`let M N)
 subst-erase σ (if L A M N)
   rewrite subst-erase σ L | subst-erase σ M | subst-erase σ N =
   refl
-subst-erase σ (ref[ ℓ ] M) rewrite subst-erase σ M = refl
-subst-erase σ (ref?[ ℓ ] M) rewrite subst-erase σ M = refl
-subst-erase σ (ref✓[ ℓ ] M) rewrite subst-erase σ M = refl
+subst-erase σ (ref⟦ ℓ ⟧ M) rewrite subst-erase σ M = refl
+subst-erase σ (ref?⟦ ℓ ⟧ M) rewrite subst-erase σ M = refl
+subst-erase σ (ref✓⟦ ℓ ⟧ M) rewrite subst-erase σ M = refl
 subst-erase σ (! M) rewrite subst-erase σ M = refl
 subst-erase σ (L := M)
   rewrite subst-erase σ L | subst-erase σ M = refl

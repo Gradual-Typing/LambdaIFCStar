@@ -61,14 +61,14 @@ infixl 7  _·_
 infix 8 _⟨_⟩
 
 pattern addr_of_ a ℓ             = (op-addr a ℓ) ⦅ nil ⦆
-pattern ƛ[_]_˙_of_ pc A N ℓ      = (op-lam pc A ℓ) ⦅ cons (bind (ast N)) nil ⦆
+pattern ƛ⟦_⟧_˙_of_ pc A N ℓ      = (op-lam pc A ℓ) ⦅ cons (bind (ast N)) nil ⦆
 pattern _·_ L M                  = op-app ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern $_of_ k ℓ                = (op-const k ℓ) ⦅ nil ⦆
 pattern if L A M N               = (op-if A) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
 pattern `let M N                 = op-let ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
-pattern ref[_]_  ℓ M             = (op-ref ℓ) ⦅ cons (ast M) nil ⦆
-pattern ref?[_]_ ℓ M             = (op-ref? ℓ) ⦅ cons (ast M) nil ⦆
-pattern ref✓[_]_ ℓ M             = (op-ref✓ ℓ) ⦅ cons (ast M) nil ⦆
+pattern ref⟦_⟧_ ℓ M              = (op-ref ℓ) ⦅ cons (ast M) nil ⦆
+pattern ref?⟦_⟧_ ℓ M             = (op-ref? ℓ) ⦅ cons (ast M) nil ⦆
+pattern ref✓⟦_⟧_ ℓ M             = (op-ref✓ ℓ) ⦅ cons (ast M) nil ⦆
 pattern !_ M                     = op-deref ⦅ cons (ast M) nil ⦆
 pattern _:=_  L M                = op-assign ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _:=?_ L M                = op-assign? ⦅ cons (ast L) (cons (ast M) nil) ⦆

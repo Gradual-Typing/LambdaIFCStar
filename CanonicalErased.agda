@@ -3,7 +3,7 @@ module CanonicalErased where
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (true; false) renaming (Bool to 𝔹)
-open import Data.List hiding ([_])
+open import Data.List
 open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
@@ -24,10 +24,10 @@ data ErasedFun : Term → Set where
 
   ϵ-fun-● : ErasedFun ●
 
-  ϵ-fun-ƛ : ∀ {pc A N} → ErasedFun (ƛ[ pc ] A ˙ N of low)
+  ϵ-fun-ƛ : ∀ {pc A N} → ErasedFun (ƛ⟦ pc ⟧ A ˙ N of low)
 
 canonical-fun-erase : ∀ {Σ gc gc′ pc A B g V}
-  → [] ; Σ ; gc ; pc ⊢ V ⦂ [ gc′ ] A ⇒ B of g
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ ⟦ gc′ ⟧ A ⇒ B of g
   → Value V
   → ∃[ V′ ] V′ ≡ erase V × ErasedFun V′
 canonical-fun-erase {gc = gc} {pc = pc} ⊢V v =
@@ -43,7 +43,7 @@ data ErasedRef : Term → Set where
 
   ϵ-ref-● : ErasedRef ●
 
-  ϵ-ref-addr : ∀ {n} → ErasedRef (addr a[ low ] n of low)
+  ϵ-ref-addr : ∀ {n} → ErasedRef (addr a⟦ low ⟧ n of low)
 
 canonical-ref-erase : ∀ {Σ gc pc A g V}
   → [] ; Σ ; gc ; pc ⊢ V ⦂ Ref A of g

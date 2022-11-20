@@ -6,4 +6,4 @@ open import SecurityLabels using (StaticLabel)
 RawAddr = ℕ
 
 data Addr : Set where
-  a[_]_ : StaticLabel → RawAddr → Addr
+  a⟦_⟧_ : StaticLabel → RawAddr → Addr

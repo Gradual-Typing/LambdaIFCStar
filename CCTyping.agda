@@ -24,10 +24,10 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       -------------------------------------------- CCConst
     → Γ ; Σ ; gc ; pc ⊢ $ k of ℓ ⦂ ` ι of l ℓ
 
-  ⊢addr : ∀ {Γ Σ gc pc n T ℓ ℓ₁}
-    → lookup-Σ Σ (a[ ℓ₁ ] n) ≡ just T
+  ⊢addr : ∀ {Γ Σ gc pc n T ℓ ℓ̂}
+    → lookup-Σ Σ (a⟦ ℓ̂ ⟧ n) ≡ just T
       ------------------------------------------------ CCAddr
-    → Γ ; Σ ; gc ; pc ⊢ addr (a[ ℓ₁ ] n) of ℓ ⦂ Ref (T of l ℓ₁) of l ℓ
+    → Γ ; Σ ; gc ; pc ⊢ addr (a⟦ ℓ̂ ⟧ n) of ℓ ⦂ Ref (T of l ℓ̂) of l ℓ
 
   ⊢var : ∀ {Γ Σ gc pc A x}
     → Γ ∋ x ⦂ A
@@ -37,10 +37,10 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
   ⊢lam : ∀ {Γ Σ gc pc pc′ A B N ℓ}
     → (∀ {pc} → A ∷ Γ ; Σ ; l pc′ ; pc ⊢ N ⦂ B)
       ------------------------------------------------------------------- CCLam
-    → Γ ; Σ ; gc ; pc ⊢ ƛ[ pc′ ] A ˙ N of ℓ ⦂ [ l pc′ ] A ⇒ B of l ℓ
+    → Γ ; Σ ; gc ; pc ⊢ ƛ⟦ pc′ ⟧ A ˙ N of ℓ ⦂ ⟦ l pc′ ⟧ A ⇒ B of l ℓ
 
   ⊢app : ∀ {Γ Σ gc pc A B L M g}
-    → Γ ; Σ ; gc ; pc ⊢ L ⦂ ([ gc ⋎̃ g ] A ⇒ B) of g
+    → Γ ; Σ ; gc ; pc ⊢ L ⦂ ⟦ gc ⋎̃ g ⟧ A ⇒ B of g
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
       --------------------------------------- CCApp
     → Γ ; Σ ; gc ; pc ⊢ L · M ⦂ stamp B g
@@ -62,18 +62,18 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l pc′ ; pc ⊢ M ⦂ T of l ℓ
     → pc′ ≼ ℓ
       ---------------------------------------------------------- CCRefStatic
-    → Γ ; Σ ; l pc′ ; pc ⊢ ref[ ℓ ] M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; l pc′ ; pc ⊢ ref⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
 
   ⊢ref? : ∀ {Γ Σ gc pc M T ℓ}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ
       ---------------------------------------------------------- CCRefUnchecked
-    → Γ ; Σ ; gc ; pc ⊢ ref?[ ℓ ] M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; gc ; pc ⊢ ref?⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
 
   ⊢ref✓ : ∀ {Γ Σ gc pc M T ℓ}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ
     → pc ≼ ℓ
       ---------------------------------------------------------- CCRefChecked
-    → Γ ; Σ ; gc ; pc ⊢ ref✓[ ℓ ] M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; gc ; pc ⊢ ref✓⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
 
   ⊢deref : ∀ {Γ Σ gc pc M A g}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ Ref A of g

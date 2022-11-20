@@ -1,7 +1,7 @@
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (true; false) renaming (Bool to 𝔹)
-open import Data.List hiding ([_])
+open import Data.List
 open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Maybe
@@ -42,7 +42,7 @@ progress : ∀ {Σ gc A} pc M → [] ; Σ ; gc ; pc ⊢ M ⦂ A → ∀ μ �
 progress pc ($ k of ℓ) ⊢const μ ⊢μ = done V-const
 progress pc (addr a of ℓ) (⊢addr _) μ ⊢μ = done V-addr
 progress pc (` x) (⊢var ())
-progress pc (ƛ[ _ ] A ˙ N of ℓ) (⊢lam ⊢M) μ ⊢μ = done V-ƛ
+progress pc (ƛ⟦ _ ⟧ A ˙ N of ℓ) (⊢lam ⊢M) μ ⊢μ = done V-ƛ
 progress pc (L · M) (⊢app ⊢L ⊢M) μ ⊢μ =
   case progress pc L ⊢L μ ⊢μ of λ where
   (step L→L′) → step (ξ {F = □· M} L→L′)
@@ -70,19 +70,19 @@ progress pc (`let M N) (⊢let ⊢M ⊢N) μ ⊢μ =
   (step M→M′) → step (ξ {F = let□ N} M→M′)
   (done v) → step (β-let v)
   (err (E-error {e})) → step (ξ-err {F = let□ N} {e = e})
-progress pc (ref[ ℓ ] M) (⊢ref ⊢M pc′≼ℓ) μ ⊢μ =
+progress pc (ref⟦ ℓ ⟧ M) (⊢ref ⊢M pc′≼ℓ) μ ⊢μ =
   step ref-static
-progress pc (ref?[ ℓ ] M) (⊢ref? ⊢M) μ ⊢μ =
+progress pc (ref?⟦ ℓ ⟧ M) (⊢ref? ⊢M) μ ⊢μ =
   case pc ≼? ℓ of λ where
   (yes pc≼ℓ) → step (ref?-ok pc≼ℓ)
   (no  pc⋠ℓ) → step (ref?-fail pc⋠ℓ)
-progress {Σ} pc (ref✓[ ℓ ] M) (⊢ref✓ ⊢M pc≼ℓ) μ ⊢μ =
+progress {Σ} pc (ref✓⟦ ℓ ⟧ M) (⊢ref✓ ⊢M pc≼ℓ) μ ⊢μ =
   case progress pc M ⊢M μ ⊢μ of λ where
-    (step M→M′) → step (ξ {F = ref✓[ ℓ ]□} M→M′)
+    (step M→M′) → step (ξ {F = ref✓⟦ ℓ ⟧□} M→M′)
     (done v) →
       let ⟨ n , fresh ⟩ = gen-fresh μ in step (ref v fresh)
     (err (E-error {e})) →
-      step (ξ-err {F = ref✓[ ℓ ]□} {e = e})
+      step (ξ-err {F = ref✓⟦ ℓ ⟧□} {e = e})
 progress pc (! M) (⊢deref ⊢M) μ ⊢μ =
   case progress pc M ⊢M μ ⊢μ of λ where
   (step M→M′) → step (ξ {F = !□} M→M′)
@@ -190,8 +190,8 @@ preserve {Σ} (⊢let ⊢V ⊢N) ⊢μ pc≾gc (β-let v) =
 preserve {Σ} (⊢ref ⊢M pc′≼ℓ) ⊢μ (≾-l pc≼pc′) ref-static =
   ⟨ Σ , ⊇-refl Σ , ⊢ref✓ ⊢M (≼-trans pc≼pc′ pc′≼ℓ) , ⊢μ ⟩
 preserve {Σ} (⊢ref✓ {T = T} {ℓ} ⊢V pc≼ℓ) ⊢μ pc≾gc (ref {n = n} {.ℓ} v fresh) =
-  ⟨ cons-Σ (a[ ℓ ] n) T Σ , ⊇-fresh (a[ ℓ ] n) T ⊢μ fresh ,
-    ⊢addr (lookup-Σ-cons (a[ ℓ ] n) Σ) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ fresh ⟩
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , ⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ fresh ,
+    ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ fresh ⟩
 preserve {Σ} (⊢ref? ⊢M) ⊢μ pc≾gc (ref?-ok pc≼ℓ) =
   ⟨ Σ , ⊇-refl Σ , ⊢ref✓ ⊢M pc≼ℓ , ⊢μ ⟩
 preserve {Σ} (⊢ref? ⊢M) ⊢μ pc≾gc (ref?-fail pc⋠ℓ) =

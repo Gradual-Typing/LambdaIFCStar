@@ -12,13 +12,13 @@ open import ApplyCastRelation public
 open import ProxyElimination  public
 
 
-{- There are 3 forms of reference creation: static, unchecked, and checked -}
+{- There are 3 forms of reference creation: static, not-yet-checked, and checked -}
 data RefCreation : (StaticLabel → Term → Term) → Set where
-  static    : RefCreation ref[_]_
-  unchecked : RefCreation ref?[_]_
-  checked   : RefCreation ref✓[_]_
+  static    : RefCreation ref⟦_⟧_
+  unchecked : RefCreation ref?⟦_⟧_
+  checked   : RefCreation ref✓⟦_⟧_
 
-{- There are 3 forms of reference assignment: static, unchecked, and checked -}
+{- There are 3 forms of reference assignment: static, not-yet-checked, and checked -}
 data RefAssign : (Term → Term → Term) → Set where
   static    : RefAssign _:=_
   unchecked : RefAssign _:=?_
