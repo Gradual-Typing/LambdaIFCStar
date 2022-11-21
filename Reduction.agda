@@ -83,29 +83,29 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       -------------------------------------------------------------------------------- Ref
     → ref✓⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr (a⟦ ℓ ⟧ n) of low ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
 
-  deref : ∀ {V μ pc v n ℓ ℓ₁}
-    → lookup-μ μ (a⟦ ℓ₁ ⟧ n) ≡ just (V & v)
+  deref : ∀ {V μ pc v n ℓ ℓ̂}
+    → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
       --------------------------------------------------------------------- Deref
-    → ! (addr (a⟦ ℓ₁ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (ℓ₁ ⋎ ℓ) V ∣ μ
+    → ! (addr (a⟦ ℓ̂ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (ℓ̂ ⋎ ℓ) V ∣ μ
 
   assign-static : ∀ {L M μ pc}
       ------------------------------------------------------- AssignStatic
     → L := M ∣ μ ∣ pc —→ L :=✓ M ∣ μ
 
-  assign?-ok : ∀ {M μ pc n ℓ ℓ₁}
-    → pc ≼ ℓ₁
+  assign?-ok : ∀ {M μ pc n ℓ ℓ̂}
+    → pc ≼ ℓ̂
       ----------------------------------------------------------------------------- AssignNSUSuccess
-    → (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=? M ∣ μ ∣ pc —→ (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=✓ M ∣ μ
+    → (addr (a⟦ ℓ̂ ⟧ n) of ℓ) :=? M ∣ μ ∣ pc —→ (addr (a⟦ ℓ̂ ⟧ n) of ℓ) :=✓ M ∣ μ
 
-  assign?-fail : ∀ {M μ pc n ℓ ℓ₁}
-    → ¬ pc ≼ ℓ₁
+  assign?-fail : ∀ {M μ pc n ℓ ℓ̂}
+    → ¬ pc ≼ ℓ̂
       ----------------------------------------------------------------------------- AssignNSUFail
-    → (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=? M ∣ μ ∣ pc —→ error nsu-error ∣ μ
+    → (addr (a⟦ ℓ̂ ⟧ n) of ℓ) :=? M ∣ μ ∣ pc —→ error nsu-error ∣ μ
 
-  assign : ∀ {V μ pc n ℓ ℓ₁}
+  assign : ∀ {V μ pc n ℓ ℓ̂}
     → (v : Value V)
       ---------------------------------------------------------------------------------------------- Assign
-    → (addr (a⟦ ℓ₁ ⟧ n) of ℓ) :=✓ V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ₁ ⟧ n) V v μ
+    → (addr (a⟦ ℓ̂ ⟧ n) of ℓ) :=✓ V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
 
   {- Reduction rules about casts, active and inert: -}
   cast : ∀ {A B V M μ pc} {c : Cast A ⇒ B}

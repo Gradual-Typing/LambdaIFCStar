@@ -69,11 +69,11 @@ data _;_⊢ᴳ_⦂_ : Context → Label → Term → Type → Set where
       -------------------------------- Deref
     → Γ ; gc ⊢ᴳ ! M ⦂ stamp A g
 
-  ⊢assign : ∀ {Γ gc L M A T g g₁ p}
-    → Γ ; gc ⊢ᴳ L ⦂ Ref (T of g₁) of g
+  ⊢assign : ∀ {Γ gc L M A T g ĝ p}
+    → Γ ; gc ⊢ᴳ L ⦂ Ref (T of ĝ) of g
     → Γ ; gc ⊢ᴳ M ⦂ A
-    → A ≲ T of g₁
-    → g ≾ g₁
-    → gc ≾ g₁
+    → A ≲ T of ĝ
+    → g ≾ ĝ
+    → gc ≾ ĝ
       --------------------------------------------- Assign
     → Γ ; gc ⊢ᴳ L := M at p ⦂ ` Unit of l low
