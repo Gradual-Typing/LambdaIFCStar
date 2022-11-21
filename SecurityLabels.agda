@@ -333,3 +333,9 @@ grad-meet-~ₗ {l high} {⋆} {l high} refl = ⟨ l~ , ⋆~ ⟩
 grad-meet-~ₗ {l high} {l high} {l high} refl = ⟨ l~ , l~ ⟩
 grad-meet-~ₗ {l low} {⋆} {l low} refl = ⟨ l~ , ⋆~ ⟩
 grad-meet-~ₗ {l low} {l low} {l low} refl = ⟨ l~ , l~ ⟩
+
+
+{- **** Precision **** -}
+data _⊑ₗ_ : Label → Label → Set where
+  ⋆⊑ : ∀ {g} → ⋆ ⊑ₗ g
+  l⊑l : ∀ {ℓ} → l ℓ ⊑ₗ l ℓ

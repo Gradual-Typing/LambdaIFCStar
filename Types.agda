@@ -513,3 +513,26 @@ stamp-low (T of l high) = refl
 
 {- **** Typing contexts **** -}
 Context = List Type
+
+
+infix 5 _⊑_
+
+{- **** Precision **** -}
+data _⊑_ : Type → Type → Set where
+  ⊑-ι : ∀ {ι g₁ g₂}
+    → g₁ ⊑ₗ g₂
+      -----------------------------
+    → ` ι of g₁ ⊑ ` ι of g₂
+
+  ⊑-ref : ∀ {A B g₁ g₂}
+    → A ⊑ B
+    → g₁ ⊑ₗ g₂
+      ----------------------------------------------
+    → Ref A of g₁ ⊑ Ref B of g₂
+
+  ⊑-fun : ∀ {A B C D gc₁ gc₂ g₁ g₂}
+    → gc₁ ⊑ₗ gc₂
+    → A ⊑ B → C ⊑ D
+    → g₁ ⊑ₗ g₂
+      ----------------------------------------------
+    → ⟦ gc₁ ⟧ A ⇒ B of g₁ ⊑ ⟦ gc₂ ⟧ C ⇒ D of g₂
