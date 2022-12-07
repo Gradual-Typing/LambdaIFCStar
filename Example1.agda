@@ -18,11 +18,11 @@ open import Heap
 open import TypeBasedCast
 
 
-_ : Type
-_ =  ⟦ ⋆ ⟧ (` Bool of ⋆) ⇒ (` Bool of l high) of l low
+A₁ : Type
+A₁ =  ⟦ ⋆ ⟧ (` Bool of ⋆) ⇒ (` Bool of l high) of l low
 
-_ : Type
-_ = Ref (` Unit of ⋆) of l high
+A₂ : Type
+A₂ = Ref (` Unit of ⋆) of l high
 
 _ : Term
 _ = (ƛ⟦ low ⟧ ` Bool of ⋆ ˙ ` 0 of high) · (` 0) at pos 0
@@ -172,8 +172,8 @@ eq :
   (compile {[]} publish ⊢publish · var 0))))
 eq = refl
 
-_ : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 1)) ∣ ∅
-_ =
+Rd : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 1)) ∣ ∅
+Rd =
   M*⇒ ∣ ∅ ∣ low
     —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
   _    ∣ ∅ ∣ low

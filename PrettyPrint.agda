@@ -56,6 +56,7 @@ pprint-term (! M) = printf "\ESC[1m!\ESC[0m (%s)" (pprint-term M)
 pprint-term (L := M at p) =
   printf "(%s) \ESC[1m:=\ESC[0m (%s) %s" (pprint-term L) (pprint-term M) (pprint-blame-label p)
 
+{- Pretty printing the cast calculus -}
 open import CC renaming (Term to CCTerm)
 open import Heap
 open import TypeBasedCast
@@ -68,7 +69,7 @@ pprint-cast (cast A B p A~B) = printf "%s ⇒ %s %s" (pprint-type A) (pprint-typ
 
 pprint-error : CC.Error → String
 pprint-error (blame p) = printf "\ESC[93mblame\ESC[0m %s" (pprint-blame-label p)
-pprint-error nsu-error = printf "\ESC[93mnsu-error\ESC[0m"
+pprint-error nsu-error = "\ESC[93mnsu-error\ESC[0m"
 
 pprint-cc : CCTerm → String
 pprint-cc (` x) = printf "\ESC[4m%u\ESC[0m" x
@@ -98,27 +99,53 @@ pprint-cc (L :=? M) =
 pprint-cc (L :=✓ M) =
   printf "(%s) \ESC[1m:=✓\ESC[0m (%s)" (pprint-cc L) (pprint-cc M)
 pprint-cc (prot ℓ M) =
-  printf "\ESC[1mprot\ESC[0m %s %s" (pprint-label (l ℓ)) (pprint-cc M)
+  printf "\ESC[1mprot\ESC[0m %s (%s)" (pprint-label (l ℓ)) (pprint-cc M)
 pprint-cc (M ⟨ c ⟩) =
-  printf "%s \ESC[1m⟨\ESC[0m %s \ESC[1m⟩\ESC[0m" (pprint-cc M) (pprint-cast c)
+  printf "(%s) \ESC[1m⟨\ESC[0m %s \ESC[1m⟩\ESC[0m" (pprint-cc M) (pprint-cast c)
 pprint-cc (cast-pc g M) =
-  printf "\ESC[1mcast-pc\ESC[0m %s %s" (pprint-label g) (pprint-cc M)
+  printf "\ESC[1mcast-pc\ESC[0m %s (%s)" (pprint-label g) (pprint-cc M)
 pprint-cc (error e) =
   printf "\ESC[1merror\ESC[0m %s" (pprint-error e)
-pprint-cc ● = printf "●"
+pprint-cc ● = "●"
 
--- private
---   print-rd-rule : ∀ {M N} → M —→ N → String
---   print-rd-rule (ξ₁ _)   = "ξ₁"
---   print-rd-rule (ξ₂ _ _) = "ξ₂"
---   print-rd-rule (β _)    = "β"
 
--- pprint-reduction : ∀ {M N} → M —→ N → String
--- pprint-reduction {M} {N} M→N =
---   printf "(%s —→⟨ %s ⟩ %s)" (pprint-term M) (print-rd-rule M→N) (pprint-term N)
+{- Pretty printing single and multi step reductions -}
+open import Reduction
 
--- pprint-mult-reduction : ∀ {M N} → M —↠ N → String
--- pprint-mult-reduction {M} {M} (_ ∎) = printf "%s\n  ∎" (pprint-term M)
--- pprint-mult-reduction {L} {N} (L —→⟨ L→M ⟩ M↠N) =
---   printf "%s\n  ↓ ⟨ %s ⟩\n%s"
---     (pprint-term L) (print-rd-rule L→M) (pprint-mult-reduction M↠N)
+print-red-rule : ∀ {M M′ μ μ′ pc} → M ∣ μ ∣ pc —→ M′ ∣ μ′ → String
+print-red-rule (ξ M→M′)           = printf "ξ(%s)" (print-red-rule M→M′)
+print-red-rule ξ-err               = "ξ-err"
+print-red-rule (prot-val _)        = "prot-val"
+print-red-rule (prot-ctx M→M′)    = printf "prot-ctx(%s)" (print-red-rule M→M′)
+print-red-rule prot-err            = "prot-err"
+print-red-rule (β _)               = "β"
+print-red-rule β-if-true           = "β-if-true"
+print-red-rule β-if-false          = "β-if-false"
+print-red-rule (β-let _)           = "β-let"
+print-red-rule ref-static          = "ref-static"
+print-red-rule (ref?-ok _)         = "ref?-ok"
+print-red-rule (ref?-fail _)       = "ref?-fail"
+print-red-rule (ref _ _)           = "ref"
+print-red-rule (deref _)           = "deref"
+print-red-rule assign-static       = "assign-static"
+print-red-rule (assign?-ok _)      = "assign?-ok"
+print-red-rule (assign?-fail _)    = "assign?-fail"
+print-red-rule (assign _)          = "assign"
+print-red-rule (cast _ _ _)        = "cast"
+print-red-rule (if-cast-true _)    = "if-cast-true"
+print-red-rule (if-cast-false _)   = "if-cast-false"
+print-red-rule (fun-cast _ _ _)    = "fun-cast"
+print-red-rule (deref-cast _ _)    = "deref-cast"
+print-red-rule (assign?-cast _ _)  = "assign?-cast"
+print-red-rule (assign-cast _ _ _) = "assign-cast"
+print-red-rule (β-cast-pc _)       = "β-cast-pc"
+
+pprint-reduction : ∀ {M M′ μ μ′ pc} → M ∣ μ ∣ pc —→ M′ ∣ μ′ → String
+pprint-reduction {M} {M′} M→M′ =
+  printf "(%s —→⟨ %s ⟩ %s)" (pprint-cc M) (print-red-rule M→M′) (pprint-cc M′)
+
+pprint-mult-reduction : ∀ {M M′ μ μ′ pc} → M ∣ μ ∣ pc —↠ M′ ∣ μ′ → String
+pprint-mult-reduction (M ∣ μ ∣ pc ∎) = printf "%s\n  ∎" (pprint-cc M)
+pprint-mult-reduction {L} {N} (L ∣ μ ∣ pc —→⟨ L→M ⟩ M↠N) =
+  printf "%s\n  ↓ ⟨ %s ⟩\n%s"
+    (pprint-cc L) (print-red-rule L→M) (pprint-mult-reduction M↠N)

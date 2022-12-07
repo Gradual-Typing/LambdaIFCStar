@@ -12,6 +12,14 @@ open import Example1
 
 main =
   run {Agda.Primitive.lzero}
-    (do (putStrLn (pprint-type (⟦ ⋆ ⟧ Ref (` Bool of l high) of l low ⇒ (` Bool of l high) of l low)))
-        (putStrLn (pprint-term M*))
-        (putStrLn "END"))
+    (do
+      (putStrLn (pprint-type A₁))
+      (putStrLn "")
+      (putStrLn (pprint-type A₂))
+      (putStrLn "")
+      (putStrLn (pprint-term M*))
+      (putStrLn "")
+      (putStrLn (pprint-cc M*⇒))
+      (putStrLn "")
+      (putStrLn (pprint-mult-reduction Rd))
+      )
