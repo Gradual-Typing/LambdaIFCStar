@@ -8,7 +8,7 @@ open import IO
 open import Types
 open import PrettyPrint
 
-open import Example1
+open import Examples
 
 main =
   run {Agda.Primitive.lzero}
@@ -22,4 +22,8 @@ main =
       (putStrLn (pprint-cc M*⇒))
       (putStrLn "")
       (putStrLn (pprint-mult-reduction Rd))
+      (putStrLn "")
+      (putStrLn (let ⟨ _ , R ⟩ = RdN₁ in pprint-mult-reduction R))
+      (putStrLn "")
+      (putStrLn (let ⟨ _ , R ⟩ = RdN₂ in pprint-mult-reduction R))
       )

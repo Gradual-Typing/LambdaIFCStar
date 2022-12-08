@@ -62,7 +62,7 @@ open import Heap
 open import TypeBasedCast
 
 pprint-addr : Addr → String
-pprint-addr (a⟦ ℓ̂ ⟧ n) = printf "\ESC[7m⟦%s⟧ %u\ESC[0m" (pprint-label (l ℓ̂)) n
+pprint-addr (a⟦ ℓ̂ ⟧ n) = printf "⟦%s⟧ \ESC[7m%u\ESC[0m" (pprint-label (l ℓ̂)) n
 
 pprint-cast : ∀ {A B} → Cast A ⇒ B → String
 pprint-cast (cast A B p A~B) = printf "%s ⇒ %s %s" (pprint-type A) (pprint-type B) (pprint-blame-label p)

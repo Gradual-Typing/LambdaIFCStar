@@ -18,12 +18,8 @@ open import BigStep
 open import Heap
 open import TypeBasedCast
 
--- publish : 𝔹 of low → ⊤
-publish : Term
-publish = ƛ⟦ low ⟧ ` Bool of l low ˙ $ tt of low of low
 
-⊢publish : ∀ {Γ} → Γ ; l low ⊢ᴳ publish ⦂ ⟦ l low ⟧ (` Bool of l low) ⇒ (` Unit of l low) of l low
-⊢publish = ⊢lam ⊢const
+open import ExampleCommon
 
 {- Input is `true` in N₁ and `false` in N₂ -}
 N₁ N₂ : Term
@@ -71,8 +67,8 @@ _ :
 _ = refl
 
 {- Both N₁ and N₂ evaluate to `nsu-error` -}
-_ : ∃[ μ ] ( N⇒₁ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
-_ = ⟨ _ , R* ⟩
+RdN₁ : ∃[ μ ] ( N⇒₁ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
+RdN₁ = ⟨ _ , R* ⟩
   where
   R* =
     N⇒₁ ∣ ∅ ∣ low
@@ -97,8 +93,8 @@ _ = ⟨ _ , R* ⟩
        —→⟨ ξ-err {F = let□ _} ⟩
     error nsu-error ∣ _ ∣ low ∎
 
-_ : ∃[ μ ] ( N⇒₂ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
-_ = ⟨ _ , R* ⟩
+RdN₂ : ∃[ μ ] ( N⇒₂ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
+RdN₂ = ⟨ _ , R* ⟩
   where
   R* =
     N⇒₂ ∣ ∅ ∣ low

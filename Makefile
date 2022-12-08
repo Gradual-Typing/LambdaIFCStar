@@ -7,5 +7,8 @@ AGDAI = $(AGDA:%.agda=%.agdai)
 
 all: ${AGDA} ${AGDAI}
 
+exe: Main.agda
+	/usr/bin/env agda --compile $<
+
 clean:
 	rm -f *.agdai *~
