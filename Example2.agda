@@ -154,17 +154,22 @@ M₂ =
            (⊢assign (⊢var refl) ⊢const ≲-refl (≾-l l≼h) ≾-refl)
            ⊢const refl))
 
+𝒞M₁  = compile M₁ ⊢M₁
+⊢𝒞M₁ = compile-preserve M₁ ⊢M₁
+𝒞M₂  = compile M₂ ⊢M₂
+⊢𝒞M₂ = compile-preserve M₂ ⊢M₂
+
 {- Both evaluate to `tt` -}
 M₁⇓tt :
   let μ = ⟨ [] , ⟨ 0 , (const false of high) & V-const ⟩ ∷ ⟨ 0 , (const true of high) & V-const ⟩ ∷ [] ⟩ in
-    ∅ ∣ low ⊢ compile M₁ ⊢M₁ ⇓ const tt of high ∣ μ
+    ∅ ∣ low ⊢ 𝒞M₁ ⇓ const tt of high ∣ μ
 M₁⇓tt = ⇓-let (⇓-val V-const)
         (⇓-let (⇓-ref (⇓-val V-const) refl)
         (⇓-if-true (⇓-val V-const) (⇓-assign (⇓-val V-addr) (⇓-val V-const))))
 
 M₂⇓tt :
   let μ = ⟨ [] , ⟨ 0 , (const true of high) & V-const ⟩ ∷ [] ⟩ in
-    ∅ ∣ low ⊢ compile M₂ ⊢M₂ ⇓ const tt of high ∣ μ
+    ∅ ∣ low ⊢ 𝒞M₂ ⇓ const tt of high ∣ μ
 M₂⇓tt = ⇓-let (⇓-val V-const)
         (⇓-let (⇓-ref (⇓-val V-const) refl)
         (⇓-if-false (⇓-val V-const) (⇓-val V-const)))
@@ -198,27 +203,30 @@ M*₂ =
            (⊢assign (⊢var refl) ⊢const ≲-refl (≾-l l≼h) ≾-refl)
            ⊢const refl))
 
-M*₁⇒ =
+𝒞M*₁  = compile M*₁ ⊢M*₁
+⊢𝒞M*₁ = compile-preserve M*₁ ⊢M*₁
+𝒞M*₂  = compile M*₂ ⊢M*₂
+⊢𝒞M*₂ = compile-preserve M*₂ ⊢M*₂
+
+_ : 𝒞M*₁ ≡
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 3) (~-ty ~⋆ ~-ι) in
   let c₂ = cast (` Bool of ⋆) (` Bool of l high) (pos 0) (~-ty ⋆~ ~-ι) in
   `let (const true of high)
        (`let (ref⟦ high ⟧ ((const true of high ⟨ c₁ ⟩) ⟨ c₂ ⟩))
              (if (var 1) (` Unit of l low) (var 0 := (const false of high)) (const tt of low)))
-
-_ : compile M*₁ ⊢M*₁ ≡ M*₁⇒
 _ = refl
 
 {- Evaluate to `tt` again -}
 M*₁⇓tt :
   let μ = ⟨ [] , ⟨ 0 , (const false of high) & V-const ⟩ ∷ ⟨ 0 , (const true of high) & V-const ⟩ ∷ [] ⟩ in
-    ∅ ∣ low ⊢ compile M*₁ ⊢M*₁ ⇓ const tt of high ∣ μ
+    ∅ ∣ low ⊢ 𝒞M*₁ ⇓ const tt of high ∣ μ
 M*₁⇓tt = ⇓-let (⇓-val V-const)
          (⇓-let (⇓-ref (⇓-cast (A-base-proj _) (⇓-val (V-cast V-const (I-base-inj _))) (cast-base-proj h≼h) (⇓-val V-const)) refl)
          (⇓-if-true (⇓-val V-const) (⇓-assign (⇓-val V-addr) (⇓-val V-const))))
 
 M*₂⇓tt :
   let μ = ⟨ [] , ⟨ 0 , (const true of high) & V-const ⟩ ∷ [] ⟩ in
-    ∅ ∣ low ⊢ compile M*₂ ⊢M*₂ ⇓ const tt of high ∣ μ
+    ∅ ∣ low ⊢ 𝒞M*₂ ⇓ const tt of high ∣ μ
 M*₂⇓tt = ⇓-let (⇓-val V-const)
          (⇓-let (⇓-ref (⇓-cast (A-base-proj _) (⇓-val (V-cast V-const (I-base-inj _))) (cast-base-proj h≼h) (⇓-val V-const)) refl)
          (⇓-if-false (⇓-val V-const) (⇓-val V-const)))
@@ -250,16 +258,21 @@ M*₂′ =
            (⊢assign (⊢var refl) ⊢const ≲-refl (≾-l l≼h) ≾-refl)
            ⊢const refl))
 
+𝒞M*₁′  = compile M*₁′ ⊢M*₁′
+⊢𝒞M*₁′ = compile-preserve M*₁′ ⊢M*₁′
+𝒞M*₂′  = compile M*₂′ ⊢M*₂′
+⊢𝒞M*₂′ = compile-preserve M*₂′ ⊢M*₂′
+
 M*₁′⇓tt :
   let μ = ⟨ [] , ⟨ 0 , (const false of high) & V-const ⟩ ∷ ⟨ 0 , (const true of low) & V-const ⟩ ∷ [] ⟩ in
-    ∅ ∣ low ⊢ compile M*₁′ ⊢M*₁′ ⇓ const tt of high ∣ μ
+    ∅ ∣ low ⊢ 𝒞M*₁′ ⇓ const tt of high ∣ μ
 M*₁′⇓tt = ⇓-let (⇓-val V-const)
          (⇓-let (⇓-ref (⇓-cast (A-base-proj _) (⇓-val (V-cast V-const (I-base-inj _))) (cast-base-proj l≼h) (⇓-val V-const)) refl)
          (⇓-if-true (⇓-val V-const) (⇓-assign (⇓-val V-addr) (⇓-val V-const))))
 
 M*₂′⇓tt :
   let μ = ⟨ [] , ⟨ 0 , (const true of low) & V-const ⟩ ∷ [] ⟩ in
-    ∅ ∣ low ⊢ compile M*₂′ ⊢M*₂′ ⇓ const tt of high ∣ μ
+    ∅ ∣ low ⊢ 𝒞M*₂′ ⇓ const tt of high ∣ μ
 M*₂′⇓tt = ⇓-let (⇓-val V-const)
          (⇓-let (⇓-ref (⇓-cast (A-base-proj _) (⇓-val (V-cast V-const (I-base-inj _))) (cast-base-proj l≼h) (⇓-val V-const)) refl)
          (⇓-if-false (⇓-val V-const) (⇓-val V-const)))

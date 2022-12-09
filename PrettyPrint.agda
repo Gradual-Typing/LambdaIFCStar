@@ -145,7 +145,8 @@ pprint-reduction {M} {M′} M→M′ =
   printf "(%s —→⟨ %s ⟩ %s)" (pprint-cc M) (print-red-rule M→M′) (pprint-cc M′)
 
 pprint-mult-reduction : ∀ {M M′ μ μ′ pc} → M ∣ μ ∣ pc —↠ M′ ∣ μ′ → String
-pprint-mult-reduction (M ∣ μ ∣ pc ∎) = printf "%s\n  ∎" (pprint-cc M)
+pprint-mult-reduction (M ∣ μ ∣ pc ∎) =
+  printf "%s\n  \ESC[90m∎\ESC[0m" (pprint-cc M)
 pprint-mult-reduction {L} {N} (L ∣ μ ∣ pc —→⟨ L→M ⟩ M↠N) =
-  printf "%s\n  ↓ ⟨ %s ⟩\n%s"
+  printf "%s\n  \ESC[90m↓ ⟨ %s ⟩\ESC[0m\n%s"
     (pprint-cc L) (print-red-rule L→M) (pprint-mult-reduction M↠N)
