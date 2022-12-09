@@ -1,6 +1,8 @@
 module TypeBasedCast where
 
 open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Function using (case_of_; case_return_of_)
 
@@ -103,6 +105,15 @@ active-or-inert (cast (⟦ ⋆ ⟧ A ⇒ B of l ℓ) (⟦ gc ⟧ C ⇒ D of _) p
   inj₁ (A-fun-pc _ active-⋆ I-label)
 active-or-inert (cast (⟦ l pc ⟧ A ⇒ B of l _) C→D p (~-ty _ (~-fun _ _ _))) =
   inj₂ (I-fun _ I-label I-label)
+
+active-not-inert : ∀ {A B} → (c : Cast A ⇒ B) → Active c → ¬ Inert c
+active-not-inert c (A-base-id .c) = λ ()
+active-not-inert c (A-base-proj .c) = λ ()
+active-not-inert c (A-fun .c A-id⋆) (I-fun .c _ ())
+active-not-inert c (A-fun .c A-proj) (I-fun .c _ ())
+active-not-inert c (A-fun-pc .c () I-label) (I-fun .c I-label I-label)
+active-not-inert c (A-ref .c ()) (I-ref .c I-label I-label)
+active-not-inert c (A-ref-ref .c () I-label) (I-ref .c I-label I-label)
 
 
 dom/c : ∀ {A B C D gc₁ gc₂ g₁ g₂}
