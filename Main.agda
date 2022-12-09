@@ -23,10 +23,12 @@ main =
     (do
       (putStrLn (foldr format "" example1-cfgs))
       (putStrLn (foldr format "" example2-cfgs))
+      (putStrLn (foldr format "" example3-cfgs))
       (putStrLn "\ESC[101mEND\ESC[0m"))
   where
   example1-cfgs = [ ⟨ N  , 𝒞N  , ⊢𝒞N  ⟩ , ⟨ M* , 𝒞M* , ⊢𝒞M* ⟩ ]
-  example2-cfgs =
+  example2-cfgs = [ ⟨ N₁ , 𝒞N₁ , ⊢𝒞N₁ ⟩ , ⟨ N₂ , 𝒞N₂ , ⊢𝒞N₂ ⟩ ]
+  example3-cfgs =
     [ {- fully annotated     : -} ⟨ M₁   , 𝒞M₁   , ⊢𝒞M₁   ⟩ , ⟨ M₂   , 𝒞M₂   , ⊢𝒞M₂   ⟩ ,
       {- partially annotated : -} ⟨ M*₁  , 𝒞M*₁  , ⊢𝒞M*₁  ⟩ , ⟨ M*₂  , 𝒞M*₂  , ⊢𝒞M*₂  ⟩ ,
       {- partially annotated : -} ⟨ M*₁′ , 𝒞M*₁′ , ⊢𝒞M*₁′ ⟩ , ⟨ M*₂′ , 𝒞M*₂′ , ⊢𝒞M*₂′ ⟩ ]
