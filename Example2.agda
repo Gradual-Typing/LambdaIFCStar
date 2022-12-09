@@ -58,6 +58,10 @@ N₂ =
 N⇒₁ N⇒₂ : CCTerm
 N⇒₁ = compile N₁ ⊢N₁; N⇒₂ = compile N₂ ⊢N₂
 
+⊢N⇒₁ : [] ; ∅ ; l low ; low ⊢ N⇒₁ ⦂ ` Unit of l low
+⊢N⇒₁ = compile-preserve N₁ ⊢N₁
+⊢N⇒₂ = compile-preserve N₂ ⊢N₂
+
 _ :
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
   N⇒₁ ≡

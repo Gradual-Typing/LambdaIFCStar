@@ -23,15 +23,18 @@ open import CC
 open import Reduction
 open import TypeSafety
 
-interp : ∀ {Σ gc A} pc M → [] ; Σ ; gc ; pc ⊢ M ⦂ A → ∀ μ → Σ ⊢ μ → (k : ℕ)
+interp : ∀ {Σ gc A} pc M → [] ; Σ ; gc ; pc ⊢ M ⦂ A → ∀ μ → Σ ⊢ μ → l pc ≾ gc → (k : ℕ)
   → ∃[ N ] ∃[ μ′ ] (M ∣ μ ∣ pc —↠ N ∣ μ′)
-interp pc M ⊢M μ ⊢μ 0                   = ⟨ M , μ , _ ∣ _ ∣ _ ∎ ⟩
-interp pc M (⊢sub ⊢M A<:B) μ ⊢μ k       = interp pc M ⊢M μ ⊢μ k
-interp pc M (⊢sub-pc ⊢M gc<:gc′) μ ⊢μ k = interp pc M ⊢M μ ⊢μ k
-interp pc M ⊢M μ ⊢μ (suc k-1) =
+interp pc M ⊢M μ ⊢μ pc≾gc 0                   = ⟨ M , μ , _ ∣ _ ∣ _ ∎ ⟩
+interp pc M (⊢sub ⊢M A<:B) μ ⊢μ pc≾gc k       = interp pc M ⊢M μ ⊢μ pc≾gc k
+interp pc M (⊢sub-pc ⊢M gc<:gc′) μ ⊢μ pc≾gc k = interp pc M ⊢M μ ⊢μ (≾-<: pc≾gc gc<:gc′) k
+interp pc M ⊢M μ ⊢μ pc≾gc (suc k-1) =
   case progress pc M ⊢M μ ⊢μ of λ where
-  (step {N} {μ′} M→N) →
-    ⟨ N , μ′ , M ∣ μ ∣ pc —→⟨ M→N ⟩ N ∣ μ′ ∣ pc ∎ ⟩
+  (step {M′} {μ′} M→M′) →
+    let ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩ = preserve ⊢M ⊢μ pc≾gc M→M′ in
+    case interp pc M′ ⊢M′ μ′ ⊢μ′ pc≾gc k-1 of λ where
+    ⟨ M″ , μ″ , M′↠M″ ⟩ →
+      ⟨ M″ , μ″ , M ∣ μ ∣ pc —→⟨ M→M′ ⟩ M′↠M″ ⟩
   (done v) →
     ⟨ M , μ , _ ∣ _ ∣ _ ∎ ⟩
   (err E-error) →

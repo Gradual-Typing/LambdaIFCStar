@@ -5,8 +5,11 @@ open import Data.Product using (∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import IO
 
+open import Utils
 open import Types
 open import PrettyPrint
+open import HeapTyping
+open import Interp
 
 open import Examples
 
@@ -26,4 +29,6 @@ main =
       (putStrLn (let ⟨ _ , R ⟩ = RdN₁ in pprint-mult-reduction R))
       (putStrLn "")
       (putStrLn (let ⟨ _ , R ⟩ = RdN₂ in pprint-mult-reduction R))
+      (putStrLn "")
+      (putStrLn (let ⟨ _ , _ , R ⟩ = interp low N⇒₂ ⊢N⇒₂ ∅ ⊢μ-nil (≾-l l≼l) 42 in pprint-mult-reduction R))
       )
