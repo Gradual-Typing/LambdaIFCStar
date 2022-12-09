@@ -30,5 +30,5 @@ main =
       (putStrLn "")
       (putStrLn (let ⟨ _ , R ⟩ = RdN₂ in pprint-mult-reduction R))
       (putStrLn "")
-      (putStrLn (let ⟨ _ , _ , R ⟩ = interp low N⇒₂ ⊢N⇒₂ ∅ ⊢μ-nil (≾-l l≼l) 42 in pprint-mult-reduction R))
+      (putStrLn (let ⟨ _ , _ , R ⟩ = interp low 𝒞N₂ ⊢𝒞N₂ ∅ ⊢μ-nil (≾-l l≼l) 42 in pprint-mult-reduction R))
       )

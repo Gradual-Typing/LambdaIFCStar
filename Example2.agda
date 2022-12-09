@@ -55,27 +55,28 @@ N₂ =
                   refl)
              (⊢app ⊢publish (⊢deref (⊢var refl)) ≲-refl ≾-refl ≾-refl))
 
-N⇒₁ N⇒₂ : CCTerm
-N⇒₁ = compile N₁ ⊢N₁; N⇒₂ = compile N₂ ⊢N₂
+𝒞N₁ 𝒞N₂ : CCTerm
+𝒞N₁ = compile N₁ ⊢N₁
+𝒞N₂ = compile N₂ ⊢N₂
 
-⊢N⇒₁ : [] ; ∅ ; l low ; low ⊢ N⇒₁ ⦂ ` Unit of l low
-⊢N⇒₁ = compile-preserve N₁ ⊢N₁
-⊢N⇒₂ = compile-preserve N₂ ⊢N₂
+⊢𝒞N₁ : [] ; ∅ ; l low ; low ⊢ 𝒞N₁ ⦂ ` Unit of l low
+⊢𝒞N₁ = compile-preserve N₁ ⊢N₁
+⊢𝒞N₂ = compile-preserve N₂ ⊢N₂
 
 _ :
   let c₁ = cast (` Bool of l high) (` Bool of ⋆) (pos 1) (~-ty ~⋆ ~-ι) in
-  N⇒₁ ≡
+  compile N₁ ⊢N₁ ≡
   (`let (ref⟦ low ⟧ (const true of low))
   (`let (if (const true of high ⟨ c₁ ⟩) _ (var 0 :=? (const false of low)) (var 0 :=? (const true of low)))
   (compile {[]} publish ⊢publish · (* var 1))))
 _ = refl
 
 {- Both N₁ and N₂ evaluate to `nsu-error` -}
-RdN₁ : ∃[ μ ] ( N⇒₁ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
+RdN₁ : ∃[ μ ] ( 𝒞N₁ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
 RdN₁ = ⟨ _ , R* ⟩
   where
   R* =
-    N⇒₁ ∣ ∅ ∣ low
+    𝒞N₁ ∣ ∅ ∣ low
       —→⟨ ξ {F = let□ _} ref-static ⟩
     _ ∣ ∅ ∣ low
       —→⟨ ξ {F = let□ _} (ref V-const refl) ⟩
@@ -97,11 +98,11 @@ RdN₁ = ⟨ _ , R* ⟩
        —→⟨ ξ-err {F = let□ _} ⟩
     error nsu-error ∣ _ ∣ low ∎
 
-RdN₂ : ∃[ μ ] ( N⇒₂ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
+RdN₂ : ∃[ μ ] ( 𝒞N₂ ∣ ∅ ∣ low —↠ error nsu-error ∣ μ )
 RdN₂ = ⟨ _ , R* ⟩
   where
   R* =
-    N⇒₂ ∣ ∅ ∣ low
+    𝒞N₂ ∣ ∅ ∣ low
       —→⟨ ξ {F = let□ _} ref-static ⟩
     _ ∣ ∅ ∣ low
       —→⟨ ξ {F = let□ _} (ref V-const refl) ⟩
