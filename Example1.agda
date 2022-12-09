@@ -55,8 +55,12 @@ N =
   (⊢let (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl)
     (⊢app ⊢publish (⊢var refl) ≲-refl ≾-refl ≾-refl))))
 
+{- Compile `N` to CC -}
+𝒞N  = compile N ⊢N
+⊢𝒞N = compile-preserve N ⊢N
+
 {- `N` evaluates to `tt` -}
-_ : ∅ ∣ low ⊢ compile N ⊢N ⇓ const tt of low ∣ ∅
+_ : ∅ ∣ low ⊢ 𝒞N ⇓ const tt of low ∣ ∅
 _ = ⇓-let (⇓-val V-ƛ)
            (⇓-let (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))
                    (⇓-let (⇓-app (⇓-val V-ƛ) (⇓-val V-const) (⇓-val V-const))
@@ -120,6 +124,9 @@ M* =
   (⊢let (⊢app (⊢var refl) (⊢var refl) (≲-ty ≾-⋆r ≲-ι) ≾-refl ≾-refl)
     (⊢app ⊢publish (⊢var refl) (≲-ty ≾-refl ≲ᵣ-refl) ≾-refl ≾-refl))))
 
+{- Compile `M*` to CC -}
+𝒞M*  = compile M* ⊢M*
+⊢𝒞M* = compile-preserve M* ⊢M*
 
 {- Alternatively, we can give `result` an extra annotation: -}
 M*′ : Term
@@ -140,28 +147,23 @@ M*′ =
   (⊢let (⊢ann (⊢app (⊢var refl) (⊢var refl) ≲-refl ≾-refl ≾-refl) (≲-ty ≾-⋆r ≲ᵣ-refl))
     (⊢app ⊢publish (⊢var refl) (≲-ty ≾-⋆l ≲ᵣ-refl) ≾-refl ≾-refl))))
 
-
-{- Let's compile M* into CC -}
-M*⇒ : CCTerm
-M*⇒ = compile M* ⊢M*
-
 {- Take a look at the compiled CC term. Note the casts inserted: -}
-eq :
+_ :
+  𝒞M* ≡
   let c~  = ~-ty ~ₗ-refl (~-fun ~ₗ-refl (~-ty ⋆~ ~-ι) (~-ty ⋆~ ~-ι)) in
   let c₁  = cast (⟦ l low ⟧ (` Bool of ⋆) ⇒ (` Bool of ⋆) of l low)
                  (⟦ l low ⟧ (` Bool of ⋆) ⇒ (` Bool of l low) of l low)
                  (pos 1) c~ in
   let c₂  = cast (` Bool of l high) (` Bool of ⋆) (pos 3) (~-ty ~⋆ ~-ι) in
-  M*⇒ ≡
   (`let (lam⟦ low ⟧ ` Bool of ⋆ ˙ if (var 0) (` Bool of l low) (const false of low) (const true of low) of low ⟨ c₁ ⟩)
   (`let (compile {[]} user-input ⊢user-input · const tt of low)
   (`let (var 1 · var 0 ⟨ c₂ ⟩)
   (compile {[]} publish ⊢publish · var 0))))
-eq = refl
+_ = refl
 
-Rd : M*⇒ ∣ ∅ ∣ low —↠ error (blame (pos 1)) ∣ ∅
-Rd =
-  M*⇒ ∣ ∅ ∣ low
+_ : 𝒞M* ∣ ∅ ∣ low —↠ error (blame (pos 1)) ∣ ∅
+_ =
+  𝒞M* ∣ ∅ ∣ low
     —→⟨ β-let (V-cast V-ƛ (I-fun _ I-label I-label)) ⟩
   _    ∣ ∅ ∣ low
     —→⟨ ξ {F = let□ _} (β V-const) ⟩

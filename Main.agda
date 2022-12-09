@@ -21,10 +21,12 @@ open import PrettyPrint renaming (pprint-mult-reduction to pprint)
 main =
   run {Agda.Primitive.lzero}
     (do
-      (putStrLn (foldr format "" all-cfgs))
+      (putStrLn (foldr format "" example1-cfgs))
+      (putStrLn (foldr format "" example2-cfgs))
       (putStrLn "\ESC[101mEND\ESC[0m"))
   where
-  all-cfgs =
+  example1-cfgs = [ ⟨ N  , 𝒞N  , ⊢𝒞N  ⟩ , ⟨ M* , 𝒞M* , ⊢𝒞M* ⟩ ]
+  example2-cfgs =
     [ {- fully annotated     : -} ⟨ M₁   , 𝒞M₁   , ⊢𝒞M₁   ⟩ , ⟨ M₂   , 𝒞M₂   , ⊢𝒞M₂   ⟩ ,
       {- partially annotated : -} ⟨ M*₁  , 𝒞M*₁  , ⊢𝒞M*₁  ⟩ , ⟨ M*₂  , 𝒞M*₂  , ⊢𝒞M*₂  ⟩ ,
       {- partially annotated : -} ⟨ M*₁′ , 𝒞M*₁′ , ⊢𝒞M*₁′ ⟩ , ⟨ M*₂′ , 𝒞M*₂′ , ⊢𝒞M*₂′ ⟩ ]
