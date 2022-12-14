@@ -42,15 +42,28 @@ cc-⊑? (` x) (` x′) =
   (no  x≢x)  → no λ { ⊑-var → contradiction refl x≢x }
 cc-⊑? (addr a of ℓ) (addr a′ of ℓ′) =
   case addr-eq? a a′ of λ where
-  (yes refl) → {!!}
+  (yes refl) →
+    case ℓ =? ℓ′ of λ where
+    (yes refl) → yes ⊑-addr
+    (no  ℓ≢ℓ)  → no λ { ⊑-addr → contradiction refl ℓ≢ℓ }
   (no  a≢a)  → no λ { ⊑-addr → contradiction refl a≢a }
--- cc-⊑? (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ) (ƛ⟦ ℓᶜ′ ⟧ A′ ˙ N′ of ℓ′) =
+cc-⊑? {Γ} {Γ′} {Σ} {Σ′} (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ) (ƛ⟦ ℓᶜ′ ⟧ A′ ˙ N′ of ℓ′) =
+  case ⟨ ℓᶜ =? ℓᶜ′ , ℓ =? ℓ′ ⟩ of λ where
+    ⟨ yes refl , yes refl ⟩ →
+      case A ⊑? A′ of λ where
+      (yes A⊑A′) →
+        case cc-⊑? {A ∷ Γ} {A′ ∷ Γ′} {Σ} {Σ′} N N′ of λ where
+        (yes N⊑N′) → yes (⊑-lam A⊑A′ N⊑N′)
+        (no  N⋤N′) → no λ { (⊑-lam _ N⊑N′) → contradiction N⊑N′ N⋤N′ }
+      (no  A⋤A′) → no λ { (⊑-lam A⊑A′ _) → contradiction A⊑A′ A⋤A′ }
+    ⟨ no ℓᶜ≢ℓᶜ , _      ⟩ → no λ { (⊑-lam _ _) → contradiction refl ℓᶜ≢ℓᶜ }
+    ⟨ _        , no ℓ≢ℓ ⟩ → no λ { (⊑-lam _ _) → contradiction refl ℓ≢ℓ }
 
 
--- M′ = ƛ⟦ low ⟧ ` Bool of l high ˙ ` 0 of low
--- M  = ƛ⟦ low ⟧ ` Bool of ⋆      ˙ ` 0 of low
+M′ = ƛ⟦ low ⟧ ` Bool of l high ˙ ` 0 of low
+M  = ƛ⟦ low ⟧ ` Bool of ⋆      ˙ ` 0 of low
 
--- res = prec-decidable {[]} {[]} {∅} {∅} M M′
+res = cc-⊑? {[]} {[]} {∅} {∅} M M′
 
--- _ : ∃[ p ] (res ≡ yes p)
--- _ = ⟨ ⊑-lam (⊑-ι ⋆⊑) ⊑-var , {!refl!} ⟩
+_ : ∃[ ƛ⊑ƛ′ ] (res ≡ yes ƛ⊑ƛ′)
+_ = ⟨ _ , refl ⟩
