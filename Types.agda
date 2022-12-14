@@ -532,7 +532,45 @@ data _⊑_ : Type → Type → Set where
 
   ⊑-fun : ∀ {A B C D gc₁ gc₂ g₁ g₂}
     → gc₁ ⊑ₗ gc₂
-    → A ⊑ B → C ⊑ D
+    → A ⊑ C
+    → B ⊑ D
     → g₁ ⊑ₗ g₂
       ----------------------------------------------
     → ⟦ gc₁ ⟧ A ⇒ B of g₁ ⊑ ⟦ gc₂ ⟧ C ⇒ D of g₂
+
+infix 4 _⊑?_
+
+_⊑?_ : (A B : Type) → Dec (A ⊑ B)
+(` ι₁ of g₁) ⊑? (` ι₂ of g₂) =
+  case (` ι₁) ≡ᵣ? (` ι₂) of λ where
+  (yes refl) →
+    case g₁ ⊑ₗ? g₂ of λ where
+    (yes g₁⊑g₂) → yes (⊑-ι g₁⊑g₂)
+    (no  g₁⋤g₂)  → no λ { (⊑-ι g₁⊑g₂) → contradiction g₁⊑g₂ g₁⋤g₂ }
+  (no ι₁≢ι₂) → no λ { (⊑-ι _) → contradiction refl ι₁≢ι₂ }
+(` ι of g₁) ⊑? (Ref _ of _) = no λ ()
+(` ι of g₁) ⊑? (⟦ _ ⟧ _ ⇒ _ of _) = no λ ()
+(Ref A of g₁) ⊑? (Ref B of g₂) =
+  case A ⊑? B of λ where
+  (yes A⊑B) →
+    case g₁ ⊑ₗ? g₂ of λ where
+    (yes g₁⊑g₂) → yes (⊑-ref A⊑B g₁⊑g₂)
+    (no  g₁⋤g₂) → no λ { (⊑-ref _ g₁⊑g₂) → contradiction g₁⊑g₂ g₁⋤g₂ }
+  (no  A⋤B) → no λ { (⊑-ref A⊑B _) → contradiction A⊑B A⋤B }
+(Ref A of g₁) ⊑? (` _ of _) = no λ ()
+(Ref A of g₁) ⊑? (⟦ _ ⟧ _ ⇒ _ of _) = no λ ()
+⟦ gᶜ₁ ⟧ A₁ ⇒ B₁ of g₁ ⊑? ⟦ gᶜ₂ ⟧ A₂ ⇒ B₂ of g₂ =
+  case gᶜ₁ ⊑ₗ? gᶜ₂ of λ where
+  (yes gᶜ₁⊑gᶜ₂) →
+    case A₁ ⊑? A₂ of λ where
+    (yes A₁⊑A₂) →
+      case B₁ ⊑? B₂ of λ where
+      (yes B₁⊑B₂) →
+        case g₁ ⊑ₗ? g₂ of λ where
+          (yes g₁⊑g₂) → yes (⊑-fun gᶜ₁⊑gᶜ₂ A₁⊑A₂ B₁⊑B₂ g₁⊑g₂)
+          (no  g₁⋤g₂) → no λ { (⊑-fun _ _ _ g₁⊑g₂) → contradiction g₁⊑g₂ g₁⋤g₂ }
+      (no  B₁⋤B₂) → no λ { (⊑-fun _ _ B₁⊑B₂ _) → contradiction B₁⊑B₂ B₁⋤B₂ }
+    (no  A₁⋤A₂) → no λ { (⊑-fun _ A₁⊑A₂ _ _) → contradiction A₁⊑A₂ A₁⋤A₂ }
+  (no  gᶜ₁⋤gᶜ₂) → no λ { (⊑-fun gᶜ₁⊑gᶜ₂ _ _ _) → contradiction gᶜ₁⊑gᶜ₂ gᶜ₁⋤gᶜ₂ }
+(⟦ _ ⟧ _ ⇒ _ of _) ⊑? (` _ of _) = no λ ()
+(⟦ _ ⟧ _ ⇒ _ of _) ⊑? (Ref _ of _) = no λ ()

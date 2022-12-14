@@ -339,3 +339,14 @@ grad-meet-~ₗ {l low} {l low} {l low} refl = ⟨ l~ , l~ ⟩
 data _⊑ₗ_ : Label → Label → Set where
   ⋆⊑ : ∀ {g} → ⋆ ⊑ₗ g
   l⊑l : ∀ {ℓ} → l ℓ ⊑ₗ l ℓ
+
+infix 4 _⊑ₗ_
+
+_⊑ₗ?_ : ∀ (g₁ g₂ : Label) → Dec (g₁ ⊑ₗ g₂)
+⋆ ⊑ₗ? ⋆ = yes ⋆⊑
+⋆ ⊑ₗ? l _ = yes ⋆⊑
+l x ⊑ₗ? ⋆ = no λ ()
+l ℓ₁ ⊑ₗ? l ℓ₂ =
+  case ℓ₁ =? ℓ₂ of λ where
+  (yes refl) → yes l⊑l
+  (no ℓ₁≢ℓ₂) → no λ { l⊑l → contradiction refl ℓ₁≢ℓ₂ }
