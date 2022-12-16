@@ -491,34 +491,10 @@ consis-meet-≲-inv {S of g₁} {T of g₂} {C}
       λ { refl → ⟨ ≲-ty g₁⋏̃g₂≾g₁ U≲S , ≲-ty g₁⋏̃g₂≾g₂ U≲T ⟩ }
 
 
-{- **** Type label stamping **** -}
-stamp : Type → Label → Type
-stamp (T of g₁) g₂ = T of g₁ ⋎̃ g₂
-
-stamp-~ : ∀ {A B g₁ g₂}
-  → A ~ B → g₁ ~ₗ g₂
-  → stamp A g₁ ~ stamp B g₂
-stamp-~ {S of g₁′} {T of g₂′} (~-ty g₁′~g₂′ S~T) g₁~g₂ = ~-ty (consis-join-~ₗ g₁′~g₂′ g₁~g₂) S~T
-
-stamp-<: : ∀ {A B g₁ g₂}
-  → A <: B → g₁ <:ₗ g₂
-  → stamp A g₁ <: stamp B g₂
-stamp-<: (<:-ty g₁′<:g₂′ S<:T) g₁<:g₂ = <:-ty (consis-join-<:ₗ g₁′<:g₂′ g₁<:g₂) S<:T
-
-stamp-low : ∀ A → stamp A (l low) ≡ A
-stamp-low (T of ⋆)      = refl
-stamp-low (T of l low)  = refl
-stamp-low (T of l high) = refl
-
-
-{- **** Typing contexts **** -}
-Context = List Type
-
-
+{- **** Precision **** -}
 infix 5 _⊑ᵣ_
 infix 5 _⊑_
 
-{- **** Precision **** -}
 data _⊑ᵣ_ : RawType → RawType → Set
 data _⊑_  : Type → Type → Set
 
@@ -582,3 +558,26 @@ _⊑?_ : (A B : Type) → Dec (A ⊑ B)
   (no  gᶜ₁⋤gᶜ₂) → no λ { (⊑-ty _ (⊑-fun gᶜ₁⊑gᶜ₂ _ _)) → contradiction gᶜ₁⊑gᶜ₂ gᶜ₁⋤gᶜ₂ }
 (⟦ _ ⟧ _ ⇒ _ of _) ⊑? (` _ of _) = no λ { (⊑-ty _ ()) }
 (⟦ _ ⟧ _ ⇒ _ of _) ⊑? (Ref _ of _) = no λ { (⊑-ty _ ()) }
+
+
+{- **** Type label stamping **** -}
+stamp : Type → Label → Type
+stamp (T of g₁) g₂ = T of g₁ ⋎̃ g₂
+
+stamp-low : ∀ A → stamp A (l low) ≡ A
+stamp-low (T of ⋆)      = refl
+stamp-low (T of l low)  = refl
+stamp-low (T of l high) = refl
+
+stamp-~  : ∀ {A B g₁ g₂} → A ~ B → g₁ ~ₗ g₂ → stamp A g₁ ~ stamp B g₂
+stamp-~ {S of g₁′} {T of g₂′} (~-ty g₁′~g₂′ S~T) g₁~g₂ = ~-ty (consis-join-~ₗ g₁′~g₂′ g₁~g₂) S~T
+
+stamp-<: : ∀ {A B g₁ g₂} → A <: B → g₁ <:ₗ g₂ → stamp A g₁ <: stamp B g₂
+stamp-<: (<:-ty g₁′<:g₂′ S<:T) g₁<:g₂ = <:-ty (consis-join-<:ₗ g₁′<:g₂′ g₁<:g₂) S<:T
+
+stamp-⊑ : ∀ {A B g₁ g₂} → A ⊑ B → g₁ ⊑ₗ g₂ → stamp A g₁ ⊑ stamp B g₂
+stamp-⊑ (⊑-ty g₁′⊑g₂′ S⊑T) g₁⊑g₂ = ⊑-ty (consis-join-⊑ₗ g₁′⊑g₂′ g₁⊑g₂) S⊑T
+
+
+{- **** Typing contexts **** -}
+Context = List Type

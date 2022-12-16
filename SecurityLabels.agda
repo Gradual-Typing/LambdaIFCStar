@@ -350,3 +350,10 @@ l ℓ₁ ⊑ₗ? l ℓ₂ =
   case ℓ₁ =? ℓ₂ of λ where
   (yes refl) → yes l⊑l
   (no ℓ₁≢ℓ₂) → no λ { l⊑l → contradiction refl ℓ₁≢ℓ₂ }
+
+consis-join-⊑ₗ : ∀ {g₁ g₁′ g₂ g₂′}
+  → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′ → g₁ ⋎̃ g₂ ⊑ₗ g₁′ ⋎̃ g₂′
+consis-join-⊑ₗ ⋆⊑  ⋆⊑  = ⋆⊑
+consis-join-⊑ₗ ⋆⊑  l⊑l = ⋆⊑
+consis-join-⊑ₗ l⊑l ⋆⊑  = ⋆⊑
+consis-join-⊑ₗ l⊑l l⊑l = l⊑l
