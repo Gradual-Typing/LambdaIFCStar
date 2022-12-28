@@ -1,8 +1,12 @@
+## Binary
+bin/
+
 ## Agda files
 *.agdai
 .agda-stdlib.sed
 .links-*.sed
 MAlonzo/
+_build/
 
 ## Jekyll files
 _site/
@@ -24,6 +28,3 @@ Gemfile.lock
 
 ## Emacs files
 auto/
-
-## Binary
-Main

@@ -1,14 +1,16 @@
-%.agdai: %.agda
-	/usr/bin/env agda  $<
+AGD = /usr/bin/env agda
 
-AGDA = Compile.agda TypeSafety.agda BigStepErasedDeterministic.agda Noninterference.agda Examples.agda
+all: proofs exe
+.PHONY : all
 
-AGDAI = $(AGDA:%.agda=%.agdai)
+proofs: src/Proofs.agda
+	$(info Checking all proofs ...)
+	$(AGD) $<
 
-all: ${AGDA} ${AGDAI}
+exe: src/Demo.agda
+	$(info Compiling demo programs ...)
+	$(AGD) --compile --compile-dir=bin $<
 
-exe: Main.agda
-	/usr/bin/env agda --compile $<
-
+.PHONY: clean
 clean:
-	rm -f *.agdai *~
+	rm -rf _build/ bin/
