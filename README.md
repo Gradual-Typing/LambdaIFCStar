@@ -22,6 +22,7 @@ You can check our proofs and run our examples using Agda:
 ## Prerequisites
 
 - [Agda](https://wiki.portal.chalmers.se/agda) `2.6.2.2`
+- GHC with working [MAlonzo](https://wiki.portal.chalmers.se/agda/Docs/MAlonzo)
 - [Standard library](https://github.com/agda/agda-stdlib) `1.7.1`
 - [Abstract binding trees](https://github.com/jsiek/abstract-binding-trees/)
 
@@ -38,4 +39,16 @@ You can check our proofs and run our examples using Agda:
 
 # File Structure
 
-TBA
++ `src/Examples.agda`: contains examples programs. It sources the
+  following modules:
+  - `src/ExamplePrograms/Example1.agda`: shows that
+    $\lambda_{\mathtt{SEC}}^\star$ indeed facilitates both compile-time
+    (static) and runtime (dynamic) information-flow control.
+    If a $\lambda_{\mathtt{SEC}}^\star$ program is fully statically-typed,
+    our type system alone guarantees security. Transition between
+    static and dynamic is controlled by the precision of type annotations
+    given by the programmer.
+  - `src/ExamplePrograms/Example2.agda`: establishes the
+    intuition that even if the programmer opts for runtime enforcement,
+    $\lambda_{\mathtt{SEC}}^\star$ still guards against any possible
+    information leakage.
