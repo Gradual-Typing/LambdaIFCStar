@@ -25,6 +25,7 @@ You can check our proofs and run our examples using Agda:
 - GHC with working [MAlonzo](https://wiki.portal.chalmers.se/agda/Docs/MAlonzo)
 - [Standard library](https://github.com/agda/agda-stdlib) `1.7.1`
 - [Abstract binding trees](https://github.com/jsiek/abstract-binding-trees/)
+- [GNU Make](https://www.gnu.org/software/make/)
 
 ## Building
 
@@ -34,8 +35,8 @@ You can check our proofs and run our examples using Agda:
 + To check the proofs only, run `make proofs`. The type-checker of Agda makes sure
   everything is correct.
 
-+ To see $\lambda_{\mathtt{SEC}}^\star$ running in action, build everything first
-  and then run `bin/Demo`.
++ To get a taste of $\lambda_{\mathtt{SEC}}^\star$ running in action, build everything
+  first and then run `bin/Demo`.
 
 # File Structure
 
@@ -44,10 +45,10 @@ In further detail:
 + `src/Proofs.agda`: sources the proofs of several important
   meta-theoretical results, most noticeably, type safety and noninterference.
   This file depends upon modules in the following sub-directories:
-  - `src/Surface/`: contains the syntax and the type system of
+  - `src/Surface/`: contains syntax and type system of
     $\lambda_{\mathtt{SEC}}^\star$. This is the "surface language",
     i.e., the language exposed to the programmers.
-  - `src/Memory/`: contains our heap model. It has a public, low-security
+  - `src/Memory/`: contains our heap model. The heap has a public, low-security
     region and a secretive, high-security region.
   - `src/CC/`: the formal specification of $\lambda_{\mathtt{SEC}}^\Rightarrow$:
     its syntax, its type system, and its operational semantics (both small-step
