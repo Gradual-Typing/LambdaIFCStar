@@ -52,6 +52,8 @@ In further detail:
   - `src/CC/`: the formal specification of $\lambda_{\mathtt{SEC}}^\Rightarrow$:
     its syntax, its type system, and its operational semantics (both small-step
     and big-step).
+      * `src/CC/Compile.agda`: defines type-preserving compilation
+        from $\lambda_{\mathtt{SEC}}^\star$ to $\lambda_{\mathtt{SEC}}^\Rightarrow$.
 
 + `src/Examples.agda`: contains examples programs. It sources the
   following modules:
