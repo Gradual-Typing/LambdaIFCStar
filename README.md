@@ -42,8 +42,8 @@ You can check our proofs and run our examples using Agda:
 In further detail:
 
 + `src/Proofs.agda`: sources the proofs of several important
-  meta-theoretical results.
-  It depends upon modules in the following sub-directories:
+  meta-theoretical results, most noticeably, type safety and noninterference.
+  This file depends upon modules in the following sub-directories:
   - `src/Surface/`: contains the syntax and the type system of
     $\lambda_{\mathtt{SEC}}^\star$. This is the "surface language",
     i.e., the language exposed to the programmers.
