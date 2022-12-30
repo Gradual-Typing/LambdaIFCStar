@@ -16,7 +16,7 @@ open import Common.Utils
 open import Common.Types
 open import Common.TypeBasedCast
 open import Memory.HeapContext
-open import CCExpSub.Syntax
+open import CCExpSub.Syntax Cast_⇒_
 open import CCExpSub.Typing Cast_⇒_
 
 
