@@ -93,3 +93,38 @@ canonical-fun {gc = gc} (⊢sub ⊢V (<:-ty _ (<:-fun _ _ _))) (V-const↟ neq) 
 canonical-fun (⊢sub ⊢V (<:-ty _ (<:-fun _ _ _))) (V-addr↟ neq) =
   case canonical-fun ⊢V V-addr of λ ()
 canonical-fun (⊢sub-pc ⊢V gc<:gc′) v = canonical-fun ⊢V v
+
+data Reference : Term → HeapContext → Type → Set where
+  Ref-addr : ∀ {Σ n T ℓ ℓ̂}
+    → lookup-Σ Σ (a⟦ ℓ̂ ⟧ n) ≡ just T
+      ---------------------------------------------------------- Reference
+    → Reference (addr a⟦ ℓ̂ ⟧ n of ℓ) Σ (Ref (T of l ℓ̂) of l ℓ)
+
+  Ref-addr↟ : ∀ {Σ A n T ℓ̂ ℓ} {Ref<:A : Ref (T of l ℓ̂) of l ℓ <: A}
+    → lookup-Σ Σ (a⟦ ℓ̂ ⟧ n) ≡ just T
+    → Ref (T of l ℓ̂) of l ℓ ≢ A
+      ---------------------------------------------------------- Reference Subtyping
+    → Reference (addr a⟦ ℓ̂ ⟧ n of ℓ ↟ Ref<:A) Σ A
+
+  Ref-proxy : ∀ {Σ A₁ A₂ g₁ g₂ V} {c : Cast (Ref A₁ of g₁) ⇒ (Ref A₂ of g₂)}
+    → Reference V Σ (Ref A₁ of g₁)
+    → Inert c
+      ------------------------------------------ Reference Proxy
+    → Reference (V ⟨ c ⟩) Σ (Ref A₂ of g₂)
+
+  Ref-proxy↟ : ∀ {Σ A₁ A₂ B g₁ g₂ V}
+                {c : Cast (Ref A₁ of g₁) ⇒ (Ref A₂ of g₂)}
+                {Ref<:B : Ref A₂ of g₂ <: B}
+    → Reference V Σ (Ref A₁ of g₁)
+    → Inert c
+    → Ref A₂ of g₂ ≢ B
+      ------------------------------------------ Reference Proxy Subtyping
+    → Reference ((V ⟨ c ⟩) ↟ Ref<:B) Σ B
+
+ref-is-value : ∀ {Σ V A g}
+  → Reference V Σ (Ref A of g)
+  → Value V
+ref-is-value (Ref-addr _)            = V-addr
+ref-is-value (Ref-proxy ref i)       = V-cast (ref-is-value ref) i
+ref-is-value (Ref-addr↟ _ neq)      = V-addr↟ neq
+ref-is-value (Ref-proxy↟ ref i neq) = V-cast↟ (ref-is-value ref) i neq
