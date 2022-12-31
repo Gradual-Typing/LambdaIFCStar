@@ -118,10 +118,16 @@ canonical-ref : ∀ {Σ gc pc A g V}
 canonical-ref (⊢addr eq) V-addr = Ref-addr eq
 canonical-ref (⊢cast ⊢V) (V-cast v (I-ref c i₁ i₂)) =
   Ref-proxy (canonical-ref ⊢V v) (I-ref c i₁ i₂)
-canonical-ref (⊢sub ⊢V sub) (V-addr↟ x) = {!!}
-canonical-ref (⊢sub ⊢V sub) (V-cast↟ v x x₁) = {!!}
-canonical-ref (⊢sub ⊢V sub) (V-const↟ x) = {!!}
-canonical-ref (⊢sub ⊢V sub) (V-ƛ↟ x) = {!!}
+canonical-ref (⊢sub ⊢V (<:-ty _ (<:-ref _ _))) (V-addr↟ neq) =
+  case canonical-ref ⊢V V-addr of λ where
+  (Ref-addr eq) → Ref-addr↟ eq neq
+canonical-ref (⊢sub ⊢V (<:-ty _ (<:-ref _ _))) (V-cast↟ v i neq) =
+  case i of λ where
+  (I-ref _ i₁ i₂) → Ref-proxy↟ (canonical-ref (cast-wt-inv ⊢V) v) i neq
+canonical-ref {gc = gc} (⊢sub ⊢V (<:-ty _ (<:-ref _ _))) (V-const↟ _) =
+  case uniqueness ⊢V (⊢const {gc = gc}) of λ ()
+canonical-ref (⊢sub ⊢V (<:-ty _ (<:-ref _ _))) (V-ƛ↟ neq) =
+  case canonical-ref ⊢V V-ƛ of λ where ()
 canonical-ref (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref ⊢V v
 
 -- data Constant : Term → Type → Set where
@@ -279,13 +285,17 @@ canonical-ref (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref ⊢V v
 -- ... | low  | l low  | l~ = refl
 -- stamp-val-low V-● = refl
 
--- ⊢value-pc : ∀ {Γ Σ gc gc′ pc pc′ V A}
---   → Γ ; Σ ; gc  ; pc ⊢ V ⦂ A
---   → Value V
---   → Γ ; Σ ; gc′ ; pc′ ⊢ V ⦂ A
--- ⊢value-pc (⊢addr eq) V-addr = ⊢addr eq
--- ⊢value-pc (⊢lam ⊢N) V-ƛ = ⊢lam ⊢N
--- ⊢value-pc ⊢const V-const = ⊢const
--- ⊢value-pc (⊢cast ⊢V) (V-cast v i) = ⊢cast (⊢value-pc ⊢V v)
--- ⊢value-pc (⊢sub ⊢V A<:B) v = ⊢sub (⊢value-pc ⊢V v) A<:B
--- ⊢value-pc (⊢sub-pc ⊢V gc<:gc′) v = ⊢value-pc ⊢V v
+⊢value-pc : ∀ {Γ Σ gc gc′ pc pc′ V A}
+  → Γ ; Σ ; gc  ; pc ⊢ V ⦂ A
+  → Value V
+    ------------------------------------
+  → Γ ; Σ ; gc′ ; pc′ ⊢ V ⦂ A
+⊢value-pc (⊢addr eq) V-addr = ⊢addr eq
+⊢value-pc (⊢lam ⊢N) V-ƛ = ⊢lam ⊢N
+⊢value-pc ⊢const V-const = ⊢const
+⊢value-pc (⊢cast ⊢V) (V-cast v i) = ⊢cast (⊢value-pc ⊢V v)
+⊢value-pc (⊢sub ⊢V A<:B) (V-const↟ _)    = ⊢sub (⊢value-pc ⊢V V-const) A<:B
+⊢value-pc (⊢sub ⊢V A<:B) (V-addr↟ _)     = ⊢sub (⊢value-pc ⊢V V-addr) A<:B
+⊢value-pc (⊢sub ⊢V A<:B) (V-ƛ↟ _)        = ⊢sub (⊢value-pc ⊢V V-ƛ) A<:B
+⊢value-pc (⊢sub ⊢V A<:B) (V-cast↟ v i _) = ⊢sub (⊢value-pc ⊢V (V-cast v i)) A<:B
+⊢value-pc (⊢sub-pc ⊢V gc<:gc′) v = ⊢value-pc ⊢V v
