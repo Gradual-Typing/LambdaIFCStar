@@ -1,21 +1,10 @@
 module CCExpSub.Values where
 
-open import Data.Nat
-open import Data.List
-open import Data.Maybe
-open import Data.Product using (_×_; ∃; ∃-syntax; Σ; Σ-syntax) renaming (_,_ to ⟨_,_⟩)
-open import Relation.Nullary.Negation using (contradiction)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
-open import Function using (case_of_)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_)
 
-open import Common.Utils
 open import Common.Types
 open import Common.TypeBasedCast
-open import Memory.HeapContext
 open import CCExpSub.Syntax Cast_⇒_
-open import CCExpSub.Typing Cast_⇒_
-
-open import CCExpSub.Uniqueness
 
 
 data Err : Term → Set where
@@ -36,95 +25,3 @@ data Value : Term → Set where
   V-cast↟ : ∀ {A B C V} {c : Cast A ⇒ B} {B<:C : B <: C}
     → Value V → Inert c → B ≢ C → Value ((V ⟨ c ⟩) ↟ B<:C)
   V-● : Value ●
-
-data Fun : Term → HeapContext → Type → Set where
-  Fun-ƛ : ∀ {Σ A B N ℓᶜ ℓ}
-    → (∀ {pc} → A ∷ [] ; Σ ; l ℓᶜ ; pc ⊢ N ⦂ B)
-      ----------------------------------------------------- Lambda
-    → Fun (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ) Σ (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ)
-
-  Fun-ƛ↟ : ∀ {Σ A B C N ℓᶜ ℓ} {A→B<:C : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ <: C}
-    → (∀ {pc} → A ∷ [] ; Σ ; l ℓᶜ ; pc ⊢ N ⦂ B)
-    → ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ≢ C
-      ----------------------------------------------------- Lambda Subtyping
-    → Fun (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ ↟ A→B<:C) Σ C
-
-  Fun-proxy : ∀ {Σ gc₁ gc₂ A₁ A₂ B₁ B₂ g₁ g₂ V}
-                {c : Cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁) ⇒ (⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂)}
-    → Fun V Σ (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁)
-    → Inert c
-      ----------------------------------------------------- Function Proxy
-    → Fun (V ⟨ c ⟩) Σ (⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂)
-
-  Fun-proxy↟ : ∀ {Σ gc₁ gc₂ A₁ A₂ B₁ B₂ C g₁ g₂ V}
-                  {c : Cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁) ⇒ (⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂)}
-                  {A₂→B₂<:C : ⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂ <: C}
-    → Fun V Σ (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁)
-    → Inert c
-    → ⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂ ≢ C
-      ----------------------------------------------------- Function Proxy Subtyping
-    → Fun ((V ⟨ c ⟩) ↟ A₂→B₂<:C) Σ C
-
--- Sanity check
-fun-is-value : ∀ {Σ V gc A B g}
-  → Fun V Σ (⟦ gc ⟧ A ⇒ B of g)
-  → Value V
-fun-is-value (Fun-ƛ       _)         = V-ƛ
-fun-is-value (Fun-ƛ↟     _ neq)     = V-ƛ↟ neq
-fun-is-value (Fun-proxy   fun i)     = V-cast (fun-is-value fun) i
-fun-is-value (Fun-proxy↟ fun i neq) = V-cast↟ (fun-is-value fun) i neq
-
--- Canonical form of value of function type
-canonical-fun : ∀ {Σ gc pc A B g gᶜ V}
-  → [] ; Σ ; gc ; pc ⊢ V ⦂ ⟦ gᶜ ⟧ A ⇒ B of g
-  → Value V
-  → Fun V Σ (⟦ gᶜ ⟧ A ⇒ B of g)
-canonical-fun (⊢lam ⊢N) V-ƛ = Fun-ƛ ⊢N
-canonical-fun (⊢cast ⊢V) (V-cast v (I-fun c i₁ i₂)) =
-  Fun-proxy (canonical-fun ⊢V v) (I-fun c i₁ i₂)
-canonical-fun (⊢sub ⊢V (<:-ty _ (<:-fun _ _ _))) (V-ƛ↟ neq) =
-  case canonical-fun ⊢V V-ƛ of λ where
-  (Fun-ƛ ⊢N) → Fun-ƛ↟ ⊢N neq
-canonical-fun (⊢sub ⊢V (<:-ty _ (<:-fun _ _ _))) (V-cast↟ v i neq) =
-  case i of λ where
-  (I-fun _ i₁ i₂) → Fun-proxy↟ (canonical-fun (cast-wt-inv ⊢V) v) i neq
-canonical-fun {gc = gc} (⊢sub ⊢V (<:-ty _ (<:-fun _ _ _))) (V-const↟ neq) =
-  case uniqueness ⊢V (⊢const {gc = gc}) of λ where ()
-canonical-fun (⊢sub ⊢V (<:-ty _ (<:-fun _ _ _))) (V-addr↟ neq) =
-  case canonical-fun ⊢V V-addr of λ ()
-canonical-fun (⊢sub-pc ⊢V gc<:gc′) v = canonical-fun ⊢V v
-
-data Reference : Term → HeapContext → Type → Set where
-  Ref-addr : ∀ {Σ n T ℓ ℓ̂}
-    → lookup-Σ Σ (a⟦ ℓ̂ ⟧ n) ≡ just T
-      ---------------------------------------------------------- Reference
-    → Reference (addr a⟦ ℓ̂ ⟧ n of ℓ) Σ (Ref (T of l ℓ̂) of l ℓ)
-
-  Ref-addr↟ : ∀ {Σ A n T ℓ̂ ℓ} {Ref<:A : Ref (T of l ℓ̂) of l ℓ <: A}
-    → lookup-Σ Σ (a⟦ ℓ̂ ⟧ n) ≡ just T
-    → Ref (T of l ℓ̂) of l ℓ ≢ A
-      ---------------------------------------------------------- Reference Subtyping
-    → Reference (addr a⟦ ℓ̂ ⟧ n of ℓ ↟ Ref<:A) Σ A
-
-  Ref-proxy : ∀ {Σ A₁ A₂ g₁ g₂ V} {c : Cast (Ref A₁ of g₁) ⇒ (Ref A₂ of g₂)}
-    → Reference V Σ (Ref A₁ of g₁)
-    → Inert c
-      ------------------------------------------ Reference Proxy
-    → Reference (V ⟨ c ⟩) Σ (Ref A₂ of g₂)
-
-  Ref-proxy↟ : ∀ {Σ A₁ A₂ B g₁ g₂ V}
-                {c : Cast (Ref A₁ of g₁) ⇒ (Ref A₂ of g₂)}
-                {Ref<:B : Ref A₂ of g₂ <: B}
-    → Reference V Σ (Ref A₁ of g₁)
-    → Inert c
-    → Ref A₂ of g₂ ≢ B
-      ------------------------------------------ Reference Proxy Subtyping
-    → Reference ((V ⟨ c ⟩) ↟ Ref<:B) Σ B
-
-ref-is-value : ∀ {Σ V A g}
-  → Reference V Σ (Ref A of g)
-  → Value V
-ref-is-value (Ref-addr _)            = V-addr
-ref-is-value (Ref-proxy ref i)       = V-cast (ref-is-value ref) i
-ref-is-value (Ref-addr↟ _ neq)      = V-addr↟ neq
-ref-is-value (Ref-proxy↟ ref i neq) = V-cast↟ (ref-is-value ref) i neq
