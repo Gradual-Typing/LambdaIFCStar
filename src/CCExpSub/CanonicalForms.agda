@@ -60,6 +60,7 @@ fun-is-value (Fun-proxy↟ fun i neq) = V-cast↟ (fun-is-value fun) i neq
 canonical-fun : ∀ {Σ gc pc A B g gᶜ V}
   → [] ; Σ ; gc ; pc ⊢ V ⦂ ⟦ gᶜ ⟧ A ⇒ B of g
   → Value V
+    -------------------------------
   → Fun V Σ (⟦ gᶜ ⟧ A ⇒ B of g)
 canonical-fun (⊢lam ⊢N) V-ƛ = Fun-ƛ ⊢N
 canonical-fun (⊢cast ⊢V) (V-cast v (I-fun c i₁ i₂)) =
@@ -114,6 +115,7 @@ ref-is-value (Ref-proxy↟ ref i neq) = V-cast↟ (ref-is-value ref) i neq
 canonical-ref : ∀ {Σ gc pc A g V}
   → [] ; Σ ; gc ; pc ⊢ V ⦂ Ref A of g
   → Value V
+    -----------------------------------
   → Reference V Σ (Ref A of g)
 canonical-ref (⊢addr eq) V-addr = Ref-addr eq
 canonical-ref (⊢cast ⊢V) (V-cast v (I-ref c i₁ i₂)) =
@@ -130,38 +132,44 @@ canonical-ref (⊢sub ⊢V (<:-ty _ (<:-ref _ _))) (V-ƛ↟ neq) =
   case canonical-ref ⊢V V-ƛ of λ where ()
 canonical-ref (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref ⊢V v
 
--- data Constant : Term → Type → Set where
---   Const-base : ∀ {ι} {k : rep ι} {ℓ}
---       --------------------------------------- Constant
---     → Constant ($ k of ℓ) (` ι of l ℓ)
+data Constant : Term → Type → Set where
+  Const-base : ∀ {ι} {k : rep ι} {ℓ}
+      --------------------------------------- Constant
+    → Constant ($ k of ℓ) (` ι of l ℓ)
 
---   Const-sub : ∀ {M} {ι ℓ₁ ℓ₂} {ιℓ₁<:ιℓ₂ : ` ι of l ℓ₁ <: ` ι of l ℓ₂}
---     → Constant M (` ι of l ℓ₁)
---     → ` ι of l ℓ₁ ≢ ` ι of l ℓ₂
---       ------------------------------------------------------ ConstantSubtyping
---     → Constant (M ↟ ιℓ₁<:ιℓ₂) (` ι of l ℓ₂)
+  Const-base↟ : ∀ {A ι} {k : rep ι} {ℓ} {ι<:A : ` ι of l ℓ <: A}
+    → ` ι of l ℓ ≢ A
+      --------------------------------------- Constant Subtyping
+    → Constant ($ k of ℓ ↟ ι<:A) A
 
---   Const-inj : ∀ {M} {ι ℓ} {c : Cast (` ι of l ℓ) ⇒ (` ι of ⋆)}
---     → Constant M (` ι of l ℓ)
---       ------------------------------------------------------ ConstantInjection
---     → Constant (M ⟨ c ⟩) (` ι of ⋆)
+  Const-inj : ∀ {M} {ι ℓ} {c : Cast (` ι of l ℓ) ⇒ (` ι of ⋆)}
+    → Constant M (` ι of l ℓ)
+      ------------------------------------------------------ Constant Injection
+    → Constant (M ⟨ c ⟩) (` ι of ⋆)
 
--- canonical-const : ∀ {Σ gc pc ι g V}
---   → [] ; Σ ; gc ; pc ⊢ V ⦂ ` ι of g
---   → Value V
---     --------------------------
---   → Constant V (` ι of g)
--- canonical-const ⊢const V-const = Const-base
--- canonical-const (⊢cast ⊢V) (V-cast v (I-base-inj c)) =
---   case canonical-const ⊢V v of λ where
---   Const-base          → Const-inj Const-base
---   (Const-sub cst neq) → Const-inj (Const-sub cst neq)
--- canonical-const (⊢sub ⊢V (<:-ty <:-⋆ <:-ι)) (V-sub v neq)= contradiction refl neq
--- canonical-const (⊢sub ⊢V (<:-ty (<:-l ℓ≼) <:-ι)) (V-sub v neq) =
---   case canonical-const ⊢V v of λ where
---   Const-base           → Const-sub Const-base neq
---   (Const-sub cst neq′) → Const-sub (Const-sub cst neq′) neq
--- canonical-const (⊢sub-pc ⊢V _) v = canonical-const ⊢V v
+canonical-const : ∀ {Σ gc pc ι g V}
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ ` ι of g
+  → Value V
+    --------------------------
+  → Constant V (` ι of g)
+canonical-const ⊢const V-const = Const-base
+canonical-const (⊢cast ⊢V) (V-cast v (I-base-inj c)) =
+  case canonical-const ⊢V v of λ where
+  Const-base          → Const-inj Const-base
+  (Const-base↟ neq)  → Const-inj (Const-base↟ neq)
+canonical-const (⊢sub ⊢V (<:-ty <:-⋆ <:-ι)) (V-const↟ neq) =
+  contradiction refl neq
+canonical-const (⊢sub ⊢V (<:-ty (<:-l ℓ₁≼ℓ) <:-ι)) (V-const↟ neq) =
+  case canonical-const ⊢V V-const of λ where
+  Const-base → Const-base↟ neq
+canonical-const (⊢sub ⊢V (<:-ty g₁<:g <:-ι)) (V-cast↟ v (I-base-inj _) neq) =
+  case g₁<:g of λ where
+  <:-⋆ → contradiction refl neq
+canonical-const (⊢sub ⊢V (<:-ty _ <:-ι)) (V-addr↟ _) =
+  case canonical-const ⊢V V-addr of λ where ()
+canonical-const (⊢sub ⊢V (<:-ty _ <:-ι)) (V-ƛ↟ _) =
+  case canonical-const ⊢V V-ƛ of λ where ()
+canonical-const (⊢sub-pc ⊢V _) v = canonical-const ⊢V v
 
 
 -- canonical⋆ : ∀ {Γ Σ gc pc V T}
