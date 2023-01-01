@@ -26,6 +26,12 @@ cast-wt-inv : ∀ {Γ Σ gc pc A B M} {c : Cast A ⇒ B}
 cast-wt-inv (⊢cast ⊢M)              = ⊢M
 cast-wt-inv (⊢sub-pc ⊢M⟨c⟩ gc<:gc′) = ⊢sub-pc (cast-wt-inv ⊢M⟨c⟩) gc<:gc′
 
+sub-wt-inv : ∀ {Γ Σ gc pc A B M} {A<:B : A <: B}
+  → Γ ; Σ ; gc ; pc ⊢ M ↟ A<:B ⦂ B
+  → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
+sub-wt-inv (⊢sub ⊢M _)            = ⊢M
+sub-wt-inv (⊢sub-pc ⊢M↟ gc<:gc′) = ⊢sub-pc (sub-wt-inv ⊢M↟) gc<:gc′
+
 private
   lookup-unique : ∀ {Γ} {A B : Type} (x : Var) → Γ ∋ x ⦂ A → Γ ∋ x ⦂ B → A ≡ B
   lookup-unique {_ ∷ Γ} 0 refl refl = refl
