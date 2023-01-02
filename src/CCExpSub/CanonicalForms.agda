@@ -237,9 +237,9 @@ canonical-pc⋆ : ∀ {Σ gc pc V A B g}
 canonical-pc⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) = inj-pc i
 canonical-pc⋆ (⊢sub ⊢V (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B₂))) v =
   case v of λ where
-  (V-const↟ neq) → {!!}
-  (V-addr↟  _)   → {!!}
-  (V-ƛ↟     _)   → {!!}
+  (V-const↟ _)   → case canonical-fun ⊢V V-const of λ where ()
+  (V-addr↟  _)   → case canonical-fun ⊢V V-addr of λ where ()
+  (V-ƛ↟     _)   → case canonical-fun ⊢V V-ƛ of λ where ()
   (V-cast↟ _ i neq) → inj-pc↟ i neq
 canonical-pc⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical-pc⋆ ⊢V v
 
