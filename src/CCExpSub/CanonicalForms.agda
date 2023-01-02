@@ -212,22 +212,36 @@ canonical⋆ (⊢sub ⊢W (<:-ty <:-⋆ S<:T)) v =
   (V-cast↟ _ i neq) → inj↟ i neq
 canonical⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical⋆ ⊢V v
 
--- canonical-pc⋆ : ∀ {Γ Σ gc pc V A B g}
---   → Γ ; Σ ; gc ; pc ⊢ V ⦂ ⟦ ⋆ ⟧ A ⇒ B of g
---   → Value V
---   → ∃[ C ] ∃[ D ] Σ[ c ∈ Cast C ⇒ D ] ∃[ W ]
---        (V ≡ W ⟨ c ⟩) × (Inert c) × (Γ ; Σ ; gc ; pc ⊢ W ⦂ C) × (D <: ⟦ ⋆ ⟧ A ⇒ B of g)
--- canonical-pc⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) =
---   ⟨ _ , _ , c , W , refl , i , ⊢W , <:-refl ⟩
--- canonical-pc⋆ (⊢sub ⊢V (<:-ty g′<:g (<:-fun <:-⋆ A<:A′ B′<:B))) v =
---   case canonical-pc⋆ ⊢V v of λ where
---     ⟨ C , D , c , W , refl , i , ⊢W , D<:A′→B′ ⟩ →
---       let D<:A→B = <:-trans D<:A′→B′ (<:-ty g′<:g (<:-fun <:-⋆ A<:A′ B′<:B)) in
---         ⟨ C , D , c , W , refl , i , ⊢W , D<:A→B ⟩
--- canonical-pc⋆ (⊢sub-pc ⊢V gc<:gc′) v =
---   case canonical-pc⋆ ⊢V v of λ where
---   ⟨ C , D , c , W , refl , i , ⊢W , D<:A→B ⟩ →
---     ⟨ C , D , c , W , refl , i , ⊢sub-pc ⊢W gc<:gc′ , D<:A→B ⟩
+data CanonicalPC⋆ : Term → Set where
+
+  -- V ⟨ C ⇒ ⟦ ⋆ ⟧ A → B of g ⟩
+  inj-pc : ∀ {A B C V g} {c : Cast C ⇒ (⟦ ⋆ ⟧ A ⇒ B of g)}
+    → Inert c
+      -------------------------
+    → CanonicalPC⋆ (V ⟨ c ⟩)
+
+  -- V ⟨ C ⇒ ⟦ ⋆ ⟧ A₁ → B₁ of g₁ ↟ ⟦ ⋆ ⟧ A₂ → B₂ of g₂
+  inj-pc↟ : ∀ {A₁ A₂ B₁ B₂ C V g₁ g₂}
+               {c : Cast C ⇒ (⟦ ⋆ ⟧ A₁ ⇒ B₁ of g₁)}
+               {A₁→B₁<:A₂→B₂ : ⟦ ⋆ ⟧ A₁ ⇒ B₁ of g₁ <: ⟦ ⋆ ⟧ A₂ ⇒ B₂ of g₂}
+    → Inert c
+    → ⟦ ⋆ ⟧ A₁ ⇒ B₁ of g₁ ≢ ⟦ ⋆ ⟧ A₂ ⇒ B₂ of g₂
+      --------------------------------------------------
+    → CanonicalPC⋆ ((V ⟨ c ⟩) ↟ A₁→B₁<:A₂→B₂)
+
+canonical-pc⋆ : ∀ {Σ gc pc V A B g}
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ ⟦ ⋆ ⟧ A ⇒ B of g
+  → Value V
+    ----------------------------
+  → CanonicalPC⋆ V
+canonical-pc⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) = inj-pc i
+canonical-pc⋆ (⊢sub ⊢V (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B₂))) v =
+  case v of λ where
+  (V-const↟ neq) → {!!}
+  (V-addr↟  _)   → {!!}
+  (V-ƛ↟     _)   → {!!}
+  (V-cast↟ _ i neq) → inj-pc↟ i neq
+canonical-pc⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical-pc⋆ ⊢V v
 
 -- canonical-ref⋆ : ∀ {Γ Σ gc pc V T g}
 --   → Γ ; Σ ; gc ; pc ⊢ V ⦂ Ref (T of ⋆) of g
