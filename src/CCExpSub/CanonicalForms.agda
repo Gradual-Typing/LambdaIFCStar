@@ -243,39 +243,52 @@ canonical-pc⋆ (⊢sub ⊢V (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B
   (V-cast↟ _ i neq) → inj-pc↟ i neq
 canonical-pc⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical-pc⋆ ⊢V v
 
--- canonical-ref⋆ : ∀ {Γ Σ gc pc V T g}
---   → Γ ; Σ ; gc ; pc ⊢ V ⦂ Ref (T of ⋆) of g
---   → Value V
---   → ∃[ A ] ∃[ B ] Σ[ c ∈ Cast A ⇒ B ] ∃[ W ]
---        (V ≡ W ⟨ c ⟩) × (Inert c) × (Γ ; Σ ; gc ; pc ⊢ W ⦂ A) × (B <: Ref (T of ⋆) of g)
--- canonical-ref⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) =
---   ⟨ _ , _ , c , W , refl , i , ⊢W , <:-refl ⟩
--- canonical-ref⋆ (⊢sub ⊢V sub) v =
---   case sub of λ where
---     (<:-ty _ (<:-ref (<:-ty <:-⋆ S<:T) (<:-ty <:-⋆ T<:S))) →
---       case canonical-ref⋆ ⊢V v of λ where
---         ⟨ A , B , c , W , refl , i , ⊢W , B<:RefS ⟩ →
---           ⟨ A , B , c , W , refl , i , ⊢W , <:-trans B<:RefS sub ⟩
--- canonical-ref⋆ (⊢sub-pc ⊢V gc<:gc′) v =
---   case canonical-ref⋆ ⊢V v of λ where
---   ⟨ A , B , c , W , refl , i , ⊢W , B<:RefT ⟩ →
---     ⟨ A , B , c , W , refl , i , ⊢sub-pc ⊢W gc<:gc′ , B<:RefT ⟩
+data CanonicalRef⋆ : Term → Set where
+
+  -- V ⟨ A ⇒ Ref (T of ⋆) of g ⟩
+  inj-ref : ∀ {A V T g} {c : Cast A ⇒ Ref (T of ⋆) of g}
+    → Inert c
+      -------------------------
+    → CanonicalRef⋆ (V ⟨ c ⟩)
+
+  -- V ⟨ A ⇒ Ref (T₁ of ⋆) of g₁ ↟ Ref (T₂ of ⋆) of g₂
+  inj-ref↟ : ∀ {A V T₁ T₂ g₁ g₂}
+                {c : Cast A ⇒ Ref (T₁ of ⋆) of g₁}
+                {RefT₁<:RefT₂ : Ref (T₁ of ⋆) of g₁ <: Ref (T₂ of ⋆) of g₂}
+    → Inert c
+    → Ref (T₁ of ⋆) of g₁ ≢ Ref (T₂ of ⋆) of g₂
+      --------------------------------------------------
+    → CanonicalRef⋆ ((V ⟨ c ⟩) ↟ RefT₁<:RefT₂)
+
+canonical-ref⋆ : ∀ {Σ gc pc V T g}
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ Ref (T of ⋆) of g
+  → Value V
+    ----------------------------
+  → CanonicalRef⋆ V
+canonical-ref⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) = inj-ref i
+canonical-ref⋆ (⊢sub ⊢V (<:-ty g₁<:g₂ (<:-ref (<:-ty <:-⋆ _) _))) v =
+  case v of λ where
+  (V-const↟ _)   → case canonical-ref ⊢V V-const of λ where ()
+  (V-addr↟  _)   → case canonical-ref ⊢V V-addr of λ where ()
+  (V-ƛ↟     _)   → case canonical-ref ⊢V V-ƛ of λ where ()
+  (V-cast↟ _ i neq) → inj-ref↟ i neq
+canonical-ref⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref⋆ ⊢V v
 
 
-
--- stamp-inert : ∀ {A B} → (c : Cast A ⇒ B) → Inert c → ∀ ℓ
---                       → (Cast (stamp A (l ℓ)) ⇒ (stamp B (l ℓ)))
--- stamp-inert (cast (` ι of l ℓ₁) (` ι of ⋆) p (~-ty ~⋆ ~-ι))
---             (I-base-inj _) ℓ =
---   cast (` ι of l (ℓ₁ ⋎ ℓ)) (` ι of ⋆) p (~-ty ~⋆ ~-ι)
--- stamp-inert (cast (⟦ gc₁ ⟧ A ⇒ B of g₁) (⟦ gc₂ ⟧ C ⇒ D of g₂) p (~-ty g₁~g₂ A→B~C→D))
---             (I-fun _ I-label I-label) ℓ =
---   let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) A→B~C→D in
---     cast (⟦ gc₁ ⟧ A ⇒ B of (g₁ ⋎̃ l ℓ)) (⟦ gc₂ ⟧ C ⇒ D of (g₂ ⋎̃ l ℓ)) p c~
--- stamp-inert (cast (Ref A of g₁) (Ref B of g₂) p (~-ty g₁~g₂ RefA~RefB))
---             (I-ref _ I-label I-label) ℓ =
---   let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) RefA~RefB in
---     cast (Ref A of (g₁ ⋎̃ l ℓ)) (Ref B of (g₂ ⋎̃ l ℓ)) p c~
+stamp-inert : ∀ {A B} (c : Cast A ⇒ B)
+  → Inert c → ∀ ℓ
+  → (Cast (stamp A (l ℓ)) ⇒ (stamp B (l ℓ)))
+stamp-inert (cast (` ι of l ℓ₁) (` ι of ⋆) p (~-ty ~⋆ ~-ι))
+            (I-base-inj _) ℓ =
+  cast (` ι of l (ℓ₁ ⋎ ℓ)) (` ι of ⋆) p (~-ty ~⋆ ~-ι)
+stamp-inert (cast (⟦ gc₁ ⟧ A ⇒ B of g₁) (⟦ gc₂ ⟧ C ⇒ D of g₂) p (~-ty g₁~g₂ A→B~C→D))
+            (I-fun _ I-label I-label) ℓ =
+  let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) A→B~C→D in
+    cast (⟦ gc₁ ⟧ A ⇒ B of (g₁ ⋎̃ l ℓ)) (⟦ gc₂ ⟧ C ⇒ D of (g₂ ⋎̃ l ℓ)) p c~
+stamp-inert (cast (Ref A of g₁) (Ref B of g₂) p (~-ty g₁~g₂ RefA~RefB))
+            (I-ref _ I-label I-label) ℓ =
+  let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) RefA~RefB in
+    cast (Ref A of (g₁ ⋎̃ l ℓ)) (Ref B of (g₂ ⋎̃ l ℓ)) p c~
 
 -- stamp-inert-inert : ∀ {A B ℓ} {c : Cast A ⇒ B} (i : Inert c) → Inert (stamp-inert c i ℓ)
 -- stamp-inert-inert (I-base-inj c) = I-base-inj _
