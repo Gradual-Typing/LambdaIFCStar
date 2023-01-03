@@ -290,19 +290,25 @@ stamp-inert (cast (Ref A of g₁) (Ref B of g₂) p (~-ty g₁~g₂ RefA~RefB))
   let c~ = ~-ty (consis-join-~ₗ g₁~g₂ ~ₗ-refl) RefA~RefB in
     cast (Ref A of (g₁ ⋎̃ l ℓ)) (Ref B of (g₂ ⋎̃ l ℓ)) p c~
 
--- stamp-inert-inert : ∀ {A B ℓ} {c : Cast A ⇒ B} (i : Inert c) → Inert (stamp-inert c i ℓ)
--- stamp-inert-inert (I-base-inj c) = I-base-inj _
--- stamp-inert-inert (I-fun c I-label I-label) =
---   I-fun (stamp-inert c _ _) I-label I-label
--- stamp-inert-inert (I-ref c I-label I-label) =
---   I-ref (stamp-inert c _ _) I-label I-label
+stamp-inert-inert : ∀ {A B ℓ} {c : Cast A ⇒ B} (i : Inert c) → Inert (stamp-inert c i ℓ)
+stamp-inert-inert (I-base-inj c) = I-base-inj _
+stamp-inert-inert (I-fun c I-label I-label) = I-fun (stamp-inert c _ _) I-label I-label
+stamp-inert-inert (I-ref c I-label I-label) = I-ref (stamp-inert c _ _) I-label I-label
 
--- stamp-val : ∀ V → Value V → StaticLabel → Term
--- stamp-val (addr a of ℓ₁) V-addr ℓ = addr a of (ℓ₁ ⋎ ℓ)
--- stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁) V-ƛ ℓ = ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ)
--- stamp-val ($ k of ℓ₁) V-const ℓ = $ k of (ℓ₁ ⋎ ℓ)
--- stamp-val (V ⟨ c ⟩) (V-cast v i) ℓ = stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩
--- stamp-val ● V-● ℓ = ●
+stamp-val : ∀ V → Value V → StaticLabel → Term
+stamp-val ($ k of ℓ₁) V-const ℓ = $ k of (ℓ₁ ⋎ ℓ)
+stamp-val ($ k of ℓ₁ ↟ A<:B) (V-const↟ A≢B) ℓ =
+  $ k of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A<:B (<:ₗ-refl {l ℓ})
+stamp-val (addr a of ℓ₁) V-addr ℓ = addr a of (ℓ₁ ⋎ ℓ)
+stamp-val (addr a of ℓ₁ ↟ A<:B) (V-addr↟ A≢B) ℓ =
+  addr a of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A<:B (<:ₗ-refl {l ℓ})
+stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁) V-ƛ ℓ = ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ)
+stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁ ↟ A₁<:A₂) (V-ƛ↟ A₁≢A₂) ℓ =
+  ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A₁<:A₂ (<:ₗ-refl {l ℓ})
+stamp-val (V ⟨ c ⟩) (V-cast v i) ℓ = stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩
+stamp-val ((V ⟨ c ⟩) ↟ B<:C) (V-cast↟ v i B≢C) ℓ =
+  (stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩) ↟ stamp-<: B<:C (<:ₗ-refl {l ℓ})
+stamp-val ● V-● ℓ = ●
 
 -- -- A stamped value is value
 -- stamp-val-value : ∀ {V ℓ} (v : Value V) → Value (stamp-val V v ℓ)
