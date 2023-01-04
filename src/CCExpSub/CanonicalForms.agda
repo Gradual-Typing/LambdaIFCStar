@@ -4,6 +4,7 @@ open import Data.Nat
 open import Data.List
 open import Data.Maybe
 open import Data.Product using (_×_; ∃; ∃-syntax; Σ; Σ-syntax) renaming (_,_ to ⟨_,_⟩)
+open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
 open import Function using (case_of_)
@@ -297,58 +298,83 @@ stamp-inert-inert (I-ref c I-label I-label) = I-ref (stamp-inert c _ _) I-label 
 
 stamp-val : ∀ V → Value V → StaticLabel → Term
 stamp-val ($ k of ℓ₁) V-const ℓ = $ k of (ℓ₁ ⋎ ℓ)
-stamp-val ($ k of ℓ₁ ↟ A<:B) (V-const↟ A≢B) ℓ =
-  $ k of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A<:B (<:ₗ-refl {l ℓ})
 stamp-val (addr a of ℓ₁) V-addr ℓ = addr a of (ℓ₁ ⋎ ℓ)
-stamp-val (addr a of ℓ₁ ↟ A<:B) (V-addr↟ A≢B) ℓ =
-  addr a of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A<:B (<:ₗ-refl {l ℓ})
 stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁) V-ƛ ℓ = ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ)
-stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁ ↟ A₁<:A₂) (V-ƛ↟ A₁≢A₂) ℓ =
-  ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A₁<:A₂ (<:ₗ-refl {l ℓ})
 stamp-val (V ⟨ c ⟩) (V-cast v i) ℓ = stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩
-stamp-val ((V ⟨ c ⟩) ↟ B<:C) (V-cast↟ v i B≢C) ℓ =
-  (stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩) ↟ stamp-<: B<:C (<:ₗ-refl {l ℓ})
 stamp-val ● V-● ℓ = ●
+{- values with subtyping ↟ -}
+stamp-val ($ k of ℓ₁ ↟ A<:B) (V-const↟ {A} {B} A≢B) ℓ =
+  case stamp A (l ℓ) ≡? stamp B (l ℓ) of λ where
+  (yes _) → $ k of (ℓ₁ ⋎ ℓ)  -- if A ⋎ ℓ = B ⋎ ℓ
+  (no  _) → $ k of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A<:B (<:ₗ-refl {l ℓ})
+stamp-val (addr a of ℓ₁ ↟ A<:B) (V-addr↟ {A} {B} A≢B) ℓ =
+  case stamp A (l ℓ) ≡? stamp B (l ℓ) of λ where
+  (yes _) → addr a of (ℓ₁ ⋎ ℓ) -- if A ⋎ ℓ = B ⋎ ℓ
+  (no  _) → addr a of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A<:B (<:ₗ-refl {l ℓ})
+stamp-val (ƛ⟦ pc ⟧ A ˙ N of ℓ₁ ↟ A₁<:A₂) (V-ƛ↟ {A₁} {A₂} A₁≢A₂) ℓ =
+  case stamp A₁ (l ℓ) ≡? stamp A₂ (l ℓ) of λ where
+  (yes _) → ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ)
+  (no  _) → ƛ⟦ pc ⟧ A ˙ N of (ℓ₁ ⋎ ℓ) ↟ stamp-<: A₁<:A₂ (<:ₗ-refl {l ℓ})
+stamp-val ((V ⟨ c ⟩) ↟ B<:C) (V-cast↟ {A} {B} {C} v i B≢C) ℓ =
+  case stamp B (l ℓ) ≡? stamp C (l ℓ) of λ where
+  (yes _) → stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩
+  (no  _) → (stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩) ↟ stamp-<: B<:C (<:ₗ-refl {l ℓ})
 
--- -- A stamped value is value
--- stamp-val-value : ∀ {V ℓ} (v : Value V) → Value (stamp-val V v ℓ)
--- stamp-val-value V-addr = V-addr
--- stamp-val-value V-ƛ = V-ƛ
--- stamp-val-value V-const = V-const
--- stamp-val-value (V-cast v i) =
---   V-cast (stamp-val-value v) (stamp-inert-inert i)
--- stamp-val-value V-● = V-●
+-- A stamped value is value
+stamp-val-value : ∀ {V ℓ} (v : Value V) → Value (stamp-val V v ℓ)
+stamp-val-value V-const = V-const
+stamp-val-value V-addr = V-addr
+stamp-val-value V-ƛ = V-ƛ
+stamp-val-value (V-cast v i) =
+  V-cast (stamp-val-value v) (stamp-inert-inert i)
+stamp-val-value V-● = V-●
+stamp-val-value {V} {ℓ} (V-const↟ {A} {B} _)
+  with stamp A (l ℓ) ≡? stamp B (l ℓ)
+... | yes _       = V-const
+... | no  A⋎ℓ≢B⋎ℓ = V-const↟ A⋎ℓ≢B⋎ℓ
+stamp-val-value {V} {ℓ} (V-addr↟ {A} {B} _)
+  with stamp A (l ℓ) ≡? stamp B (l ℓ)
+... | yes _       = V-addr
+... | no  A⋎ℓ≢B⋎ℓ = V-addr↟ A⋎ℓ≢B⋎ℓ
+stamp-val-value {V} {ℓ} (V-ƛ↟ {A} {B} _)
+  with stamp A (l ℓ) ≡? stamp B (l ℓ)
+... | yes _       = V-ƛ
+... | no  A⋎ℓ≢B⋎ℓ = V-ƛ↟ A⋎ℓ≢B⋎ℓ
+stamp-val-value {V} {ℓ} (V-cast↟ {A} {B} {C} v i _)
+  with stamp B (l ℓ) ≡? stamp C (l ℓ)
+... | yes _       = V-cast (stamp-val-value v) (stamp-inert-inert i)
+... | no  B⋎ℓ≢C⋎ℓ = V-cast↟ (stamp-val-value v) (stamp-inert-inert i) B⋎ℓ≢C⋎ℓ
 
--- stamp-val-low : ∀ {V} (v : Value V) → stamp-val V v low ≡ V
--- stamp-val-low (V-addr {ℓ = ℓ}) with ℓ
--- ... | low  = refl
--- ... | high = refl
--- stamp-val-low (V-ƛ {ℓ = ℓ}) with ℓ
--- ... | low  = refl
--- ... | high = refl
--- stamp-val-low (V-const {ℓ = ℓ}) with ℓ
--- ... | low  = refl
--- ... | high = refl
--- stamp-val-low (V-cast v (I-base-inj (cast (` ι of l ℓ) (` ι of ⋆) p (~-ty ℓ~⋆ ~-ι))))
---   rewrite stamp-val-low v
---   with ℓ   | ℓ~⋆
--- ... | low  | ~⋆ = refl
--- ... | high | ~⋆ = refl
--- stamp-val-low (V-cast v (I-fun (cast (_ of l ℓ₁) (_ of g₂) p (~-ty ℓ₁~g₂ _)) I-label I-label))
---   rewrite stamp-val-low v
---   with ℓ₁  | g₂     | ℓ₁~g₂
--- ... | high | ⋆      | ~⋆ = refl
--- ... | high | l high | l~ = refl
--- ... | low  | ⋆      | ~⋆ = refl
--- ... | low  | l low  | l~ = refl
--- stamp-val-low (V-cast v (I-ref (cast (_ of l ℓ₁) (_ of g₂) p (~-ty ℓ₁~g₂ _)) I-label I-label))
---   rewrite stamp-val-low v
---   with ℓ₁  | g₂     | ℓ₁~g₂
--- ... | high | ⋆      | ~⋆ = refl
--- ... | high | l high | l~ = refl
--- ... | low  | ⋆      | ~⋆ = refl
--- ... | low  | l low  | l~ = refl
--- stamp-val-low V-● = refl
+stamp-val-low : ∀ {V} (v : Value V) → stamp-val V v low ≡ V
+stamp-val-low (V-const {ℓ = low})  = refl
+stamp-val-low (V-const {ℓ = high}) = refl
+stamp-val-low (V-addr {ℓ = low})   = refl
+stamp-val-low (V-addr {ℓ = high})  = refl
+stamp-val-low (V-ƛ {ℓ = low})      = refl
+stamp-val-low (V-ƛ {ℓ = high})     = refl
+stamp-val-low (V-cast v (I-base-inj (cast (` ι of l ℓ) (` ι of ⋆) p (~-ty ℓ~⋆ ~-ι))))
+  rewrite stamp-val-low v
+  with ℓ   | ℓ~⋆
+... | low  | ~⋆ = refl
+... | high | ~⋆ = refl
+stamp-val-low (V-cast v (I-fun (cast (_ of l ℓ₁) (_ of g₂) p (~-ty ℓ₁~g₂ _)) I-label I-label))
+  rewrite stamp-val-low v
+  with ℓ₁  | g₂     | ℓ₁~g₂
+... | high | ⋆      | ~⋆ = refl
+... | high | l high | l~ = refl
+... | low  | ⋆      | ~⋆ = refl
+... | low  | l low  | l~ = refl
+stamp-val-low (V-cast v (I-ref (cast (_ of l ℓ₁) (_ of g₂) p (~-ty ℓ₁~g₂ _)) I-label I-label))
+  rewrite stamp-val-low v
+  with ℓ₁  | g₂     | ℓ₁~g₂
+... | high | ⋆      | ~⋆ = refl
+... | high | l high | l~ = refl
+... | low  | ⋆      | ~⋆ = refl
+... | low  | l low  | l~ = refl
+stamp-val-low V-● = refl
+stamp-val-low (V-const↟ {A} {B} _) with stamp A (l low) ≡? stamp B (l low)
+... | yes _ = {!!}
+... | no  _ = {!!}
 
 ⊢value-pc : ∀ {Γ Σ gc gc′ pc pc′ V A}
   → Γ ; Σ ; gc  ; pc ⊢ V ⦂ A
