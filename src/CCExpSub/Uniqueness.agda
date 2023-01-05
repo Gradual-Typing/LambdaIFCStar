@@ -38,9 +38,9 @@ private
   lookup-unique {_ ∷ Γ} 0 refl refl = refl
   lookup-unique {_ ∷ Γ} (suc x) Γ∋x⦂A Γ∋x⦂B = lookup-unique {Γ} x Γ∋x⦂A Γ∋x⦂B
 
-uniqueness : ∀ {Γ Σ gc gc† pc A B M}
-  → Γ ; Σ ; gc  ; pc ⊢ M ⦂ A
-  → Γ ; Σ ; gc† ; pc ⊢ M ⦂ B
+uniqueness : ∀ {Γ Σ gc gc† pc pc† A B M}
+  → Γ ; Σ ; gc  ; pc  ⊢ M ⦂ A
+  → Γ ; Σ ; gc† ; pc† ⊢ M ⦂ B
     -----------------------------------
   → A ≡ B
 uniqueness ⊢const ⊢const = refl
@@ -50,7 +50,7 @@ uniqueness (⊢addr eq) (⊢addr eq†) =
 uniqueness {Γ} (⊢var {x = x} ∋x) (⊢var ∋x†) =
   lookup-unique {Γ} x ∋x ∋x†
 uniqueness (⊢lam ⊢N) (⊢lam ⊢N†) =
-  case uniqueness {pc = low} ⊢N ⊢N† of λ where
+  case uniqueness {pc = low} {low} ⊢N ⊢N† of λ where
   refl → refl
 uniqueness {gc = gc} {gc†} (⊢app {g = g} ⊢L ⊢M) (⊢app {g = g†} ⊢L† ⊢M†)
   with gc ⋎̃ g | gc† ⋎̃ g† | uniqueness ⊢L ⊢L†
@@ -61,7 +61,7 @@ uniqueness (⊢if ⊢L ⊢M ⊢N) (⊢if ⊢L† ⊢M† ⊢N†) =
   refl → refl
 uniqueness (⊢let ⊢M ⊢N) (⊢let ⊢M† ⊢N†) =
   case uniqueness ⊢M ⊢M† of λ where
-  refl → uniqueness {pc = low} ⊢N ⊢N†
+  refl → uniqueness {pc = low} {low} ⊢N ⊢N†
 uniqueness (⊢ref ⊢M _) (⊢ref ⊢M† _) =
   cong (λ □ → Ref □ of l low) (uniqueness ⊢M ⊢M†)
 uniqueness (⊢ref? ⊢M) (⊢ref? ⊢M†) =
