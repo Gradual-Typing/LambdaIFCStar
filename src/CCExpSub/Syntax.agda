@@ -6,6 +6,8 @@ open import Data.List
 open import Data.Bool renaming (Bool to 𝔹)
 
 open import Syntax
+
+open import Common.SubtypeCast
 open import Common.BlameLabels
 open import Memory.Addr
 
@@ -29,7 +31,7 @@ data Op : Set where
   op-assign?      : Op
   op-assign✓      : Op
   op-cast         : ∀ {A B} → Cast A ⇒ B → Op
-  op-sub          : ∀ {A B} → A <: B      → Op
+  op-sub          : ∀ {A B} →      A ↟ B → Op
   op-prot         : StaticLabel → Op
   op-cast-pc      : Label → Op
   op-error        : Type → Error → Op
@@ -51,7 +53,7 @@ sig op-assign          = ■ ∷ ■ ∷ []
 sig op-assign?         = ■ ∷ ■ ∷ []
 sig op-assign✓         = ■ ∷ ■ ∷ []
 sig (op-cast c)        = ■ ∷ []
-sig (op-sub A<:B)      = ■ ∷ []
+sig (op-sub  s)        = ■ ∷ []
 sig (op-prot ℓ)        = ■ ∷ []
 sig (op-cast-pc g)     = ■ ∷ []
 sig (op-error A e)     = []
@@ -61,7 +63,7 @@ open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug) public
 
 infixl 7  _·_
 infix 8 _⟨_⟩
-infix 8 _↟_
+infix 8 _↟⟨_⟩
 
 pattern addr_of_ a ℓ             = (op-addr a ℓ) ⦅ nil ⦆
 pattern ƛ⟦_⟧_˙_of_ pc A N ℓ      = (op-lam pc A ℓ) ⦅ cons (bind (ast N)) nil ⦆
@@ -76,8 +78,8 @@ pattern !_ M                     = op-deref ⦅ cons (ast M) nil ⦆
 pattern _:=_  L M                = op-assign ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _:=?_ L M                = op-assign? ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _:=✓_ L M                = op-assign✓ ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern _⟨_⟩ M c                 = (op-cast c) ⦅ cons (ast M) nil ⦆
-pattern _↟_ M A<:B              = (op-sub A<:B) ⦅ cons (ast M) nil ⦆
+pattern _⟨_⟩   M c               = (op-cast c) ⦅ cons (ast M) nil ⦆
+pattern _↟⟨_⟩ M s                = (op-sub s) ⦅ cons (ast M) nil ⦆
 pattern prot ℓ M                 = (op-prot ℓ) ⦅ cons (ast M) nil ⦆      {- protection term -}
 pattern cast-pc g M              = (op-cast-pc g) ⦅ cons (ast M) nil ⦆
 pattern error A e                = (op-error A e) ⦅ nil ⦆                  {- blame / nsu error -}

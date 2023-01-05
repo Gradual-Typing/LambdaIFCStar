@@ -13,6 +13,7 @@ open import Syntax
 
 open import Common.Utils
 open import Common.Types
+open import Common.SubtypeCast
 open import Common.TypeBasedCast
 open import Memory.HeapContext
 open import CCExpSub.Syntax Cast_⇒_
@@ -26,10 +27,10 @@ cast-wt-inv : ∀ {Γ Σ gc pc A B M} {c : Cast A ⇒ B}
 cast-wt-inv (⊢cast ⊢M)              = ⊢M
 cast-wt-inv (⊢sub-pc ⊢M⟨c⟩ gc<:gc′) = ⊢sub-pc (cast-wt-inv ⊢M⟨c⟩) gc<:gc′
 
-sub-wt-inv : ∀ {Γ Σ gc pc A B M} {A<:B : A <: B}
-  → Γ ; Σ ; gc ; pc ⊢ M ↟ A<:B ⦂ B
+sub-wt-inv : ∀ {Γ Σ gc pc A B M} {s : A ↟ B}
+  → Γ ; Σ ; gc ; pc ⊢ M ↟⟨ s ⟩ ⦂ B
   → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
-sub-wt-inv (⊢sub ⊢M _)            = ⊢M
+sub-wt-inv (⊢sub ⊢M)              = ⊢M
 sub-wt-inv (⊢sub-pc ⊢M↟ gc<:gc′) = ⊢sub-pc (sub-wt-inv ⊢M↟) gc<:gc′
 
 private
@@ -78,6 +79,6 @@ uniqueness (⊢prot ⊢M) (⊢prot ⊢M†) =
 uniqueness (⊢cast ⊢M) (⊢cast ⊢M†) = refl
 uniqueness (⊢cast-pc ⊢M _) (⊢cast-pc ⊢M† _) = uniqueness ⊢M ⊢M†
 uniqueness ⊢err ⊢err = refl
-uniqueness (⊢sub ⊢M A<:B) (⊢sub ⊢M† .A<:B) = refl
+uniqueness (⊢sub ⊢M) (⊢sub ⊢M†) = refl
 uniqueness (⊢sub-pc ⊢M x) ⊢M† = uniqueness ⊢M ⊢M†
 uniqueness ⊢M (⊢sub-pc ⊢M† x) = uniqueness ⊢M ⊢M†

@@ -14,6 +14,7 @@ open import Syntax
 
 open import Common.Utils
 open import Common.Types
+open import Common.SubtypeCast
 open import Memory.HeapContext
 open import CCExpSub.Syntax Cast_⇒_
 
@@ -118,18 +119,17 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       ----------------------------------------- CCCastPC
     → Γ ; Σ ; gc ; pc ⊢ cast-pc g M ⦂ A
 
-  ⊢err : ∀ {Γ Σ gc pc A e}
-      ------------------------------------ CCError
-    → Γ ; Σ ; gc ; pc ⊢ error A e ⦂ A
-
-  ⊢sub : ∀ {Γ Σ gc pc A B M}
+  ⊢sub : ∀ {Γ Σ gc pc A B M} {s : A ↟ B}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
-    → (A<:B : A <: B)
       ---------------------------------- CCSub
-    → Γ ; Σ ; gc ; pc ⊢ M ↟ A<:B ⦂ B
+    → Γ ; Σ ; gc ; pc ⊢ M ↟⟨ s ⟩ ⦂ B
 
   ⊢sub-pc : ∀ {Γ Σ gc gc′ pc A M}
     → Γ ; Σ ; gc′ ; pc ⊢ M ⦂ A
     → gc <:ₗ gc′
       -------------------------- CCSubPC
     → Γ ; Σ ; gc  ; pc ⊢ M ⦂ A
+
+  ⊢err : ∀ {Γ Σ gc pc A e}
+      ------------------------------------ CCError
+    → Γ ; Σ ; gc ; pc ⊢ error A e ⦂ A
