@@ -53,9 +53,9 @@ cc-⊑? {M = $ k of ℓ} {$ k′ of ℓ′} (⊢const {ι = ι}) (⊢const {ι =
       (no  ℓ≢ℓ)  → no λ { ⊑-const → contradiction refl ℓ≢ℓ }
     (no  k≢k)    → no λ { ⊑-const → contradiction refl k≢k }
   (no  ι≢ι)      → no λ { ⊑-const → contradiction refl ι≢ι }
-cc-⊑? ⊢const (⊢addr x)         = no λ ()
-cc-⊑? ⊢const (⊢var x)          = no λ ()
-cc-⊑? ⊢const (⊢lam x)          = no λ ()
+cc-⊑? ⊢const (⊢addr _)         = no λ ()
+cc-⊑? ⊢const (⊢var _)          = no λ ()
+cc-⊑? ⊢const (⊢lam _)          = no λ ()
 cc-⊑? ⊢const (⊢app _ _)        = no λ ()
 cc-⊑? ⊢const (⊢if _ _ _)       = no λ ()
 cc-⊑? ⊢const (⊢let _ _)        = no λ ()
@@ -129,6 +129,49 @@ cc-⊑? (⊢prot ⊢M) ⊢M′ = {!!}
 cc-⊑? (⊢cast ⊢M) ⊢M′ = {!!}
 cc-⊑? (⊢cast-pc ⊢M x) ⊢M′ = {!!}
 cc-⊑? (⊢sub ⊢M) ⊢M′ = {!!}
-cc-⊑? ⊢err ⊢M′ = {!!}
+cc-⊑? ⊢err ⊢const            = no λ ()
+cc-⊑? ⊢err (⊢addr _)         = no λ ()
+cc-⊑? ⊢err (⊢var _)          = no λ ()
+cc-⊑? ⊢err (⊢lam _)          = no λ ()
+cc-⊑? ⊢err (⊢app _ _)        = no λ ()
+cc-⊑? ⊢err (⊢if _ _ _)       = no λ ()
+cc-⊑? ⊢err (⊢let _ _)        = no λ ()
+cc-⊑? ⊢err (⊢ref _ _)        = no λ ()
+cc-⊑? ⊢err (⊢ref? _)         = no λ ()
+cc-⊑? ⊢err (⊢ref✓ _ _)      = no λ ()
+cc-⊑? ⊢err (⊢deref _)        = no λ ()
+cc-⊑? ⊢err (⊢assign _ _ _)   = no λ ()
+cc-⊑? ⊢err (⊢assign? _ _)    = no λ ()
+cc-⊑? ⊢err (⊢assign✓ _ _ _) = no λ ()
+cc-⊑? ⊢err (⊢prot _)         = no λ ()
+cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} (⊢err {A = A}) (⊢cast {A = A′} {B′} ⊢M′) =
+  case A ⊑? A′ of λ where
+  (yes A⊑A′) →
+    case A ⊑? B′ of λ where
+    (yes A⊑B′) →
+      case cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} ⊢err ⊢M′ of λ where
+      (yes M⊑M′) →
+        yes (⊑-castᵣ A⊑A′ A⊑B′ ⟨ gc , pc , ⊢err ⟩ M⊑M′)
+      (no  M⋤M′) → no λ { (⊑-castᵣ _ _ _ M⊑M′) → contradiction M⊑M′ M⋤M′ }
+    (no  A⋤B′) →
+      no λ { (⊑-castᵣ _ A⊑B′ ⟨ _ , _ , ⊢M ⟩ _) →
+        case uniqueness {gc† = gc} {pc† = pc} ⊢M ⊢err of λ where
+        refl → contradiction A⊑B′ A⋤B′ }
+  (no  A⋤A′) →
+    no λ { (⊑-castᵣ A⊑A′ _ ⟨ _ , _ , ⊢M ⟩ _) →
+      case uniqueness {gc† = gc} {pc† = pc} ⊢M ⊢err of λ where
+      refl → contradiction A⊑A′ A⋤A′ }
+cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} ⊢err (⊢cast-pc {g = g} ⊢M′ _) =
+  case cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {g} {pc} ⊢err ⊢M′ of λ where
+  (yes M⊑M′) → yes (⊑-cast-pcᵣ M⊑M′)
+  (no  M⋤M′) → no (λ { (⊑-cast-pcᵣ M⊑M′) → contradiction M⊑M′ M⋤M′ })
+cc-⊑? ⊢err (⊢sub ⊢M′) = {!!}
+cc-⊑? {gc = gc} {pc = pc} (⊢err {A = A}) (⊢err {A = A′}) =
+  case A ⊑? A′ of λ where
+  (yes A⊑A′) → yes (⊑-err ⟨ gc , pc , ⊢err ⟩ A⊑A′)
+  (no  A⋤A′) →
+    no (λ { (⊑-err ⟨ _ , _ , ⊢M ⟩ A⊑A′) →
+      case uniqueness {gc† = gc} {pc† = pc} ⊢M ⊢err of λ where
+      refl → contradiction A⊑A′ A⋤A′ })
 cc-⊑? (⊢sub-pc ⊢M _) ⊢M′ = cc-⊑? ⊢M ⊢M′
 cc-⊑? ⊢M (⊢sub-pc ⊢M′ _) = cc-⊑? ⊢M ⊢M′
