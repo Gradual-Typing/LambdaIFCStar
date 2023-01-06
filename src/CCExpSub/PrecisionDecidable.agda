@@ -53,20 +53,20 @@ cc-⊑? {M = $ k of ℓ} {$ k′ of ℓ′} (⊢const {ι = ι}) (⊢const {ι =
       (no  ℓ≢ℓ)  → no λ { ⊑-const → contradiction refl ℓ≢ℓ }
     (no  k≢k)    → no λ { ⊑-const → contradiction refl k≢k }
   (no  ι≢ι)      → no λ { ⊑-const → contradiction refl ι≢ι }
-cc-⊑? ⊢const (⊢addr x) = no λ ()
-cc-⊑? ⊢const (⊢var x) = no λ ()
-cc-⊑? ⊢const (⊢lam x) = no λ ()
-cc-⊑? ⊢const (⊢app _ _) = no λ ()
-cc-⊑? ⊢const (⊢if _ _ _) = no λ ()
-cc-⊑? ⊢const (⊢let _ _) = no λ ()
-cc-⊑? ⊢const (⊢ref _ _) = no λ ()
-cc-⊑? ⊢const (⊢ref? _) = no λ ()
-cc-⊑? ⊢const (⊢ref✓ _ _) = no λ ()
-cc-⊑? ⊢const (⊢deref _) = no λ ()
-cc-⊑? ⊢const (⊢assign _ _ _) = no λ ()
-cc-⊑? ⊢const (⊢assign? _ _) = no λ ()
+cc-⊑? ⊢const (⊢addr x)         = no λ ()
+cc-⊑? ⊢const (⊢var x)          = no λ ()
+cc-⊑? ⊢const (⊢lam x)          = no λ ()
+cc-⊑? ⊢const (⊢app _ _)        = no λ ()
+cc-⊑? ⊢const (⊢if _ _ _)       = no λ ()
+cc-⊑? ⊢const (⊢let _ _)        = no λ ()
+cc-⊑? ⊢const (⊢ref _ _)        = no λ ()
+cc-⊑? ⊢const (⊢ref? _)         = no λ ()
+cc-⊑? ⊢const (⊢ref✓ _ _)      = no λ ()
+cc-⊑? ⊢const (⊢deref _)        = no λ ()
+cc-⊑? ⊢const (⊢assign _ _ _)   = no λ ()
+cc-⊑? ⊢const (⊢assign? _ _)    = no λ ()
 cc-⊑? ⊢const (⊢assign✓ _ _ _) = no λ ()
-cc-⊑? ⊢const (⊢prot _) = no λ ()
+cc-⊑? ⊢const (⊢prot _)         = no λ ()
 cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} {A = A} ⊢const (⊢cast {A = A′} {B′} ⊢M′) =
   case A ⊑? A′ of λ where
   (yes A⊑A′) →
@@ -84,7 +84,10 @@ cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} {A = A} ⊢const (�
     no λ { (⊑-castᵣ A⊑A′ _ ⟨ _ , _ , ⊢M ⟩ _) →
       case uniqueness {gc† = gc} {pc† = pc} ⊢M ⊢const of λ where
       refl → contradiction A⊑A′ A⋤A′ }
-cc-⊑? ⊢const (⊢cast-pc ⊢M′ x) = {!!}
+cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} ⊢const (⊢cast-pc {g = g} ⊢M′ _) =
+  case cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {g} {pc} ⊢const ⊢M′ of λ where
+  (yes M⊑M′) → yes (⊑-cast-pcᵣ M⊑M′)
+  (no  M⋤M′) → no (λ { (⊑-cast-pcᵣ M⊑M′) → contradiction M⊑M′ M⋤M′ })
 cc-⊑? {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {pc} {pc′} {A = A} ⊢const (⊢sub {A = A′} {B′} ⊢M′) =
   case A ⊑? A′ of λ where
   (yes A⊑A′) →
