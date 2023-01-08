@@ -24,6 +24,14 @@ rep : Base → Set
 rep Bool = 𝔹
 rep Unit = ⊤
 
+const-eq? : ∀ {ι} → (k₁ k₂ : rep ι) → Dec (k₁ ≡ k₂)
+const-eq? {Bool} false false  = yes refl
+const-eq? {Bool} false true   = no  λ ()
+const-eq? {Bool} true false   = no  λ ()
+const-eq? {Bool} true true    = yes refl
+const-eq? {Unit} tt tt        = yes refl
+
+
 data RawType : Set
 data Type : Set
 
