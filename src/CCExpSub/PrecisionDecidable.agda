@@ -131,16 +131,91 @@ cc-⊑?-cast {A = A} {A′} {B} {M} {M′} (⊢cast ⊢M) (⊢if ⊢L′ ⊢M′
     no λ { (⊑-castₗ A⊑A′ _ ⟨ _ , _ , ⊢M′† ⟩ _) →
       case uniqueness ⊢M′† (⊢if ⊢L′ ⊢M′ ⊢N′) of λ where
       refl → contradiction A⊑A′ A⋤A′ }
-cc-⊑?-cast (⊢cast ⊢M) (⊢let ⊢M′ x) = {!!}
-cc-⊑?-cast (⊢cast ⊢M) (⊢ref ⊢M′ x) = {!!}
-cc-⊑?-cast (⊢cast ⊢M) (⊢ref? ⊢M′) = {!!}
-cc-⊑?-cast (⊢cast ⊢M) (⊢ref✓ ⊢M′ x) = {!!}
+cc-⊑?-cast {A = A} {A′} {B} {M} {M′} (⊢cast ⊢M) (⊢let ⊢M′ ⊢N′) =
+  case A ⊑? A′ of λ where
+  (yes A⊑A′) →
+    case B ⊑? A′ of λ where
+    (yes B⊑A′) →
+      case cc-⊑? _ _ ⊢M (⊢let ⊢M′ ⊢N′) of λ where
+      (yes M⊑M′) → yes (⊑-castₗ A⊑A′ B⊑A′ ⟨ _ , _ , ⊢let ⊢M′ ⊢N′ ⟩ M⊑M′)
+      (no  M⋤M′) → no λ { (⊑-castₗ _ _ _ M⊑M′) → contradiction M⊑M′ M⋤M′ }
+    (no  B⋤A′) →
+      no λ { (⊑-castₗ _ B⊑A′ ⟨ _ , _ , ⊢M′† ⟩ _) →
+        case uniqueness ⊢M′† (⊢let ⊢M′ ⊢N′) of λ where
+        refl → contradiction B⊑A′ B⋤A′ }
+  (no  A⋤A′) →
+    no λ { (⊑-castₗ A⊑A′ _ ⟨ _ , _ , ⊢M′† ⟩ _) →
+      case uniqueness ⊢M′† (⊢let ⊢M′ ⊢N′) of λ where
+      refl → contradiction A⊑A′ A⋤A′ }
+cc-⊑?-cast {A = A} {A′} {B} {M} {M′} (⊢cast ⊢M) (⊢ref ⊢M′ pc′≼ℓ) =
+  case A ⊑? A′ of λ where
+  (yes A⊑A′) →
+    case B ⊑? A′ of λ where
+    (yes B⊑A′) →
+      case cc-⊑? _ _ ⊢M (⊢ref ⊢M′ pc′≼ℓ) of λ where
+      (yes M⊑M′) → yes (⊑-castₗ A⊑A′ B⊑A′ ⟨ _ , _ , ⊢ref ⊢M′ pc′≼ℓ ⟩ M⊑M′)
+      (no  M⋤M′) → no λ { (⊑-castₗ _ _ _ M⊑M′) → contradiction M⊑M′ M⋤M′ }
+    (no  B⋤A′) →
+      no λ { (⊑-castₗ _ B⊑A′ ⟨ _ , _ , ⊢M′† ⟩ _) →
+        case uniqueness ⊢M′† (⊢ref ⊢M′ pc′≼ℓ) of λ where
+        refl → contradiction B⊑A′ B⋤A′ }
+  (no  A⋤A′) →
+    no λ { (⊑-castₗ A⊑A′ _ ⟨ _ , _ , ⊢M′† ⟩ _) →
+      case uniqueness ⊢M′† (⊢ref ⊢M′ pc′≼ℓ) of λ where
+      refl → contradiction A⊑A′ A⋤A′ }
+cc-⊑?-cast {A = A} {A′} {B} {M} {M′} (⊢cast ⊢M) (⊢ref? ⊢M′) =
+  case A ⊑? A′ of λ where
+  (yes A⊑A′) →
+    case B ⊑? A′ of λ where
+    (yes B⊑A′) →
+      case cc-⊑? _ _ ⊢M (⊢ref? ⊢M′) of λ where
+      (yes M⊑M′) → yes (⊑-castₗ A⊑A′ B⊑A′ ⟨ _ , _ , ⊢ref? ⊢M′ ⟩ M⊑M′)
+      (no  M⋤M′) → no λ { (⊑-castₗ _ _ _ M⊑M′) → contradiction M⊑M′ M⋤M′ }
+    (no  B⋤A′) →
+      no λ { (⊑-castₗ _ B⊑A′ ⟨ _ , _ , ⊢M′† ⟩ _) →
+        case uniqueness ⊢M′† (⊢ref? ⊢M′) of λ where
+        refl → contradiction B⊑A′ B⋤A′ }
+  (no  A⋤A′) →
+    no λ { (⊑-castₗ A⊑A′ _ ⟨ _ , _ , ⊢M′† ⟩ _) →
+      case uniqueness ⊢M′† (⊢ref? ⊢M′) of λ where
+      refl → contradiction A⊑A′ A⋤A′ }
+cc-⊑?-cast {A = A} {A′} {B} {M} {M′} (⊢cast ⊢M) (⊢ref✓ ⊢M′ pc≼ℓ) =
+  case A ⊑? A′ of λ where
+  (yes A⊑A′) →
+    case B ⊑? A′ of λ where
+    (yes B⊑A′) →
+      case cc-⊑? _ _ ⊢M (⊢ref✓ ⊢M′ pc≼ℓ) of λ where
+      (yes M⊑M′) → yes (⊑-castₗ A⊑A′ B⊑A′ ⟨ _ , _ , ⊢ref✓ ⊢M′ pc≼ℓ ⟩ M⊑M′)
+      (no  M⋤M′) → no λ { (⊑-castₗ _ _ _ M⊑M′) → contradiction M⊑M′ M⋤M′ }
+    (no  B⋤A′) →
+      no λ { (⊑-castₗ _ B⊑A′ ⟨ _ , _ , ⊢M′† ⟩ _) →
+        case uniqueness ⊢M′† (⊢ref✓ ⊢M′ pc≼ℓ) of λ where
+        refl → contradiction B⊑A′ B⋤A′ }
+  (no  A⋤A′) →
+    no λ { (⊑-castₗ A⊑A′ _ ⟨ _ , _ , ⊢M′† ⟩ _) →
+      case uniqueness ⊢M′† (⊢ref✓ ⊢M′ pc≼ℓ) of λ where
+      refl → contradiction A⊑A′ A⋤A′ }
 cc-⊑?-cast (⊢cast ⊢M) (⊢deref ⊢M′) = {!!}
 cc-⊑?-cast (⊢cast ⊢M) (⊢assign ⊢M′ ⊢M′₁ x) = {!!}
 cc-⊑?-cast (⊢cast ⊢M) (⊢assign? ⊢M′ x) = {!!}
 cc-⊑?-cast (⊢cast ⊢M) (⊢assign✓ ⊢M′ ⊢M′₁ x) = {!!}
 cc-⊑?-cast (⊢cast ⊢M) (⊢prot ⊢M′) = {!!}
-cc-⊑?-cast (⊢cast ⊢M) (⊢cast ⊢M′) = {!!}
+cc-⊑?-cast (⊢cast {A = A} {B} ⊢M) (⊢cast {A = A′} {B′} ⊢M′) =
+  case B ⊑? B′ of λ where
+  (yes B⊑B′) →
+    case A ⊑? A′ of λ where
+    (yes A⊑A′) →
+      case cc-⊑? _ _ ⊢M ⊢M′ of λ where
+      (yes M⊑M′) → yes (⊑-cast A⊑A′ B⊑B′ M⊑M′)
+      (no  M⋤M′) → {!!}
+    (no  A⋤A′) → {!!}
+  (no  B⋤B′) →
+    no λ {
+      (⊑-cast A⊑A′ B⊑B′ M⊑M′)    → contradiction B⊑B′ B⋤B′ ;
+      (⊑-castₗ _ B⊑B′ ⟨ _ , _ , ⊢M† ⟩ _) →
+        case cast-wt-inv ⊢M† of λ { ⟨ refl , _ ⟩ → contradiction B⊑B′ B⋤B′ } ;
+      (⊑-castᵣ _ B⊑B′ ⟨ _ , _ , ⊢M† ⟩ _) →
+        case cast-wt-inv ⊢M† of λ { ⟨ refl , _ ⟩ → contradiction B⊑B′ B⋤B′ } }
 cc-⊑?-cast (⊢cast ⊢M) (⊢cast-pc ⊢M′ x) = {!!}
 cc-⊑?-cast (⊢cast ⊢M) (⊢sub ⊢M′) = {!!}
 cc-⊑?-cast (⊢cast ⊢M) ⊢err = {!!}

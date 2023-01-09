@@ -114,7 +114,7 @@ data _;_∣_;_⊢_⊑_ : Context → HeapContext → Context → HeapContext �
     → Γ ; Σ ∣ Γ′ ; Σ′ ⊢ M ⊑ cast-pc g′ M′
 
   ⊑-cast : ∀ {Γ Γ′ Σ Σ′} {A A′ B B′ M M′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′}
-    → A ⊑ B → A′ ⊑ B′
+    → A ⊑ A′ → B ⊑ B′
     → Γ ; Σ ∣ Γ′ ; Σ′ ⊢ M ⊑ M′
       ------------------------------------------
     → Γ ; Σ ∣ Γ′ ; Σ′ ⊢ M ⟨ c ⟩ ⊑ M′ ⟨ c′ ⟩
@@ -134,7 +134,7 @@ data _;_∣_;_⊢_⊑_ : Context → HeapContext → Context → HeapContext �
     → Γ ; Σ ∣ Γ′ ; Σ′ ⊢ M ⊑ M′ ⟨ c′ ⟩
 
   ⊑-sub : ∀ {Γ Γ′ Σ Σ′} {A A′ B B′ M M′} {s : A ↟ B} {s′ : A′ ↟ B′}
-    → A ⊑ B → A′ ⊑ B′
+    → A ⊑ A′ → B ⊑ B′
     → Γ ; Σ ∣ Γ′ ; Σ′ ⊢ M ⊑ M′
       ------------------------------------------
     → Γ ; Σ ∣ Γ′ ; Σ′ ⊢ M ↟⟨ s ⟩ ⊑ M′ ↟⟨ s′ ⟩
