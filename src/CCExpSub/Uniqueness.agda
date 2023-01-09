@@ -20,18 +20,24 @@ open import CCExpSub.Syntax Cast_⇒_
 open import CCExpSub.Typing Cast_⇒_
 
 
-{- The `cast` term is honest about the casted term's type -}
-cast-wt-inv : ∀ {Γ Σ gc pc A B M} {c : Cast A ⇒ B}
-  → Γ ; Σ ; gc ; pc ⊢ M ⟨ c ⟩ ⦂ B
-  → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
-cast-wt-inv (⊢cast ⊢M)              = ⊢M
-cast-wt-inv (⊢sub-pc ⊢M⟨c⟩ gc<:gc′) = ⊢sub-pc (cast-wt-inv ⊢M⟨c⟩) gc<:gc′
+{- The `cast` term is honest about the types -}
+cast-wt-inv : ∀ {Γ Σ gc pc A B B′ M} {c : Cast A ⇒ B}
+  → Γ ; Σ ; gc ; pc ⊢ M ⟨ c ⟩ ⦂ B′
+    --------------------------------------------
+  → (B ≡ B′) × (Γ ; Σ ; gc ; pc ⊢ M ⦂ A)
+cast-wt-inv (⊢cast ⊢M)              = ⟨ refl , ⊢M ⟩
+cast-wt-inv (⊢sub-pc ⊢M⟨c⟩ gc<:gc′) =
+  case cast-wt-inv ⊢M⟨c⟩ of λ where
+  ⟨ refl , ⊢M ⟩ → ⟨ refl , ⊢sub-pc ⊢M gc<:gc′ ⟩
 
-sub-wt-inv : ∀ {Γ Σ gc pc A B M} {s : A ↟ B}
-  → Γ ; Σ ; gc ; pc ⊢ M ↟⟨ s ⟩ ⦂ B
-  → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
-sub-wt-inv (⊢sub ⊢M)              = ⊢M
-sub-wt-inv (⊢sub-pc ⊢M↟ gc<:gc′) = ⊢sub-pc (sub-wt-inv ⊢M↟) gc<:gc′
+sub-wt-inv : ∀ {Γ Σ gc pc A B B′ M} {s : A ↟ B}
+  → Γ ; Σ ; gc ; pc ⊢ M ↟⟨ s ⟩ ⦂ B′
+    --------------------------------------------
+  → (B ≡ B′) × (Γ ; Σ ; gc ; pc ⊢ M ⦂ A)
+sub-wt-inv (⊢sub ⊢M)               = ⟨ refl , ⊢M ⟩
+sub-wt-inv (⊢sub-pc ⊢M⟨c⟩ gc<:gc′) =
+  case sub-wt-inv ⊢M⟨c⟩ of λ where
+  ⟨ refl , ⊢M ⟩ → ⟨ refl , ⊢sub-pc ⊢M gc<:gc′ ⟩
 
 private
   lookup-unique : ∀ {Γ} {A B : Type} (x : Var) → Γ ∋ x ⦂ A → Γ ∋ x ⦂ B → A ≡ B

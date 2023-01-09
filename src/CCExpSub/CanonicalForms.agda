@@ -3,7 +3,7 @@ module CCExpSub.CanonicalForms where
 open import Data.Nat
 open import Data.List
 open import Data.Maybe
-open import Data.Product using (_×_; ∃; ∃-syntax; Σ; Σ-syntax) renaming (_,_ to ⟨_,_⟩)
+open import Data.Product using (_×_; proj₁; proj₂; ∃; ∃-syntax; Σ; Σ-syntax) renaming (_,_ to ⟨_,_⟩)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst; subst₂; cong; cong₂; sym)
@@ -72,9 +72,10 @@ canonical-fun (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-ƛ↟ 
   (Fun-ƛ ⊢N) → Fun-ƛ↟ ⊢N neq
 canonical-fun (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-cast↟ v i neq) =
   case i of λ where
-  (I-fun _ i₁ i₂) → Fun-proxy↟ (canonical-fun (cast-wt-inv ⊢V) v) i neq
-canonical-fun {gc = gc} (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-const↟ neq) =
-  case uniqueness ⊢V (⊢const {gc = gc}) of λ where ()
+  (I-fun _ i₁ i₂) →
+    Fun-proxy↟ (canonical-fun (proj₂ (cast-wt-inv ⊢V)) v) i neq
+canonical-fun {gc = gc} {pc} (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-const↟ neq) =
+  case uniqueness ⊢V (⊢const {gc = gc} {pc}) of λ where ()
 canonical-fun (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-addr↟ neq) =
   case canonical-fun ⊢V V-addr of λ ()
 canonical-fun (⊢sub-pc ⊢V gc<:gc′) v = canonical-fun ⊢V v
@@ -127,9 +128,10 @@ canonical-ref (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V ) (V-addr↟
   (Ref-addr eq) → Ref-addr↟ eq neq
 canonical-ref (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-cast↟ v i neq) =
   case i of λ where
-  (I-ref _ i₁ i₂) → Ref-proxy↟ (canonical-ref (cast-wt-inv ⊢V) v) i neq
-canonical-ref {gc = gc} (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-const↟ _) =
-  case uniqueness ⊢V (⊢const {gc = gc}) of λ ()
+  (I-ref _ i₁ i₂) →
+    Ref-proxy↟ (canonical-ref (proj₂ (cast-wt-inv ⊢V)) v) i neq
+canonical-ref {gc = gc} {pc} (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-const↟ _) =
+  case uniqueness ⊢V (⊢const {gc = gc} {pc}) of λ ()
 canonical-ref (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-ƛ↟ neq) =
   case canonical-ref ⊢V V-ƛ of λ where ()
 canonical-ref (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref ⊢V v
