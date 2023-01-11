@@ -1,4 +1,4 @@
-module CC.AST where
+module Simulator.AST where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -38,7 +38,28 @@ data AST : Set where
   cast : AST → Type → Type → AST
   castpc : Label → AST → Type → AST
   err : Type → AST
-  sub : AST → Type → Type → AST
+  -- sub : AST → Type → Type → AST
+
+get-type : AST → Type
+get-type (var _ A) = A
+get-type (const _ _ A) = A
+get-type (addr _ _ A) = A
+get-type (lam _ _ _ _ A) = A
+get-type (app _ _ A) = A
+get-type (cond _ _ _ A) = A
+get-type (let-bind _ _ A) = A
+get-type (ref _ _ A) = A
+get-type (ref? _ _ A) = A
+get-type (ref✓ _ _ A) = A
+get-type (deref _ A) = A
+get-type (assign _ _ A) = A
+get-type (assign? _ _ A) = A
+get-type (assign✓ _ _ A) = A
+get-type (protect _ _ A) = A
+get-type (cast _ _ A) = A
+get-type (castpc _ _ A) = A
+get-type (err A) = A
+-- get-type (sub _ _ A) = A
 
 {- Translates a typing derivation into an AST -}
 to-ast : ∀ {Γ Σ gc pc A} M → Γ ; Σ ; gc ; pc ⊢ M ⦂ A → AST
@@ -65,7 +86,8 @@ to-ast {A = A} (prot ℓ M) (⊢prot ⊢M) = protect ℓ (to-ast M ⊢M) A
 to-ast {A = B} (M ⟨ c ⟩) (⊢cast {A = A} {.B} ⊢M) = cast (to-ast M ⊢M) A B
 to-ast {A = A} (cast-pc g M) (⊢cast-pc ⊢M _) = castpc g (to-ast M ⊢M) A
 to-ast {A = A} (error e) ⊢err = err A
-to-ast {A = B} M (⊢sub {A = A} {.B} ⊢M _) = sub (to-ast M ⊢M) A B
+to-ast {A = B} M (⊢sub ⊢M _) = to-ast M ⊢M
+-- to-ast {A = B} M (⊢sub {A = A} {.B} ⊢M _) = sub (to-ast M ⊢M) A B
 to-ast M (⊢sub-pc ⊢M _) = to-ast M ⊢M
 
 M : Term
