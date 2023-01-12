@@ -257,3 +257,26 @@ preserve (⊢sub ⊢M A<:B) ⊢μ pc≾gc M→M′ =
 preserve (⊢sub-pc ⊢M gc<:gc′) ⊢μ pc≾gc M→M′ =
   let ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩ = preserve ⊢M ⊢μ (≾-<: pc≾gc gc<:gc′) M→M′ in
   ⟨ Σ′ , Σ′⊇Σ , ⊢sub-pc ⊢M′ gc<:gc′ , ⊢μ′ ⟩
+
+multi-pres : ∀ {Σ gc pc M M′ A μ μ′}
+  → [] ; Σ ; gc ; pc ⊢ M ⦂ A
+  → Σ ⊢ μ
+  → l pc ≾ gc
+  → M ∣ μ ∣ pc —↠ M′ ∣ μ′
+    ---------------------------------------------------------------
+  → ∃[ Σ′ ] (Σ′ ⊇ Σ) × ([] ; Σ′ ; gc ; pc ⊢ M′ ⦂ A) × (Σ′ ⊢ μ′)
+multi-pres {Σ} ⊢M ⊢μ pc≲gc (_ ∣ _ ∣ _ ∎) =
+  ⟨ Σ , ⊇-refl Σ , ⊢M , ⊢μ ⟩
+multi-pres ⊢M ⊢μ pc≲gc (M ∣ μ ∣ pc —→⟨ M→N ⟩ N↠M′) =
+  let ⟨ Σ′ , Σ′⊇Σ , ⊢N , ⊢μ′ ⟩ = preserve ⊢M ⊢μ pc≲gc M→N in
+  let ⟨ Σ″ , Σ″⊇Σ′ , ⊢M′ , ⊢μ″ ⟩ = multi-pres ⊢N ⊢μ′ pc≲gc N↠M′ in
+  ⟨ Σ″ , ⊇-trans Σ″⊇Σ′ Σ′⊇Σ , ⊢M′ , ⊢μ″ ⟩
+
+multi-preserve : ∀ {M M′ A μ}
+  → [] ; ∅ ; l low ; low ⊢ M ⦂ A
+  → M ∣ ∅ ∣ low —↠ M′ ∣ μ
+    -----------------------------------------------------
+  → ∃[ Σ ] ([] ; Σ ; l low ; low ⊢ M′ ⦂ A) × (Σ ⊢ μ)
+multi-preserve ⊢M M↠M′ =
+  let ⟨ Σ , _ , ⊢M′ , ⊢μ ⟩ = multi-pres ⊢M ⊢μ-nil (≾-l l≼l) M↠M′ in
+  ⟨ Σ , ⊢M′ , ⊢μ ⟩

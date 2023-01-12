@@ -45,11 +45,31 @@ sim-helper M μ ⊢M ⊢μ t (suc k-1) =
       (done v)      {- M is value already -} → nothing
       (err E-error) {- M is an error -}      → nothing)
 
-simulator : ∀ {A A′} (M M′ : CCTerm)
+sim-cc : ∀ {Σ A A′} (M M′ : CCTerm)
   → [] ; ∅ ; l low ; low ⊢ M  ⦂ A
-  → [] ; ∅ ; l low ; low ⊢ M′ ⦂ A′
+  → [] ; Σ ; l low ; low ⊢ M′ ⦂ A′
   → 𝔹
-simulator M M′ ⊢M ⊢M′ =
+sim-cc M M′ ⊢M ⊢M′ =
   case sim-helper M ∅ ⊢M ⊢μ-nil (to-ast M′ ⊢M′) magic-num of λ where
   nothing  → false
   (just N) → true
+
+{-
+  𝒞M′ —→ N′
+  ⊔|       ⊔|
+  𝒞M  —↠ N
+-}
+simulator : ∀ {A A′} (M M′ : Term)
+  → [] ; l low ⊢ᴳ M  ⦂ A
+  → [] ; l low ⊢ᴳ M′ ⦂ A′
+  → Maybe 𝔹
+simulator M M′ ⊢M ⊢M′ =
+  let 𝒞M = 𝒞 M ⊢M in
+  let ⊢𝒞M = 𝒞-pres M ⊢M in
+  let 𝒞M′ = 𝒞 M′ ⊢M′ in
+  let ⊢𝒞M′ = 𝒞-pres M′ ⊢M′ in
+  case progress low 𝒞M′ ⊢𝒞M′ ∅ ⊢μ-nil of λ where
+  (step {N′} {μ′} 𝒞M′→N′) →
+    let ⟨ Σ′ , Σ′⊇Σ , ⊢N′ , ⊢μ′ ⟩ = preserve ⊢𝒞M′ ⊢μ-nil (low≾ _) 𝒞M′→N′ in
+    just (sim-cc 𝒞M N′ ⊢𝒞M ⊢N′)
+  _ → nothing
