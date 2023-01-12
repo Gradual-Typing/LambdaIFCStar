@@ -18,7 +18,7 @@ open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; sym; subst; cong)
 
-open import Memory.HeapContext hiding (Addr; RawAddr; a⟦_⟧_) public
+open import Memory.HeapContext hiding (Addr; RawAddr; a⟦_⟧_; addr-eq?) public
 open import Memory.Heap        Term Value                    public
 open import Memory.WFAddr      Term Value                    public
 
