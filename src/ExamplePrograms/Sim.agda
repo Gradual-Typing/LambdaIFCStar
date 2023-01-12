@@ -14,6 +14,7 @@ open import CC.CCStatics renaming (Term to CCTerm;
   `_ to var; $_of_ to const_of_; ƛ⟦_⟧_˙_of_ to lam⟦_⟧_˙_of_; !_ to *_)
 open import CC.Compile renaming (compile to 𝒞; compilation-preserves-type to 𝒞-pres)
 open import CC.Reduction
+open import CC.TypeSafety
 open import CC.BigStep
 open import Memory.Heap CCTerm Value
 
@@ -51,11 +52,13 @@ t₁′ = to-ast 𝒞M₁′ ⊢𝒞M₁′
 
 b₁ = check-⊑? t₁ t₁′
 
-N₁ = let ⟨ N , _ , R ⟩ = interp 𝒞M₁ ⊢𝒞M₁ 42 in N
+N₁ = let ⟨ N , _ , 𝒞M₁↠N₁ ⟩      = interp 𝒞M₁ ⊢𝒞M₁ 42 in N
+𝒞M₁↠N₁ = let ⟨ N , _ , 𝒞M₁↠N₁ ⟩ = interp 𝒞M₁ ⊢𝒞M₁ 42 in 𝒞M₁↠N₁
 ⊢N₁ : [] ; ∅ ; l low ; low ⊢ N₁ ⦂ ` Bool of ⋆
-⊢N₁ = ⊢cast ⊢const
-N₁′ = let ⟨ N , _ , R ⟩ = interp 𝒞M₁′ ⊢𝒞M₁′ 1 in N
+⊢N₁ = let ⟨ Σ , ⊢N₁ , ⊢μ ⟩ = multi-preserve ⊢𝒞M₁ 𝒞M₁↠N₁ in ⊢N₁
+N₁′ = let ⟨ N , _ , 𝒞M₁′↠N₁′ ⟩ = interp 𝒞M₁′ ⊢𝒞M₁′ 42 in N
+𝒞M₁′↠N₁′ = let ⟨ N , _ , 𝒞M₁′↠N₁′ ⟩ = interp 𝒞M₁′ ⊢𝒞M₁′ 42 in 𝒞M₁′↠N₁′
 ⊢N₁′ : [] ; ∅ ; l low ; low ⊢ N₁′ ⦂ ` Bool of ⋆
-⊢N₁′ = ⊢let (⊢cast (⊢sub ⊢const (<:-ty (<:-l l≼h) <:-ι))) (⊢var refl)
+⊢N₁′ = let ⟨ Σ , ⊢N₁′ , ⊢μ ⟩ = multi-preserve ⊢𝒞M₁′ 𝒞M₁′↠N₁′ in ⊢N₁′
 
 b₂ = check-⊑? (to-ast N₁ ⊢N₁) (to-ast N₁′ ⊢N₁′)
