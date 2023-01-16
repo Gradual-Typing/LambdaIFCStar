@@ -32,27 +32,20 @@ sim-helper : ∀ {Σ gc A} M μ
   → [] ; Σ ; gc ; low ⊢ M ⦂ A
   → Σ ⊢ μ → (t : AST) → (k : ℕ)
     ------------------------------------------
-  → Maybe CCTerm
+  → Maybe (∃[ N ] ∃[ μ′ ] (M ∣ μ ∣ low —↠ N ∣ μ′))
 sim-helper M μ ⊢M ⊢μ t 0 =
-  if (check-⊑? (to-ast M ⊢M) t) then (just M) else nothing
+  if (check-⊑? (to-ast M ⊢M) t) then just ⟨ M , μ , M ∣ μ ∣ _ ∎ ⟩ else nothing
 sim-helper M μ ⊢M ⊢μ t (suc k-1) =
-  if (check-⊑? (to-ast M ⊢M) t) then (just M)
+  if (check-⊑? (to-ast M ⊢M) t) then just ⟨ M , μ , M ∣ μ ∣ _ ∎ ⟩
     else
     (case progress low M ⊢M μ ⊢μ of λ where
       (step {N} {μ′} M→N) →
         let ⟨ Σ′ , Σ′⊇Σ , ⊢N , ⊢μ′ ⟩ = preserve ⊢M ⊢μ (low≾ _) M→N in
-        sim-helper N μ′ ⊢N ⊢μ′ t k-1
+        do
+          ⟨ N′ , μ″ , N↠N′ ⟩ ← sim-helper N μ′ ⊢N ⊢μ′ t k-1
+          just ⟨ N′ , μ″ , M ∣ _ ∣ _ —→⟨ M→N ⟩ N↠N′ ⟩
       (done v)      {- M is value already -} → nothing
       (err E-error) {- M is an error -}      → nothing)
-
-sim-cc : ∀ {Σ A A′} (M M′ : CCTerm)
-  → [] ; ∅ ; l low ; low ⊢ M  ⦂ A
-  → [] ; Σ ; l low ; low ⊢ M′ ⦂ A′
-  → 𝔹
-sim-cc M M′ ⊢M ⊢M′ =
-  case sim-helper M ∅ ⊢M ⊢μ-nil (to-ast M′ ⊢M′) magic-num of λ where
-  nothing  → false
-  (just N) → true
 
 {-
   𝒞M′ —→ N′
@@ -62,14 +55,15 @@ sim-cc M M′ ⊢M ⊢M′ =
 simulator : ∀ {A A′} (M M′ : Term)
   → [] ; l low ⊢ᴳ M  ⦂ A
   → [] ; l low ⊢ᴳ M′ ⦂ A′
-  → Maybe 𝔹
+  → Maybe (∃[ N₁ ] ∃[ N₂ ] ∃[ μ ] (N₁ ∣ ∅ ∣ low —↠ N₂ ∣ μ))
 simulator M M′ ⊢M ⊢M′ =
-  let 𝒞M = 𝒞 M ⊢M in
-  let ⊢𝒞M = 𝒞-pres M ⊢M in
-  let 𝒞M′ = 𝒞 M′ ⊢M′ in
-  let ⊢𝒞M′ = 𝒞-pres M′ ⊢M′ in
+  let 𝒞M  = 𝒞 M ⊢M   ; ⊢𝒞M  = 𝒞-pres M ⊢M   in
+  let 𝒞M′ = 𝒞 M′ ⊢M′ ; ⊢𝒞M′ = 𝒞-pres M′ ⊢M′ in
+  -- make the more precise side step once
   case progress low 𝒞M′ ⊢𝒞M′ ∅ ⊢μ-nil of λ where
   (step {N′} {μ′} 𝒞M′→N′) →
     let ⟨ Σ′ , Σ′⊇Σ , ⊢N′ , ⊢μ′ ⟩ = preserve ⊢𝒞M′ ⊢μ-nil (low≾ _) 𝒞M′→N′ in
-    just (sim-cc 𝒞M N′ ⊢𝒞M ⊢N′)
+    do
+      ⟨ N , μ , 𝒞M↠N ⟩ ← sim-helper 𝒞M ∅ ⊢𝒞M ⊢μ-nil (to-ast N′ ⊢N′) magic-num
+      just ⟨ 𝒞M , N , μ , 𝒞M↠N ⟩
   _ → nothing
