@@ -90,10 +90,10 @@ to-ast {A = B} M (⊢sub ⊢M _) = to-ast M ⊢M
 -- to-ast {A = B} M (⊢sub {A = A} {.B} ⊢M _) = sub (to-ast M ⊢M) A B
 to-ast M (⊢sub-pc ⊢M _) = to-ast M ⊢M
 
-M : Term
-M = (ƛ⟦ low ⟧ ` Bool of l high ˙ ` 0 of low) · ($ true of low)
+-- M : Term
+-- M = (ƛ⟦ low ⟧ ` Bool of l high ˙ ` 0 of low) · ($ true of low)
 
-⊢M : [] ; ∅ ; l low ; low ⊢ M ⦂ ` Bool of l high
-⊢M = ⊢app (⊢lam (⊢var refl)) (⊢sub ⊢const (<:-ty (<:-l l≼h) <:-ι))
+-- ⊢M : [] ; ∅ ; l low ; low ⊢ M ⦂ ` Bool of l high
+-- ⊢M = ⊢app (⊢lam (⊢var refl)) (⊢sub ⊢const (<:-ty (<:-l l≼h) <:-ι))
 
-t = to-ast M ⊢M
+-- t = to-ast M ⊢M
