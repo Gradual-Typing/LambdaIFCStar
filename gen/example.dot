@@ -1,0 +1,16 @@
+digraph {
+  node[shape=plaintext];
+  subgraph left {
+    rankdir="TB";
+    A -> B -> C;  // generate this sequence
+  }
+  subgraph right {
+    rankdir="TB";
+    D -> E -> F -> G;  // generate this sequence too
+  }
+  edge[style=dotted, constraint=false, arrowhead=none, minlen=3];
+  // generate the simulation edges
+  A -> D; { rank="same"; A; D; }
+  B -> F; { rank="same"; B; F; }
+  C -> G; { rank="same"; C; G; }
+}
