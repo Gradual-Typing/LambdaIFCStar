@@ -11,6 +11,7 @@ open import CC.HeapTyping
 open import CC.CCStatics
 open import CC.Reduction
 open import CC.TypeSafety
+open import CC.MultiStep
 
 
 interpret : ∀ {Σ gc A} pc M

@@ -153,21 +153,3 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
     → Value V
       ------------------------------------- CastPC
     → cast-pc g V ∣ μ ∣ pc —→ V ∣ μ
-
-
-{- Multi-step reduction -}
-infix  2 _∣_∣_—↠_∣_
-infixr 2 _∣_∣_—→⟨_⟩_
-infix  3 _∣_∣_∎
-
-data _∣_∣_—↠_∣_ : Term → Heap → StaticLabel → Term → Heap → Set where
-
-    _∣_∣_∎ : ∀ M μ pc
-        -----------------------------------
-      → M ∣ μ ∣ pc —↠ M ∣ μ
-
-    _∣_∣_—→⟨_⟩_ : ∀ L μ pc {M N μ′ μ″}
-      → L ∣ μ  ∣ pc —→ M ∣ μ′
-      → M ∣ μ′ ∣ pc —↠ N ∣ μ″
-        -----------------------------------
-      → L ∣ μ  ∣ pc —↠ N ∣ μ″
