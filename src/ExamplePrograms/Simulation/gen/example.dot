@@ -2,15 +2,25 @@ digraph {
   node[shape=plaintext];
   subgraph left {
     rankdir="TB";
-    A -> B -> C;  // generate this sequence
+    // ↓ generate the sequence below ↓
+    left0 -> left1 [label="β-let"];
+    left0 [label="let (true of L) ⟨ 𝔹 of L ⇒ 𝔹 of ⋆ ⟩ in let 0 in 0"];
+    left1 -> left2 [label="β-let"];
+    left1 [label="let (true of L) ⟨ 𝔹 of L ⇒ 𝔹 of ⋆ ⟩ in 0"];
+    left2 [label="(true of L) ⟨ 𝔹 of L ⇒ 𝔹 of ⋆ ⟩"];
   }
   subgraph right {
     rankdir="TB";
-    D -> E -> F -> G;  // generate this sequence too
+    // ↓ generate this sequence too ↓
+    right0 -> right1 [label="β-let"];
+    right0 [label="let true of L in let (0) ⟨ 𝔹 of H ⇒ 𝔹 of ⋆ ⟩ in 0"];
+    right1 -> right2 [label="β-let"];
+    right1 [label="let (true of L) ⟨ 𝔹 of H ⇒ 𝔹 of ⋆ ⟩ in 0"];
+    right2 [label="(true of L) ⟨ 𝔹 of H ⇒ 𝔹 of ⋆ ⟩"];
   }
   edge[style=dotted, constraint=false, arrowhead=none, minlen=3];
-  // generate the simulation edges
-  A -> D; { rank="same"; A; D; }
-  B -> F; { rank="same"; B; F; }
-  C -> G; { rank="same"; C; G; }
+  // ↓ generate the simulation edges ↓
+  left0 -> right0; { rank="same"; left0; right0; }
+  left1 -> right1; { rank="same"; left1; right1; }
+  left2 -> right2; { rank="same"; left2; right2; }
 }
