@@ -14,6 +14,7 @@ open import CC.CCStatics renaming (Term to CCTerm;
   `_ to var; $_of_ to const_of_; ƛ⟦_⟧_˙_of_ to lam⟦_⟧_˙_of_; !_ to *_)
 open import CC.Compile
 open import CC.Reduction
+open import CC.MultiStep
 open import CC.BigStep
 open import Memory.Heap CCTerm Value
 

@@ -16,7 +16,7 @@ open import CC.HeapTyping
 open import CC.Interp
 
 open import Examples
-open import PrettyPrinter.PP renaming (pprint-mult-reduction to pprint)
+open import PrettyPrinter.Console.PP
 
 
 main =
@@ -38,5 +38,5 @@ main =
     (printf "%s\n\n%s\n%s"
       (printf "\ESC[7m**** Running λSEC* program: ****\ESC[0m\n%s" (pprint-term M))
       (printf "\ESC[7m**** Reduction of the compiled λSEC⇒ term: ****\ESC[0m\n%s\n"
-        (let ⟨ _ , _ , R ⟩ = interp 𝒞M ⊢𝒞M 42 in pprint R))
+        (let ⟨ _ , _ , R ⟩ = interp 𝒞M ⊢𝒞M 42 in pprint-↠ R))
       rest)
