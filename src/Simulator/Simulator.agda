@@ -20,6 +20,7 @@ open import CC.Compile renaming (compile to 𝒞; compilation-preserves-type to 
 open import CC.Reduction
 open import CC.TypeSafety
 open import CC.BigStep
+open import CC.MultiStep renaming (multi-trans to _↠_)
 open import Memory.Heap CCTerm Value
 
 open import Simulator.AST
@@ -65,17 +66,18 @@ step-right : ∀ {Σ Σ′ gc gc′ A A′} M M′ μ₁ μ₁′
   → (⊢M′ : [] ; Σ′ ; gc′ ; low ⊢ M′ ⦂ A′)
   → (⊢μ₁  : Σ  ⊢ μ₁)
   → (⊢μ₁′ : Σ′ ⊢ μ₁′)
-  → (k : ℕ)  -- gas (steps left) for the right side
-  → (n : ℕ)  -- steps already taken on the left side
+  → (k : ℕ)  -- gas: steps left for the right side
+  → (n : ℕ)  -- steps taken on the left side
+  → (n′ : ℕ) -- steps taken on the right side
     ------------------------------------------------------------
   → (ℕ × ∃[ N ]  ∃[ μ₂  ] (M  ∣ μ₁  ∣ low —↠ N  ∣ μ₂ )) ×
      (ℕ × ∃[ N′ ] ∃[ μ₂′ ] (M′ ∣ μ₁′ ∣ low —↠ N′ ∣ μ₂′)) ×
      (List (ℕ × ℕ))
-step-right M M′ μ₁ μ₁′ ⊢M ⊢M′ ⊢μ ⊢μ₁′ 0 n =
+step-right M M′ μ₁ μ₁′ ⊢M ⊢M′ ⊢μ ⊢μ₁′ 0 n n′ =
   -- we run out of gas and can't further proceed on the more precise side,
   -- - or either side
   ⟨ ⟨ 0 , M , μ₁ , _ ∣ _ ∣ _ ∎ ⟩ , ⟨ 0 , M′ , μ₁′ , _ ∣ _ ∣ _ ∎ ⟩ , [] ⟩
-step-right M M′ μ₁ μ₁′ ⊢M ⊢M′ ⊢μ₁ ⊢μ₁′ (suc k) n =
+step-right M M′ μ₁ μ₁′ ⊢M ⊢M′ ⊢μ₁ ⊢μ₁′ (suc k-1) n₀ n₀′ =
   -- the more precise side (right) takes one step
   case progress low M′ ⊢M′ μ₁′ ⊢μ₁′ of λ where
   (step {N′} {μ₂′} M′→N′) →
@@ -88,33 +90,35 @@ step-right M M′ μ₁ μ₁′ ⊢M ⊢M′ ⊢μ₁ ⊢μ₁′ (suc k) n =
       M  —↠ₙ N
     -}
     (just ⟨ n , N , μ₂ , M↠N ⟩) →
-      {!!}
+      let ⟨ _ , _ , ⊢N , ⊢μ₂ ⟩ = multi-pres ⊢M ⊢μ₁ (low≾ _) M↠N in
+      let ⟨ ⟨ n₁ , N₁ , μ₃ , N↠N₁ ⟩ ,
+            ⟨ n₁′ , N₁′ , μ₃′ , N′↠N₁′ ⟩ ,
+            s ⟩ = step-right N N′ μ₂ μ₂′ ⊢N ⊢N′ ⊢μ₂ ⊢μ₂′ k-1 (n + n₀) (1 + n₀′) in
+      ⟨ ⟨ n + n₁ , N₁ , μ₃ , M↠N ↠ N↠N₁ ⟩ ,
+        ⟨ 1 + n₁′ , N₁′ , μ₃′ , _ ∣ _ ∣ _ —→⟨ M′→N′ ⟩ N′↠N₁′ ⟩ ,
+        ⟨ n + n₀ , 1 + n₀′ ⟩ ∷ s ⟩
     nothing →
       -- if we can't find N to stay in simulation
       -- we don't go anywhere else
-      ⟨ ⟨ 0 , M , μ₁ , _ ∣ _ ∣ _ ∎ ⟩ , ⟨ 1 , N′ , μ₂′ , _ ∣ _ ∣ _ —→⟨ M′→N′ ⟩ _ ∣ _ ∣ _ ∎ ⟩ , [] ⟩
-  (done vM′) →
-    ⟨ ⟨ 0 , M , μ₁ , _ ∣ _ ∣ _ ∎ ⟩ , ⟨ 0 , M′ , μ₁′ , _ ∣ _ ∣ _ ∎ ⟩ , [] ⟩
-  (err E-error) →
-    ⟨ ⟨ 0 , M , μ₁ , _ ∣ _ ∣ _ ∎ ⟩ , ⟨ 0 , M′ , μ₁′ , _ ∣ _ ∣ _ ∎ ⟩ , [] ⟩
+      ⟨ ⟨ 0 , M , μ₁ , _ ∣ _ ∣ _ ∎ ⟩ ,
+        ⟨ 1 , N′ , μ₂′ , _ ∣ _ ∣ _ —→⟨ M′→N′ ⟩ _ ∣ _ ∣ _ ∎ ⟩ ,
+        [] ⟩
+  _ → -- if M′ is a value or an error
+    ⟨ ⟨ 0 , M , μ₁ , _ ∣ _ ∣ _ ∎ ⟩ ,
+      ⟨ 0 , M′ , μ₁′ , _ ∣ _ ∣ _ ∎ ⟩ ,
+      [] ⟩
 
-{-
-  𝒞M′ —→ N′
-  ⊔|       ⊔|
-  𝒞M  —↠ N
--}
--- simulator : ∀ {A A′} (M M′ : Term)
---   → [] ; l low ⊢ᴳ M  ⦂ A
---   → [] ; l low ⊢ᴳ M′ ⦂ A′
---   → Maybe (∃[ N₁ ] ∃[ N₂ ] ∃[ μ ] (N₁ ∣ ∅ ∣ low —↠ N₂ ∣ μ))
--- simulator M M′ ⊢M ⊢M′ =
---   let 𝒞M  = 𝒞 M ⊢M   ; ⊢𝒞M  = 𝒞-pres M ⊢M   in
---   let 𝒞M′ = 𝒞 M′ ⊢M′ ; ⊢𝒞M′ = 𝒞-pres M′ ⊢M′ in
---   -- make the more precise side step once
---   case progress low 𝒞M′ ⊢𝒞M′ ∅ ⊢μ-nil of λ where
---   (step {N′} {μ′} 𝒞M′→N′) →
---     let ⟨ Σ′ , Σ′⊇Σ , ⊢N′ , ⊢μ′ ⟩ = preserve ⊢𝒞M′ ⊢μ-nil (low≾ _) 𝒞M′→N′ in
---     do
---       ⟨ N , μ , 𝒞M↠N ⟩ ← sim-helper 𝒞M ∅ ⊢𝒞M ⊢μ-nil (to-ast N′ ⊢N′) magic-num
---       just ⟨ 𝒞M , N , μ , 𝒞M↠N ⟩
---   _ → nothing
+simulator : ∀ {A A′} (M M′ : Term)
+  → [] ; l low ⊢ᴳ M  ⦂ A
+  → [] ; l low ⊢ᴳ M′ ⦂ A′
+    -------------------------------------------------------------------
+  → (ℕ × ∃[ N₁  ] ∃[ N₂  ] ∃[ μ  ] (N₁  ∣ ∅ ∣ low —↠ N₂  ∣ μ )) ×
+     (ℕ × ∃[ N₁′ ] ∃[ N₂′ ] ∃[ μ′ ] (N₁′ ∣ ∅ ∣ low —↠ N₂′ ∣ μ′)) ×
+     (List (ℕ × ℕ))
+simulator M M′ ⊢M ⊢M′ =
+  let N₁  = 𝒞 M ⊢M   ; ⊢N₁  = 𝒞-pres M ⊢M   in
+  let N₁′ = 𝒞 M′ ⊢M′ ; ⊢N₁′ = 𝒞-pres M′ ⊢M′ in
+  let ⟨ ⟨ n , N₂ , μ , N₁↠N₂ ⟩ ,
+        ⟨ n′ , N₂′ , μ′ , N₁′↠N₂′ ⟩ ,
+        s ⟩ = step-right N₁ N₁′ ∅ ∅ ⊢N₁ ⊢N₁′ ⊢μ-nil ⊢μ-nil magic-num 0 0 in
+  ⟨ ⟨ n , N₁ , N₂ , μ , N₁↠N₂ ⟩ , ⟨ n′ , N₁′ , N₂′ , μ′ , N₁′↠N₂′ ⟩ , s ⟩
