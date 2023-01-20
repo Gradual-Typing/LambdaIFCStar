@@ -8,17 +8,17 @@ open import Text.Printf
 open import Common.Types
 
 pprint-label : Label → String
-pprint-label ⋆        = printf "⋆"
-pprint-label (l low)  = printf "L"
-pprint-label (l high) = printf "H"
+pprint-label ⋆        = printf "\\unk"
+pprint-label (l low)  = printf "\\low"
+pprint-label (l high) = printf "\\high"
 
 pprint-raw-type : RawType → String
 pprint-type : Type → String
 
-pprint-raw-type (` Bool) = "𝔹"
-pprint-raw-type (` Unit) = "⊤"
-pprint-raw-type (Ref A)  = printf "Ref (%s)" (pprint-type A)
+pprint-raw-type (` Bool) = "\\Bool"
+pprint-raw-type (` Unit) = "\\Unit"
+pprint-raw-type (Ref A)  = printf "\\Refer{%s}" (pprint-type A)
 pprint-raw-type (⟦ gc ⟧ A ⇒ B) =
-  printf "⟦%s⟧ (%s) ⇒ (%s)" (pprint-label gc) (pprint-type A) (pprint-type B)
+  printf "\\Fun{%s}{%s}{%s}" (pprint-type A) (pprint-label gc) (pprint-type B)
 
-pprint-type (T of g) = printf "%s of %s" (pprint-raw-type T) (pprint-label g)
+pprint-type (T of g) = printf "%s_{%s}" (pprint-raw-type T) (pprint-label g)

@@ -8,5 +8,5 @@ open import Text.Printf
 open import Common.BlameLabels
 
 pprint-blame-label : BlameLabel → String
-pprint-blame-label (pos x) = printf "@%u" x
-pprint-blame-label (neg x) = printf "@%u" x
+pprint-blame-label (pos x) = printf "%u" x
+pprint-blame-label (neg x) = printf "%u" x
