@@ -32,21 +32,24 @@ pprint-cc (ƛ⟦ pc ⟧ A ˙ N of ℓ) =
 pprint-cc (L · M) =
   printf "(%s)\\;(%s)" (pprint-cc L) (pprint-cc M)
 pprint-cc (if L A M N) =
+  -- not sure if it's a good idea to hard-code those parentheses
   printf "\\ccif{(%s)}{}{(%s)}{(%s)}" (pprint-cc L) (pprint-cc M) (pprint-cc N)
 pprint-cc (`let M N) =
+  -- always generate one line break here; good enough for now
   printf "\\cclet{%s}{} \\\\ &%s" (pprint-cc M) (pprint-cc N)
 pprint-cc (ref⟦ ℓ ⟧ M) =
-  printf "ref %s (%s)" (pprint-label (l ℓ)) (pprint-cc M)
+  printf "\\ccref{}{%s}{(%s)}" (pprint-label (l ℓ)) (pprint-cc M)
 pprint-cc (ref?⟦ ℓ ⟧ M) =
-  printf "ref? %s (%s)" (pprint-label (l ℓ)) (pprint-cc M)
+  printf "\\ccref{?}{%s}{(%s)}" (pprint-label (l ℓ)) (pprint-cc M)
 pprint-cc (ref✓⟦ ℓ ⟧ M) =
-  printf "ref✓ %s (%s)" (pprint-label (l ℓ)) (pprint-cc M)
-pprint-cc (! M) = printf "! (%s)" (pprint-cc M)
-pprint-cc (L := M)   = printf "(%s) := (%s)" (pprint-cc L) (pprint-cc M)
-pprint-cc (L :=? M)  = printf "(%s) :=? (%s)" (pprint-cc L) (pprint-cc M)
-pprint-cc (L :=✓ M) = printf "(%s) :=✓ (%s)" (pprint-cc L) (pprint-cc M)
-pprint-cc (prot ℓ M) = printf "prot %s (%s)" (pprint-label (l ℓ)) (pprint-cc M)
+  printf "\\ccref{\\checkmark}{%s}{(%s)}" (pprint-label (l ℓ)) (pprint-cc M)
+pprint-cc (! M) = printf "\\ccderef{(%s)}" (pprint-cc M)
+pprint-cc (L := M)   = printf "\\ccassign{(%s)}{}{(%s)}" (pprint-cc L) (pprint-cc M)
+pprint-cc (L :=? M)  = printf "\\ccassign{(%s)}{?}{(%s)}" (pprint-cc L) (pprint-cc M)
+pprint-cc (L :=✓ M) = printf "\\ccassign{(%s)}{\\checkmark}{(%s)}" (pprint-cc L) (pprint-cc M)
+pprint-cc (prot ℓ M) = printf "\\ccprot{%s}{(%s)}" (pprint-label (l ℓ)) (pprint-cc M)
 pprint-cc (M ⟨ c ⟩)  = printf "\\cccast{(%s)}{%s}" (pprint-cc M) (pprint-cast c)
-pprint-cc (cast-pc g M) = printf "cast-pc %s (%s)" (pprint-label g) (pprint-cc M)
-pprint-cc (error e) = printf "error %s" (pprint-error e)
-pprint-cc ● = "●"
+pprint-cc (cast-pc g M) = printf "\\cccastpc{%s}{(%s)}" (pprint-label g) (pprint-cc M)
+pprint-cc (error e) = printf "\\ccerr{%s}" (pprint-error e)
+-- should never encounter this
+pprint-cc ● = ""
