@@ -49,9 +49,9 @@ sim-helper M μ ⊢M ⊢μ t (suc k-1) =
       (err E-error) {- M is an error -}      → nothing)
 
 {-
-         M′
-         ⊔|
-  M —↠ N
+          M′
+          ⊔|
+  M —↠ₙ N
 -}
 step-left : ∀ {Σ Σ′ gc gc′ A A′} M M′ μ₁
   → (⊢M  : [] ; Σ  ; gc  ; low ⊢ M  ⦂ A)

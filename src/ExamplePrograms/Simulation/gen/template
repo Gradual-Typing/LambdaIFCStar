@@ -32,6 +32,7 @@
 \newcommand{\assign}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:=}\;{#2}\syntax{)}^{\orangetext{#3}}}}
 \newcommand{\ann}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:}\;{#2}\syntax{)}^{\orangetext{#3}}}}
 \newcommand{\letexp}[3]{\ensuremath{\syntax{let}\;{#1}={#2}\;\syntax{in}\;{#3}}}
+\newcommand{\ccvar}[1]{\ensuremath{\ccsyntax{`}\,{#1}}}
 \newcommand{\ccconst}[2]{\ensuremath{\ccsyntax{(\$}\;{#1}\ccsyntax{)}_{#2}}}
 \newcommand{\ccaddr}[2]{\ensuremath{\ccsyntax{(addr}\;{#1}\ccsyntax{)}_{#2}}}
 \newcommand{\cclam}[4]{\ensuremath{\ccsyntax{(}\redtext{\lambda}^{#1}{#2}\ccsyntax{.}\,{#3}\ccsyntax{)}_{#4}}}

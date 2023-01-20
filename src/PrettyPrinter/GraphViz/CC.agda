@@ -24,7 +24,7 @@ pprint-error (blame p) = printf "\\blame{%s}" (pprint-blame-label p)
 pprint-error nsu-error = "\\key{nsu-error}"
 
 pprint-cc : CCTerm → String
-pprint-cc (` x) = printf "%u" x
+pprint-cc (` x) = printf "\\ccvar{%u}" x
 pprint-cc (addr a of ℓ) = printf "\\ccaddr{%s}{%s}" (pprint-addr a) (pprint-label (l ℓ))
 pprint-cc ($ k of ℓ) = printf "\\ccconst{%s}{%s}" (pprint-const k) (pprint-label (l ℓ))
 pprint-cc (ƛ⟦ pc ⟧ A ˙ N of ℓ) =
@@ -46,7 +46,7 @@ pprint-cc (L := M)   = printf "(%s) := (%s)" (pprint-cc L) (pprint-cc M)
 pprint-cc (L :=? M)  = printf "(%s) :=? (%s)" (pprint-cc L) (pprint-cc M)
 pprint-cc (L :=✓ M) = printf "(%s) :=✓ (%s)" (pprint-cc L) (pprint-cc M)
 pprint-cc (prot ℓ M) = printf "prot %s (%s)" (pprint-label (l ℓ)) (pprint-cc M)
-pprint-cc (M ⟨ c ⟩)  = printf "\\cccast{%s}{%s}" (pprint-cc M) (pprint-cast c)
+pprint-cc (M ⟨ c ⟩)  = printf "\\cccast{(%s)}{%s}" (pprint-cc M) (pprint-cast c)
 pprint-cc (cast-pc g M) = printf "cast-pc %s (%s)" (pprint-label g) (pprint-cc M)
 pprint-cc (error e) = printf "error %s" (pprint-error e)
 pprint-cc ● = "●"
