@@ -1,0 +1,169 @@
+\documentclass[border=0.2cm]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+
+\newcommand{\redtext}[1]{\textcolor{Maroon}{#1}}
+\newcommand{\bluetext}[1]{\textcolor{NavyBlue}{#1}}
+\newcommand{\orangetext}[1]{\textcolor{BurntOrange}{#1}}
+\newcommand{\graytext}[1]{\textcolor{gray}{#1}}
+\newcommand{\key}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand{\high}{\textcolor{OrangeRed}{\key{high}}}
+\newcommand{\low}{\textcolor{PineGreen}{\key{low}}}
+\newcommand{\unk}{\textcolor{Maroon}{\key{\star}}}
+\newcommand{\Bool}{\key{Bool}}
+\newcommand{\Unit}{\key{Unit}}
+\newcommand{\Fun}[3]{\ensuremath{{#1}\xrightarrow{{#2}}{#3}}}
+\newcommand{\Refer}[1]{\ensuremath{\key{Ref}\;{#1}}}
+\newcommand{\true}{\key{true}}
+\newcommand{\false}{\key{false}}
+\newcommand{\unit}{\key{unit}}
+\newcommand{\syntax}[1]{\text{\texttt{\textcolor{Purple}{#1}}}}
+\newcommand{\ccsyntax}[1]{\text{\texttt{\textcolor{Violet}{#1}}}}
+\newcommand{\const}[2]{\ensuremath{\syntax{(\$}\;{#1}\syntax{)}_{#2}}}
+\newcommand{\lam}[5]{\ensuremath{\syntax{(λ}^{#1}{#2}\syntax{:}{#3}\syntax{.}\,{#4}\syntax{)}_{#5}}}
+\newcommand{\app}[3]{\ensuremath{\syntax{(}{#1}\;{#2}\syntax{)}^{\orangetext{#3}}}}
+\newcommand{\ifexp}[4]{\ensuremath{\syntax{(if}\;{#1}\;\syntax{then}\;{#2}\;\syntax{else}\;{#3}\syntax{)}^{\orangetext{#4}}}}
+\newcommand{\refexp}[3]{\ensuremath{\syntax{(ref}\;{#1}\;{#2}\syntax{)}^{\orangetext{#3}}}}
+\newcommand{\deref}[1]{\ensuremath{\syntax{!}\;{#1}}}
+\newcommand{\assign}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:=}\;{#2}\syntax{)}^{\orangetext{#3}}}}
+\newcommand{\ann}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:}\;{#2}\syntax{)}^{\orangetext{#3}}}}
+\newcommand{\letexp}[3]{\ensuremath{\syntax{let}\;{#1}={#2}\;\syntax{in}\;{#3}}}
+\newcommand{\ccvar}[1]{\ensuremath{\ccsyntax{`}\,{#1}}}
+\newcommand{\ccconst}[2]{\ensuremath{\ccsyntax{(\$}\;{#1}\ccsyntax{)}_{#2}}}
+\newcommand{\ccaddr}[2]{\ensuremath{\ccsyntax{(addr}\;{#1}\ccsyntax{)}_{#2}}}
+\newcommand{\cclam}[4]{\ensuremath{\ccsyntax{(}\redtext{\lambda}^{#1}{#2}\ccsyntax{.}\,{#3}\ccsyntax{)}_{#4}}}
+\newcommand{\ccif}[4]{\ensuremath{\ccsyntax{if}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccref}[3]{\ensuremath{\ccsyntax{ref}^{\ccsyntax{#1}}\;{#2}\;{#3}}}
+\newcommand{\ccderef}[1]{\ensuremath{\ccsyntax{!}\;{#1}}}
+\newcommand{\ccassign}[3]{\ensuremath{{#1}\;\ccsyntax{:=}^{\ccsyntax{#2}}\;{#3}}}
+\newcommand{\cccast}[2]{\ensuremath{{#1}\,\ccsyntax{\{}\,{#2}\,\ccsyntax{\}}}}
+\newcommand{\ccprot}[2]{\ensuremath{\ccsyntax{prot}\;{#1}\;{#2}}}
+\newcommand{\cccastpc}[2]{\ensuremath{\ccsyntax{cast}_{\ccsyntax{pc}}\;{#1}\;{#2}}}
+\newcommand{\cclet}[2]{\ensuremath{\ccsyntax{let}\;{#1}\;\ccsyntax{in}\;{#2}}}
+\newcommand{\ccerr}[1]{\ensuremath{\ccsyntax{error}\;{#1}}}
+\newcommand{\Cast}[3]{\ensuremath{{#1}\Rightarrow^{\orangetext{#3}}{#2}}}
+\newcommand{\blame}[1]{\ensuremath{\key{blame}^{\orangetext{#1}}}}
+
+%
+%
+%
+%
+
+\begin{document}
+%
+%
+%
+
+% Start of code
+% \begin{tikzpicture}[anchor=mid,>=latex',join=bevel,]
+\begin{tikzpicture}[>=latex',join=bevel,]
+\pgfsetlinewidth{1bp}
+%%
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0};
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0};
+  \pgfsetfillcolor{fillcol}
+  \filldraw (0.0bp,0.0bp) -- (0.0bp,248.0bp) -- (528.5bp,248.0bp) -- (528.5bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0};
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0};
+  \pgfsetfillcolor{fillcol}
+  \filldraw (0.0bp,0.0bp) -- (0.0bp,248.0bp) -- (528.5bp,248.0bp) -- (528.5bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0};
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0};
+  \pgfsetfillcolor{fillcol}
+  \filldraw (0.0bp,0.0bp) -- (0.0bp,248.0bp) -- (528.5bp,248.0bp) -- (528.5bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0};
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0};
+  \pgfsetfillcolor{fillcol}
+  \filldraw (0.0bp,0.0bp) -- (0.0bp,248.0bp) -- (528.5bp,248.0bp) -- (528.5bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0};
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0};
+  \pgfsetfillcolor{fillcol}
+  \filldraw (0.0bp,0.0bp) -- (0.0bp,248.0bp) -- (528.5bp,248.0bp) -- (528.5bp,0.0bp) -- cycle;
+\end{scope}
+  \pgfsetcolor{black}
+  % Edge: left0 -> left1
+  \draw [->] (104.5bp,190.68bp) .. controls (104.5bp,176.76bp) and (104.5bp,159.77bp)  .. (104.5bp,133.91bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (121.0bp,162.0bp) node {$\beta$\textit{-let}};
+  % Edge: left1 -> left2
+  \draw [->] (104.5bp,92.277bp) .. controls (104.5bp,79.197bp) and (104.5bp,61.83bp)  .. (104.5bp,35.889bp);
+  \draw (121.0bp,64.0bp) node {$\beta$\textit{-let}};
+  % Edge: right0 -> right1
+  \draw [->] (422.5bp,190.13bp) .. controls (422.5bp,176.22bp) and (422.5bp,159.34bp)  .. (422.5bp,133.71bp);
+  \draw (439.0bp,162.0bp) node {$\beta$\textit{-let}};
+  % Edge: right1 -> right2
+  \draw [->] (422.5bp,92.277bp) .. controls (422.5bp,79.197bp) and (422.5bp,61.83bp)  .. (422.5bp,35.889bp);
+  \draw (439.0bp,64.0bp) node {$\beta$\textit{-let}};
+  % Edge: left0 -> right0
+  \draw [dotted] (208.84bp,219.0bp) .. controls (251.27bp,219.0bp) and (293.69bp,219.0bp)  .. (336.12bp,219.0bp);
+  % Edge: left1 -> right1
+  \draw [dotted] (208.84bp,113.0bp) .. controls (244.73bp,113.0bp) and (280.62bp,113.0bp)  .. (316.51bp,113.0bp);
+  % Edge: left2 -> right2
+  \draw [dotted] (196.42bp,18.0bp) .. controls (240.58bp,18.0bp) and (284.73bp,18.0bp)  .. (328.89bp,18.0bp);
+  % Node: left0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (104.5bp,219.0bp) node {$\begin{aligned}&\cclet{\cccast{(\ccconst{\true}{\low})}{\Cast{\Bool_{\low}}{\Bool_{\unk}}{0}}}{} \\ &\cclet{\ccvar{0}}{} \\ &\ccvar{0}\end{aligned}$};
+\end{scope}
+  % Node: right0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (422.5bp,219.0bp) node {$\begin{aligned}&\cclet{\ccconst{\true}{\low}}{} \\ &\cclet{\cccast{(\ccvar{0})}{\Cast{\Bool_{\high}}{\Bool_{\unk}}{0}}}{} \\ &\ccvar{0}\end{aligned}$};
+\end{scope}
+  % Node: left1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (104.5bp,113.0bp) node {$\begin{aligned}&\cclet{\cccast{(\ccconst{\true}{\low})}{\Cast{\Bool_{\low}}{\Bool_{\unk}}{0}}}{} \\ &\ccvar{0}\end{aligned}$};
+\end{scope}
+  % Node: right1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (422.5bp,113.0bp) node {$\begin{aligned}&\cclet{\cccast{(\ccconst{\true}{\low})}{\Cast{\Bool_{\high}}{\Bool_{\unk}}{0}}}{} \\ &\ccvar{0}\end{aligned}$};
+\end{scope}
+  % Node: left2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (104.5bp,18.0bp) node {$\begin{aligned}&\cccast{(\ccconst{\true}{\low})}{\Cast{\Bool_{\low}}{\Bool_{\unk}}{0}}\end{aligned}$};
+\end{scope}
+  % Node: right2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (422.5bp,18.0bp) node {$\begin{aligned}&\cccast{(\ccconst{\true}{\low})}{\Cast{\Bool_{\high}}{\Bool_{\unk}}{0}}\end{aligned}$};
+\end{scope}
+%
+\end{tikzpicture}
+% End of code
+
+%
+\end{document}
+%
