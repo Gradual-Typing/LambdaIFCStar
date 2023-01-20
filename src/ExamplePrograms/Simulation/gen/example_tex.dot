@@ -1,0 +1,26 @@
+digraph {
+  node[shape=plaintext];
+  subgraph left {
+    rankdir="TB";
+    left0 -> left1 [texlbl="$\beta$\textit{-let}"];
+    left0 [texlbl="$\begin{aligned}&\cclet{\cccast{\ccconst{\true}{\low}}{\Cast{\Bool_{\low}}{\Bool_{\unk}}{0}}}{} \\ &\cclet{0}{} \\ &0\end{aligned}$"];
+    left1 -> left2 [texlbl="$\beta$\textit{-let}"];
+    left1 [texlbl="$\begin{aligned}&\cclet{\cccast{\ccconst{\true}{\low}}{\Cast{\Bool_{\low}}{\Bool_{\unk}}{0}}}{} \\ &0\end{aligned}$"];
+    left2 [texlbl="$\begin{aligned}&\cccast{\ccconst{\true}{\low}}{\Cast{\Bool_{\low}}{\Bool_{\unk}}{0}}\end{aligned}$"];
+
+  }
+  subgraph right {
+    rankdir="TB";
+    right0 -> right1 [texlbl="$\beta$\textit{-let}"];
+    right0 [texlbl="$\begin{aligned}&\cclet{\ccconst{\true}{\low}}{} \\ &\cclet{\cccast{0}{\Cast{\Bool_{\high}}{\Bool_{\unk}}{0}}}{} \\ &0\end{aligned}$"];
+    right1 -> right2 [texlbl="$\beta$\textit{-let}"];
+    right1 [texlbl="$\begin{aligned}&\cclet{\cccast{\ccconst{\true}{\low}}{\Cast{\Bool_{\high}}{\Bool_{\unk}}{0}}}{} \\ &0\end{aligned}$"];
+    right2 [texlbl="$\begin{aligned}&\cccast{\ccconst{\true}{\low}}{\Cast{\Bool_{\high}}{\Bool_{\unk}}{0}}\end{aligned}$"];
+
+  }
+  edge[style=dotted, constraint=false, arrowhead=none, minlen=3];
+  // ↓ generate the simulation edges ↓
+  left0 -> right0; { rank="same"; left0; right0; }
+  left1 -> right1; { rank="same"; left1; right1; }
+  left2 -> right2; { rank="same"; left2; right2; }
+}
