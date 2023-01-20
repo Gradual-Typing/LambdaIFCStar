@@ -11,9 +11,10 @@ open import CC.MultiStep
 open import PrettyPrinter.GraphViz.MultiStep renaming (pprint to pprint-↠)
 
 print-sim-diagram : ∀ {M₁ M₁′ M₂ M₂′ μ₁ μ₁′ μ₂ μ₂′}
-  → M₁ ∣ μ₁ ∣ low —↠ M₂ ∣ μ₂
-  → M₁′ ∣ μ₁′ ∣ low —↠ M₂′ ∣ μ₂′
-  → (List (ℕ × ℕ))
+  → M₁  ∣ μ₁  ∣ low —↠ M₂  ∣ μ₂   {- reduction seq on the left   -}
+  → M₁′ ∣ μ₁′ ∣ low —↠ M₂′ ∣ μ₂′  {- reduction seq on the right  -}
+  → List (ℕ × ℕ)                    {- edges between two subgraphs -}
+    ---------------
   → String
 print-sim-diagram M₁↠M₂ M₁′↠M₂′ s =
   printf
