@@ -17,7 +17,7 @@ print-sim-edges (⟨ n , m ⟩ ∷ rest) =
   let l_node = printf "left%u"  n
       r_node = printf "right%u" m in
   primStringAppend
-  (printf "%s -> %s; { rank=\"same\"; %s; %s; }\n"
+  (printf "  %s -> %s; { rank=\"same\"; %s; %s; }\n"
          l_node r_node l_node r_node)
   (print-sim-edges rest)
 
@@ -40,4 +40,5 @@ print-sim-diagram M₁↠M₂ M₁′↠M₂′ s =
 %s
   }
   edge[style=dotted, constraint=false, arrowhead=none, minlen=3];
-}\n" (pprint-↠ "left" M₁↠M₂) (pprint-↠ "right" M₁′↠M₂′)
+%s
+}\n" (pprint-↠ "left" M₁↠M₂) (pprint-↠ "right" M₁′↠M₂′) (print-sim-edges s)
