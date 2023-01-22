@@ -1,4 +1,4 @@
-module PrettyPrinter.Literals where
+module PrettyPrinter.Console.Literals where
 
 open import Data.Bool renaming (Bool to 𝔹)
 open import Data.Unit using (⊤; tt)

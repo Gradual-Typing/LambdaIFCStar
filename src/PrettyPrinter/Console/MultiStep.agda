@@ -2,7 +2,7 @@ module PrettyPrinter.Console.MultiStep where
 
 open import Agda.Builtin.String
 open import Text.Printf
-open import PrettyPrinter.RedRules
+open import PrettyPrinter.Console.RedRules
 open import PrettyPrinter.Console.CC
 
 

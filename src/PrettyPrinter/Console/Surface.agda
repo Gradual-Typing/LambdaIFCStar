@@ -3,7 +3,7 @@ module PrettyPrinter.Console.Surface where
 open import Agda.Builtin.String
 open import Text.Printf
 open import Common.Types
-open import PrettyPrinter.Literals
+open import PrettyPrinter.Console.Literals
 open import PrettyPrinter.Console.Types
 open import PrettyPrinter.Console.BlameLabels
 

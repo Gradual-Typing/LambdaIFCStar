@@ -1,4 +1,4 @@
-module PrettyPrinter.RedRules where
+module PrettyPrinter.Console.RedRules where
 
 open import Agda.Builtin.String
 open import Text.Printf
