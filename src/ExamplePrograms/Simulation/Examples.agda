@@ -13,10 +13,12 @@ Cfg = String ×
   ([] ; l low ⊢ᴳ M ⦂ A) × ([] ; l low ⊢ᴳ M′ ⦂ A′)
 
 open import ExamplePrograms.Simulation.SubInj as SubInj
-open import ExamplePrograms.Simulation.IfAssign as IfAssign
+open import ExamplePrograms.Simulation.IfTrueAssign as IfTrueAssign
+open import ExamplePrograms.Simulation.IfFalseAssign as IfFalseAssign
 
 cfgs : List Cfg
 cfgs = [
-    ⟨ "SubInj"   , SubInj.M   , SubInj.M′   , _ , _ , SubInj.⊢M   , SubInj.⊢M′   ⟩ ,
-    ⟨ "IfAssign" , IfAssign.M , IfAssign.M′ , _ , _ , IfAssign.⊢M , IfAssign.⊢M′ ⟩
+    ⟨ "SubInj"        , SubInj.M        , SubInj.M′        , _ , _ , SubInj.⊢M        , SubInj.⊢M′        ⟩ ,
+    ⟨ "IfTrueAssign"  , IfTrueAssign.M  , IfTrueAssign.M′  , _ , _ , IfTrueAssign.⊢M  , IfTrueAssign.⊢M′  ⟩ ,
+    ⟨ "IfFalseAssign" , IfFalseAssign.M , IfFalseAssign.M′ , _ , _ , IfFalseAssign.⊢M , IfFalseAssign.⊢M′ ⟩
   ]

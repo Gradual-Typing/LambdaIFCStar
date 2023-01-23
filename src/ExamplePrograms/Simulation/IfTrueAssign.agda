@@ -1,4 +1,4 @@
-module ExamplePrograms.Simulation.IfAssign where
+module ExamplePrograms.Simulation.IfTrueAssign where
 
 open import Data.List using ([])
 open import Data.Unit
