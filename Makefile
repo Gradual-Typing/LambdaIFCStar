@@ -7,7 +7,7 @@ proofs: src/Proofs.agda
 	$(info Checking all proofs ...)
 	$(AGD) $<
 
-exe: src/Demo.agda
+exe: src/RunDemo.agda
 	$(info Compiling demo programs ...)
 	$(AGD) --compile --compile-dir=bin $<
 
