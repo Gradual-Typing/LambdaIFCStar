@@ -21,11 +21,20 @@ You can check our proofs and run our examples using Agda:
 
 ## Prerequisites
 
+### Checking proofs and running demo:
+
 - [Agda](https://wiki.portal.chalmers.se/agda) `2.6.2.2`
 - GHC with working [MAlonzo](https://wiki.portal.chalmers.se/agda/Docs/MAlonzo)
 - [Standard library](https://github.com/agda/agda-stdlib) `1.7.1`
 - [Abstract binding trees](https://github.com/jsiek/abstract-binding-trees/)
 - [GNU Make](https://www.gnu.org/software/make/)
+
+### Generating simulation diagrams:
+
+- XeLaTeX and `latexmk`
+- [GraphViz](https://graphviz.org/) and specifically, `dot`
+- [Dot2TeX](https://dot2tex.readthedocs.io/en/latest/)
+- [Zsh](https://www.zsh.org/), for running the plotting script
 
 ## Building
 
