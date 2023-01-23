@@ -27,6 +27,7 @@ main = run {Agda.Primitive.lzero} (foldr run-cfg (return tt) cfgs)
   run-cfg : Cfg → IO ⊤ → IO ⊤
   run-cfg ⟨ name , M , M′ , _ , _ , ⊢M , ⊢M′ ⟩ rest =
     do
+    (putStrLn (primStringAppend "Running example: " name))
     (let ⟨ ⟨ n , _ , _ , _ , N₁↠N₂ ⟩ ,
            ⟨ m , _ , _ , _ , N₁′↠N₂′ ⟩ ,
            edges ⟩ = simulator M M′ ⊢M ⊢M′ in
