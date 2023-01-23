@@ -20,7 +20,7 @@ open import Simulator.Simulator
 open import PrettyPrinter.GraphViz.Simulation
 
 
-dir = "gen/"
+dir = "plot/"
 
 main = run {Agda.Primitive.lzero} (foldr run-cfg (return tt) cfgs)
   where
