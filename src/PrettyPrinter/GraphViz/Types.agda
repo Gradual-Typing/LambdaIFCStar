@@ -17,8 +17,8 @@ pprint-type : Type → String
 
 pprint-raw-type (` Bool) = "\\Bool"
 pprint-raw-type (` Unit) = "\\Unit"
-pprint-raw-type (Ref A)  = printf "\\Refer{%s}" (pprint-type A)
+pprint-raw-type (Ref A)  = printf "(\\Refer{%s})" (pprint-type A)
 pprint-raw-type (⟦ gc ⟧ A ⇒ B) =
-  printf "\\Fun{%s}{%s}{%s}" (pprint-type A) (pprint-label gc) (pprint-type B)
+  printf "(\\Fun{%s}{%s}{%s})" (pprint-type A) (pprint-label gc) (pprint-type B)
 
 pprint-type (T of g) = printf "%s_{%s}" (pprint-raw-type T) (pprint-label g)
