@@ -1,10 +1,5 @@
-The plotting script ~plot.sh~ takes a ~.dot~ file and
-generates a simulation diagram in PDF format.
+The plotting script ~plot.sh~ generates simulation diagrams in PDF format.
 
-*[Note]* ~plot.sh~ must be invoked from the ~plot/~ directory.
-
-Example usage:
-
-#+BEGIN_SRC sh
-  ./plot.sh example/example.dot
-#+END_SRC
++ ~plot.sh~ must be invoked from within the ~plot/~ directory
++ =./plot.sh example/example.dot= plots the diagram from a single ~.dot~ file
++ =./plot.sh= (with no file supplied) plots all ~.dot~ files in the ~plot/~ directory
