@@ -66,6 +66,10 @@ check-⊑? (cast t A B) (cast t′ A′ B′) =
   (isYes (A ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t t′) ∨
   (isYes (A ⊑? B′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t (cast t′ A′ B′)) ∨
   (isYes (B ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? (cast t A B) t′)
+-- Special case: cast on the left, error on the right
+check-⊑? (cast t A B) (err A′) =
+  (isYes (A ⊑? A′) ∧ isYes (B ⊑? A′) ∧ check-⊑? t (err A′)) {- relate by castₗ -} ∨
+  (isYes (B ⊑? A′))                                         {- relate by err   -}
 -- CastL
 check-⊑? (cast t A B) t′ =
   let A′ = get-type t′ in
@@ -74,6 +78,7 @@ check-⊑? (cast t A B) t′ =
 check-⊑? t (cast t′ A′ B′) =
   let A = get-type t in
   isYes (A ⊑? A′) ∧ isYes (A ⊑? B′) ∧ check-⊑? t t′
+-- Err
 check-⊑? t (err A′) =
   let A = get-type t in
   isYes (A ⊑? A′)

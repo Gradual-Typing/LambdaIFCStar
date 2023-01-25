@@ -73,3 +73,6 @@ pattern [_,_,_,_,_] v w x y z = v ∷ w ∷ x ∷ y ∷ z ∷ []
 pattern [_,_,_,_,_,_] u v w x y z = u ∷ v ∷ w ∷ x ∷ y ∷ z ∷ []
 pattern [_,_,_,_,_,_,_] u v w x y z p = u ∷ v ∷ w ∷ x ∷ y ∷ z ∷ p ∷ []
 pattern [_,_,_,_,_,_,_,_] u v w x y z p q = u ∷ v ∷ w ∷ x ∷ y ∷ z ∷ p ∷ q ∷ []
+
+
+magic-num = 256

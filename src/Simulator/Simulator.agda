@@ -27,8 +27,6 @@ open import Simulator.AST
 open import Simulator.CheckPrecision
 
 
-magic-num = 256
-
 sim-helper : ∀ {Σ gc A} M μ
   → [] ; Σ ; gc ; low ⊢ M ⦂ A
   → Σ ⊢ μ → (t : AST) → (k : ℕ)
