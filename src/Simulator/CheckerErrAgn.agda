@@ -1,4 +1,4 @@
-module Simulator.CheckPrecision where
+module Simulator.CheckerErrAgn where
 
 open import Data.Nat
 open import Data.Bool renaming (Bool to 𝔹; _≟_ to _≟ᵇ_)
@@ -16,13 +16,12 @@ open import Relation.Binary.PropositionalEquality
 open import Common.Utils
 open import Common.Types
 open import Memory.Addr
-open import CC.Errors
 open import Simulator.AST
 
 
 {- Each case of the `check` function below reflects
    its corresponding rule in `Precision` -}
-check-⊑? : (t t′ : AST) → 𝔹
+check-⊑? : (t₁ t₂ : AST) → 𝔹
 -- first get rid of all the `cast-pc`s
 check-⊑? (castpc _ t _) t′ = check-⊑? t t′
 check-⊑? t (castpc _ t′ _) = check-⊑? t t′
@@ -53,7 +52,7 @@ check-⊑? (let-bind t₁ t₂ _) (let-bind t₁′ t₂′ _) =
 check-⊑? (ref ℓ t _) (ref ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
 check-⊑? (ref? ℓ t _) (ref? ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
 check-⊑? (ref✓ ℓ t _) (ref✓ ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
--- Deref
+-- -- Deref
 check-⊑? (deref t _) (deref t′ _) = check-⊑? t t′
 -- Assign, Assign?, and Assign✓
 check-⊑? (assign t₁ t₂ _) (assign t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
@@ -64,17 +63,15 @@ check-⊑? (assign✓ t₁ t₂ _) (assign  t₁′ t₂′ _) = check-⊑? t₁
 -- Prot
 check-⊑? (protect ℓ t _) (protect ℓ′ t′ _) =
   isYes (ℓ =? ℓ′) ∧ check-⊑? t t′
--- NSU error
-check-⊑? (err nsu-error _) (err nsu-error _) = true
 -- Cast
 check-⊑? (cast t A B) (cast t′ A′ B′) =
   (isYes (A ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t t′) ∨
   (isYes (A ⊑? B′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t (cast t′ A′ B′)) ∨
   (isYes (B ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? (cast t A B) t′)
--- Special case: cast on the left, cast error on the right
-check-⊑? (cast t A B) (err (blame p) A′) =
+-- Special case: cast on the left, error on the right
+check-⊑? (cast t A B) (err e A′) =
   {- relate by castₗ -}
-  (isYes (A ⊑? A′) ∧ isYes (B ⊑? A′) ∧ check-⊑? t (err (blame p) A′)) ∨
+  (isYes (A ⊑? A′) ∧ isYes (B ⊑? A′) ∧ check-⊑? t (err e A′)) ∨
   {- relate by err   -}
   (isYes (B ⊑? A′))
 -- CastL
@@ -85,8 +82,8 @@ check-⊑? (cast t A B) t′ =
 check-⊑? t (cast t′ A′ B′) =
   let A = get-type t in
   isYes (A ⊑? A′) ∧ isYes (A ⊑? B′) ∧ check-⊑? t t′
--- Cast error
-check-⊑? t (err (blame p) A′) =
+-- Err
+check-⊑? t (err e A′) =
   let A = get-type t in
   isYes (A ⊑? A′)
 -- Otherwise
