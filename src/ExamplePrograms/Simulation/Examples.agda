@@ -18,6 +18,7 @@ open import ExamplePrograms.Simulation.SubInj         as SubInj
 open import ExamplePrograms.Simulation.IfTrueAssign   as IfTrueAssign
 open import ExamplePrograms.Simulation.IfFalseAssign  as IfFalseAssign
 open import ExamplePrograms.Simulation.WrongAnn1      as WrongAnn1
+open import ExamplePrograms.Simulation.WrongAnn2      as WrongAnn2
 
 cfgs : List Cfg
 cfgs =
@@ -26,4 +27,5 @@ cfgs =
   ⟨ "SubInj"        , SubInj.M        , SubInj.M′        , _ , _ , SubInj.⊢M        , SubInj.⊢M′        ⟩ ∷
   ⟨ "IfTrueAssign"  , IfTrueAssign.M  , IfTrueAssign.M′  , _ , _ , IfTrueAssign.⊢M  , IfTrueAssign.⊢M′  ⟩ ∷
   ⟨ "IfFalseAssign" , IfFalseAssign.M , IfFalseAssign.M′ , _ , _ , IfFalseAssign.⊢M , IfFalseAssign.⊢M′ ⟩ ∷
-  ⟨ "WrongAnn1"     , WrongAnn1.M     , WrongAnn1.M′     , _ , _ , WrongAnn1.⊢M     , WrongAnn1.⊢M′     ⟩ ∷ []
+  ⟨ "WrongAnn1"     , WrongAnn1.M     , WrongAnn1.M′     , _ , _ , WrongAnn1.⊢M     , WrongAnn1.⊢M′     ⟩ ∷
+  ⟨ "WrongAnn2"     , WrongAnn2.M     , WrongAnn2.M′     , _ , _ , WrongAnn2.⊢M     , WrongAnn2.⊢M′     ⟩ ∷ []
