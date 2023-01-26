@@ -21,7 +21,7 @@ pprint-cast (cast A B p A~B) =
 
 pprint-error : CC.CCStatics.Error → String
 pprint-error (blame p) = printf "\\blame{%s}" (pprint-blame-label p)
-pprint-error nsu-error = "\\key{nsu-error}"
+pprint-error nsu-error = "\\key{nsu{-}error}"
 
 pprint-cc : CCTerm → String
 pprint-cc (` x) = printf "\\ccvar{%u}" x
