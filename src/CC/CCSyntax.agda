@@ -8,11 +8,8 @@ open import Data.Bool renaming (Bool to 𝔹)
 open import Syntax
 open import Common.BlameLabels
 open import Memory.Addr
+open import CC.Errors public
 
-
-data Error : Set where
-  blame     : BlameLabel → Error
-  nsu-error : Error
 
 data Op : Set where
   op-addr         : (a : Addr) → (ℓ : StaticLabel) → Op

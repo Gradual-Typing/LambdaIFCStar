@@ -37,7 +37,7 @@ data AST : Set where
   protect : StaticLabel → AST → Type → AST
   cast : AST → Type → Type → AST
   castpc : Label → AST → Type → AST
-  err : Type → AST
+  err : Error → Type → AST
   -- sub : AST → Type → Type → AST
 
 get-type : AST → Type
@@ -58,7 +58,7 @@ get-type (assign✓ _ _ A) = A
 get-type (protect _ _ A) = A
 get-type (cast _ _ A) = A
 get-type (castpc _ _ A) = A
-get-type (err A) = A
+get-type (err e A) = A
 -- get-type (sub _ _ A) = A
 
 {- Translates a typing derivation into an AST -}
@@ -85,15 +85,7 @@ to-ast {A = A} (L :=✓ M) (⊢assign✓ ⊢L ⊢M _) =
 to-ast {A = A} (prot ℓ M) (⊢prot ⊢M) = protect ℓ (to-ast M ⊢M) A
 to-ast {A = B} (M ⟨ c ⟩) (⊢cast {A = A} {.B} ⊢M) = cast (to-ast M ⊢M) A B
 to-ast {A = A} (cast-pc g M) (⊢cast-pc ⊢M _) = castpc g (to-ast M ⊢M) A
-to-ast {A = A} (error e) ⊢err = err A
+to-ast {A = A} (error e) ⊢err = err e A
 to-ast {A = B} M (⊢sub ⊢M _) = to-ast M ⊢M
 -- to-ast {A = B} M (⊢sub {A = A} {.B} ⊢M _) = sub (to-ast M ⊢M) A B
 to-ast M (⊢sub-pc ⊢M _) = to-ast M ⊢M
-
--- M : Term
--- M = (ƛ⟦ low ⟧ ` Bool of l high ˙ ` 0 of low) · ($ true of low)
-
--- ⊢M : [] ; ∅ ; l low ; low ⊢ M ⦂ ` Bool of l high
--- ⊢M = ⊢app (⊢lam (⊢var refl)) (⊢sub ⊢const (<:-ty (<:-l l≼h) <:-ι))
-
--- t = to-ast M ⊢M
