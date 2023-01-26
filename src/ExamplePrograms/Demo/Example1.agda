@@ -1,4 +1,4 @@
-module ExamplePrograms.Example1 where
+module ExamplePrograms.Demo.Example1 where
 
 open import Data.Unit
 open import Data.List
@@ -17,7 +17,7 @@ open import CC.MultiStep
 open import CC.BigStep
 open import Memory.Heap CCTerm Value
 
-open import ExamplePrograms.Common
+open import ExamplePrograms.Demo.Common
 
 
 

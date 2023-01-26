@@ -15,26 +15,18 @@ open import CC.CCStatics renaming (Term to CCTerm)
 open import CC.HeapTyping
 open import CC.Interp
 
-open import Examples
+open import ExamplePrograms.Demo.Examples
 open import PrettyPrinter.Console.PP
 
 
 main =
   run {Agda.Primitive.lzero}
     (do
-      (putStrLn (foldr format "" example1-cfgs))
-      (putStrLn (foldr format "" example2-cfgs))
-      (putStrLn (foldr format "" example3-cfgs))
+      (putStrLn (foldr run-cfg "" cfgs))
       (putStrLn "\ESC[101mEND\ESC[0m"))
   where
-  example1-cfgs = [ ⟨ N  , 𝒞N  , ⊢𝒞N  ⟩ , ⟨ M* , 𝒞M* , ⊢𝒞M* ⟩ ]
-  example2-cfgs = [ ⟨ N₁ , 𝒞N₁ , ⊢𝒞N₁ ⟩ , ⟨ N₂ , 𝒞N₂ , ⊢𝒞N₂ ⟩ ]
-  example3-cfgs =
-    [ {- fully annotated     : -} ⟨ M₁   , 𝒞M₁   , ⊢𝒞M₁   ⟩ , ⟨ M₂   , 𝒞M₂   , ⊢𝒞M₂   ⟩ ,
-      {- partially annotated : -} ⟨ M*₁  , 𝒞M*₁  , ⊢𝒞M*₁  ⟩ , ⟨ M*₂  , 𝒞M*₂  , ⊢𝒞M*₂  ⟩ ,
-      {- partially annotated : -} ⟨ M*₁′ , 𝒞M*₁′ , ⊢𝒞M*₁′ ⟩ , ⟨ M*₂′ , 𝒞M*₂′ , ⊢𝒞M*₂′ ⟩ ]
-  format : ∀ {A} → (Term × Σ[ M ∈ CCTerm ] [] ; ∅ ; l low ; low ⊢ M ⦂ A) → String → String
-  format ⟨ M , 𝒞M , ⊢𝒞M ⟩ rest =
+  run-cfg : Cfg → String → String
+  run-cfg ⟨ M , 𝒞M , _ , ⊢𝒞M ⟩ rest =
     (printf "%s\n\n%s\n%s"
       (printf "\ESC[7m**** Running λSEC* program: ****\ESC[0m\n%s" (pprint-term M))
       (printf "\ESC[7m**** Reduction of the compiled λSEC⇒ term: ****\ESC[0m\n%s\n"

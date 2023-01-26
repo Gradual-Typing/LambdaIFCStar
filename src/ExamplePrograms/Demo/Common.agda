@@ -1,4 +1,4 @@
-module ExamplePrograms.Common where
+module ExamplePrograms.Demo.Common where
 
 open import Data.Unit
 open import Data.Bool renaming (Bool to 𝔹)
