@@ -57,7 +57,9 @@ check-⊑? (deref t _) (deref t′ _) = check-⊑? t t′
 -- Assign, Assign?, and Assign✓
 check-⊑? (assign t₁ t₂ _) (assign t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 check-⊑? (assign? t₁ t₂ _) (assign? t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
+check-⊑? (assign? t₁ t₂ _) (assign  t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 check-⊑? (assign✓ t₁ t₂ _) (assign✓ t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
+check-⊑? (assign✓ t₁ t₂ _) (assign  t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 -- Prot
 check-⊑? (protect ℓ t _) (protect ℓ′ t′ _) =
   isYes (ℓ =? ℓ′) ∧ check-⊑? t t′
