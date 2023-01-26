@@ -14,6 +14,7 @@ Cfg = String ×
 
 open import ExamplePrograms.Simulation.FunInjArg      as FunInjArg
 open import ExamplePrograms.Simulation.AppFunProxy    as AppFunProxy
+open import ExamplePrograms.Simulation.DerefRefProxy  as DerefRefProxy
 open import ExamplePrograms.Simulation.SubInj         as SubInj
 open import ExamplePrograms.Simulation.IfTrueAssign   as IfTrueAssign
 open import ExamplePrograms.Simulation.IfFalseAssign  as IfFalseAssign
@@ -23,6 +24,7 @@ open import ExamplePrograms.Simulation.WrongAnn2      as WrongAnn2
 cfgs : List Cfg
 cfgs =
   ⟨ "AppFunProxy"   , AppFunProxy.M   , AppFunProxy.M′   , _ , _ , AppFunProxy.⊢M   , AppFunProxy.⊢M′   ⟩ ∷
+  ⟨ "DerefRefProxy" , DerefRefProxy.M , DerefRefProxy.M′ , _ , _ , DerefRefProxy.⊢M , DerefRefProxy.⊢M′ ⟩ ∷
   ⟨ "FunInjArg"     , FunInjArg.M     , FunInjArg.M′     , _ , _ , FunInjArg.⊢M     , FunInjArg.⊢M′     ⟩ ∷
   ⟨ "SubInj"        , SubInj.M        , SubInj.M′        , _ , _ , SubInj.⊢M        , SubInj.⊢M′        ⟩ ∷
   ⟨ "IfTrueAssign"  , IfTrueAssign.M  , IfTrueAssign.M′  , _ , _ , IfTrueAssign.⊢M  , IfTrueAssign.⊢M′  ⟩ ∷
