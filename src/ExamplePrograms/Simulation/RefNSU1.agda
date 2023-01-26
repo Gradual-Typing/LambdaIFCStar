@@ -1,4 +1,4 @@
-module ExamplePrograms.Simulation.RefNSU where
+module ExamplePrograms.Simulation.RefNSU1 where
 
 open import Data.List using ([])
 open import Data.Unit

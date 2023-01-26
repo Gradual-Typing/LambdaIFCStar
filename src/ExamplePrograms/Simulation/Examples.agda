@@ -16,7 +16,8 @@ open import ExamplePrograms.Simulation.FunInjArg      as FunInjArg
 open import ExamplePrograms.Simulation.AppFunProxy    as AppFunProxy
 open import ExamplePrograms.Simulation.DerefRefProxy  as DerefRefProxy
 open import ExamplePrograms.Simulation.RefAndImplicitFlow as RefImpFlow
-open import ExamplePrograms.Simulation.RefNSU         as RefNSU
+open import ExamplePrograms.Simulation.RefNSU1        as RefNSU1
+open import ExamplePrograms.Simulation.RefNSU2        as RefNSU2
 open import ExamplePrograms.Simulation.SubInj         as SubInj
 open import ExamplePrograms.Simulation.IfTrueAssign   as IfTrueAssign
 open import ExamplePrograms.Simulation.IfFalseAssign  as IfFalseAssign
@@ -28,7 +29,8 @@ cfgs =
   ⟨ "AppFunProxy"   , AppFunProxy.M   , AppFunProxy.M′   , _ , _ , AppFunProxy.⊢M   , AppFunProxy.⊢M′   ⟩ ∷
   ⟨ "DerefRefProxy" , DerefRefProxy.M , DerefRefProxy.M′ , _ , _ , DerefRefProxy.⊢M , DerefRefProxy.⊢M′ ⟩ ∷
   ⟨ "RefImpFlow"    , RefImpFlow.M    , RefImpFlow.M′    , _ , _ , RefImpFlow.⊢M    , RefImpFlow.⊢M′    ⟩ ∷
-  ⟨ "RefNSU"        , RefNSU.M        , RefNSU.M′        , _ , _ , RefNSU.⊢M        , RefNSU.⊢M′        ⟩ ∷
+  ⟨ "RefNSU1"       , RefNSU1.M       , RefNSU1.M′       , _ , _ , RefNSU1.⊢M       , RefNSU1.⊢M′       ⟩ ∷
+  ⟨ "RefNSU2"       , RefNSU2.M       , RefNSU2.M′       , _ , _ , RefNSU2.⊢M       , RefNSU2.⊢M′       ⟩ ∷
   ⟨ "FunInjArg"     , FunInjArg.M     , FunInjArg.M′     , _ , _ , FunInjArg.⊢M     , FunInjArg.⊢M′     ⟩ ∷
   ⟨ "SubInj"        , SubInj.M        , SubInj.M′        , _ , _ , SubInj.⊢M        , SubInj.⊢M′        ⟩ ∷
   ⟨ "IfTrueAssign"  , IfTrueAssign.M  , IfTrueAssign.M′  , _ , _ , IfTrueAssign.⊢M  , IfTrueAssign.⊢M′  ⟩ ∷
