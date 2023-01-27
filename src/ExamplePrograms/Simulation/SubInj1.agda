@@ -1,4 +1,4 @@
-module ExamplePrograms.Simulation.SubInj where
+module ExamplePrograms.Simulation.SubInj1 where
 
 open import Data.List using ([])
 open import Data.Bool renaming (Bool to 𝔹)
