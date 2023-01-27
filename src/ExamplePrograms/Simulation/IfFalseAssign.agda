@@ -12,25 +12,25 @@ open import Surface.SurfaceLang
 
 {- less precise -}
 M =
-  `let ($ false of high) `in
-  `let (ref⟦ high ⟧ ($ true of high) ∶ ` Bool of ⋆ at pos 3 at pos 0) `in
+  `let $ false of high `in
+  `let ref⟦ high ⟧ (($ true of high) ∶ ` Bool of ⋆ at pos 3) at pos 0 `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
-           else $ tt of low at pos 2
+           else $ tt of low                at pos 2
 
 ⊢M : [] ; l low ⊢ᴳ M ⦂ ` Unit of l high
 ⊢M =
   ⊢let ⊢const
-    (⊢let (⊢ref (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι)) (≲-ty ≾-⋆l ≲-ι) (≾-l l≼h))
-      (⊢if (⊢var refl)
-           (⊢assign (⊢var refl) ⊢const ≲-refl (≾-l l≼h) ≾-refl)
-           ⊢const refl))
+  (⊢let (⊢ref (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι)) (≲-ty ≾-⋆l ≲-ι) (≾-l l≼h))
+    (⊢if (⊢var refl)
+         (⊢assign (⊢var refl) ⊢const ≲-refl (≾-l l≼h) ≾-refl)
+         ⊢const refl))
 
 {- more precise -}
 M′ =
-  `let ($ false of high) `in
-  `let (ref⟦ high ⟧ $ true of high at pos 0) `in
+  `let $ false of high `in
+  `let ref⟦ high ⟧ $ true of high at pos 0 `in
     if ` 1 then (` 0) := ($ false of high) at pos 1
-           else $ tt of low at pos 2
+           else $ tt of low                at pos 2
 
 ⊢M′ : [] ; l low ⊢ᴳ M′ ⦂ ` Unit of l high
 ⊢M′ =

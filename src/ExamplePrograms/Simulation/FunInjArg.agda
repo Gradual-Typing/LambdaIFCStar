@@ -13,7 +13,7 @@ open import Surface.SurfaceLang
 {- less precise -}
 M =
   `let ƛ⟦ low ⟧ ` Bool of ⋆ ˙ ` 0 of low `in
-  `let ((` 0) ∶ ⟦ ⋆ ⟧ (` Bool of ⋆) ⇒ (` Bool of l low) of ⋆ at pos 0) `in
+  `let (` 0) ∶ ⟦ ⋆ ⟧ (` Bool of ⋆) ⇒ (` Bool of l low) of ⋆ at pos 0 `in
   (` 0 · $ false of low at pos 1)
 
 ⊢M : [] ; l low ⊢ᴳ M ⦂ ` Bool of ⋆
@@ -24,7 +24,7 @@ M =
 {- more precise -}
 M′ =
   `let ƛ⟦ low ⟧ ` Bool of l low ˙ ` 0 of low `in
-  `let ((` 0) ∶ ⟦ l low ⟧ (` Bool of l low) ⇒ (` Bool of l low) of l low at pos 0) `in
+  `let (` 0) ∶ ⟦ l low ⟧ (` Bool of l low) ⇒ (` Bool of l low) of l low at pos 0 `in
   (` 0 · $ false of low at pos 1)
 
 ⊢M′ : [] ; l low ⊢ᴳ M′ ⦂ ` Bool of l low
