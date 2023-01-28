@@ -357,3 +357,16 @@ consis-join-⊑ₗ ⋆⊑  ⋆⊑  = ⋆⊑
 consis-join-⊑ₗ ⋆⊑  l⊑l = ⋆⊑
 consis-join-⊑ₗ l⊑l ⋆⊑  = ⋆⊑
 consis-join-⊑ₗ l⊑l l⊑l = l⊑l
+
+
+{- **** Precision-subtyping **** -}
+infix 4 _⊑:>ₗ_
+infix 4 _⊑<:ₗ_
+
+data _⊑:>ₗ_ : Label → Label → Set where
+  ⋆⊑:>  : ∀ {g}     → ⋆ ⊑:>ₗ g
+  ⊑:>-l : ∀ {ℓ₁ ℓ₂} → ℓ₂ ≼ ℓ₁ → l ℓ₁ ⊑:>ₗ l ℓ₂
+
+data _⊑<:ₗ_ : Label → Label → Set where
+  ⋆⊑<:  : ∀ {g}     → ⋆ ⊑<:ₗ g
+  ⊑:>-l : ∀ {ℓ₁ ℓ₂} → ℓ₁ ≼ ℓ₂ → l ℓ₁ ⊑<:ₗ l ℓ₂

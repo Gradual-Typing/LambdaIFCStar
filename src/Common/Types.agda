@@ -566,6 +566,62 @@ _⊑?_ : (A B : Type) → Dec (A ⊑ B)
 (⟦ _ ⟧ _ ⇒ _ of _) ⊑? (Ref _ of _) = no λ { (⊑-ty _ ()) }
 
 
+{- **** Precision-subtyping **** -}
+infix 5 _⊑:>ᵣ_
+infix 5 _⊑:>_
+infix 5 _⊑<:ᵣ_
+infix 5 _⊑<:_
+
+data _⊑:>ᵣ_ : RawType → RawType → Set
+data _⊑:>_  : Type    → Type    → Set
+data _⊑<:ᵣ_ : RawType → RawType → Set
+data _⊑<:_  : Type    → Type    → Set
+
+data _⊑:>ᵣ_ where
+  ⊑:>-ι : ∀ {ι} → ` ι ⊑:>ᵣ ` ι
+
+  ⊑:>-ref : ∀ {A B}
+    → A ⊑:> B → A ⊑<: B
+      --------------------
+    → Ref A ⊑:>ᵣ Ref B
+
+  ⊑:>-fun : ∀ {A B C D gc₁ gc₂}
+    → gc₁ ⊑<:ₗ gc₂
+    → A ⊑<: C
+    → B ⊑:> D
+      ----------------------------------------------
+    → ⟦ gc₁ ⟧ A ⇒ B ⊑:>ᵣ ⟦ gc₂ ⟧ C ⇒ D
+
+data _⊑:>_ where
+  ⊑:>-ty : ∀ {S T g₁ g₂}
+    → g₁ ⊑:>ₗ g₂
+    → S  ⊑:>ᵣ T
+      --------------------
+    → S of g₁ ⊑:> T of g₂
+
+data _⊑<:ᵣ_ where
+  ⊑<:-ι : ∀ {ι} → ` ι ⊑<:ᵣ ` ι
+
+  ⊑<:-ref : ∀ {A B}
+    → A ⊑<: B → A ⊑:> B
+      --------------------
+    → Ref A ⊑<:ᵣ Ref B
+
+  ⊑<:-fun : ∀ {A B C D gc₁ gc₂}
+    → gc₁ ⊑:>ₗ gc₂
+    → A ⊑:> C
+    → B ⊑<: D
+      ----------------------------------------------
+    → ⟦ gc₁ ⟧ A ⇒ B ⊑<:ᵣ ⟦ gc₂ ⟧ C ⇒ D
+
+data _⊑<:_ where
+  ⊑<:-ty : ∀ {S T g₁ g₂}
+    → g₁ ⊑<:ₗ g₂
+    → S  ⊑<:ᵣ T
+      --------------------
+    → S of g₁ ⊑<: T of g₂
+
+
 {- **** Type label stamping **** -}
 stamp : Type → Label → Type
 stamp (T of g₁) g₂ = T of g₁ ⋎̃ g₂
