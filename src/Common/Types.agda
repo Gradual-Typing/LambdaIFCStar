@@ -8,6 +8,7 @@ open import Data.List using (List)
 open import Function using (case_of_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
+open import Relation.Binary using (_⇔_)
 open import Relation.Binary.PropositionalEquality
   using (_≡_; _≢_; refl; trans; sym; subst; cong; cong₂)
 
@@ -581,7 +582,8 @@ data _⊑:>ᵣ_ where
   ⊑:>-ι : ∀ {ι} → ` ι ⊑:>ᵣ ` ι
 
   ⊑:>-ref : ∀ {A B}
-    → A ⊑:> B → A ⊑<: B
+    -- → A ⊑:> B → A ⊑<: B
+    → A ⊑ B
       --------------------
     → Ref A ⊑:>ᵣ Ref B
 
@@ -603,7 +605,8 @@ data _⊑<:ᵣ_ where
   ⊑<:-ι : ∀ {ι} → ` ι ⊑<:ᵣ ` ι
 
   ⊑<:-ref : ∀ {A B}
-    → A ⊑<: B → A ⊑:> B
+    -- → A ⊑<: B → A ⊑:> B
+    → A ⊑ B
       --------------------
     → Ref A ⊑<:ᵣ Ref B
 
@@ -620,6 +623,66 @@ data _⊑<:_ where
     → S  ⊑<:ᵣ T
       --------------------
     → S of g₁ ⊑<: T of g₂
+
+⊑:>ᵣ-prop-from : ∀ {T₁ T₂} → T₁ ⊑:>ᵣ T₂ → ∃[ S ] (T₁ ⊑ᵣ S) × (T₂ <:ᵣ S)
+⊑:>-prop-from  : ∀ {A B} → A ⊑:> B → ∃[ C ] (A ⊑ C) × (B <: C)
+⊑<:ᵣ-prop-from : ∀ {T₁ T₂} → T₁ ⊑<:ᵣ T₂ → ∃[ S ] (T₁ ⊑ᵣ S) × (S <:ᵣ T₂)
+⊑<:-prop-from  : ∀ {A B} → A ⊑<: B → ∃[ C ] (A ⊑ C) × (C <: B)
+
+⊑:>ᵣ-prop-from {` ι} ⊑:>-ι = ⟨ ` ι , ⊑-ι , <:-ι ⟩
+⊑:>ᵣ-prop-from {Ref A} {Ref B} (⊑:>-ref A⊑B) =
+  ⟨ Ref B , ⊑-ref A⊑B , <:ᵣ-refl ⟩
+⊑:>ᵣ-prop-from {⟦ gc₁ ⟧ A ⇒ B} {⟦ gc₂ ⟧ C ⇒ D} (⊑:>-fun gc₁⊑<:gc₂ A⊑<:C B⊑:>D) =
+  let ⟨ gc , gc₁⊑gc , gc<:gc₂ ⟩ = ⊑<:ₗ-prop-from gc₁⊑<:gc₂
+      ⟨ E  , A⊑E , E<:C ⟩ = ⊑<:-prop-from A⊑<:C
+      ⟨ F  , B⊑F , D<:F ⟩ = ⊑:>-prop-from B⊑:>D in
+  ⟨ ⟦ gc ⟧ E ⇒ F , ⊑-fun gc₁⊑gc A⊑E B⊑F , <:-fun gc<:gc₂ E<:C D<:F ⟩
+⊑:>-prop-from {T₁ of g₁} {T₂ of g₂} (⊑:>-ty g₁⊑:>g₂ T₁⊑:>T₂) =
+  let ⟨ g , g₁⊑g , g₂<:g ⟩ = ⊑:>ₗ-prop-from g₁⊑:>g₂
+      ⟨ S , T₁⊑S , T₂<:S ⟩ = ⊑:>ᵣ-prop-from T₁⊑:>T₂ in
+  ⟨ S of g , ⊑-ty g₁⊑g T₁⊑S , <:-ty g₂<:g T₂<:S ⟩
+
+⊑<:ᵣ-prop-from {` ι} ⊑<:-ι = ⟨ ` ι , ⊑-ι , <:-ι ⟩
+⊑<:ᵣ-prop-from {Ref A} {Ref B} (⊑<:-ref A⊑B) =
+  ⟨ Ref B , ⊑-ref A⊑B , <:ᵣ-refl ⟩
+⊑<:ᵣ-prop-from {⟦ gc₁ ⟧ A ⇒ B} {⟦ gc₂ ⟧ C ⇒ D} (⊑<:-fun gc₁⊑:>gc₂ A⊑:>C B⊑<:D) =
+  let ⟨ gc , gc₁⊑gc , gc₂<:gc ⟩ = ⊑:>ₗ-prop-from gc₁⊑:>gc₂
+      ⟨ E  , A⊑E , C<:E ⟩ = ⊑:>-prop-from A⊑:>C
+      ⟨ F  , B⊑F , F<:D ⟩ = ⊑<:-prop-from B⊑<:D in
+  ⟨ ⟦ gc ⟧ E ⇒ F , ⊑-fun gc₁⊑gc A⊑E B⊑F , <:-fun gc₂<:gc C<:E F<:D ⟩
+⊑<:-prop-from {T₁ of g₁} {T₂ of g₂} (⊑<:-ty g₁⊑<:g₂ T₁⊑<:T₂) =
+  let ⟨ g , g₁⊑g , g<:g₂ ⟩ = ⊑<:ₗ-prop-from g₁⊑<:g₂
+      ⟨ S , T₁⊑S , S<:T₂ ⟩ = ⊑<:ᵣ-prop-from T₁⊑<:T₂ in
+  ⟨ S of g , ⊑-ty g₁⊑g T₁⊑S , <:-ty g<:g₂ S<:T₂ ⟩
+
+
+⊑:>ᵣ-prop-to : ∀ {T₁ T₂} → ∃[ S ] (T₁ ⊑ᵣ S) × (T₂ <:ᵣ S) → T₁ ⊑:>ᵣ T₂
+⊑:>-prop-to  : ∀ {A B} → ∃[ C ] (A ⊑ C) × (B <: C) → A ⊑:> B
+⊑<:ᵣ-prop-to : ∀ {T₁ T₂} → ∃[ S ] (T₁ ⊑ᵣ S) × (S <:ᵣ T₂) → T₁ ⊑<:ᵣ T₂
+⊑<:-prop-to  : ∀ {A B} → ∃[ C ] (A ⊑ C) × (C <: B) → A ⊑<: B
+
+⊑:>ᵣ-prop-to ⟨ ` ι , ⊑-ι , <:-ι ⟩ = ⊑:>-ι
+⊑:>ᵣ-prop-to ⟨ Ref C , ⊑-ref A⊑C , <:-ref B<:C C<:B ⟩
+  rewrite <:-antisym B<:C C<:B = ⊑:>-ref A⊑C
+⊑:>ᵣ-prop-to ⟨ ⟦ gc ⟧ E ⇒ F , ⊑-fun gc₁⊑gc A⊑E B⊑F , <:-fun gc<:gc₂ E<:C D<:F ⟩ =
+  ⊑:>-fun (⊑<:ₗ-prop-to ⟨ gc , gc₁⊑gc , gc<:gc₂ ⟩) (⊑<:-prop-to ⟨ E , A⊑E , E<:C ⟩) (⊑:>-prop-to ⟨ F , B⊑F , D<:F ⟩)
+⊑:>-prop-to ⟨ S of g , ⊑-ty g₁⊑g T₁⊑S , <:-ty g₂<:g T₂<:S ⟩ =
+  ⊑:>-ty (⊑:>ₗ-prop-to ⟨ g , g₁⊑g , g₂<:g ⟩) (⊑:>ᵣ-prop-to ⟨ S , T₁⊑S , T₂<:S ⟩)
+
+⊑<:ᵣ-prop-to ⟨ ` ι , ⊑-ι , <:-ι ⟩ = ⊑<:-ι
+⊑<:ᵣ-prop-to ⟨ Ref C , ⊑-ref A⊑C , <:-ref C<:B B<:C ⟩
+  rewrite <:-antisym B<:C C<:B = ⊑<:-ref A⊑C
+⊑<:ᵣ-prop-to ⟨ ⟦ gc ⟧ E ⇒ F , ⊑-fun gc₁⊑gc A⊑E B⊑F , <:-fun gc₂<:gc C<:E F<:D ⟩ =
+  ⊑<:-fun (⊑:>ₗ-prop-to ⟨ gc , gc₁⊑gc , gc₂<:gc ⟩) (⊑:>-prop-to ⟨ E , A⊑E , C<:E ⟩) (⊑<:-prop-to ⟨ F , B⊑F , F<:D ⟩)
+⊑<:-prop-to ⟨ S of g , ⊑-ty g₁⊑g T₁⊑S , <:-ty g<:g₂ S<:T₂ ⟩ =
+  ⊑<:-ty (⊑<:ₗ-prop-to ⟨ g , g₁⊑g , g<:g₂ ⟩) (⊑<:ᵣ-prop-to ⟨ S , T₁⊑S , S<:T₂ ⟩)
+
+{- Properties of precision-subtyping -}
+⊑:>-prop : _⊑:>_ ⇔ λ A B → ∃[ C ] (A ⊑ C) × (B <: C)
+⊑:>-prop = ⟨ ⊑:>-prop-from , ⊑:>-prop-to ⟩
+
+⊑<:-prop : _⊑<:_ ⇔ λ A B → ∃[ C ] (A ⊑ C) × (C <: B)
+⊑<:-prop = ⟨ ⊑<:-prop-from , ⊑<:-prop-to ⟩
 
 
 {- **** Type label stamping **** -}

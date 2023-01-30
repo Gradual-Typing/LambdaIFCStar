@@ -8,6 +8,7 @@ open import Data.List using (List)
 open import Function using (case_of_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
+open import Relation.Binary using (_⇔_)
 open import Relation.Binary.PropositionalEquality
   using (_≡_; _≢_; refl; trans; sym; subst; cong; cong₂)
 
@@ -336,11 +337,15 @@ grad-meet-~ₗ {l low} {l low} {l low} refl = ⟨ l~ , l~ ⟩
 
 
 {- **** Precision **** -}
+infix 4 _⊑ₗ_
+
 data _⊑ₗ_ : Label → Label → Set where
   ⋆⊑ : ∀ {g} → ⋆ ⊑ₗ g
   l⊑l : ∀ {ℓ} → l ℓ ⊑ₗ l ℓ
 
-infix 4 _⊑ₗ_
+⊑ₗ-refl : ∀ {g} → g ⊑ₗ g
+⊑ₗ-refl {⋆} = ⋆⊑
+⊑ₗ-refl {l _} = l⊑l
 
 _⊑ₗ?_ : ∀ (g₁ g₂ : Label) → Dec (g₁ ⊑ₗ g₂)
 ⋆ ⊑ₗ? ⋆ = yes ⋆⊑
@@ -370,3 +375,26 @@ data _⊑:>ₗ_ : Label → Label → Set where
 data _⊑<:ₗ_ : Label → Label → Set where
   ⋆⊑<:  : ∀ {g}     → ⋆ ⊑<:ₗ g
   ⊑:>-l : ∀ {ℓ₁ ℓ₂} → ℓ₁ ≼ ℓ₂ → l ℓ₁ ⊑<:ₗ l ℓ₂
+
+⊑:>ₗ-prop-from : ∀ {g₁ g₂} → g₁ ⊑:>ₗ g₂ → ∃[ g ] (g₁ ⊑ₗ g) × (g₂ <:ₗ g)
+⊑:>ₗ-prop-from {g₁} {g₂} ⋆⊑:> = ⟨ g₂ , ⋆⊑ , <:ₗ-refl ⟩
+⊑:>ₗ-prop-from (⊑:>-l ℓ₂≼ℓ₁)  = ⟨ _ , ⊑ₗ-refl , <:-l ℓ₂≼ℓ₁ ⟩
+
+⊑:>ₗ-prop-to : ∀ {g₁ g₂} → ∃[ g ] (g₁ ⊑ₗ g) × (g₂ <:ₗ g) → g₁ ⊑:>ₗ g₂
+⊑:>ₗ-prop-to ⟨ g₂ , ⋆⊑ , <:ₗ-refl ⟩   = ⋆⊑:>
+⊑:>ₗ-prop-to ⟨ _ , l⊑l , <:-l ℓ₂≼ℓ₁ ⟩ = ⊑:>-l ℓ₂≼ℓ₁
+
+⊑<:ₗ-prop-from : ∀ {g₁ g₂} → g₁ ⊑<:ₗ g₂ → ∃[ g ] (g₁ ⊑ₗ g) × (g <:ₗ g₂)
+⊑<:ₗ-prop-from {g₁} {g₂} ⋆⊑<: = ⟨ g₂ , ⋆⊑ , <:ₗ-refl ⟩
+⊑<:ₗ-prop-from (⊑:>-l ℓ₁≼ℓ₂)  = ⟨ _ , ⊑ₗ-refl , <:-l ℓ₁≼ℓ₂ ⟩
+
+⊑<:ₗ-prop-to : ∀ {g₁ g₂} → ∃[ g ] (g₁ ⊑ₗ g) × (g <:ₗ g₂) → g₁ ⊑<:ₗ g₂
+⊑<:ₗ-prop-to ⟨ g₂ , ⋆⊑ , <:ₗ-refl ⟩ = ⋆⊑<:
+⊑<:ₗ-prop-to ⟨ _ , l⊑l , <:-l ℓ₁≼ℓ₂ ⟩ = ⊑:>-l ℓ₁≼ℓ₂
+
+{- Properties of precision-subtyping for labels -}
+⊑:>ₗ-prop : _⊑:>ₗ_ ⇔ λ g₁ g₂ → ∃[ g ] (g₁ ⊑ₗ g) × (g₂ <:ₗ g)
+⊑:>ₗ-prop = ⟨ ⊑:>ₗ-prop-from , ⊑:>ₗ-prop-to ⟩
+
+⊑<:ₗ-prop : _⊑<:ₗ_ ⇔ λ g₁ g₂ → ∃[ g ] (g₁ ⊑ₗ g) × (g <:ₗ g₂)
+⊑<:ₗ-prop = ⟨ ⊑<:ₗ-prop-from , ⊑<:ₗ-prop-to ⟩
