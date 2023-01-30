@@ -398,3 +398,23 @@ data _⊑<:ₗ_ : Label → Label → Set where
 
 ⊑<:ₗ-prop : _⊑<:ₗ_ ⇔ λ g₁ g₂ → ∃[ g ] (g₁ ⊑ₗ g) × (g <:ₗ g₂)
 ⊑<:ₗ-prop = ⟨ ⊑<:ₗ-prop-from , ⊑<:ₗ-prop-to ⟩
+
+_⊑:>ₗ?_ : ∀ g₁ g₂ → Dec (g₁ ⊑:>ₗ g₂)
+⋆ ⊑:>ₗ? ⋆ = yes ⋆⊑:>
+⋆ ⊑:>ₗ? l ℓ = yes ⋆⊑:>
+l ℓ ⊑:>ₗ? ⋆ = no λ ()
+l ℓ₁ ⊑:>ₗ? l ℓ₂ =
+  case ℓ₂ ≼? ℓ₁ of λ where
+  (yes ℓ₂≼ℓ₁) → yes (⊑:>-l ℓ₂≼ℓ₁)
+  (no  ℓ₂⋠ℓ₁) →
+    no λ { (⊑:>-l ℓ₂≼ℓ₁) → contradiction ℓ₂≼ℓ₁ ℓ₂⋠ℓ₁ }
+
+_⊑<:ₗ?_ : ∀ g₁ g₂ → Dec (g₁ ⊑<:ₗ g₂)
+⋆ ⊑<:ₗ? ⋆ = yes ⋆⊑<:
+⋆ ⊑<:ₗ? l ℓ = yes ⋆⊑<:
+l ℓ ⊑<:ₗ? ⋆ = no λ ()
+l ℓ₁ ⊑<:ₗ? l ℓ₂ =
+  case ℓ₁ ≼? ℓ₂ of λ where
+  (yes ℓ₁≼ℓ₂) → yes (⊑:>-l ℓ₁≼ℓ₂)
+  (no  ℓ₁⋠ℓ₂) →
+    no λ { (⊑:>-l ℓ₁≼ℓ₂) → contradiction ℓ₁≼ℓ₂ ℓ₁⋠ℓ₂ }

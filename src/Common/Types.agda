@@ -684,6 +684,80 @@ data _⊑<:_ where
 ⊑<:-prop : _⊑<:_ ⇔ λ A B → ∃[ C ] (A ⊑ C) × (C <: B)
 ⊑<:-prop = ⟨ ⊑<:-prop-from , ⊑<:-prop-to ⟩
 
+{- Precision-subtyping is decidable -}
+_⊑:>ᵣ?_ : ∀ S T → Dec (S ⊑:>ᵣ T)
+_⊑:>?_  : ∀ A B → Dec (A ⊑:>  B)
+_⊑<:ᵣ?_ : ∀ S T → Dec (S ⊑<:ᵣ T)
+_⊑<:?_  : ∀ A B → Dec (A ⊑<:  B)
+
+(` Unit) ⊑:>ᵣ? (` Unit) = yes ⊑:>-ι
+(` Bool) ⊑:>ᵣ? (` Unit) = no λ ()
+(` Unit) ⊑:>ᵣ? (` Bool) = no λ ()
+(` Bool) ⊑:>ᵣ? (` Bool) = yes ⊑:>-ι
+(` _) ⊑:>ᵣ? (Ref _) = no λ ()
+(` _) ⊑:>ᵣ? (⟦ _ ⟧ _ ⇒ _) = no λ ()
+(Ref _) ⊑:>ᵣ? (` _) = no λ ()
+(Ref A) ⊑:>ᵣ? (Ref B) =
+  case A ⊑? B of λ where
+  (yes A⊑B) → yes (⊑:>-ref A⊑B)
+  (no  A⋤B) → no λ { (⊑:>-ref A⊑B) → contradiction A⊑B A⋤B }
+(Ref _) ⊑:>ᵣ? (⟦ _ ⟧ _ ⇒ _) = no λ ()
+(⟦ _ ⟧ _ ⇒ _) ⊑:>ᵣ? (` _) = no λ ()
+(⟦ _ ⟧ _ ⇒ _) ⊑:>ᵣ? (Ref _) = no λ ()
+(⟦ gc₁ ⟧ A ⇒ B) ⊑:>ᵣ? (⟦ gc₂ ⟧ C ⇒ D) =
+  case gc₁ ⊑<:ₗ? gc₂ of λ where
+  (yes gc₁⊑<:gc₂) →
+    case A ⊑<:? C of λ where
+    (yes A⊑<:C) →
+      case B ⊑:>? D of λ where
+      (yes B⊑:>D) → yes (⊑:>-fun gc₁⊑<:gc₂ A⊑<:C B⊑:>D)
+      (no ¬B⊑:>D) → no λ { (⊑:>-fun _ _ B⊑:>D) → contradiction B⊑:>D ¬B⊑:>D }
+    (no ¬A⊑<:C) → no λ { (⊑:>-fun _ A⊑<:C _) → contradiction A⊑<:C ¬A⊑<:C }
+  (no ¬gc₁⊑<:gc₂) →
+    no λ { (⊑:>-fun gc₁⊑<:gc₂ _ _) → contradiction gc₁⊑<:gc₂ ¬gc₁⊑<:gc₂ }
+(S of g₁) ⊑:>? (T of g₂) =
+  case S ⊑:>ᵣ? T of λ where
+  (yes S⊑:>T) →
+    case g₁ ⊑:>ₗ? g₂ of λ where
+    (yes g₁⊑:>g₂) → yes (⊑:>-ty g₁⊑:>g₂ S⊑:>T)
+    (no ¬g₁⊑:>g₂) → no λ { (⊑:>-ty g₁⊑:>g₂ _) → contradiction g₁⊑:>g₂ ¬g₁⊑:>g₂ }
+  (no ¬S⊑:>T) →
+    no (λ { (⊑:>-ty _ S⊑:>T) → contradiction S⊑:>T ¬S⊑:>T })
+
+(` Unit) ⊑<:ᵣ? (` Unit) = yes ⊑<:-ι
+(` Bool) ⊑<:ᵣ? (` Unit) = no λ ()
+(` Unit) ⊑<:ᵣ? (` Bool) = no λ ()
+(` Bool) ⊑<:ᵣ? (` Bool) = yes ⊑<:-ι
+(` _) ⊑<:ᵣ? (Ref _) = no λ ()
+(` _) ⊑<:ᵣ? (⟦ _ ⟧ _ ⇒ _) = no λ ()
+(Ref _) ⊑<:ᵣ? (` _) = no λ ()
+(Ref A) ⊑<:ᵣ? (Ref B) =
+  case A ⊑? B of λ where
+  (yes A⊑B) → yes (⊑<:-ref A⊑B)
+  (no  A⋤B) → no λ { (⊑<:-ref A⊑B) → contradiction A⊑B A⋤B }
+(Ref _) ⊑<:ᵣ? (⟦ _ ⟧ _ ⇒ _) = no λ ()
+(⟦ _ ⟧ _ ⇒ _) ⊑<:ᵣ? (` _) = no λ ()
+(⟦ _ ⟧ _ ⇒ _) ⊑<:ᵣ? (Ref _) = no λ ()
+(⟦ gc₁ ⟧ A ⇒ B) ⊑<:ᵣ? (⟦ gc₂ ⟧ C ⇒ D) =
+  case gc₁ ⊑:>ₗ? gc₂ of λ where
+  (yes gc₁⊑:>gc₂) →
+    case A ⊑:>? C of λ where
+    (yes A⊑:>C) →
+      case B ⊑<:? D of λ where
+      (yes B⊑<:D) → yes (⊑<:-fun gc₁⊑:>gc₂ A⊑:>C B⊑<:D)
+      (no ¬B⊑<:D) → no λ { (⊑<:-fun _ _ B⊑<:D) → contradiction B⊑<:D ¬B⊑<:D }
+    (no ¬A⊑:>C) → no λ { (⊑<:-fun _ A⊑:>C _) → contradiction A⊑:>C ¬A⊑:>C }
+  (no ¬gc₁⊑:>gc₂) →
+    no λ { (⊑<:-fun gc₁⊑:>gc₂ _ _) → contradiction gc₁⊑:>gc₂ ¬gc₁⊑:>gc₂ }
+(S of g₁) ⊑<:? (T of g₂) =
+  case S ⊑<:ᵣ? T of λ where
+  (yes S⊑<:T) →
+    case g₁ ⊑<:ₗ? g₂ of λ where
+    (yes g₁⊑<:g₂) → yes (⊑<:-ty g₁⊑<:g₂ S⊑<:T)
+    (no ¬g₁⊑<:g₂) → no λ { (⊑<:-ty g₁⊑<:g₂ _) → contradiction g₁⊑<:g₂ ¬g₁⊑<:g₂ }
+  (no ¬S⊑<:T) →
+    no (λ { (⊑<:-ty _ S⊑<:T) → contradiction S⊑<:T ¬S⊑<:T })
+
 
 {- **** Type label stamping **** -}
 stamp : Type → Label → Type
