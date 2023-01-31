@@ -1,4 +1,4 @@
-module Simulator.CheckPrecision where
+module Simulator.CheckerNoSubtyping where
 
 open import Data.Nat
 open import Data.Bool renaming (Bool to 𝔹; _≟_ to _≟ᵇ_)
@@ -69,25 +69,25 @@ check-⊑? (err nsu-error _) (err nsu-error _) = true
 -- Cast
 check-⊑? (cast t A B) (cast t′ A′ B′) =
   (isYes (A ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t t′) ∨
-  (isYes (A ⊑:>? B′) ∧ isYes (B ⊑:>? B′) ∧ check-⊑? t (cast t′ A′ B′)) ∨
-  (isYes (B ⊑:>? A′) ∧ isYes (B ⊑:>? B′) ∧ check-⊑? (cast t A B) t′)
+  (isYes (A ⊑? B′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t (cast t′ A′ B′)) ∨
+  (isYes (B ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? (cast t A B) t′)
 -- Special case: cast on the left, cast error on the right
 check-⊑? (cast t A B) (err (blame p) A′) =
   {- relate by castₗ -}
-  (isYes (A ⊑:>? A′) ∧ isYes (B ⊑:>? A′) ∧ check-⊑? t (err (blame p) A′)) ∨
+  (isYes (A ⊑? A′) ∧ isYes (B ⊑? A′) ∧ check-⊑? t (err (blame p) A′)) ∨
   {- relate by err   -}
-  (isYes (B ⊑:>? A′))
+  (isYes (B ⊑? A′))
 -- CastL
 check-⊑? (cast t A B) t′ =
   let A′ = get-type t′ in
-  isYes (A ⊑:>? A′) ∧ isYes (B ⊑:>? A′) ∧ check-⊑? t t′
+  isYes (A ⊑? A′) ∧ isYes (B ⊑? A′) ∧ check-⊑? t t′
 -- CastR
 check-⊑? t (cast t′ A′ B′) =
   let A = get-type t in
-  isYes (A ⊑:>? A′) ∧ isYes (A ⊑:>? B′) ∧ check-⊑? t t′
+  isYes (A ⊑? A′) ∧ isYes (A ⊑? B′) ∧ check-⊑? t t′
 -- Cast error
 check-⊑? t (err (blame p) A′) =
   let A = get-type t in
-  isYes (A ⊑:>? A′)
+  isYes (A ⊑? A′)
 -- Otherwise
 check-⊑? _ _ = false
