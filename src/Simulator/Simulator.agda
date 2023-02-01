@@ -32,10 +32,10 @@ sim-helper : ∀ {Σ gc A} M μ
   → Σ ⊢ μ → (t : AST) → (k : ℕ)
     ------------------------------------------
   → Maybe (ℕ × ∃[ N ] ∃[ μ′ ] (M ∣ μ ∣ low —↠ N ∣ μ′))
-sim-helper M μ ⊢M ⊢μ t 0 =
-  if (check-⊑? (to-ast M ⊢M _ <:-refl) t) then just ⟨ 0 , M , μ , M ∣ μ ∣ _ ∎ ⟩ else nothing
-sim-helper M μ ⊢M ⊢μ t (suc k-1) =
-  if (check-⊑? (to-ast M ⊢M _ <:-refl) t) then just ⟨ 0 , M , μ , M ∣ μ ∣ _ ∎ ⟩
+sim-helper {A = A} M μ ⊢M ⊢μ t 0 =
+  if (check-⊑? (to-ast M ⊢M A) t) then just ⟨ 0 , M , μ , M ∣ μ ∣ _ ∎ ⟩ else nothing
+sim-helper {A = A} M μ ⊢M ⊢μ t (suc k-1) =
+  if (check-⊑? (to-ast M ⊢M A) t) then just ⟨ 0 , M , μ , M ∣ μ ∣ _ ∎ ⟩
     else
     (case progress low M ⊢M μ ⊢μ of λ where
       (step {N} {μ′} M→N) →
@@ -57,7 +57,8 @@ step-left : ∀ {Σ Σ′ gc gc′ A A′} M M′ μ₁
   → (⊢μ₁ : Σ ⊢ μ₁)
     ---------------------------------------------------
   → Maybe (ℕ × ∃[ N ] ∃[ μ₂ ] (M ∣ μ₁ ∣ low —↠ N ∣ μ₂))
-step-left M M′ μ₁ ⊢M ⊢M′ ⊢μ₁ = sim-helper M μ₁ ⊢M ⊢μ₁ (to-ast M′ ⊢M′ _ <:-refl) magic-num
+step-left {A = A} {A′} M M′ μ₁ ⊢M ⊢M′ ⊢μ₁ =
+  sim-helper M μ₁ ⊢M ⊢μ₁ (to-ast M′ ⊢M′ A′) magic-num
 
 step-right : ∀ {Σ Σ′ gc gc′ A A′} M M′ μ₁ μ₁′
   → (⊢M  : [] ; Σ  ; gc  ; low ⊢ M  ⦂ A)
@@ -113,10 +114,10 @@ simulator : ∀ {A A′} (M M′ : Term)
   → (ℕ × ∃[ N₁  ] ∃[ N₂  ] ∃[ μ  ] (N₁  ∣ ∅ ∣ low —↠ N₂  ∣ μ )) ×
      (ℕ × ∃[ N₁′ ] ∃[ N₂′ ] ∃[ μ′ ] (N₁′ ∣ ∅ ∣ low —↠ N₂′ ∣ μ′)) ×
      (List (ℕ × ℕ))
-simulator M M′ ⊢M ⊢M′ =
+simulator {A} {A′} M M′ ⊢M ⊢M′ =
   let N₁  = 𝒞 M ⊢M   ; ⊢N₁  = 𝒞-pres M ⊢M   in
   let N₁′ = 𝒞 M′ ⊢M′ ; ⊢N₁′ = 𝒞-pres M′ ⊢M′ in
-  if check-⊑? (to-ast N₁ ⊢N₁ _ <:-refl) (to-ast N₁′ ⊢N₁′ _ <:-refl) then
+  if check-⊑? (to-ast N₁ ⊢N₁ A) (to-ast N₁′ ⊢N₁′ A′) then
     (let ⟨ ⟨ n , N₂ , μ , N₁↠N₂ ⟩ ,
            ⟨ n′ , N₂′ , μ′ , N₁′↠N₂′ ⟩ ,
            s ⟩ = step-right N₁ N₁′ ∅ ∅ ⊢N₁ ⊢N₁′ ⊢μ-nil ⊢μ-nil magic-num 0 0 in
