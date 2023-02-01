@@ -21,6 +21,8 @@ open import ExamplePrograms.Simulation.RefNSU1        as RefNSU1
 open import ExamplePrograms.Simulation.RefNSU2        as RefNSU2
 open import ExamplePrograms.Simulation.SubInj1        as SubInj1
 open import ExamplePrograms.Simulation.SubInj2        as SubInj2
+open import ExamplePrograms.Simulation.InjProj1       as InjProj1
+open import ExamplePrograms.Simulation.InjProj2       as InjProj2
 open import ExamplePrograms.Simulation.IfTrueAssign   as IfTrueAssign
 open import ExamplePrograms.Simulation.IfFalseAssign  as IfFalseAssign
 open import ExamplePrograms.Simulation.WrongAnn1      as WrongAnn1
@@ -37,6 +39,8 @@ cfgs =
   ⟨ "FunInjArg"     , FunInjArg.M     , FunInjArg.M′     , _ , _ , FunInjArg.⊢M     , FunInjArg.⊢M′     ⟩ ∷
   ⟨ "SubInj1"       , SubInj1.M       , SubInj1.M′       , _ , _ , SubInj1.⊢M       , SubInj1.⊢M′       ⟩ ∷
   ⟨ "SubInj2"       , SubInj2.M       , SubInj2.M′       , _ , _ , SubInj2.⊢M       , SubInj2.⊢M′       ⟩ ∷
+  ⟨ "InjProj1"      , InjProj1.M      , InjProj1.M′      , _ , _ , InjProj1.⊢M      , InjProj1.⊢M′      ⟩ ∷
+  ⟨ "InjProj2"      , InjProj2.M      , InjProj2.M′      , _ , _ , InjProj2.⊢M      , InjProj2.⊢M′      ⟩ ∷
   ⟨ "IfTrueAssign"  , IfTrueAssign.M  , IfTrueAssign.M′  , _ , _ , IfTrueAssign.⊢M  , IfTrueAssign.⊢M′  ⟩ ∷
   ⟨ "IfFalseAssign" , IfFalseAssign.M , IfFalseAssign.M′ , _ , _ , IfFalseAssign.⊢M , IfFalseAssign.⊢M′ ⟩ ∷
   ⟨ "WrongAnn1"     , WrongAnn1.M     , WrongAnn1.M′     , _ , _ , WrongAnn1.⊢M     , WrongAnn1.⊢M′     ⟩ ∷
