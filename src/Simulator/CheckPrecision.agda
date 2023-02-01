@@ -50,16 +50,16 @@ check-⊑? (cond t₁ t₂ t₃ _) (cond t₁′ t₂′ t₃′ _) =
 check-⊑? (let-bind t₁ t₂ _) (let-bind t₁′ t₂′ _) =
   (check-⊑? t₁ t₁′) ∧ (check-⊑? t₂ t₂′)
 -- Ref, Ref?, and Ref✓
-check-⊑? (ref ℓ t _) (ref ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
-check-⊑? (ref? ℓ t _) (ref? ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
-check-⊑? (ref? ℓ t _) (ref  ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
+check-⊑? (ref   ℓ t _) (ref   ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
+check-⊑? (ref?  ℓ t _) (ref?  ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
+check-⊑? (ref?  ℓ t _) (ref   ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
 check-⊑? (ref✓ ℓ t _) (ref✓ ℓ′ t′ _) = isYes (ℓ =? ℓ′) ∧ (check-⊑? t t′)
 -- Deref
 check-⊑? (deref t _) (deref t′ _) = check-⊑? t t′
 -- Assign, Assign?, and Assign✓
-check-⊑? (assign t₁ t₂ _) (assign t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
-check-⊑? (assign? t₁ t₂ _) (assign? t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
-check-⊑? (assign? t₁ t₂ _) (assign  t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
+check-⊑? (assign   t₁ t₂ _) (assign   t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
+check-⊑? (assign?  t₁ t₂ _) (assign?  t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
+check-⊑? (assign?  t₁ t₂ _) (assign   t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 check-⊑? (assign✓ t₁ t₂ _) (assign✓ t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 -- Prot
 check-⊑? (protect ℓ t _) (protect ℓ′ t′ _) =
@@ -67,27 +67,31 @@ check-⊑? (protect ℓ t _) (protect ℓ′ t′ _) =
 -- NSU error
 check-⊑? (err nsu-error _) (err nsu-error _) = true
 -- Cast
-check-⊑? (cast t A B) (cast t′ A′ B′) =
+check-⊑? (cast t A B C) (cast t′ A′ B′ C′) =
+  -- relate by Cast
   (isYes (A ⊑? A′) ∧ isYes (B ⊑? B′) ∧ check-⊑? t t′) ∨
-  (isYes (A ⊑:>? B′) ∧ isYes (B ⊑:>? B′) ∧ check-⊑? t (cast t′ A′ B′)) ∨
-  (isYes (B ⊑:>? A′) ∧ isYes (B ⊑:>? B′) ∧ check-⊑? (cast t A B) t′)
--- Special case: cast on the left, cast error on the right
-check-⊑? (cast t A B) (err (blame p) A′) =
-  {- relate by castₗ -}
-  (isYes (A ⊑:>? A′) ∧ isYes (B ⊑:>? A′) ∧ check-⊑? t (err (blame p) A′)) ∨
-  {- relate by err   -}
-  (isYes (B ⊑:>? A′))
+  -- relate by CastL
+  (isYes (A ⊑<:? C′) ∧ isYes (B ⊑<:? C′) ∧ check-⊑? t (cast t′ A′ B′ C′)) ∨
+  -- relate by CastR
+  (isYes (C ⊑:>? A′) ∧ isYes (C ⊑:>? B′) ∧ check-⊑? (cast t A B C) t′)
+-- Special case: cast on the left, blame on the right
+check-⊑? (cast t A B C) (err (blame p) A′) =
+  {- relate by CastL -}
+  (isYes (A ⊑? A′) ∧ isYes (B ⊑? A′) ∧ check-⊑? t (err (blame p) A′)) ∨
+  {- relate by Blame -}
+  (isYes (C ⊑? A′))
 -- CastL
-check-⊑? (cast t A B) t′ =
-  let A′ = get-type t′ in
-  isYes (A ⊑:>? A′) ∧ isYes (B ⊑:>? A′) ∧ check-⊑? t t′
+check-⊑? (cast t A B C) t′ =
+  let C′ = get-type t′ in
+  {- intuition: more precise side can go up in subtyping -}
+  isYes (A ⊑<:? C′) ∧ isYes (B ⊑<:? C′) ∧ check-⊑? t t′
 -- CastR
-check-⊑? t (cast t′ A′ B′) =
-  let A = get-type t in
-  isYes (A ⊑:>? A′) ∧ isYes (A ⊑:>? B′) ∧ check-⊑? t t′
--- Cast error
+check-⊑? t (cast t′ A′ B′ C′) =
+  let C = get-type t in
+  isYes (C ⊑? A′) ∧ isYes (C ⊑? B′) ∧ check-⊑? t t′
+-- Blame
 check-⊑? t (err (blame p) A′) =
   let A = get-type t in
-  isYes (A ⊑:>? A′)
+  isYes (A ⊑? A′)
 -- Otherwise
 check-⊑? _ _ = false

@@ -35,10 +35,10 @@ data AST : Set where
   assign? : AST → AST → Type → AST
   assign✓ : AST → AST → Type → AST
   protect : StaticLabel → AST → Type → AST
-  cast : AST → Type → Type → AST
+  cast : AST → Type → Type → Type → AST
   castpc : Label → AST → Type → AST
   err : Error → Type → AST
-  -- sub : AST → Type → Type → AST
+
 
 get-type : AST → Type
 get-type (var _ A) = A
@@ -56,36 +56,47 @@ get-type (assign _ _ A) = A
 get-type (assign? _ _ A) = A
 get-type (assign✓ _ _ A) = A
 get-type (protect _ _ A) = A
-get-type (cast _ _ A) = A
+get-type (cast _ A B A′) = A′
 get-type (castpc _ _ A) = A
 get-type (err e A) = A
--- get-type (sub _ _ A) = A
 
 {- Translates a typing derivation into an AST -}
-to-ast : ∀ {Γ Σ gc pc A} M → Γ ; Σ ; gc ; pc ⊢ M ⦂ A → AST
-to-ast {A = A} (` x) (⊢var _) = var x A
-to-ast {A = A} ($ k of ℓ) ⊢const = const k ℓ A
-to-ast {A = A} (addr_of_ a ℓ) (⊢addr _) = addr a ℓ A
-to-ast {A = B} (ƛ⟦ pc ⟧ A ˙ N of ℓ) (⊢lam ⊢N) =
-  lam pc A (to-ast {pc = low} N ⊢N) ℓ B
-to-ast {A = A} (L · M) (⊢app ⊢L ⊢M) = app (to-ast L ⊢L) (to-ast M ⊢M) A
-to-ast {A = A} (if L _ M N) (⊢if ⊢L ⊢M ⊢N) =
-  cond (to-ast L ⊢L) (to-ast {pc = low} M ⊢M) (to-ast {pc = low} N ⊢N) A
-to-ast {A = A} (`let M N) (⊢let ⊢M ⊢N) =
-  let-bind (to-ast M ⊢M) (to-ast {pc = low} N ⊢N) A
-to-ast {A = A} (ref⟦ ℓ ⟧ M) (⊢ref ⊢M _) = ref ℓ (to-ast M ⊢M) A
-to-ast {A = A} (ref?⟦ ℓ ⟧ M) (⊢ref? ⊢M) = ref? ℓ (to-ast M ⊢M) A
-to-ast {A = A} (ref✓⟦ ℓ ⟧ M) (⊢ref✓ ⊢M _) = ref✓ ℓ (to-ast M ⊢M) A
-to-ast {A = A} (! M) (⊢deref ⊢M) = deref (to-ast M ⊢M) A
-to-ast {A = A} (L := M) (⊢assign ⊢L ⊢M _) = assign (to-ast L ⊢L) (to-ast M ⊢M) A
-to-ast {A = A} (L :=? M) (⊢assign? ⊢L ⊢M) =
-  assign? (to-ast L ⊢L) (to-ast {pc = low} M ⊢M) A
-to-ast {A = A} (L :=✓ M) (⊢assign✓ ⊢L ⊢M _) =
-  assign✓ (to-ast L ⊢L) (to-ast M ⊢M) A
-to-ast {A = A} (prot ℓ M) (⊢prot ⊢M) = protect ℓ (to-ast M ⊢M) A
-to-ast {A = B} (M ⟨ c ⟩) (⊢cast {A = A} {.B} ⊢M) = cast (to-ast M ⊢M) A B
-to-ast {A = A} (cast-pc g M) (⊢cast-pc ⊢M _) = castpc g (to-ast M ⊢M) A
-to-ast {A = A} (error e) ⊢err = err e A
-to-ast {A = B} M (⊢sub ⊢M _) = to-ast M ⊢M
--- to-ast {A = B} M (⊢sub {A = A} {.B} ⊢M _) = sub (to-ast M ⊢M) A B
-to-ast M (⊢sub-pc ⊢M _) = to-ast M ⊢M
+to-ast : ∀ {Γ Σ gc pc A} M → Γ ; Σ ; gc ; pc ⊢ M ⦂ A → (A′ : Type) → (A <: A′) → AST
+to-ast (` x) (⊢var _) A′ _ = var x A′
+to-ast ($ k of ℓ) ⊢const A′ _ = const k ℓ A′
+to-ast (addr_of_ a ℓ) (⊢addr _) A′ _ = addr a ℓ A′
+to-ast (ƛ⟦ pc ⟧ A ˙ N of ℓ) (⊢lam ⊢N) A′ _ =
+  lam pc A (to-ast {pc = low} N ⊢N _ <:-refl) ℓ A′
+to-ast (L · M) (⊢app ⊢L ⊢M) A′ _ =
+  app (to-ast L ⊢L _ <:-refl) (to-ast M ⊢M _ <:-refl) A′
+to-ast (if L _ M N) (⊢if ⊢L ⊢M ⊢N) A′ _ =
+  cond (to-ast            L ⊢L _ <:-refl)
+       (to-ast {pc = low} M ⊢M _ <:-refl)
+       (to-ast {pc = low} N ⊢N _ <:-refl) A′
+to-ast (`let M N) (⊢let ⊢M ⊢N) A′ _ =
+  let-bind (to-ast M ⊢M _ <:-refl) (to-ast {pc = low} N ⊢N _ <:-refl) A′
+to-ast (ref⟦ ℓ ⟧ M) (⊢ref ⊢M _) A′ _ =
+  ref  ℓ (to-ast M ⊢M _ <:-refl) A′
+to-ast (ref?⟦ ℓ ⟧ M) (⊢ref? ⊢M) A′ _ =
+  ref? ℓ (to-ast M ⊢M _ <:-refl) A′
+to-ast (ref✓⟦ ℓ ⟧ M) (⊢ref✓ ⊢M _) A′ _ =
+  ref✓ ℓ (to-ast M ⊢M _ <:-refl) A′
+to-ast (! M) (⊢deref ⊢M) A′ _ =
+  deref (to-ast M ⊢M _ <:-refl) A′
+to-ast (L := M) (⊢assign ⊢L ⊢M _) A′ _ =
+  assign (to-ast L ⊢L _ <:-refl) (to-ast M ⊢M _ <:-refl) A′
+to-ast (L :=? M) (⊢assign? ⊢L ⊢M) A′ _ =
+  assign? (to-ast L ⊢L _ <:-refl) (to-ast {pc = low} M ⊢M _ <:-refl) A′
+to-ast (L :=✓ M) (⊢assign✓ ⊢L ⊢M _) A′ _ =
+  assign✓ (to-ast L ⊢L _ <:-refl) (to-ast M ⊢M _ <:-refl) A′
+to-ast (prot ℓ M) (⊢prot ⊢M) A′ _ =
+  protect ℓ (to-ast M ⊢M _ <:-refl) A′
+to-ast {A = B} (M ⟨ c ⟩) (⊢cast {A = A} {.B} ⊢M) A′ _ =
+  cast (to-ast M ⊢M _ <:-refl) A B A′
+to-ast (cast-pc g M) (⊢cast-pc ⊢M _) A′ _ =
+  castpc g (to-ast M ⊢M _ <:-refl) A′
+to-ast (error e) ⊢err A′ _ = err e A′
+to-ast {A = B} M (⊢sub {A = A} {.B} ⊢M A<:B) A′ B<:A′ =
+  to-ast M ⊢M A′ (<:-trans A<:B B<:A′)
+to-ast M (⊢sub-pc ⊢M _) A′ A<:A′ =
+  to-ast M ⊢M A′ A<:A′
