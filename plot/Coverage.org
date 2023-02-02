@@ -9,7 +9,7 @@ Reduction rule coverage on the more precise side:
 - [X] β-if-true / β-if-false
 - [X] β-let
 - [X] ref-static
-- [ ] ref?-ok
+- [X] ref?-ok
 - [X] ref?-fail
 - [X] ref
 - [X] deref
@@ -35,7 +35,7 @@ Reduction rule coverage on the more precise side:
   + [ ] ~cast-ref-ref-proj-blame~
 - [X] if-cast-true / if-cast-false
 - [ ] fun-cast
-- [ ] deref-cast
+- [X] deref-cast
 - [ ] assign?-cast
 - [ ] assign-cast
-- [ ] β-cast-pc
+- [X] β-cast-pc

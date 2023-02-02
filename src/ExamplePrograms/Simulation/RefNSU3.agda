@@ -1,4 +1,4 @@
-module ExamplePrograms.Simulation.RefNSU2 where
+module ExamplePrograms.Simulation.RefNSU3 where
 
 open import Data.List using ([])
 open import Data.Unit
@@ -11,7 +11,7 @@ open import Surface.SurfaceLang
 
 {- less precise -}
 M =
-  `let ($ true of high) ∶ ` Bool of ⋆ at pos 0 `in
+  `let ($ true of low) ∶ ` Bool of l high at pos 0 `in
   `let if ((` 0) ∶ ` Bool of ⋆ at pos 1)
        then ref⟦ high ⟧ $ false of low at pos 3
        else ref⟦ high ⟧ $ true of low at pos 4
@@ -20,25 +20,25 @@ M =
 
 ⊢M : [] ; l low ⊢ᴳ M ⦂ ` Bool of ⋆
 ⊢M =
-  ⊢let (⊢ann ⊢const (≲-ty ≾-⋆r ≲-ι))
-  (⊢let (⊢if (⊢ann (⊢var refl) ≲-refl)
+  ⊢let (⊢ann ⊢const (≲-ty (≾-l l≼h) ≲-ι))
+  (⊢let (⊢if (⊢ann (⊢var refl) (≲-ty ≾-⋆r ≲-ι))
              (⊢ref ⊢const (≲-ty (≾-l l≼h) ≲-ι) ≾-⋆l)
              (⊢ref ⊢const (≲-ty (≾-l l≼h) ≲-ι) ≾-⋆l) refl)
     (⊢deref (⊢var refl)))
 
 {- more precise -}
 M′ =
-  `let ($ true of high) ∶ ` Bool of l high at pos 0 `in
-  `let if ((` 0) ∶ ` Bool of ⋆ at pos 1)
+  `let ($ true of low) ∶ ` Bool of l high at pos 0 `in
+  `let if ((` 0) ∶ ` Bool of l high at pos 1)
        then ref⟦ high ⟧ $ false of low at pos 3
        else ref⟦ high ⟧ $ true of low at pos 4
        at pos 2 `in
   (! (` 0))
 
-⊢M′ : [] ; l low ⊢ᴳ M′ ⦂ ` Bool of ⋆
+⊢M′ : [] ; l low ⊢ᴳ M′ ⦂ ` Bool of l high
 ⊢M′ =
-  ⊢let (⊢ann ⊢const ≲-refl)
-  (⊢let (⊢if (⊢ann (⊢var refl) (≲-ty ≾-⋆r ≲-ι))
-             (⊢ref ⊢const (≲-ty (≾-l l≼h) ≲-ι) ≾-⋆l)
-             (⊢ref ⊢const (≲-ty (≾-l l≼h) ≲-ι) ≾-⋆l) refl)
+  ⊢let (⊢ann ⊢const (≲-ty (≾-l l≼h) ≲-ι))
+  (⊢let (⊢if (⊢ann (⊢var refl) (≲-ty ≾-refl ≲-ι))
+             (⊢ref ⊢const (≲-ty (≾-l l≼h) ≲-ι) ≾-refl)
+             (⊢ref ⊢const (≲-ty (≾-l l≼h) ≲-ι) ≾-refl) refl)
     (⊢deref (⊢var refl)))
