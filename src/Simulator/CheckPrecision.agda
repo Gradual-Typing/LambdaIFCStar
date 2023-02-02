@@ -60,6 +60,7 @@ check-⊑? (deref t _) (deref t′ _) = check-⊑? t t′
 check-⊑? (assign   t₁ t₂ _) (assign   t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 check-⊑? (assign?  t₁ t₂ _) (assign?  t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 check-⊑? (assign?  t₁ t₂ _) (assign   t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
+check-⊑? (assign?  t₁ t₂ _) (assign✓ t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′  {- example: `AssignRefProxy` -}
 check-⊑? (assign✓ t₁ t₂ _) (assign✓ t₁′ t₂′ _) = check-⊑? t₁ t₁′ ∧ check-⊑? t₂ t₂′
 -- Prot
 check-⊑? (protect ℓ t _) (protect ℓ′ t′ _) =
