@@ -1,24 +1,26 @@
-- [ ] ξ
-- [ ] ξ-err
-- [ ] prot-val
-- [ ] prot-ctx
-- [ ] prot-err
-- [ ] β
-- [ ] β-if-true / β-if-false
-- [ ] β-let
-- [ ] ref-static
+Reduction rule coverage on the more precise side:
+
+- [X] ξ
+- [X] ξ-err
+- [X] prot-val
+- [X] prot-ctx
+- [X] prot-err
+- [X] β
+- [X] β-if-true / β-if-false
+- [X] β-let
+- [X] ref-static
 - [ ] ref?-ok
-- [ ] ref?-fail
-- [ ] ref
-- [ ] deref
-- [ ] assign-static
+- [X] ref?-fail
+- [X] ref
+- [X] deref
+- [X] assign-static
 - [ ] assign?-ok
 - [ ] assign?-fail
-- [ ] assign
-- [ ] cast
+- [X] assign
+- [-] cast
   + [ ] ~cast-base-id~
-  + [ ] ~cast-base-proj~
-  + [ ] ~cast-base-proj-blame~
+  + [X] ~cast-base-proj~
+  + [X] ~cast-base-proj-blame~
   + [ ] ~cast-fun-id⋆~
   + [ ] ~cast-fun-proj~
   + [ ] ~cast-fun-proj-blame~
@@ -31,7 +33,7 @@
   + [ ] ~cast-ref-ref-id⋆~
   + [ ] ~cast-ref-ref-proj~
   + [ ] ~cast-ref-ref-proj-blame~
-- [ ] if-cast-true / if-cast-false
+- [X] if-cast-true / if-cast-false
 - [ ] fun-cast
 - [ ] deref-cast
 - [ ] assign?-cast
