@@ -14,11 +14,11 @@ Reduction rule coverage on the more precise side:
 - [X] ref
 - [X] deref
 - [X] assign-static
-- [ ] assign?-ok
+- [X] assign?-ok
 - [X] assign?-fail
 - [X] assign
 - [-] cast
-  + [ ] ~cast-base-id~
+  + [X] ~cast-base-id~
   + [X] ~cast-base-proj~
   + [X] ~cast-base-proj-blame~
   + [ ] ~cast-fun-id⋆~
