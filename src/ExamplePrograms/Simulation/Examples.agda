@@ -16,6 +16,7 @@ open import ExamplePrograms.Simulation.Values         as Values
 open import ExamplePrograms.Simulation.FunInjArg      as FunInjArg
 open import ExamplePrograms.Simulation.AppFunProxy    as AppFunProxy
 open import ExamplePrograms.Simulation.DerefRefProxy  as DerefRefProxy
+open import ExamplePrograms.Simulation.AssignRefProxy as AssignRefProxy
 open import ExamplePrograms.Simulation.RefAndImplicitFlow as RefImpFlow
 open import ExamplePrograms.Simulation.RefNSU1        as RefNSU1
 open import ExamplePrograms.Simulation.RefNSU2        as RefNSU2
@@ -23,6 +24,7 @@ open import ExamplePrograms.Simulation.RefNSU3        as RefNSU3
 open import ExamplePrograms.Simulation.AssignNSU1     as AssignNSU1
 open import ExamplePrograms.Simulation.AssignNSU2     as AssignNSU2
 open import ExamplePrograms.Simulation.AssignNSU3     as AssignNSU3
+open import ExamplePrograms.Simulation.AssignNSU4     as AssignNSU4
 open import ExamplePrograms.Simulation.SubInj1        as SubInj1
 open import ExamplePrograms.Simulation.SubInj2        as SubInj2
 open import ExamplePrograms.Simulation.InjProj1       as InjProj1
@@ -37,6 +39,7 @@ cfgs =
   ⟨ "Values"        , Values.M        , Values.M′        , _ , _ , Values.⊢M        , Values.⊢M′        ⟩ ∷
   ⟨ "AppFunProxy"   , AppFunProxy.M   , AppFunProxy.M′   , _ , _ , AppFunProxy.⊢M   , AppFunProxy.⊢M′   ⟩ ∷
   ⟨ "DerefRefProxy" , DerefRefProxy.M , DerefRefProxy.M′ , _ , _ , DerefRefProxy.⊢M , DerefRefProxy.⊢M′ ⟩ ∷
+  ⟨ "AssignRefProxy" , AssignRefProxy.M , AssignRefProxy.M′ , _ , _ , AssignRefProxy.⊢M , AssignRefProxy.⊢M′ ⟩ ∷
   ⟨ "RefImpFlow"    , RefImpFlow.M    , RefImpFlow.M′    , _ , _ , RefImpFlow.⊢M    , RefImpFlow.⊢M′    ⟩ ∷
   ⟨ "RefNSU1"       , RefNSU1.M       , RefNSU1.M′       , _ , _ , RefNSU1.⊢M       , RefNSU1.⊢M′       ⟩ ∷
   ⟨ "RefNSU2"       , RefNSU2.M       , RefNSU2.M′       , _ , _ , RefNSU2.⊢M       , RefNSU2.⊢M′       ⟩ ∷
@@ -44,6 +47,7 @@ cfgs =
   ⟨ "AssignNSU1"    , AssignNSU1.M    , AssignNSU1.M′    , _ , _ , AssignNSU1.⊢M    , AssignNSU1.⊢M′    ⟩ ∷
   ⟨ "AssignNSU2"    , AssignNSU2.M    , AssignNSU2.M′    , _ , _ , AssignNSU2.⊢M    , AssignNSU2.⊢M′    ⟩ ∷
   ⟨ "AssignNSU3"    , AssignNSU3.M    , AssignNSU3.M′    , _ , _ , AssignNSU3.⊢M    , AssignNSU3.⊢M′    ⟩ ∷
+  ⟨ "AssignNSU4"    , AssignNSU4.M    , AssignNSU4.M′    , _ , _ , AssignNSU4.⊢M    , AssignNSU4.⊢M′    ⟩ ∷
   ⟨ "FunInjArg"     , FunInjArg.M     , FunInjArg.M′     , _ , _ , FunInjArg.⊢M     , FunInjArg.⊢M′     ⟩ ∷
   ⟨ "SubInj1"       , SubInj1.M       , SubInj1.M′       , _ , _ , SubInj1.⊢M       , SubInj1.⊢M′       ⟩ ∷
   ⟨ "SubInj2"       , SubInj2.M       , SubInj2.M′       , _ , _ , SubInj2.⊢M       , SubInj2.⊢M′       ⟩ ∷
