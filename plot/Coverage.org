@@ -15,7 +15,7 @@ Reduction rule coverage on the more precise side:
 - [X] deref
 - [X] assign-static
 - [ ] assign?-ok
-- [ ] assign?-fail
+- [X] assign?-fail
 - [X] assign
 - [-] cast
   + [ ] ~cast-base-id~
@@ -30,12 +30,12 @@ Reduction rule coverage on the more precise side:
   + [ ] ~cast-ref-id⋆~
   + [ ] ~cast-ref-proj~
   + [ ] ~cast-ref-proj-blame~
-  + [ ] ~cast-ref-ref-id⋆~
+  + [X] ~cast-ref-ref-id⋆~
   + [ ] ~cast-ref-ref-proj~
   + [ ] ~cast-ref-ref-proj-blame~
 - [X] if-cast-true / if-cast-false
 - [ ] fun-cast
 - [X] deref-cast
-- [ ] assign?-cast
+- [X] assign?-cast
 - [ ] assign-cast
 - [X] β-cast-pc

@@ -20,6 +20,9 @@ open import ExamplePrograms.Simulation.RefAndImplicitFlow as RefImpFlow
 open import ExamplePrograms.Simulation.RefNSU1        as RefNSU1
 open import ExamplePrograms.Simulation.RefNSU2        as RefNSU2
 open import ExamplePrograms.Simulation.RefNSU3        as RefNSU3
+open import ExamplePrograms.Simulation.AssignNSU1     as AssignNSU1
+open import ExamplePrograms.Simulation.AssignNSU2     as AssignNSU2
+open import ExamplePrograms.Simulation.AssignNSU3     as AssignNSU3
 open import ExamplePrograms.Simulation.SubInj1        as SubInj1
 open import ExamplePrograms.Simulation.SubInj2        as SubInj2
 open import ExamplePrograms.Simulation.InjProj1       as InjProj1
@@ -38,6 +41,9 @@ cfgs =
   ⟨ "RefNSU1"       , RefNSU1.M       , RefNSU1.M′       , _ , _ , RefNSU1.⊢M       , RefNSU1.⊢M′       ⟩ ∷
   ⟨ "RefNSU2"       , RefNSU2.M       , RefNSU2.M′       , _ , _ , RefNSU2.⊢M       , RefNSU2.⊢M′       ⟩ ∷
   ⟨ "RefNSU3"       , RefNSU3.M       , RefNSU3.M′       , _ , _ , RefNSU3.⊢M       , RefNSU3.⊢M′       ⟩ ∷
+  ⟨ "AssignNSU1"    , AssignNSU1.M    , AssignNSU1.M′    , _ , _ , AssignNSU1.⊢M    , AssignNSU1.⊢M′    ⟩ ∷
+  ⟨ "AssignNSU2"    , AssignNSU2.M    , AssignNSU2.M′    , _ , _ , AssignNSU2.⊢M    , AssignNSU2.⊢M′    ⟩ ∷
+  ⟨ "AssignNSU3"    , AssignNSU3.M    , AssignNSU3.M′    , _ , _ , AssignNSU3.⊢M    , AssignNSU3.⊢M′    ⟩ ∷
   ⟨ "FunInjArg"     , FunInjArg.M     , FunInjArg.M′     , _ , _ , FunInjArg.⊢M     , FunInjArg.⊢M′     ⟩ ∷
   ⟨ "SubInj1"       , SubInj1.M       , SubInj1.M′       , _ , _ , SubInj1.⊢M       , SubInj1.⊢M′       ⟩ ∷
   ⟨ "SubInj2"       , SubInj2.M       , SubInj2.M′       , _ , _ , SubInj2.⊢M       , SubInj2.⊢M′       ⟩ ∷
