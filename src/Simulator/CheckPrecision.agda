@@ -73,7 +73,7 @@ check-⊑? (cast t A B C) (cast t′ A′ B′ C′) =
   -- relate by CastL
   (isYes (A ⊑<:? C′) ∧ isYes (B ⊑<:? C′) ∧ check-⊑? t (cast t′ A′ B′ C′)) ∨
   -- relate by CastR
-  (isYes (C ⊑:>? A′) ∧ isYes (C ⊑:>? B′) ∧ check-⊑? (cast t A B C) t′)
+  (isYes (C ⊑? A′) ∧ isYes (C ⊑? B′) ∧ check-⊑? (cast t A B C) t′)
 -- Special case: cast on the left, blame on the right
 check-⊑? (cast t A B C) (err (blame p) A′) =
   {- relate by CastL -}
