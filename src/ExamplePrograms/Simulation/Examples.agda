@@ -19,6 +19,7 @@ open import ExamplePrograms.Simulation.AppFunProxy2   as AppFunProxy2
 open import ExamplePrograms.Simulation.FunCast1       as FunCast1
 open import ExamplePrograms.Simulation.FunCast2       as FunCast2
 open import ExamplePrograms.Simulation.FunCast3       as FunCast3
+open import ExamplePrograms.Simulation.FunCast4       as FunCast4
 open import ExamplePrograms.Simulation.DerefRefProxy  as DerefRefProxy
 open import ExamplePrograms.Simulation.AssignRefProxy as AssignRefProxy
 open import ExamplePrograms.Simulation.RefAndImplicitFlow as RefImpFlow
@@ -46,6 +47,7 @@ cfgs =
   ⟨ "FunCast1"      , FunCast1.M      , FunCast1.M′      , _ , _ , FunCast1.⊢M      , FunCast1.⊢M′      ⟩ ∷
   ⟨ "FunCast2"      , FunCast2.M      , FunCast2.M′      , _ , _ , FunCast2.⊢M      , FunCast2.⊢M′      ⟩ ∷
   ⟨ "FunCast3"      , FunCast3.M      , FunCast3.M′      , _ , _ , FunCast3.⊢M      , FunCast3.⊢M′      ⟩ ∷
+  ⟨ "FunCast4"      , FunCast4.M      , FunCast4.M′      , _ , _ , FunCast4.⊢M      , FunCast4.⊢M′      ⟩ ∷
   ⟨ "DerefRefProxy" , DerefRefProxy.M , DerefRefProxy.M′ , _ , _ , DerefRefProxy.⊢M , DerefRefProxy.⊢M′ ⟩ ∷
   ⟨ "AssignRefProxy" , AssignRefProxy.M , AssignRefProxy.M′ , _ , _ , AssignRefProxy.⊢M , AssignRefProxy.⊢M′ ⟩ ∷
   ⟨ "RefImpFlow"    , RefImpFlow.M    , RefImpFlow.M′    , _ , _ , RefImpFlow.⊢M    , RefImpFlow.⊢M′    ⟩ ∷

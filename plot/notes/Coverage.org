@@ -26,7 +26,7 @@ Reduction rule coverage on the more precise side:
   + [X] ~cast-fun-proj-blame~
   + [X] ~cast-fun-pc-id⋆~
   + [X] ~cast-fun-pc-proj~
-  + [ ] ~cast-fun-pc-proj-blame~
+  + [X] ~cast-fun-pc-proj-blame~
   + [ ] ~cast-ref-id⋆~
   + [X] ~cast-ref-proj~
   + [ ] ~cast-ref-proj-blame~
