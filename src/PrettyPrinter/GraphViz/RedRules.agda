@@ -3,7 +3,26 @@ module PrettyPrinter.GraphViz.RedRules where
 open import Agda.Builtin.String
 open import Text.Printf
 
+open import CC.CCStatics
 open import CC.Reduction
+
+print-cast-rule : ∀ {A B} {c : Cast A ⇒ B} {V M}
+  → ApplyCast V , c ↝ M → String
+print-cast-rule cast-base-id                  = "\\graytext{\\textit{-base-id}}"
+print-cast-rule (cast-base-proj _)            = "\\graytext{\\textit{-base-proj}}"
+print-cast-rule (cast-base-proj-blame _)      = "\\graytext{\\textit{-base-proj-blame}}"
+print-cast-rule cast-fun-id⋆                  = "\\graytext{\\textit{-fun-id\\unk}}"
+print-cast-rule (cast-fun-proj _)             = "\\graytext{\\textit{-fun-proj}}"
+print-cast-rule (cast-fun-proj-blame _)       = "\\graytext{\\textit{-fun-proj-blame}}"
+print-cast-rule cast-fun-pc-id⋆               = "\\graytext{\\textit{-fun-pc-id\\unk}}"
+print-cast-rule (cast-fun-pc-proj _)          = "\\graytext{\\textit{-fun-pc-proj}}"
+print-cast-rule (cast-fun-pc-proj-blame _)    = "\\graytext{\\textit{-fun-pc-proj-blame}}"
+print-cast-rule cast-ref-id⋆                  = "\\graytext{\\textit{-ref-id\\unk}}"
+print-cast-rule (cast-ref-proj _)             = "\\graytext{\\textit{-ref-proj}}"
+print-cast-rule (cast-ref-proj-blame _)       = "\\graytext{\\textit{-ref-proj-blame}}"
+print-cast-rule cast-ref-ref-id⋆              = "\\graytext{\\textit{-ref-ref-id\\unk}}"
+print-cast-rule (cast-ref-ref-proj _)         = "\\graytext{\\textit{-ref-ref-proj}}"
+print-cast-rule (cast-ref-ref-proj-blame _)   = "\\graytext{\\textit{-ref-ref-proj-blame}}"
 
 
 print-red-rule : ∀ {M M′ μ μ′ pc} → M ∣ μ ∣ pc —→ M′ ∣ μ′ → String
@@ -25,7 +44,7 @@ print-red-rule assign-static       = "\\textit{assign-static}"
 print-red-rule (assign?-ok _)      = "\\textit{assign?-ok}"
 print-red-rule (assign?-fail _)    = "\\textit{assign?-fail}"
 print-red-rule (assign _)          = "\\textit{assign}"
-print-red-rule (cast _ _ _)        = "\\textit{cast}"
+print-red-rule (cast _ _ app)      = printf "\\textit{cast}%s" (print-cast-rule app)
 print-red-rule (if-cast-true _)    = "\\textit{if-cast-true}"
 print-red-rule (if-cast-false _)   = "\\textit{if-cast-false}"
 print-red-rule (fun-cast _ _ _)    = "\\textit{fun-cast}"
