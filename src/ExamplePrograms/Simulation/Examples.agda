@@ -14,7 +14,8 @@ Cfg = String ×
 
 open import ExamplePrograms.Simulation.Values         as Values
 open import ExamplePrograms.Simulation.FunInjArg      as FunInjArg
-open import ExamplePrograms.Simulation.AppFunProxy    as AppFunProxy
+open import ExamplePrograms.Simulation.AppFunProxy1   as AppFunProxy1
+open import ExamplePrograms.Simulation.AppFunProxy2   as AppFunProxy2
 open import ExamplePrograms.Simulation.DerefRefProxy  as DerefRefProxy
 open import ExamplePrograms.Simulation.AssignRefProxy as AssignRefProxy
 open import ExamplePrograms.Simulation.RefAndImplicitFlow as RefImpFlow
@@ -37,7 +38,8 @@ open import ExamplePrograms.Simulation.WrongAnn2      as WrongAnn2
 cfgs : List Cfg
 cfgs =
   ⟨ "Values"        , Values.M        , Values.M′        , _ , _ , Values.⊢M        , Values.⊢M′        ⟩ ∷
-  ⟨ "AppFunProxy"   , AppFunProxy.M   , AppFunProxy.M′   , _ , _ , AppFunProxy.⊢M   , AppFunProxy.⊢M′   ⟩ ∷
+  ⟨ "AppFunProxy1"  , AppFunProxy1.M  , AppFunProxy1.M′  , _ , _ , AppFunProxy1.⊢M  , AppFunProxy1.⊢M′  ⟩ ∷
+  ⟨ "AppFunProxy2"  , AppFunProxy2.M  , AppFunProxy2.M′  , _ , _ , AppFunProxy2.⊢M  , AppFunProxy2.⊢M′  ⟩ ∷
   ⟨ "DerefRefProxy" , DerefRefProxy.M , DerefRefProxy.M′ , _ , _ , DerefRefProxy.⊢M , DerefRefProxy.⊢M′ ⟩ ∷
   ⟨ "AssignRefProxy" , AssignRefProxy.M , AssignRefProxy.M′ , _ , _ , AssignRefProxy.⊢M , AssignRefProxy.⊢M′ ⟩ ∷
   ⟨ "RefImpFlow"    , RefImpFlow.M    , RefImpFlow.M′    , _ , _ , RefImpFlow.⊢M    , RefImpFlow.⊢M′    ⟩ ∷

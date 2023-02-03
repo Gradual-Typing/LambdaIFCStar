@@ -1,4 +1,4 @@
-module ExamplePrograms.Simulation.AppFunProxy where
+module ExamplePrograms.Simulation.AppFunProxy1 where
 
 open import Data.List using ([])
 open import Data.Unit
