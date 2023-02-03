@@ -37,5 +37,5 @@ Reduction rule coverage on the more precise side:
 - [ ] fun-cast
 - [X] deref-cast
 - [X] assign?-cast
-- [ ] assign-cast
+- [X] assign-cast
 - [X] β-cast-pc
