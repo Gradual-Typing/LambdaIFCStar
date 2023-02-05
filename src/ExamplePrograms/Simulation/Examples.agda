@@ -30,6 +30,7 @@ open import ExamplePrograms.Simulation.AssignNSU1     as AssignNSU1
 open import ExamplePrograms.Simulation.AssignNSU2     as AssignNSU2
 open import ExamplePrograms.Simulation.AssignNSU3     as AssignNSU3
 open import ExamplePrograms.Simulation.AssignNSU4     as AssignNSU4
+open import ExamplePrograms.Simulation.RefCast1       as RefCast1
 open import ExamplePrograms.Simulation.SubInj1        as SubInj1
 open import ExamplePrograms.Simulation.SubInj2        as SubInj2
 open import ExamplePrograms.Simulation.InjProj1       as InjProj1
@@ -58,6 +59,7 @@ cfgs =
   ⟨ "AssignNSU2"    , AssignNSU2.M    , AssignNSU2.M′    , _ , _ , AssignNSU2.⊢M    , AssignNSU2.⊢M′    ⟩ ∷
   ⟨ "AssignNSU3"    , AssignNSU3.M    , AssignNSU3.M′    , _ , _ , AssignNSU3.⊢M    , AssignNSU3.⊢M′    ⟩ ∷
   ⟨ "AssignNSU4"    , AssignNSU4.M    , AssignNSU4.M′    , _ , _ , AssignNSU4.⊢M    , AssignNSU4.⊢M′    ⟩ ∷
+  ⟨ "RefCast1"      , RefCast1.M      , RefCast1.M′      , _ , _ , RefCast1.⊢M      , RefCast1.⊢M′      ⟩ ∷
   ⟨ "FunInjArg"     , FunInjArg.M     , FunInjArg.M′     , _ , _ , FunInjArg.⊢M     , FunInjArg.⊢M′     ⟩ ∷
   ⟨ "SubInj1"       , SubInj1.M       , SubInj1.M′       , _ , _ , SubInj1.⊢M       , SubInj1.⊢M′       ⟩ ∷
   ⟨ "SubInj2"       , SubInj2.M       , SubInj2.M′       , _ , _ , SubInj2.⊢M       , SubInj2.⊢M′       ⟩ ∷
