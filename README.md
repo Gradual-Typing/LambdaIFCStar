@@ -49,7 +49,7 @@ You can check proofs and explore examples by following the steps:
 To get a taste of $\lambda_{\mathtt{SEC}}^\star$ running in action,
 build everything first and then run `bin/RunDemo`.
 
-# File Structure
+# Project Code Structure (selected)
 
 All Agda source files are located in the [`src/`](./src) directory 
 and end with `.agda`.
