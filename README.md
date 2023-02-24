@@ -51,7 +51,7 @@ build everything first and then run `bin/RunDemo`.
 
 # Project Code Structure (selected)
 
-All Agda source files are located in the [`src/`](./src) directory 
+All Agda source files are located in the [`src/`](./src) directory
 and end with `.agda`.
 
 There are three top-level modules: one contains all type-check-able proofs;
@@ -76,19 +76,19 @@ the other two compiles to executable binaries:
 + [`RunDemo`](./src/RunDemo.agda): runs the stepper on $\lambda_{\mathtt{SEC}}^\star$
   programs in the following modules and pretty-prints their reduction
   sequences to console:
-  - [`ExamplePrograms.Demo.Example1`](./src/ExamplePrograms/Demo/Example1.agda): 
+  - [`ExamplePrograms.Demo.Example1`](./src/ExamplePrograms/Demo/Example1.agda):
     shows that $\lambda_{\mathtt{SEC}}^\star$ indeed facilitates both compile-time
     (static) and runtime (dynamic) information-flow control.
     If a $\lambda_{\mathtt{SEC}}^\star$ program is fully statically-typed,
     our type system alone guarantees security. Transition between
     static and dynamic is controlled by the precision of type annotations
     given by the programmer.
-  - [`ExamplePrograms.Demo.Example2`](./src/ExamplePrograms/Demo/Example2.agda): 
+  - [`ExamplePrograms.Demo.Example2`](./src/ExamplePrograms/Demo/Example2.agda):
     establishes the intuition that even if the programmer opts for runtime enforcement,
     $\lambda_{\mathtt{SEC}}^\star$ still guards against any possible
     information leakage.
-  - [`ExamplePrograms.Demo.Example3`](./src/ExamplePrograms/Demo/Example3.agda): 
-    shows that moving type annotations to be less precise (or more dynamic) does not 
+  - [`ExamplePrograms.Demo.Example3`](./src/ExamplePrograms/Demo/Example3.agda):
+    shows that moving type annotations to be less precise (or more dynamic) does not
     change the runtime behavior of a program.
 
 + [`RunSimulation`](./src/RunSimulation.agda): simulates between
