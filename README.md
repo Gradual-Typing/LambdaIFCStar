@@ -1,55 +1,53 @@
-# What?
-
 $\lambda_{\mathtt{SEC}}^\star$ is an experimental gradual security-typed programming language.
 It provides programmers with the freedom of choice between runtime versus compile-time
-information-flow enforcement.
+information-flow (IFC) enforcement.
+The Agda development of $\lambda_{\mathtt{SEC}}^\star$ comes with machine-checked proofs of
+various meta-theoretical results.
 
-# Why?
-
-The Agda development of $\lambda_{\mathtt{SEC}}^\star$ in this repository comes with
-machine-checked proofs of various meta-theoretical results, thus establishing a rock
-solid foundation for gradual security. Furthermore, formalizing $\lambda_{\mathtt{SEC}}^\star$
-in Agda helps us experiment with different language design choices.
-
-# How?
+# Building and Testing
 
 We compile $\lambda_{\mathtt{SEC}}^\star$ into an intermediate representation ("cast calculus"),
-namely, $\lambda_{\mathtt{SEC}}^\Rightarrow$. We have defined operational semantics for
-$\lambda_{\mathtt{SEC}}^\star$, which includes blame tracking.
+namely, $\lambda_{\mathtt{SEC}}^\Rightarrow$. We define an operational semantics for
+$\lambda_{\mathtt{SEC}}^\star$ that includes blame tracking.
 
-You can check our proofs and run our examples using Agda:
+You can check proofs and explore examples by following the steps:
 
 ## Prerequisites
 
-### Checking proofs and running demo:
+### Software dependencies for checking proofs:
 
 - [Agda](https://wiki.portal.chalmers.se/agda) `2.6.2.2`
-- GHC with working [MAlonzo](https://wiki.portal.chalmers.se/agda/Docs/MAlonzo)
 - [Standard library](https://github.com/agda/agda-stdlib) `1.7.1`
 - [Abstract binding trees](https://github.com/jsiek/abstract-binding-trees/)
 - [GNU Make](https://www.gnu.org/software/make/)
 
-### Generating simulation diagrams:
+### Additional dependencies for running demo:
+
+- GHC with working [MAlonzo](https://wiki.portal.chalmers.se/agda/Docs/MAlonzo)
+
+### Additional dependencies for generating simulation diagrams:
 
 - XeLaTeX and `latexmk`
 - [GraphViz](https://graphviz.org/) and specifically, `dot`
 - [Dot2TeX](https://dot2tex.readthedocs.io/en/latest/)
-- [Zsh](https://www.zsh.org/), for running the plotting script
+- [Zsh](https://www.zsh.org/), for running plotting scripts
 
 ## Building
 
 + To build everything, simply run `make` at the top level of this repository.
-    - This will build both the proofs and the runnable demo.
+    - This will build the proofs, the runnable demo, and a simulation explorer.
 
-+ To check the proofs only, run `make proofs`. The type-checker of Agda makes sure
-  everything is correct.
++ To check the proofs only, run `make proofs`.
+  The type-checker of Agda makes sure everything is correct.
 
-+ To get a taste of $\lambda_{\mathtt{SEC}}^\star$ running in action, build everything
-  first and then run `bin/RunDemo`.
++ **[Advanced]** To build the simulator only, run `make sim`.
+
+## Running Demo
+
+To get a taste of $\lambda_{\mathtt{SEC}}^\star$ running in action, 
+build everything first and then run `bin/RunDemo`.
 
 # File Structure
-
-In further detail:
 
 + `src/Proofs.agda`: sources the proofs of several important
   meta-theoretical results, most noticeably, type safety and noninterference.
