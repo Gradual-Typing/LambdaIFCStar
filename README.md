@@ -51,7 +51,9 @@ build everything first and then run `bin/RunDemo`.
 
 # File Structure
 
-+ `src/Proofs.agda`: sources the proofs of important meta-theoretical results
+Agda source files are located in the `src/` directory and end with `.agda`:
+
++ `Proofs`: sources the proofs of important meta-theoretical results
   in the following modules:
   - `CC.TypeSafety`: $\lambda_{\mathtt{SEC}}^\Rightarrow$ is type safe by
     satisfying progress and preservation.
@@ -62,7 +64,7 @@ build everything first and then run `bin/RunDemo`.
   - `CC.Compile`: Compilation from $\lambda_{\mathtt{SEC}}^\star$
     to $\lambda_{\mathtt{SEC}}^\Rightarrow$ preserves types.
 
-+ `src/RunDemo.agda`: Runs the stepper on $\lambda_{\mathtt{SEC}}^\star$
++ `RunDemo`: runs the stepper on $\lambda_{\mathtt{SEC}}^\star$
   programs in the following modules and pretty-prints their reduction
   sequences to console:
   - `ExamplePrograms.Demo.Example1`: shows that
@@ -80,5 +82,5 @@ build everything first and then run `bin/RunDemo`.
     type annotations to be less precise (or more dynamic) does not change
     the runtime behaviors of a program.
 
-+ `src/RunSimulation.agda`: [WIP] Simulates between
-  $\lambda_{\mathtt{SEC}}^\Rightarrow$ of different precision.
++ `RunSimulation`: simulates between
+  $\lambda_{\mathtt{SEC}}^\Rightarrow$ terms of different precision.
