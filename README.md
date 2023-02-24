@@ -53,18 +53,23 @@ build everything first and then run `bin/RunDemo`.
 
 Agda source files are located in the `src/` directory and end with `.agda`:
 
-+ `Proofs`: sources the proofs of important meta-theoretical results
++ [`Proofs`](./src/Proofs.agda): sources the proofs of important meta-theoretical results
   in the following modules:
-  - `CC.TypeSafety`: $\lambda_{\mathtt{SEC}}^\Rightarrow$ is type safe by
+  - [`CC.TypeSafety`](./src/CC/TypeSafety.agda):
+    $\lambda_{\mathtt{SEC}}^\Rightarrow$ is type safe by
     satisfying progress and preservation.
-  - `CC.BigStepPreservation`: Big-step evaluation to value is type safe.
-  - `CC.BigStepErasedDeterministic`: Big-step evaluation of erased
+  - [`CC.BigStepPreservation`](./src/CC/BigStepPreservation.agda):
+    Big-step evaluation to value is type safe.
+  - [`CC.BigStepErasedDeterministic`](./src/CC/BigStepErasedDeterministic.agda):
+    Big-step evaluation of erased
     $\lambda_{\mathtt{SEC}}^\Rightarrow$ is deterministic.
-  - `CC.Noninterference`: The main security guarantee.
-  - `CC.Compile`: Compilation from $\lambda_{\mathtt{SEC}}^\star$
+  - [`CC.Noninterference`](./src/CC/Noninterference.agda):
+    The main security guarantee.
+  - [`CC.Compile`](./src/CC/Compile.agda):
+    Compilation from $\lambda_{\mathtt{SEC}}^\star$
     to $\lambda_{\mathtt{SEC}}^\Rightarrow$ preserves types.
 
-+ `RunDemo`: runs the stepper on $\lambda_{\mathtt{SEC}}^\star$
++ [`RunDemo`](./src/RunDemo.agda): runs the stepper on $\lambda_{\mathtt{SEC}}^\star$
   programs in the following modules and pretty-prints their reduction
   sequences to console:
   - `ExamplePrograms.Demo.Example1`: shows that
@@ -82,5 +87,5 @@ Agda source files are located in the `src/` directory and end with `.agda`:
     type annotations to be less precise (or more dynamic) does not change
     the runtime behaviors of a program.
 
-+ `RunSimulation`: simulates between
++ [`RunSimulation`](./src/RunSimulation.agda): simulates between
   $\lambda_{\mathtt{SEC}}^\Rightarrow$ terms of different precision.
