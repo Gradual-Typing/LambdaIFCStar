@@ -1,3 +1,5 @@
+# About
+
 $\lambda_{\mathtt{SEC}}^\star$ is an experimental gradual security-typed programming language.
 It provides programmers with the freedom of choice between runtime versus compile-time
 information-flow (IFC) enforcement.
@@ -16,8 +18,8 @@ You can check proofs and explore examples by following the steps:
 
 ### Software dependencies for checking proofs:
 
-- [Agda](https://wiki.portal.chalmers.se/agda) `2.6.2.2`
-- [Standard library](https://github.com/agda/agda-stdlib) `1.7.1`
+- [Agda](https://wiki.portal.chalmers.se/agda) `2.6.3`
+- [Standard library](https://github.com/agda/agda-stdlib) `v1.7.2 (b2e6385)`
 - [Abstract binding trees](https://github.com/jsiek/abstract-binding-trees/)
 - [GNU Make](https://www.gnu.org/software/make/)
 
