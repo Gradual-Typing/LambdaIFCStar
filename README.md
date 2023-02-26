@@ -55,7 +55,7 @@ All Agda source files are located in the [`src/`](./src) directory
 and end with `.agda`.
 
 There are three top-level modules: one contains all type-check-able proofs;
-the other two compiles to executable binaries:
+the other two compile to executable binaries:
 
 + [`Proofs`](./src/Proofs.agda): sources the proofs of important meta-theoretical results
   in the following modules:
@@ -68,7 +68,7 @@ the other two compiles to executable binaries:
     Big-step evaluation of erased
     $\lambda_{\mathtt{SEC}}^\Rightarrow$ is deterministic.
   - [`CC.Noninterference`](./src/CC/Noninterference.agda):
-    The main security guarantee.
+    Termination-insensitive noninterference (TINI), the main security guarantee.
   - [`CC.Compile`](./src/CC/Compile.agda):
     Compilation from $\lambda_{\mathtt{SEC}}^\star$
     to $\lambda_{\mathtt{SEC}}^\Rightarrow$ preserves types.
@@ -93,3 +93,12 @@ the other two compiles to executable binaries:
 
 + [`RunSimulation`](./src/RunSimulation.agda): simulates between
   $\lambda_{\mathtt{SEC}}^\Rightarrow$ terms of different precision.
+
+Important technical definitions:
+
++ [`Surface`](./src/Surface): contains the statics of the surface language.
+  - [`Surface.SurfaceSyntax`](./src/Surface/SurfaceSyntax.agda):
+    defines the syntax of $\lambda_{\mathtt{SEC}}^\star$.
+  - [`Surface.SurfaceTyping`](./src/Surface/SurfaceTyping.agda):
+    defines the typing rules of $\lambda_{\mathtt{SEC}}^\star$.
+
