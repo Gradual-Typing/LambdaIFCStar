@@ -96,6 +96,11 @@ the other two compile to executable binaries:
 
 Important technical definitions:
 
++ [`Common.SecurityLabels`](./src/Common/SecurityLabels.agda) and [`Common.Types`](./src/Common/Types.agda):
+  defines security labels and security types.
++ [`Common.TypeBasedCast`](./src/Common/TypeBasedCast.agda):
+  defines type-based casts between security types.
+
 + [`Surface`](./src/Surface): contains the statics of the surface language.
   - [`Surface.SurfaceSyntax`](./src/Surface/SurfaceSyntax.agda):
     defines the syntax of $\lambda_{\mathtt{SEC}}^\star$.
