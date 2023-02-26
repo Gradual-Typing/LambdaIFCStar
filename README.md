@@ -110,11 +110,12 @@ Important technical definitions:
 + [`Memory`](./src/Memory): the memory model of $\lambda_{\mathtt{SEC}}^\star$.
 
 + [`CC`](./src/CC): contains the statics and operational semantics of
-  the case calculus.
+  the cast calculus.
   - [`CC.CCSyntax`](./src/CC/CCSyntax.agda):
     presents the syntax of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
   - [`CC.CCTyping`](./src/CC/CCTyping.agda):
     the typing rules of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+  - [`CC.HeapTyping`](./src/CC/HeapTyping.agda): defines well-typed heap.
   - [`CC.Values`](./src/CC/Values.agda): definition of values.
   - [`CC.Compile`](./src/CC/Compile.agda):
     defines type-preserving compilation from $\lambda_{\mathtt{SEC}}^\star$ to
@@ -132,3 +133,9 @@ Important technical definitions:
   - [`CC.BigStepErased`](./src/CC/BigStepErased.agda):
     big-step evaluation of erased $\lambda_{\mathtt{SEC}}^\Rightarrow$.
   - [`CC.Interp`](./src/CC/Interp.agda): a stepper that produces reduction sequences.
+
++ [`PrettyPrinter`](./src/PrettyPrinter)
+  - [`PrettyPrinter.Console`](./src/PrettyPrinter/Console):
+    prints to console / tty.
+  - [`PrettyPrinter.GraphViz`](./src/PrettyPrinter/GraphViz):
+    prints in GraphViz visualizer format.
