@@ -107,3 +107,20 @@ Important technical definitions:
   - [`Surface.SurfaceTyping`](./src/Surface/SurfaceTyping.agda):
     defines the typing rules of $\lambda_{\mathtt{SEC}}^\star$.
 
++ [`Memory`](./src/Memory): the memory model of $\lambda_{\mathtt{SEC}}^\star$.
+
++ [`CC`](./src/CC): contains the statics and operational semantics of
+  the case calculus.
+  - [`CC.CCSyntax`](./src/CC/CCSyntax.agda):
+    presents the syntax of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+  - [`CC.CCTyping`](./src/CC/CCTyping.agda):
+    the typing rules of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+  - [`CC.Compile`](./src/CC/Compile.agda):
+    defines type-preserving compilation from $\lambda_{\mathtt{SEC}}^\star$ to
+    $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+  - [`CC.Reduction`](./src/CC/Reduction.agda):
+    small-step reduction semantics of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+    + [`CC.ApplyCast`](./src/CC/ApplyCast.agda):
+      application rules for active casts.
+    + [`CC.ProxyElimination`](./src/CC/ProxyElimination.agda):
+      elimination rules for function and reference proxies.
