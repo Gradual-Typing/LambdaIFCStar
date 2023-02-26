@@ -115,6 +115,7 @@ Important technical definitions:
     presents the syntax of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
   - [`CC.CCTyping`](./src/CC/CCTyping.agda):
     the typing rules of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+  - [`CC.Values`](./src/CC/Values.agda): definition of values.
   - [`CC.Compile`](./src/CC/Compile.agda):
     defines type-preserving compilation from $\lambda_{\mathtt{SEC}}^\star$ to
     $\lambda_{\mathtt{SEC}}^\Rightarrow$.
@@ -124,3 +125,10 @@ Important technical definitions:
       application rules for active casts.
     + [`CC.ProxyElimination`](./src/CC/ProxyElimination.agda):
       elimination rules for function and reference proxies.
+  - [`CC.Bigstep`](./src/CC/BigStep.agda):
+    big-step semantics to values.
+  - [`CC.Erasure`](./src/CC/Erasure.agda):
+    defines the erasure function.
+  - [`CC.BigStepErased`](./src/CC/BigStepErased.agda):
+    big-step evaluation of erased $\lambda_{\mathtt{SEC}}^\Rightarrow$.
+  - [`CC.Interp`](./src/CC/Interp.agda): a stepper that produces reduction sequences.
