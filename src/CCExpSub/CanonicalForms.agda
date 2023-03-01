@@ -170,3 +170,64 @@ canonical-const (⊢sub {s = cast↟ _ _ (<:-ty _ <:-ι)} ⊢V) (V-↟ V-ƛ) =
   case canonical-const ⊢V (V V-ƛ) of λ where
   (Const ())
 canonical-const (⊢sub-pc ⊢V _) v = canonical-const ⊢V v
+
+
+data Canonical⋆ : Term → Set where
+  -- V ⟨ A ⇒ T of ⋆ ⟩
+  inj : ∀ {A T V} {c : Cast A ⇒ T of ⋆}
+    → Inert c
+      ------------------------------
+    → Canonical⋆ (V ⟨ c ⟩)
+
+  -- V ⟨ A ⇒ S of ⋆ ↟ T of ⋆ ⟩
+  inj↟ : ∀ {A S T V} {c : Cast A ⇒ S of ⋆} {s : S of ⋆ ↟ T of ⋆}
+    → Inert c
+      ----------------------------------
+    → Canonical⋆ (V ⟨ c ⟩ ↟⟨ s ⟩)
+
+canonical⋆ : ∀ {Σ gc pc V T}
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ T of ⋆
+  → Value V
+    ---------------------------------
+  → Canonical⋆ V
+canonical⋆ (⊢cast {M = W} ⊢W) (V (V-cast v i)) = inj i
+canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ V-const) =
+  case S<:T of λ where
+  <:-ι           →
+    case canonical-const ⊢W (V V-const) of λ where
+    (Const ())
+  (<:-fun _ _ _) →
+    case canonical-fun   ⊢W (V V-const) of λ where
+    (Fun-fun ())
+  (<:-ref _ _)   →
+    case canonical-ref   ⊢W (V V-const) of λ where
+    (Ref-ref ())
+canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ V-addr) =
+  case S<:T of λ where
+  <:-ι           →
+    case canonical-const ⊢W (V V-addr) of λ where
+    (Const ())
+  (<:-fun _ _ _) →
+    case canonical-fun   ⊢W (V V-addr) of λ where
+    (Fun-fun ())
+  (<:-ref _ _)   →
+    case canonical-ref   ⊢W (V V-addr) of λ where
+    (Ref-ref ())
+canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ V-ƛ) =
+  case S<:T of λ where
+  <:-ι           →
+    case canonical-const ⊢W (V V-ƛ) of λ where
+    (Const ())
+  (<:-fun _ _ _) →
+    case canonical-fun   ⊢W (V V-ƛ) of λ where
+    (Fun-fun ())
+  (<:-ref _ _)   →
+    case canonical-ref   ⊢W (V V-ƛ) of λ where
+    (Ref-ref ())
+canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ (V-cast v i)) =
+  case canonical⋆ ⊢W (V (V-cast v i)) of λ where
+  (inj i) →
+    case cast-wt-inv ⊢W of λ where
+    ⟨ refl , _ ⟩ → inj↟ i
+canonical⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical⋆ ⊢V v
+

@@ -27,6 +27,6 @@ data SimpleValue where
     → Value V → Inert c → SimpleValue (V ⟨ c ⟩)
 
 data Value where
-  V-val : ∀ {V} → SimpleValue V → Value V
+  V     : ∀ {V} → SimpleValue V → Value V
   V-↟  : ∀ {A B V} {s : A ↟ B} → SimpleValue V → Value (V ↟⟨ s ⟩)
   V-●  : Value ●
