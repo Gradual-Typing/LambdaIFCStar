@@ -16,18 +16,17 @@ data Err : Term → Set where
   classifying:     true of high
 -}
 
-data Value : Term → Set where
-  V-const   : ∀ {ι} {k : rep ι} {ℓ} → Value ($ k of ℓ)
-  V-const↟ : ∀ {A B} {ι} {k : rep ι} {ℓ} {s : A ↟ B}
-    → Value ($ k of ℓ ↟⟨ s ⟩)
-  V-addr    : ∀ {a ℓ} → Value (addr a of ℓ)
-  V-addr↟  : ∀ {A B} {a ℓ} {s : A ↟ B}
-    → Value (addr a of ℓ ↟⟨ s ⟩)
-  V-ƛ       : ∀ {pc A N ℓ} → Value (ƛ⟦ pc ⟧ A ˙ N of ℓ)
-  V-ƛ↟     : ∀ {pc A B C N ℓ} {s : B ↟ C}
-    → Value (ƛ⟦ pc ⟧ A ˙ N of ℓ ↟⟨ s ⟩)
+data SimpleValue : Term → Set
+data Value : Term → Set
+
+data SimpleValue where
+  V-const   : ∀ {ι} {k : rep ι} {ℓ} → SimpleValue ($ k of ℓ)
+  V-addr    : ∀ {a ℓ} → SimpleValue (addr a of ℓ)
+  V-ƛ       : ∀ {pc A N ℓ} → SimpleValue (ƛ⟦ pc ⟧ A ˙ N of ℓ)
   V-cast    : ∀ {A B V} {c : Cast A ⇒ B}
-    → Value V → Inert c → Value (V ⟨ c ⟩)
-  V-cast↟  : ∀ {A B C V} {c : Cast A ⇒ B} {s : B ↟ C}
-    → Value V → Inert c → B ≢ C → Value (V ⟨ c ⟩ ↟⟨ s ⟩)
-  V-●      : Value ●
+    → Value V → Inert c → SimpleValue (V ⟨ c ⟩)
+
+data Value where
+  V-val : ∀ {V} → SimpleValue V → Value V
+  V-↟  : ∀ {A B V} {s : A ↟ B} → SimpleValue V → Value (V ↟⟨ s ⟩)
+  V-●  : Value ●
