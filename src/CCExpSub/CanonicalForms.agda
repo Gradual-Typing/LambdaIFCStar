@@ -48,8 +48,8 @@ data Fun where
 fun-is-value : ∀ {Σ V gc A B g}
   → Fun V Σ (⟦ gc ⟧ A ⇒ B of g)
   → Value V
-fun-is-value (Fun-fun (Fun-ƛ     _))         = V V-ƛ
-fun-is-value (Fun-fun (Fun-proxy fun i))     = V (V-cast (fun-is-value fun) i)
+fun-is-value (Fun-fun (Fun-ƛ     _))         = V-v V-ƛ
+fun-is-value (Fun-fun (Fun-proxy fun i))     = V-v (V-cast (fun-is-value fun) i)
 fun-is-value (Fun-↟  (Fun-ƛ _))             = V-↟  V-ƛ
 fun-is-value (Fun-↟  (Fun-proxy fun i))     = V-↟  (V-cast (fun-is-value fun) i)
 
@@ -59,19 +59,19 @@ canonical-fun : ∀ {Σ gc pc A B g gᶜ V}
   → Value V
     -------------------------------
   → Fun V Σ (⟦ gᶜ ⟧ A ⇒ B of g)
-canonical-fun (⊢lam ⊢N) (V V-ƛ) = Fun-fun (Fun-ƛ ⊢N)
-canonical-fun (⊢cast ⊢V) (V (V-cast v (I-fun c i₁ i₂))) =
+canonical-fun (⊢lam ⊢N) (V-v V-ƛ) = Fun-fun (Fun-ƛ ⊢N)
+canonical-fun (⊢cast ⊢V) (V-v (V-cast v (I-fun c i₁ i₂))) =
   Fun-fun (Fun-proxy (canonical-fun ⊢V v) (I-fun c i₁ i₂))
 canonical-fun (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-↟ V-ƛ) =
-  case canonical-fun ⊢V (V V-ƛ) of λ where
+  case canonical-fun ⊢V (V-v V-ƛ) of λ where
   (Fun-fun (Fun-ƛ ⊢N)) → Fun-↟ (Fun-ƛ ⊢N)
 canonical-fun (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-↟ (V-cast v i)) =
-  case canonical-fun ⊢V (V (V-cast v i)) of λ where
+  case canonical-fun ⊢V (V-v (V-cast v i)) of λ where
   (Fun-fun (Fun-proxy fun i)) → Fun-↟ (Fun-proxy fun i)
 canonical-fun {gc = gc} {pc} (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-↟ V-const) =
   case uniqueness ⊢V (⊢const {gc = gc} {pc}) of λ where ()
 canonical-fun (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-fun _ _ _))} ⊢V) (V-↟ V-addr) =
-  case canonical-fun ⊢V (V V-addr) of λ where
+  case canonical-fun ⊢V (V-v V-addr) of λ where
   (Fun-fun ())
 canonical-fun (⊢sub-pc ⊢V gc<:gc′) v = canonical-fun ⊢V v
 
@@ -100,8 +100,8 @@ data Reference where
 ref-is-value : ∀ {Σ V A g}
   → Reference V Σ (Ref A of g)
   → Value V
-ref-is-value (Ref-ref (Ref-addr _))       = V V-addr
-ref-is-value (Ref-ref (Ref-proxy ref i))  = V (V-cast (ref-is-value ref) i)
+ref-is-value (Ref-ref (Ref-addr _))       = V-v V-addr
+ref-is-value (Ref-ref (Ref-proxy ref i))  = V-v (V-cast (ref-is-value ref) i)
 ref-is-value (Ref-↟ (Ref-addr _))        = V-↟  V-addr
 ref-is-value (Ref-↟ (Ref-proxy ref i))   = V-↟  (V-cast (ref-is-value ref) i)
 
@@ -110,19 +110,19 @@ canonical-ref : ∀ {Σ gc pc A g V}
   → Value V
     -----------------------------------
   → Reference V Σ (Ref A of g)
-canonical-ref (⊢addr eq) (V V-addr) = Ref-ref (Ref-addr eq)
-canonical-ref (⊢cast ⊢V) (V (V-cast v (I-ref c i₁ i₂))) =
+canonical-ref (⊢addr eq) (V-v V-addr) = Ref-ref (Ref-addr eq)
+canonical-ref (⊢cast ⊢V) (V-v (V-cast v (I-ref c i₁ i₂))) =
   Ref-ref (Ref-proxy (canonical-ref ⊢V v) (I-ref c i₁ i₂))
 canonical-ref (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-↟ V-addr) =
-  case canonical-ref ⊢V (V V-addr) of λ where
+  case canonical-ref ⊢V (V-v V-addr) of λ where
   (Ref-ref (Ref-addr eq)) → Ref-↟ (Ref-addr eq)
 canonical-ref (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-↟ (V-cast v i)) =
-  case canonical-ref ⊢V (V (V-cast v i)) of λ where
+  case canonical-ref ⊢V (V-v (V-cast v i)) of λ where
   (Ref-ref (Ref-proxy ref i)) → Ref-↟ (Ref-proxy ref i)
 canonical-ref {gc = gc} {pc} (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-↟ V-const) =
   case uniqueness ⊢V (⊢const {gc = gc} {pc}) of λ ()
 canonical-ref (⊢sub {s = cast↟ _ _ (<:-ty _ (<:-ref _ _))} ⊢V) (V-↟ V-ƛ) =
-  case canonical-ref ⊢V (V V-ƛ) of λ where
+  case canonical-ref ⊢V (V-v V-ƛ) of λ where
   (Ref-ref ())
 canonical-ref (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref ⊢V v
 
@@ -151,23 +151,23 @@ canonical-const : ∀ {Σ gc pc ι g V}
   → Value V
     --------------------------
   → Constant V (` ι of g)
-canonical-const ⊢const (V V-const) = Const Const-base
-canonical-const (⊢cast ⊢V) (V (V-cast v (I-base-inj c))) =
+canonical-const ⊢const (V-v V-const) = Const Const-base
+canonical-const (⊢cast ⊢V) (V-v (V-cast v (I-base-inj c))) =
   Const (Const-inj (canonical-const ⊢V v))
 canonical-const (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ <:-ι)} ⊢V) (V-↟ V-const) =
-  case canonical-const ⊢V (V V-const) of λ where
+  case canonical-const ⊢V (V-v V-const) of λ where
   (Const ())
 canonical-const (⊢sub {s = cast↟ _ _ (<:-ty (<:-l ℓ₁≼ℓ) <:-ι)} ⊢V) (V-↟ V-const) =
-  case canonical-const ⊢V (V V-const) of λ where
+  case canonical-const ⊢V (V-v V-const) of λ where
   (Const Const-base) → Const-↟ Const-base
 canonical-const (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g <:-ι)} ⊢V) (V-↟ (V-cast v i)) =
-  case canonical-const ⊢V (V (V-cast v i)) of λ where
+  case canonical-const ⊢V (V-v (V-cast v i)) of λ where
   (Const (Const-inj const)) → Const-↟ (Const-inj const)
 canonical-const (⊢sub {s = cast↟ _ _ (<:-ty _ <:-ι)} ⊢V) (V-↟ V-addr) =
-  case canonical-const ⊢V (V V-addr) of λ where
+  case canonical-const ⊢V (V-v V-addr) of λ where
   (Const ())
 canonical-const (⊢sub {s = cast↟ _ _ (<:-ty _ <:-ι)} ⊢V) (V-↟ V-ƛ) =
-  case canonical-const ⊢V (V V-ƛ) of λ where
+  case canonical-const ⊢V (V-v V-ƛ) of λ where
   (Const ())
 canonical-const (⊢sub-pc ⊢V _) v = canonical-const ⊢V v
 
@@ -190,44 +190,121 @@ canonical⋆ : ∀ {Σ gc pc V T}
   → Value V
     ---------------------------------
   → Canonical⋆ V
-canonical⋆ (⊢cast {M = W} ⊢W) (V (V-cast v i)) = inj i
+canonical⋆ (⊢cast {M = W} ⊢W) (V-v (V-cast v i)) = inj i
 canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ V-const) =
   case S<:T of λ where
   <:-ι           →
-    case canonical-const ⊢W (V V-const) of λ where
+    case canonical-const ⊢W (V-v V-const) of λ where
     (Const ())
   (<:-fun _ _ _) →
-    case canonical-fun   ⊢W (V V-const) of λ where
+    case canonical-fun   ⊢W (V-v V-const) of λ where
     (Fun-fun ())
   (<:-ref _ _)   →
-    case canonical-ref   ⊢W (V V-const) of λ where
+    case canonical-ref   ⊢W (V-v V-const) of λ where
     (Ref-ref ())
 canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ V-addr) =
   case S<:T of λ where
   <:-ι           →
-    case canonical-const ⊢W (V V-addr) of λ where
+    case canonical-const ⊢W (V-v V-addr) of λ where
     (Const ())
   (<:-fun _ _ _) →
-    case canonical-fun   ⊢W (V V-addr) of λ where
+    case canonical-fun   ⊢W (V-v V-addr) of λ where
     (Fun-fun ())
   (<:-ref _ _)   →
-    case canonical-ref   ⊢W (V V-addr) of λ where
+    case canonical-ref   ⊢W (V-v V-addr) of λ where
     (Ref-ref ())
 canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ V-ƛ) =
   case S<:T of λ where
   <:-ι           →
-    case canonical-const ⊢W (V V-ƛ) of λ where
+    case canonical-const ⊢W (V-v V-ƛ) of λ where
     (Const ())
   (<:-fun _ _ _) →
-    case canonical-fun   ⊢W (V V-ƛ) of λ where
+    case canonical-fun   ⊢W (V-v V-ƛ) of λ where
     (Fun-fun ())
   (<:-ref _ _)   →
-    case canonical-ref   ⊢W (V V-ƛ) of λ where
+    case canonical-ref   ⊢W (V-v V-ƛ) of λ where
     (Ref-ref ())
 canonical⋆ (⊢sub {s = cast↟ _ _ (<:-ty <:-⋆ S<:T)} ⊢W) (V-↟ (V-cast v i)) =
-  case canonical⋆ ⊢W (V (V-cast v i)) of λ where
+  case canonical⋆ ⊢W (V-v (V-cast v i)) of λ where
   (inj i) →
     case cast-wt-inv ⊢W of λ where
     ⟨ refl , _ ⟩ → inj↟ i
 canonical⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical⋆ ⊢V v
 
+
+data CanonicalPC⋆ : Term → Set where
+
+  -- V ⟨ C ⇒ ⟦ ⋆ ⟧ A → B of g ⟩
+  inj-pc : ∀ {A B C V g} {c : Cast C ⇒ (⟦ ⋆ ⟧ A ⇒ B of g)}
+    → Inert c
+      -------------------------
+    → CanonicalPC⋆ (V ⟨ c ⟩)
+
+  -- V ⟨ C ⇒ ⟦ ⋆ ⟧ A₁ → B₁ of g₁ ↟ ⟦ ⋆ ⟧ A₂ → B₂ of g₂ ⟩
+  inj-pc↟ : ∀ {A₁ A₂ B₁ B₂ C V g₁ g₂}
+               {c : Cast C ⇒ (⟦ ⋆ ⟧ A₁ ⇒ B₁ of g₁)}
+               {s : ⟦ ⋆ ⟧ A₁ ⇒ B₁ of g₁ ↟ ⟦ ⋆ ⟧ A₂ ⇒ B₂ of g₂}
+    → Inert c
+      --------------------------------------------------
+    → CanonicalPC⋆ ((V ⟨ c ⟩) ↟⟨ s ⟩)
+
+canonical-pc⋆ : ∀ {Σ gc pc V A B g}
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ ⟦ ⋆ ⟧ A ⇒ B of g
+  → Value V
+    ----------------------------
+  → CanonicalPC⋆ V
+canonical-pc⋆ (⊢cast ⊢W) (V-v (V-cast {V = W} {c} w i)) = inj-pc i
+canonical-pc⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B₂))} ⊢V) (V-↟ V-const) =
+  case canonical-fun ⊢V (V-v V-const) of λ where
+  (Fun-fun ())
+canonical-pc⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B₂))} ⊢V) (V-↟ V-addr) =
+  case canonical-fun ⊢V (V-v V-addr) of λ where
+  (Fun-fun ())
+canonical-pc⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B₂))} ⊢V) (V-↟ V-ƛ) =
+  case canonical-fun ⊢V (V-v V-ƛ) of λ where
+  (Fun-fun ())
+canonical-pc⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-fun <:-⋆ A₂<:A₁ B₁<:B₂))} ⊢W) (V-↟ (V-cast v i)) =
+  case canonical-pc⋆ ⊢W (V-v (V-cast v i)) of λ where
+  (inj-pc i) →
+    case cast-wt-inv ⊢W of λ where
+    ⟨ refl , _ ⟩ → inj-pc↟ i
+canonical-pc⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical-pc⋆ ⊢V v
+
+
+data CanonicalRef⋆ : Term → Set where
+
+  -- V ⟨ A ⇒ Ref (T of ⋆) of g ⟩
+  inj-ref : ∀ {A V T g} {c : Cast A ⇒ Ref (T of ⋆) of g}
+    → Inert c
+      -------------------------
+    → CanonicalRef⋆ (V ⟨ c ⟩)
+
+  -- V ⟨ A ⇒ Ref (T₁ of ⋆) of g₁ ↟ Ref (T₂ of ⋆) of g₂ ⟩
+  inj-ref↟ : ∀ {A V T₁ T₂ g₁ g₂}
+                {c : Cast A ⇒ Ref (T₁ of ⋆) of g₁}
+                {s : Ref (T₁ of ⋆) of g₁ ↟ Ref (T₂ of ⋆) of g₂}
+    → Inert c
+      --------------------------------------------------
+    → CanonicalRef⋆ ((V ⟨ c ⟩) ↟⟨ s ⟩)
+
+canonical-ref⋆ : ∀ {Σ gc pc V T g}
+  → [] ; Σ ; gc ; pc ⊢ V ⦂ Ref (T of ⋆) of g
+  → Value V
+    ----------------------------
+  → CanonicalRef⋆ V
+canonical-ref⋆ (⊢cast ⊢W) (V-v (V-cast {V = W} {c} w i)) = inj-ref i
+canonical-ref⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-ref (<:-ty <:-⋆ _) _))} ⊢V) (V-↟ V-const) =
+  case canonical-ref ⊢V (V-v V-const) of λ where
+  (Ref-ref ())
+canonical-ref⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-ref (<:-ty <:-⋆ _) _))} ⊢V) (V-↟ V-addr) =
+  case canonical-ref ⊢V (V-v V-addr) of λ where
+  (Ref-ref ())
+canonical-ref⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-ref (<:-ty <:-⋆ _) _))} ⊢V) (V-↟ V-ƛ) =
+  case canonical-ref ⊢V (V-v V-ƛ) of λ where
+  (Ref-ref ())
+canonical-ref⋆ (⊢sub {s = cast↟ _ _ (<:-ty g₁<:g₂ (<:-ref (<:-ty <:-⋆ _) _))} ⊢W) (V-↟ (V-cast v i)) =
+  case canonical-ref⋆ ⊢W (V-v (V-cast v i)) of λ where
+  (inj-ref i) →
+    case cast-wt-inv ⊢W of λ where
+    ⟨ refl , _ ⟩ → inj-ref↟ i
+canonical-ref⋆ (⊢sub-pc ⊢V gc<:gc′) v = canonical-ref⋆ ⊢V v
