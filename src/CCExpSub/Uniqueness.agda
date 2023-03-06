@@ -20,7 +20,7 @@ open import CCExpSub.Syntax Cast_⇒_
 open import CCExpSub.Typing Cast_⇒_
 
 
-{- The `cast` term is honest about the types -}
+{- Casts are honest about their types -}
 cast-wt-inv : ∀ {Γ Σ gc pc A B B′ M} {c : Cast A ⇒ B}
   → Γ ; Σ ; gc ; pc ⊢ M ⟨ c ⟩ ⦂ B′
     --------------------------------------------
@@ -38,6 +38,7 @@ sub-wt-inv (⊢sub ⊢M)               = ⟨ refl , ⊢M ⟩
 sub-wt-inv (⊢sub-pc ⊢M⟨c⟩ gc<:gc′) =
   case sub-wt-inv ⊢M⟨c⟩ of λ where
   ⟨ refl , ⊢M ⟩ → ⟨ refl , ⊢sub-pc ⊢M gc<:gc′ ⟩
+
 
 private
   lookup-unique : ∀ {Γ} {A B : Type} (x : Var) → Γ ∋ x ⦂ A → Γ ∋ x ⦂ B → A ≡ B

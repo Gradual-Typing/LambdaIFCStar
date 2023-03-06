@@ -13,3 +13,8 @@ infix 6 _↟_
 
 data _↟_ : Type → Type → Set where
   cast↟ : ∀ A B → A <: B → A ↟ B
+
+branch/s : ∀ {g₁ g₂} A (s : ` Bool of g₁ ↟ ` Bool of g₂)
+  → (stamp A g₁) ↟ (stamp A g₂)
+branch/s {g₁} {g₂} A (cast↟ .(` Bool of g₁) .(` Bool of g₂) (<:-ty g₁<:g₂ <:-ι)) =
+  cast↟ (stamp A g₁) (stamp A g₂) (stamp-<: <:-refl g₁<:g₂)
