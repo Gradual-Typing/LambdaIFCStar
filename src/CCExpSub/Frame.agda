@@ -22,7 +22,7 @@ data Frame : HeapContext → (gcₒ gcᵢ : Label) → StaticLabel → (A B : Ty
     → Value V
     → Frame Σ gc gc pc A (stamp B g)
 
-  ref✓⟦_⟧□ : ∀ {Σ gc pc T} ℓ
+  ref✓⟦_⟧_□ : ∀ {Σ gc pc} ℓ T
     → pc ≼ ℓ
     → Frame Σ gc gc pc (T of l ℓ) (Ref (T of l ℓ) of l low)
 
@@ -69,7 +69,7 @@ data Frame : HeapContext → (gcₒ gcᵢ : Label) → StaticLabel → (A B : Ty
 plug : ∀ {Σ gcₒ gcᵢ pc A B} → Term → Frame Σ gcₒ gcᵢ pc A B → Term
 plug L ((□· M) ⊢M)           = L · M
 plug M ((V ·□) ⊢V v)         = V · M
-plug M ((ref✓⟦ ℓ ⟧□) _)     = ref✓⟦ ℓ ⟧ M
+plug M ((ref✓⟦ ℓ ⟧ T □) _)     = ref✓⟦ ℓ ⟧ T M
 plug M !□                    = ! M
 plug L ((□:=? M) ⊢M)         = L :=? M
 plug L ((□:=✓ M) ⊢M _)      = L :=✓ M
@@ -86,7 +86,7 @@ plug-wt : ∀ {Σ gcₒ gcᵢ pc A B} (M : Term)
   → [] ; Σ ; gcₒ ; pc ⊢ plug M F ⦂ B
 plug-wt L ⊢L ((□· M) ⊢M)           = ⊢app ⊢L ⊢M
 plug-wt M ⊢M ((V ·□) ⊢V v)         = ⊢app ⊢V ⊢M
-plug-wt M ⊢M ((ref✓⟦ ℓ ⟧□) pc≼ℓ)  = ⊢ref✓ ⊢M pc≼ℓ
+plug-wt M ⊢M ((ref✓⟦ ℓ ⟧ T □) pc≼ℓ)  = ⊢ref✓ ⊢M pc≼ℓ
 plug-wt M ⊢M !□                    = ⊢deref ⊢M
 plug-wt L ⊢L ((□:=? M) ⊢M)         = ⊢assign? ⊢L ⊢M
 plug-wt L ⊢L ((□:=✓ M) ⊢M pc≼ℓ)   = ⊢assign✓ ⊢L ⊢M pc≼ℓ

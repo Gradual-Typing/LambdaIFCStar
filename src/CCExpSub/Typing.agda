@@ -65,18 +65,18 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l pc′ ; pc ⊢ M ⦂ T of l ℓ
     → pc′ ≼ ℓ
       ---------------------------------------------------------- CCRefStatic
-    → Γ ; Σ ; l pc′ ; pc ⊢ ref⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; l pc′ ; pc ⊢ ref⟦ ℓ ⟧ T M ⦂ Ref (T of l ℓ) of l low
 
   ⊢ref? : ∀ {Γ Σ gc pc M T ℓ}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ
       ---------------------------------------------------------- CCRefUnchecked
-    → Γ ; Σ ; gc ; pc ⊢ ref?⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; gc ; pc ⊢ ref?⟦ ℓ ⟧ T M ⦂ Ref (T of l ℓ) of l low
 
   ⊢ref✓ : ∀ {Γ Σ gc pc M T ℓ}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ
     → pc ≼ ℓ
       ---------------------------------------------------------- CCRefChecked
-    → Γ ; Σ ; gc ; pc ⊢ ref✓⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; gc ; pc ⊢ ref✓⟦ ℓ ⟧ T M ⦂ Ref (T of l ℓ) of l low
 
   ⊢deref : ∀ {Γ Σ gc pc M A g}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ Ref A of g

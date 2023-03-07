@@ -23,9 +23,9 @@ data Op : Set where
   op-const        : ∀ {ι} → rep ι → StaticLabel → Op
   op-if           : Type → Op
   op-let          : Op
-  op-ref          : StaticLabel → Op
-  op-ref?         : StaticLabel → Op
-  op-ref✓         : StaticLabel → Op
+  op-ref          : StaticLabel → RawType → Op
+  op-ref?         : StaticLabel → RawType → Op
+  op-ref✓         : StaticLabel → RawType → Op
   op-deref        : Op
   op-assign       : Op
   op-assign?      : Op
@@ -45,13 +45,13 @@ sig op-app             = ■ ∷ ■ ∷ []
 sig (op-const k ℓ)     = []
 sig (op-if A)          = ■ ∷ ■ ∷ ■ ∷ []
 sig op-let             = ■ ∷ (ν ■) ∷ []
-sig (op-ref  ℓ)        = ■ ∷ []
-sig (op-ref? ℓ)        = ■ ∷ []
-sig (op-ref✓ ℓ)        = ■ ∷ []
+sig (op-ref ℓ T)       = ■ ∷ []
+sig (op-ref? ℓ T)      = ■ ∷ []
+sig (op-ref✓ ℓ T)     = ■ ∷ []
 sig op-deref           = ■ ∷ []
 sig op-assign          = ■ ∷ ■ ∷ []
 sig op-assign?         = ■ ∷ ■ ∷ []
-sig op-assign✓         = ■ ∷ ■ ∷ []
+sig op-assign✓        = ■ ∷ ■ ∷ []
 sig (op-cast c)        = ■ ∷ []
 sig (op-sub  s)        = ■ ∷ []
 sig (op-prot ℓ)        = ■ ∷ []
@@ -71,9 +71,9 @@ pattern _·_ L M                  = op-app ⦅ cons (ast L) (cons (ast M) nil) �
 pattern $_of_ k ℓ                = (op-const k ℓ) ⦅ nil ⦆
 pattern if L A M N               = (op-if A) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
 pattern `let M N                 = op-let ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
-pattern ref⟦_⟧_ ℓ M              = (op-ref ℓ) ⦅ cons (ast M) nil ⦆
-pattern ref?⟦_⟧_ ℓ M             = (op-ref? ℓ) ⦅ cons (ast M) nil ⦆
-pattern ref✓⟦_⟧_ ℓ M             = (op-ref✓ ℓ) ⦅ cons (ast M) nil ⦆
+pattern ref⟦_⟧ ℓ T M              = (op-ref ℓ T) ⦅ cons (ast M) nil ⦆
+pattern ref?⟦_⟧ ℓ T M             = (op-ref? ℓ T) ⦅ cons (ast M) nil ⦆
+pattern ref✓⟦_⟧ ℓ T M             = (op-ref✓ ℓ T) ⦅ cons (ast M) nil ⦆
 pattern !_ M                     = op-deref ⦅ cons (ast M) nil ⦆
 pattern _:=_  L M                = op-assign ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _:=?_ L M                = op-assign? ⦅ cons (ast L) (cons (ast M) nil) ⦆
