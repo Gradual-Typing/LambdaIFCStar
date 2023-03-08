@@ -129,11 +129,31 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   --     -------------------------------------------------- Cast
   --   → V ⟨ c ⟩ ∣ μ ∣ pc —→ M ∣ μ
 
-  -- fun-cast : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂} {c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂)}
-  --   → Value V → Value W
-  --   → (i : Inert c)
-  --     ---------------------------------------------------------------- FunCast
-  --   → (V ⟨ c ⟩) · W ∣ μ ∣ pc —→ elim-fun-proxy V W i pc ∣ μ
+  fun-cast : ∀ {V W μ pc A B C D ℓᶜ ℓ g}
+    → (c : Cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) ⇒ (⟦ l ℓᶜ ⟧ C ⇒ D of g))  {- c is inert -}
+    → Value V → Value W
+      ---------------------------------------------------------------- FunCast
+    → (V ⟨ c ⟩) · W ∣ μ ∣ pc —→ (V · (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
+
+  fun-cast-inj-pc : ∀ {V W μ pc A B C D ℓᶜ ℓ g}
+    → (c : Cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) ⇒ (⟦ ⋆ ⟧ C ⇒ D of g)) {- c is inert -}
+    → Value V → Value W
+    → pc ⋎ ℓ ≼ ℓᶜ
+      -------------------------------------------------------------------------------------- FunCastInjPC
+    → (V ⟨ c ⟩) · W ∣ μ ∣ pc —→ cast-pc (l pc) (V · (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
+
+  fun-cast-inj-pc-blame : ∀ {V W μ pc A B C D ℓᶜ ℓ g}
+    → (c : Cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) ⇒ (⟦ ⋆ ⟧ C ⇒ D of g)) {- c is inert -}
+    → Value V → Value W
+    → ¬ pc ⋎ ℓ ≼ ℓᶜ
+      -------------------------------------------------------------------------------------- FunCastInjPCBlame
+    → (V ⟨ c ⟩) · W ∣ μ ∣ pc —→ error (stamp D g) (blame (bl c)) ∣ μ
+
+  fun-sub : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂}
+    → (s : (⟦ gc₁ ⟧ A ⇒ B of g₁) ↟ (⟦ gc₂ ⟧ C ⇒ D of g₂))
+    → SimpleValue V → Value W
+      ---------------------------------------------------------------- FunCast
+    → (V ↟⟨ s ⟩) · W ∣ μ ∣ pc —→ (V · (W ↟⟨ dom/s s ⟩)) ↟⟨ cod/s s ⟩ ∣ μ
 
   -- deref-cast : ∀ {V μ pc A B g₁ g₂} {c : Cast (Ref A of g₁) ⇒ (Ref B of g₂)}
   --   → Value V
@@ -153,7 +173,38 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   --     --------------------------------------------------------------------------------------------- AssignCast
   --   → (V ⟨ c ⟩) :=✓ W ∣ μ ∣ pc —→ elim-ref-proxy V W i _:=✓_ {- V := (W ⟨ in/c c ⟩) -} ∣ μ
 
+  trans : ∀ {V μ pc A B C} {s₁ : A ↟ B} {s₂ : B ↟ C}
+    → SimpleValue V
+      ---------------------------------------------------------------- TransSub
+    → V ↟⟨ s₁ ⟩ ↟⟨ s₂ ⟩ ∣ μ ∣ pc  —→ V ↟⟨ trans/s s₁ s₂ ⟩ ∣ μ
+
   β-cast-pc : ∀ {V μ pc g}
     → Value V
       ------------------------------------- CastPC
     → cast-pc g V ∣ μ ∣ pc —→ V ∣ μ
+
+-- if-pres : ∀ {Σ gc pc μ₁ μ₂ M₁ M₂ L M N A B}
+--   → M₁ ≡ if L B M N
+--   → [] ; Σ ; gc ; pc ⊢ M₁ ⦂ A
+--   → M₁ ∣ μ₁ ∣ pc —→ M₂ ∣ μ₂
+--     ---------------------------------------------------
+--   → [] ; Σ ; gc ; pc ⊢ M₂ ⦂ A
+
+-- open import CCExpSub.Uniqueness
+
+-- app-pres : ∀ {Σ gc pc μ₁ μ₂ M₁ M₂ L M A}
+--   → M₁ ≡ L · M
+--   → [] ; Σ ; gc ; pc ⊢ M₁ ⦂ A
+--   → M₁ ∣ μ₁ ∣ pc —→ M₂ ∣ μ₂
+--     ---------------------------------------------------
+--   → [] ; Σ ; gc ; pc ⊢ M₂ ⦂ A
+-- app-pres eq ⊢M (ξ x M₁→M₂) = {!!}
+-- app-pres eq ⊢M ξ-err = {!!}
+-- app-pres eq (⊢app ⊢L ⊢M) (β v) = {!!}
+-- app-pres eq (⊢app ⊢L ⊢M) (fun-cast c x x₁) = {!!}
+-- app-pres eq (⊢app ⊢L ⊢M) (fun-cast-inj-pc c x x₁ x₂) = {!!}
+-- app-pres eq (⊢app ⊢L ⊢M) (fun-cast-inj-pc-blame c x x₁ x₂) = {!!}
+-- app-pres {gc = gc} eq (⊢app ⊢L ⊢M) (fun-sub s v w) =
+--   case sub-wt-inv ⊢L of λ where
+--   ⟨ refl , ⊢V ⟩ → ⊢sub (⊢app {!⊢V!} (⊢sub ⊢M))
+-- app-pres eq (⊢sub-pc ⊢M₁ gc<:gc′) M₁→M₂ = {!!}

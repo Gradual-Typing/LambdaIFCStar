@@ -308,6 +308,18 @@ consis-join-<:ₗ-inv {⋆} {⋆} ()
 consis-join-<:ₗ-inv {l ℓ₁} {l ℓ₂} (<:-l ℓ₁⋎ℓ₂≼ℓ) =
   let ⟨ ℓ₁≼ℓ , ℓ₂≼ℓ ⟩ = join-≼ ℓ₁⋎ℓ₂≼ℓ in ⟨ <:-l ℓ₁≼ℓ , <:-l ℓ₂≼ℓ ⟩
 
+join-≼-relax : ∀ {ℓ₁ ℓ₂ ℓ₃ ℓ₄} → ℓ₁ ⋎ ℓ₂ ≼ ℓ₃ → ℓ₄ ≼ ℓ₂ → ℓ₁ ⋎ ℓ₄ ≼ ℓ₃
+join-≼-relax ℓ₁⋎ℓ₂≼ℓ₃ l≼l = ℓ₁⋎ℓ₂≼ℓ₃
+join-≼-relax {high} ℓ₁⋎ℓ₂≼ℓ₃ l≼h = ℓ₁⋎ℓ₂≼ℓ₃
+join-≼-relax {low} ℓ₁⋎ℓ₂≼ℓ₃ l≼h = low≼ _
+join-≼-relax ℓ₁⋎ℓ₂≼ℓ₃ h≼h = ℓ₁⋎ℓ₂≼ℓ₃
+
+consis-join-<:ₗ-relax : ∀ {g₁ g₂ g₃ g₄} → g₁ ⋎̃ g₂ <:ₗ g₃ → g₄ <:ₗ g₂ → g₁ ⋎̃ g₄ <:ₗ g₃
+consis-join-<:ₗ-relax {g₁} {.⋆} {g₃} {.⋆} g₁⋎g₂<:g₃ <:-⋆ rewrite g⋎̃⋆≡⋆ {g₁} = g₁⋎g₂<:g₃
+consis-join-<:ₗ-relax {⋆} {l ℓ₂} {g₃} {l ℓ₄} g₁⋎g₂<:g₃ (<:-l ℓ₄≼ℓ₂) = g₁⋎g₂<:g₃
+consis-join-<:ₗ-relax {l ℓ₁} {l ℓ₂} {l ℓ₃} {l ℓ₄} (<:-l ℓ₁⋎ℓ₂≼ℓ₃) (<:-l ℓ₄≼ℓ₂) =
+  <:-l (join-≼-relax ℓ₁⋎ℓ₂≼ℓ₃ ℓ₄≼ℓ₂)
+
 ≾-<: : ∀ {g₁ g₂ g} → g₁ ≾ g₂ → g₂ <:ₗ g → g₁ ≾ g
 ≾-<: {g₂ = ⋆} g₁≾g₂ <:-⋆ = ≾-⋆r
 ≾-<: {⋆} {l ℓ₂} g₁≾g₂ g₂<:g = ≾-⋆l

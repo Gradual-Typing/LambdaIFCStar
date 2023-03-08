@@ -14,6 +14,9 @@ infix 6 Cast_⇒_
 data Cast_⇒_ : Type → Type → Set where
   cast : ∀ A B → BlameLabel → A ~ B → Cast A ⇒ B
 
+bl : ∀ {A B} → Cast A ⇒ B → BlameLabel
+bl (cast _ _ p _) = p
+
 {- Let's first consider the label parts of A ⇒ B,
    where we have four cases:
    1) ℓ ⇒ ℓ    2) ℓ ⇒ ⋆    3) ⋆ ⇒ ℓ    4) ⋆ ⇒ ⋆  -}
@@ -114,6 +117,47 @@ active-not-inert c (A-fun .c A-proj) (I-fun .c _ ())
 active-not-inert c (A-fun-pc .c () I-label) (I-fun .c I-label I-label)
 active-not-inert c (A-ref .c ()) (I-ref .c I-label I-label)
 active-not-inert c (A-ref-ref .c () I-label) (I-ref .c I-label I-label)
+
+
+-- Injections
+data Inj_⇒_ : (g₁ g₂ : Label) → Set where
+
+  inj : ∀ {ℓ} → Inj l ℓ ⇒ ⋆
+
+data Inj : ∀ {A B} → Cast A ⇒ B → Set where
+
+  base-inj : ∀ {ι g₁ g₂} (c : Cast ` ι of g₁ ⇒ ` ι of g₂)
+    → Inj g₁ ⇒ g₂
+    → Inj c
+
+  fun-inj : ∀ {A B C D gc₁ gc₂ g₁ g₂}
+    → (c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂))
+    → Inert gc₁ ⇒ gc₂ → Inj g₁ ⇒ g₂
+    → Inj c
+
+  fun-pc-inj : ∀ {A B C D gc₁ gc₂ g₁ g₂}
+    → (c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂))
+    → Inj gc₁ ⇒ gc₂ → Inert g₁ ⇒ g₂
+    → Inj c
+
+  ref-inj : ∀ {S T ĝ₁ ĝ₂ g₁ g₂}
+    → (c : Cast (Ref (S of ĝ₁) of g₁) ⇒ (Ref (T of ĝ₂) of g₂))
+    → Inert ĝ₁ ⇒ ĝ₂ → Inj g₁ ⇒ g₂
+    → Inj c
+
+  ref-ref-inj : ∀ {S T ĝ₁ ĝ₂ g₁ g₂}
+    → (c : Cast (Ref (S of ĝ₁) of g₁) ⇒ (Ref (T of ĝ₂) of g₂))
+    → Inj ĝ₁ ⇒ ĝ₂ → Inert g₁ ⇒ g₂
+    → Inj c
+
+inj-is-inert : ∀ {A B} {c : Cast A ⇒ B} → Inj c → Inert c
+inj-is-inert (base-inj c inj)      = I-base-inj c
+inj-is-inert (fun-inj c i inj)     = I-fun c i I-label
+inj-is-inert (fun-pc-inj c inj i)  = I-fun c I-label i
+inj-is-inert (ref-inj c i inj)     = I-ref c i I-label
+inj-is-inert (ref-ref-inj c inj i) = I-ref c I-label i
+
+
 
 
 dom/c : ∀ {A B C D gc₁ gc₂ g₁ g₂}
