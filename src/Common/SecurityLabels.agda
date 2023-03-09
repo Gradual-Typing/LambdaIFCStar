@@ -3,6 +3,7 @@ module Common.SecurityLabels where
 open import Data.Maybe
 open import Data.Bool renaming (Bool to 𝔹; _≟_ to _≟ᵇ_)
 open import Data.Unit using (⊤; tt)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
 open import Data.List using (List)
 open import Function using (case_of_)
@@ -23,6 +24,16 @@ data StaticLabel : Set where
 data Label : Set where
   ⋆ : Label
   l : StaticLabel → Label
+
+data Concrete : Label → Set where
+  l : ∀ {ℓ} → Concrete (l ℓ)
+
+data Unk : Label → Set where
+  ⋆ : Unk ⋆
+
+concrete-or-unk : ∀ g → Concrete g ⊎ Unk g
+concrete-or-unk ⋆     = inj₂ ⋆
+concrete-or-unk (l ℓ) = inj₁ l
 
 infix 4 _=?_
 infix 4 _==?_
