@@ -7,7 +7,7 @@ open import Data.Product using (_×_; ∃; ∃-syntax; Σ; Σ-syntax) renaming (
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import Common.Utils
-open import Common.Types
+open import Common.SecurityLabels
 open import Memory.Addr public
 
 
