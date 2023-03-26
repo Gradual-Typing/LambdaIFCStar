@@ -84,12 +84,12 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
 
   ref?-ok : ∀ {M μ pc ℓ}
     → pc ≼ ℓ
-      ------------------------------------------------- RefNSUSuccess
+      ------------------------------------------------- Ref?Success
     → ref?⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
   ref?-fail : ∀ {M μ pc ℓ}
     → ¬ pc ≼ ℓ
-      ------------------------------------------------- RefNSUFail
+      ------------------------------------------------- Ref?Fail
     → ref?⟦ ℓ ⟧ M ∣ μ ∣ pc —→ error nsu-error ∣ μ
 
   ref : ∀ {V μ pc n ℓ}
@@ -112,7 +112,6 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ---------------------------------------------------------------------------------------------- Assign
     → (addr (a⟦ ℓ̂ ⟧ n) of ℓ) :=✓ V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
 
-  {- Reduction rules about casts, active and inert: -}
   cast : ∀ {A B V M μ pc} {c : Cast A ⇒ B}
     → Value V → Active c
     → ApplyCast V , c ↝ M
@@ -141,23 +140,17 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ------------------------------------------------------ DerefCast
     → ! (V ⟨ c ⟩) ∣ μ ∣ pc —→ ! V ⟨ out/c c ⟩ ∣ μ
 
-  -- assign?-cast : ∀ {V M μ pc A T g} {c : Cast (Ref A of g) ⇒ (Ref (T of ⋆) of ⋆)}
-  --   → Value V
-  --   → (i : Inert c)
-  --     ----------------------------------------------------------------------------- AssignNSUCast
-  --   → (V ⟨ c ⟩) :=? M ∣ μ ∣ pc —→ elim-ref-proxy V M i pc ∣ μ
-
   assign?-ok : ∀ {V M μ pc S T ℓ ℓ̂} {p} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
     → Value V
-    → nsu pc ℓ ℓ̂ -- ℓ ≼ ℓ̂ × pc ≼ ℓ̂
-      ----------------------------------------------------------------------------- AssignNSUCast
+    → nsu pc ℓ ℓ̂
+      ----------------------------------------------------------------------------- Assign?Success
     → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
        (V ⟨ c ⟩) :=? M ∣ μ ∣ pc —→ V :=✓ (M ⟨ in/c c ⟩) ∣ μ
 
   assign?-fail : ∀ {V M μ pc S T ℓ ℓ̂} {p} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
     → Value V
     → ¬ nsu pc ℓ ℓ̂
-      ----------------------------------------------------------------------------- AssignNSUCast
+      ----------------------------------------------------------------------------- Assign?Fail
     → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
        (V ⟨ c ⟩) :=? M ∣ μ ∣ pc —→ error (blame p) ∣ μ
 
