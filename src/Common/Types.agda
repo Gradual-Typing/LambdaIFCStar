@@ -246,6 +246,10 @@ data _≲_ where
 ≲-antisym (≲-ty g₁≾g₂ S≲T) (≲-ty g₂≾g₁ T≲S) =
   ~-ty (≾-antisym g₁≾g₂ g₂≾g₁) (≲ᵣ-antisym S≲T T≲S)
 
+A≲Tg→A≲T⋆ : ∀ {A T g} → A ≲ T of g → A ≲ T of ⋆
+A≲Tg→A≲T⋆ {T₁ of g₁} {T₂} {g₂} (≲-ty g₁≾g₂ T₁≲T₂) =
+  ≲-ty ≾-⋆r T₁≲T₂
+
 {- Properties of consistent subtyping (≲):
         B
    ≲  / | <:
