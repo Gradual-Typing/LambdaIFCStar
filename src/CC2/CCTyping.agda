@@ -39,11 +39,25 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       ------------------------------------------------------------------- CCLam
     → Γ ; Σ ; gc ; pc ⊢ ƛ⟦ pc′ ⟧ A ˙ N of ℓ ⦂ ⟦ l pc′ ⟧ A ⇒ B of l ℓ
 
-  ⊢app : ∀ {Γ Σ gc pc A B L M g}
-    → Γ ; Σ ; gc ; pc ⊢ L ⦂ ⟦ gc ⋎̃ g ⟧ A ⇒ B of g
+  ⊢app : ∀ {Γ Σ pc pc′ A B L M ℓ ℓᶜ}
+    → Γ ; Σ ; l pc′ ; pc ⊢ L ⦂ ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ
+    → Γ ; Σ ; l pc′ ; pc ⊢ M ⦂ A
+    → pc′ ≼ ℓᶜ → ℓ ≼ ℓᶜ
+      --------------------------------------- CCAppStatic
+    → Γ ; Σ ; l pc′ ; pc ⊢ L · M ⦂ stamp B (l ℓ)
+
+  ⊢app? : ∀ {Γ Σ gc pc A B L M}
+    → Γ ; Σ ; gc ; pc ⊢ L ⦂ ⟦ ⋆ ⟧ A ⇒ B of ⋆
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
-      --------------------------------------- CCApp
-    → Γ ; Σ ; gc ; pc ⊢ L · M ⦂ stamp B g
+      --------------------------------------- CCAppUnchecked
+    → Γ ; Σ ; gc ; pc ⊢ L · M ⦂ stamp B ⋆
+
+  ⊢app✓ : ∀ {Γ Σ gc pc A B L M ℓ ℓᶜ}
+    → Γ ; Σ ; gc ; pc ⊢ L ⦂ ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ
+    → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
+    → pc ≼ ℓᶜ → ℓ ≼ ℓᶜ
+      --------------------------------------- CCAppChecked
+    → Γ ; Σ ; gc ; pc ⊢ L · M ⦂ stamp B (l ℓ)
 
   ⊢if : ∀ {Γ Σ gc pc A L M N g}
     → Γ ; Σ ; gc     ; pc ⊢ L ⦂ ` Bool of g
