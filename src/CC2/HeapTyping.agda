@@ -27,7 +27,9 @@ relax-Σ ⊢const Σ′⊇Σ = ⊢const
 relax-Σ (⊢addr {n = n} {ℓ̂ = ℓ̂} eq) Σ′⊇Σ = ⊢addr (Σ′⊇Σ (a⟦ ℓ̂ ⟧ n) eq)
 relax-Σ (⊢var Γ∋x) Σ′⊇Σ = ⊢var Γ∋x
 relax-Σ (⊢lam ⊢M) Σ′⊇Σ = ⊢lam (relax-Σ ⊢M Σ′⊇Σ)
-relax-Σ (⊢app ⊢L ⊢M) Σ′⊇Σ = ⊢app (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
+relax-Σ (⊢app ⊢L ⊢M pc′≼ℓᶜ ℓ≼ℓᶜ) Σ′⊇Σ = ⊢app (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) pc′≼ℓᶜ ℓ≼ℓᶜ
+relax-Σ (⊢app? ⊢L ⊢M) Σ′⊇Σ = ⊢app? (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
+relax-Σ (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) Σ′⊇Σ = ⊢app✓ (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) pc≼ℓᶜ ℓ≼ℓᶜ
 relax-Σ (⊢if ⊢L ⊢M ⊢N) Σ′⊇Σ = ⊢if (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
 relax-Σ (⊢let ⊢M ⊢N) Σ′⊇Σ = ⊢let (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
 relax-Σ (⊢ref ⊢M pc′≼ℓ) Σ′⊇Σ = ⊢ref (relax-Σ ⊢M Σ′⊇Σ) pc′≼ℓ

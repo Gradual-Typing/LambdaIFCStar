@@ -10,7 +10,7 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.Types
 open import CC2.CCStatics
-open import CC.ApplyCast
+open import CC2.ApplyCast
 
 
 applycast-progress : ∀ {Σ A B V} {c : Cast A ⇒ B}

@@ -6,23 +6,27 @@ open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; sym
 open import Function using (case_of_)
 
 open import Common.Types
+open import Common.BlameLabels
 open import CC2.CCStatics
 
 
 data Frame : Set where
-  □·_ : Term → Frame
 
-  _·□ : (V : Term) → Value V → Frame
+  app?□ : Term → BlameLabel → Frame
+
+  app✓□ : Term → Frame
+
+  app✓_□ : (V : Term) → Value V → Frame
 
   ref✓⟦_⟧□ : StaticLabel → Frame
 
   !□ : Frame
 
-  □:=?_ : Term → Frame
+  assign?□ : Term → BlameLabel → Frame
 
-  □:=✓_ : Term → Frame
+  assign✓□ : Term → Frame
 
-  _:=✓□ : (V : Term) → Value V → Frame
+  assign✓_□ : (V : Term) → Value V → Frame
 
   let□_ : Term → Frame
 
@@ -34,14 +38,15 @@ data Frame : Set where
 
 
 plug : Term → Frame → Term
-plug L (□· M)          = L · M
-plug M ((V ·□) v)      = V · M
-plug M (ref✓⟦ ℓ ⟧□)    = ref✓⟦ ℓ ⟧ M
-plug M !□              = ! M
-plug L (□:=? M)        = L :=? M
-plug L (□:=✓ M)        = L :=✓ M
-plug M ((V :=✓□) v)    = V :=✓ M
-plug M (let□ N)        = `let M N
-plug L (if□ A M N)     = if L A M N
-plug M □⟨ c ⟩          = M ⟨ c ⟩
-plug M (cast-pc g □)   = cast-pc g M
+plug L (app?□ M p)           = app? L M p
+plug L (app✓□ M)            = app✓ L M
+plug M ((app✓ V □) v)       = app✓ V M
+plug M (ref✓⟦ ℓ ⟧□)         = ref✓⟦ ℓ ⟧ M
+plug M !□                    = ! M
+plug L (assign?□ M p)        = assign? L M p
+plug L (assign✓□ M)         = assign✓ L M
+plug M ((assign✓ V □) v)    = assign✓ V M
+plug M (let□ N)              = `let M N
+plug L (if□ A M N)           = if L A M N
+plug M □⟨ c ⟩                = M ⟨ c ⟩
+plug M (cast-pc g □)         = cast-pc g M

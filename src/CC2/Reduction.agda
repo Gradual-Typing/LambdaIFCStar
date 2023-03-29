@@ -16,21 +16,21 @@ open import CC2.CCStatics
 open import Memory.Heap Term Value
 
 open import CC2.ApplyCast        public
-open import CC2.ProxyElimination public
 open import CC2.Frame            public
+
 
 nsu : StaticLabel → StaticLabel → StaticLabel → Set
 nsu ℓ₁ ℓ₂ ℓ = ℓ₁ ≼ ℓ × ℓ₂ ≼ ℓ
 
 nsu? : ∀ ℓ₁ ℓ₂ ℓ → Dec (nsu ℓ₁ ℓ₂ ℓ)
 nsu? high high high = yes ⟨ h≼h , h≼h ⟩
-nsu? high high low = no λ { ⟨ _ , () ⟩ }
-nsu? high low high = yes ⟨ h≼h , l≼h ⟩
-nsu? high low low = no λ { ⟨ () , _ ⟩ }
-nsu? low high high = yes ⟨ l≼h , h≼h ⟩
-nsu? low high low = no λ { ⟨ _ , () ⟩ }
-nsu? low low high = yes ⟨ l≼h , l≼h ⟩
-nsu? low low low = yes ⟨ l≼l , l≼l ⟩
+nsu? high high low  = no λ { ⟨ _ , () ⟩ }
+nsu? high low high  = yes ⟨ h≼h , l≼h ⟩
+nsu? high low low   = no λ { ⟨ () , _ ⟩ }
+nsu? low high high  = yes ⟨ l≼h , h≼h ⟩
+nsu? low high low   = no λ { ⟨ _ , () ⟩ }
+nsu? low low high   = yes ⟨ l≼h , l≼h ⟩
+nsu? low low low    = yes ⟨ l≼l , l≼l ⟩
 
 
 infix 2 _∣_∣_—→_∣_
@@ -63,7 +63,7 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   β : ∀ {V N μ pc pc′ A ℓ}
     → Value V
       ------------------------------------------------------------------- β
-    → (ƛ⟦ pc′ ⟧ A ˙ N of ℓ) ·✓ V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
+    → app✓ (ƛ⟦ pc′ ⟧ A ˙ N of ℓ) V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
 
   β-if-true : ∀ {M N μ pc A ℓ}
       ----------------------------------------------------------------------- IfTrue
@@ -82,15 +82,15 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ------------------------------------------------- RefStatic
     → ref⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
-  ref?-ok : ∀ {M μ pc ℓ}
+  ref?-ok : ∀ {M μ pc ℓ p}
     → pc ≼ ℓ
       ------------------------------------------------- Ref?Success
-    → ref?⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
+    → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
-  ref?-fail : ∀ {M μ pc ℓ}
+  ref?-fail : ∀ {M μ pc ℓ p}
     → ¬ pc ≼ ℓ
       ------------------------------------------------- Ref?Fail
-    → ref?⟦ ℓ ⟧ M ∣ μ ∣ pc —→ error nsu-error ∣ μ
+    → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ blame nsu-error p ∣ μ
 
   ref : ∀ {V μ pc n ℓ}
     → (v : Value V)
@@ -105,17 +105,17 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
 
   assign-static : ∀ {L M μ pc}
       ------------------------------------------------------- AssignStatic
-    → L := M ∣ μ ∣ pc —→ L :=✓ M ∣ μ
+    → assign L M ∣ μ ∣ pc —→ assign✓ L M ∣ μ
 
-  assign : ∀ {V μ pc n ℓ ℓ̂}
+  β-assign : ∀ {V μ pc n ℓ ℓ̂}
     → (v : Value V)
       ---------------------------------------------------------------------------------------------- Assign
-    → (addr (a⟦ ℓ̂ ⟧ n) of ℓ) :=✓ V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
+    → assign✓ (addr (a⟦ ℓ̂ ⟧ n) of ℓ) V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
 
   cast : ∀ {A B V M μ pc} {c : Cast A ⇒ B}
     → Value V → Active c
     → ApplyCast V , c ↝ M
-      -------------------------------------------------- Cast
+      ----------------------------------- Cast
     → V ⟨ c ⟩ ∣ μ ∣ pc —→ M ∣ μ
 
   if-cast-true : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
@@ -128,11 +128,25 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       --------------------------------------------------------------------------------------------- IfCastFalse
     → if ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ N) ⟨ branch/c A c ⟩ ∣ μ
 
+  app?-ok : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q} {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
+    → Value V
+    → nsu pc ℓ ℓᶜ
+      ----------------------------------------------------------------------------- App?Success
+    → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
+       app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ (app✓ V (M ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
+
+  app?-fail : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q} {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
+    → Value V
+    → ¬ nsu pc ℓ ℓᶜ
+      ----------------------------------------------------------------------------- App?Fail
+    → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
+       app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
+
   fun-cast : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂} {c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂)}
     → Value V → Value W
     → (i : Inert c)
-      ---------------------------------------------------------------- FunCast
-    → (V ⟨ c ⟩) · W ∣ μ ∣ pc —→ elim-fun-proxy V W i pc ∣ μ
+      ----------------------------------------------------------------------------- FunCast
+    → app✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ (app✓ V (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
 
   deref-cast : ∀ {V μ pc A B g₁ g₂} {c : Cast (Ref A of g₁) ⇒ (Ref B of g₂)}
     → Value V
@@ -140,25 +154,26 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ------------------------------------------------------ DerefCast
     → ! (V ⟨ c ⟩) ∣ μ ∣ pc —→ ! V ⟨ out/c c ⟩ ∣ μ
 
-  assign?-ok : ∀ {V M μ pc S T ℓ ℓ̂} {p} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
+  assign?-ok : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
     → Value V
     → nsu pc ℓ ℓ̂
       ----------------------------------------------------------------------------- Assign?Success
     → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
-       (V ⟨ c ⟩) :=? M ∣ μ ∣ pc —→ V :=✓ (M ⟨ in/c c ⟩) ∣ μ
+       assign? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ assign✓ V (M ⟨ in/c c ⟩) ∣ μ
 
-  assign?-fail : ∀ {V M μ pc S T ℓ ℓ̂} {p} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
+  assign?-fail : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
     → Value V
     → ¬ nsu pc ℓ ℓ̂
       ----------------------------------------------------------------------------- Assign?Fail
     → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
-       (V ⟨ c ⟩) :=? M ∣ μ ∣ pc —→ error (blame p) ∣ μ
+       assign? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
+       {- blame the projection assign? -}
 
   assign-cast : ∀ {V W μ pc A B g₁ g₂} {c : Cast (Ref A of g₁) ⇒ (Ref B of g₂)}
     → Value V → Value W
     → (i : Inert c)
-      --------------------------------------------------------------------------------------------- AssignCast
-    → (V ⟨ c ⟩) :=✓ W ∣ μ ∣ pc —→ V :=✓ (W ⟨ in/c c ⟩) ∣ μ
+      ------------------------------------------------------------------------ AssignCast
+    → assign✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ assign✓ V (W ⟨ in/c c ⟩) ∣ μ
 
   β-cast-pc : ∀ {V μ pc g}
     → Value V
