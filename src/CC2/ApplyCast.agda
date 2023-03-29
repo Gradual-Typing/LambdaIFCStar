@@ -1,4 +1,4 @@
-module CC.ApplyCast where
+module CC2.ApplyCast where
 
 open import Data.Bool renaming (Bool to 𝔹)
 open import Data.Product renaming (_,_ to ⟨_,_⟩)
@@ -9,7 +9,7 @@ open import Function using (case_of_)
 
 open import Common.Utils
 open import Common.Types
-open import CC.CCStatics
+open import CC2.CCStatics
 
 
 infix 4 ApplyCast_,_↝_
@@ -29,7 +29,7 @@ data ApplyCast_,_↝_ : ∀ {A B} (V : Term) → (c : Cast A ⇒ B) → Term →
     → ¬ ℓ₁ ≼ ℓ₂
     → let c₁ = cast (` ι of l ℓ₁) (` ι of ⋆) p c~ in
        let c₂ = cast (` ι of ⋆) (` ι of l ℓ₂) q d~ in
-         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
+         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ blame cast-error q
 
   cast-fun-id⋆ : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ gc₁ gc₂ gc₃ gc₄ ℓ p q c~ d~ c~′ d~′}
     → let c₁  = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of ⋆   ) p c~  in
@@ -50,7 +50,7 @@ data ApplyCast_,_↝_ : ∀ {A B} (V : Term) → (c : Cast A ⇒ B) → Term →
     → ¬ ℓ₁ ≼ ℓ₄
     → let c₁  = cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of l ℓ₁) (⟦ gc₂ ⟧ A₂ ⇒ B₂ of ⋆   ) p c~  in
        let c₂  = cast (⟦ gc₃ ⟧ A₃ ⇒ B₃ of ⋆   ) (⟦ gc₄ ⟧ A₄ ⇒ B₄ of l ℓ₄) q d~  in
-         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
+         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ blame cast-error q
 
   cast-fun-pc-id⋆ : ∀ {V A₁ A₂ A₃ A₄ B₁ B₂ B₃ B₄ g₁ g₂ ℓ₃ g₄ pc p q c~ d~ c~′ d~′}
     → let c₁  = cast (⟦ l pc ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ ⋆    ⟧ A₂ ⇒ B₂ of g₂) p c~  in
@@ -71,7 +71,7 @@ data ApplyCast_,_↝_ : ∀ {A B} (V : Term) → (c : Cast A ⇒ B) → Term →
     → ¬ pc₄ ≼ pc₁
     → let c₁  = cast (⟦ l pc₁ ⟧ A₁ ⇒ B₁ of g₁  ) (⟦ ⋆     ⟧ A₂ ⇒ B₂ of g₂) p c~  in
        let c₂  = cast (⟦ ⋆     ⟧ A₃ ⇒ B₃ of l ℓ₃) (⟦ l pc₄ ⟧ A₄ ⇒ B₄ of g₄) q d~  in
-         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
+         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ blame cast-error q
 
   cast-ref-id⋆ : ∀ {V A B C D ℓ p q c~ d~ c~′ d~′}
     → let c₁  = cast (Ref A of l ℓ) (Ref B of ⋆  ) p c~  in
@@ -92,7 +92,7 @@ data ApplyCast_,_↝_ : ∀ {A B} (V : Term) → (c : Cast A ⇒ B) → Term →
     → ¬ ℓ₁ ≼ ℓ₄
     → let c₁  = cast (Ref A of l ℓ₁) (Ref B of ⋆   ) p c~  in
        let c₂  = cast (Ref C of ⋆   ) (Ref D of l ℓ₄) q d~  in
-         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
+         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ blame cast-error q
 
   cast-ref-ref-id⋆ : ∀ {V T₁ T₂ T₃ T₄ g₁ g₂ ℓ₃ g₄ ℓ p q c~ d~ c~′ d~′}
     → let c₁  = cast (Ref (T₁ of l ℓ) of g₁  ) (Ref (T₂ of ⋆  ) of g₂) p c~  in
@@ -113,4 +113,4 @@ data ApplyCast_,_↝_ : ∀ {A B} (V : Term) → (c : Cast A ⇒ B) → Term →
     → ¬ ℓ₁ ≡ ℓ₄
     → let c₁  = cast (Ref (T₁ of l ℓ₁) of g₁  ) (Ref (T₂ of ⋆   ) of g₂) p c~  in
        let c₂  = cast (Ref (T₃ of ⋆   ) of l ℓ₃) (Ref (T₄ of l ℓ₄) of g₄) q d~  in
-         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ error (blame q)
+         ApplyCast V ⟨ c₁ ⟩ , c₂ ↝ blame cast-error q

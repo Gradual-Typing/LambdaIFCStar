@@ -11,12 +11,12 @@ open import Common.Utils
 open import Common.Types
 open import Common.TypeBasedCast
 open import Memory.HeapContext
-open import CC.CCSyntax Cast_⇒_
+open import CC2.CCSyntax Cast_⇒_
 open import CC2.CCTyping Cast_⇒_
 
 
 data Err : Term → Set where
-  E-error : ∀ {e : Error} → Err (error e)
+  E-error : ∀ {e : Error} {p} → Err (blame e p)
 
 data Value : Term → Set where
   V-addr : ∀ {a ℓ} → Value (addr a of ℓ)

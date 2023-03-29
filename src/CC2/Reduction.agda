@@ -15,7 +15,7 @@ open import Common.Types
 open import CC2.CCStatics
 open import Memory.Heap Term Value
 
-open import CC.ApplyCast        public
+open import CC2.ApplyCast        public
 open import CC2.ProxyElimination public
 open import CC2.Frame            public
 
@@ -42,9 +42,9 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ---------------------------------------------- ξ
     → plug M F ∣ μ ∣ pc —→ plug M′ F ∣ μ′
 
-  ξ-err : ∀ {F μ pc e}
+  ξ-err : ∀ {F μ pc e p}
       ---------------------------------------------- ξ-error
-    → plug (error e) F ∣ μ ∣ pc —→ error e ∣ μ
+    → plug (blame e p) F ∣ μ ∣ pc —→ blame e p ∣ μ
 
   prot-val : ∀ {V μ pc ℓ}
     → (v : Value V)
@@ -56,14 +56,14 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       --------------------------------------------------- ProtectContext
     → prot ℓ M ∣ μ ∣ pc     —→ prot ℓ M′ ∣ μ′
 
-  prot-err : ∀ {μ pc ℓ e}
+  prot-err : ∀ {μ pc ℓ e p}
       --------------------------------------------------- ProtectContext
-    → prot ℓ (error e) ∣ μ ∣ pc —→ error e ∣ μ
+    → prot ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
 
   β : ∀ {V N μ pc pc′ A ℓ}
     → Value V
       ------------------------------------------------------------------- β
-    → (ƛ⟦ pc′ ⟧ A ˙ N of ℓ) · V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
+    → (ƛ⟦ pc′ ⟧ A ˙ N of ℓ) ·✓ V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
 
   β-if-true : ∀ {M N μ pc A ℓ}
       ----------------------------------------------------------------------- IfTrue

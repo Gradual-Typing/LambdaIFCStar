@@ -14,7 +14,7 @@ open import Syntax
 open import Common.Utils
 open import Common.Types
 open import Memory.HeapContext
-open import CC.CCSyntax Cast_⇒_
+open import CC2.CCSyntax Cast_⇒_
 
 infix 4 _;_;_;_⊢_⦂_
 
@@ -44,20 +44,20 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l pc′ ; pc ⊢ M ⦂ A
     → pc′ ≼ ℓᶜ → ℓ ≼ ℓᶜ
       --------------------------------------- CCAppStatic
-    → Γ ; Σ ; l pc′ ; pc ⊢ L · M ⦂ stamp B (l ℓ)
+    → Γ ; Σ ; l pc′ ; pc ⊢ app L M ⦂ stamp B (l ℓ)
 
-  ⊢app? : ∀ {Γ Σ gc pc A B L M}
+  ⊢app? : ∀ {Γ Σ gc pc A B L M p}
     → Γ ; Σ ; gc ; pc ⊢ L ⦂ ⟦ ⋆ ⟧ A ⇒ B of ⋆
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
       --------------------------------------- CCAppUnchecked
-    → Γ ; Σ ; gc ; pc ⊢ L · M ⦂ stamp B ⋆
+    → Γ ; Σ ; gc ; pc ⊢ app? L M p ⦂ stamp B ⋆
 
   ⊢app✓ : ∀ {Γ Σ gc pc A B L M ℓ ℓᶜ}
     → Γ ; Σ ; gc ; pc ⊢ L ⦂ ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
     → pc ≼ ℓᶜ → ℓ ≼ ℓᶜ
       --------------------------------------- CCAppChecked
-    → Γ ; Σ ; gc ; pc ⊢ L · M ⦂ stamp B (l ℓ)
+    → Γ ; Σ ; gc ; pc ⊢ app✓ L M ⦂ stamp B (l ℓ)
 
   ⊢if : ∀ {Γ Σ gc pc A L M N g}
     → Γ ; Σ ; gc     ; pc ⊢ L ⦂ ` Bool of g
@@ -78,10 +78,10 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       ---------------------------------------------------------- CCRefStatic
     → Γ ; Σ ; l pc′ ; pc ⊢ ref⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
 
-  ⊢ref? : ∀ {Γ Σ gc pc M T ℓ}
+  ⊢ref? : ∀ {Γ Σ gc pc M T ℓ p}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ
       ---------------------------------------------------------- CCRefUnchecked
-    → Γ ; Σ ; gc ; pc ⊢ ref?⟦ ℓ ⟧ M ⦂ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; gc ; pc ⊢ ref?⟦ ℓ ⟧ M p ⦂ Ref (T of l ℓ) of l low
 
   ⊢ref✓ : ∀ {Γ Σ gc pc M T ℓ}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ
@@ -99,20 +99,20 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l pc′ ; pc ⊢ M ⦂ T of l ℓ̂
     → ℓ ≼ ℓ̂ → pc′ ≼ ℓ̂
       --------------------------------------------- CCAssignStatic
-    → Γ ; Σ ; l pc′ ; pc ⊢ L := M ⦂ ` Unit of l low
+    → Γ ; Σ ; l pc′ ; pc ⊢ assign L M ⦂ ` Unit of l low
 
-  ⊢assign? : ∀ {Γ Σ gc pc L M T}
+  ⊢assign? : ∀ {Γ Σ gc pc L M T p}
     → Γ ; Σ ; gc ; pc ⊢ L ⦂ Ref (T of ⋆) of ⋆
     → (∀ {pc} → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of ⋆)
       --------------------------------------------- CCAssignUnchecked
-    → Γ ; Σ ; gc ; pc ⊢ L :=? M ⦂ ` Unit of l low
+    → Γ ; Σ ; gc ; pc ⊢ assign? L M p ⦂ ` Unit of l low
 
   ⊢assign✓ : ∀ {Γ Σ gc pc L M T ℓ ℓ̂}
     → Γ ; Σ ; gc ; pc ⊢ L ⦂ Ref (T of l ℓ̂) of l ℓ
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ T of l ℓ̂
     → ℓ ≼ ℓ̂ → pc ≼ ℓ̂
       --------------------------------------------- CCAssignChecked
-    → Γ ; Σ ; gc ; pc ⊢ L :=✓ M ⦂ ` Unit of l low
+    → Γ ; Σ ; gc ; pc ⊢ assign✓ L M ⦂ ` Unit of l low
 
   ⊢prot : ∀ {Γ Σ gc pc A M ℓ}
     → Γ ; Σ ; gc ⋎̃ l ℓ ; pc ⋎ ℓ ⊢ M ⦂ A
@@ -130,9 +130,9 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       ----------------------------------------- CCCastPC
     → Γ ; Σ ; gc ; pc ⊢ cast-pc g M ⦂ A
 
-  ⊢err : ∀ {Γ Σ gc pc A e}
+  ⊢err : ∀ {Γ Σ gc pc A e p}
       ------------------------------------ CCError
-    → Γ ; Σ ; gc ; pc ⊢ error e ⦂ A
+    → Γ ; Σ ; gc ; pc ⊢ blame e p ⦂ A
 
   ⊢sub : ∀ {Γ Σ gc pc A B M}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
