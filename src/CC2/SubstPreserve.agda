@@ -31,7 +31,9 @@ rename-pres (⊢addr eq) ⊢ρ = ⊢addr eq
 rename-pres (⊢var Γ∋x) ⊢ρ = ⊢var (⊢ρ Γ∋x)
 rename-pres {Γ} {Δ} (⊢lam ⊢N) ⊢ρ =
   ⊢lam (rename-pres ⊢N (λ {x} {A} → ext-pres {Γ} {Δ} ⊢ρ {x} {A}))
-rename-pres (⊢app ⊢L ⊢M) ⊢ρ = ⊢app (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ)
+rename-pres (⊢app ⊢L ⊢M pc′≼ℓᶜ ℓ≼ℓᶜ) ⊢ρ = ⊢app (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) pc′≼ℓᶜ ℓ≼ℓᶜ
+rename-pres (⊢app? ⊢L ⊢M) ⊢ρ = ⊢app? (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ)
+rename-pres (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) ⊢ρ = ⊢app✓ (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) pc≼ℓᶜ ℓ≼ℓᶜ
 rename-pres (⊢if ⊢L ⊢M ⊢N) ⊢ρ =
   ⊢if (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N ⊢ρ)
 rename-pres {Γ} {Δ} (⊢let ⊢M ⊢N) ⊢ρ =
@@ -74,7 +76,9 @@ subst-pres (⊢addr eq) ⊢σ = ⊢addr eq
 subst-pres (⊢var Γ∋x) ⊢σ = ⊢σ Γ∋x
 subst-pres {Γ} {Δ} (⊢lam ⊢N) ⊢σ =
   ⊢lam (subst-pres ⊢N (λ {x} {A} → exts-pres {Γ} {Δ} ⊢σ {x} {A}))
-subst-pres (⊢app ⊢L ⊢M) ⊢σ = ⊢app (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ)
+subst-pres (⊢app ⊢L ⊢M pc′≼ℓᶜ ℓ≼ℓᶜ) ⊢σ = ⊢app (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) pc′≼ℓᶜ ℓ≼ℓᶜ
+subst-pres (⊢app? ⊢L ⊢M) ⊢σ = ⊢app? (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ)
+subst-pres (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) ⊢σ = ⊢app✓ (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) pc≼ℓᶜ ℓ≼ℓᶜ
 subst-pres (⊢if ⊢L ⊢M ⊢N) ⊢σ =
   ⊢if (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) (subst-pres ⊢N ⊢σ)
 subst-pres {Γ} {Δ} (⊢let ⊢M ⊢N) ⊢σ =
