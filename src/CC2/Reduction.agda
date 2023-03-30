@@ -60,6 +60,10 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       --------------------------------------------------- ProtectContext
     → prot ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
 
+  app-static : ∀ {L M μ pc}
+      ------------------------------------- AppStatic
+    → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
+
   β : ∀ {V N μ pc pc′ A ℓ}
     → Value V
       ------------------------------------------------------------------- β
