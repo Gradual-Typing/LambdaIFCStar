@@ -13,9 +13,7 @@ open import CC2.CCStatics
 data Frame : Set where
 
   app?□ : Term → BlameLabel → Frame
-
   app✓□ : Term → Frame
-
   app✓_□ : (V : Term) → Value V → Frame
 
   ref✓⟦_⟧□ : StaticLabel → Frame
@@ -23,18 +21,17 @@ data Frame : Set where
   !□ : Frame
 
   assign?□ : Term → BlameLabel → Frame
-
   assign✓□ : Term → Frame
-
   assign✓_□ : (V : Term) → Value V → Frame
 
   let□_ : Term → Frame
 
   if□ : Type → Term → Term → Frame
+  if⋆□ : Type → Term → Term → Frame
 
   □⟨_⟩ : ∀ {A B} → Cast A ⇒ B → Frame
 
-  cast-pc_□ : Label → Frame
+
 
 
 plug : Term → Frame → Term
@@ -48,5 +45,5 @@ plug L (assign✓□ M)         = assign✓ L M
 plug M ((assign✓ V □) v)    = assign✓ V M
 plug M (let□ N)              = `let M N
 plug L (if□ A M N)           = if L A M N
+plug L (if⋆□ A M N)          = if⋆ L A M N
 plug M □⟨ c ⟩                = M ⟨ c ⟩
-plug M (cast-pc g □)         = cast-pc g M

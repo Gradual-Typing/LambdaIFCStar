@@ -59,12 +59,19 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       --------------------------------------- CCAppChecked
     → Γ ; Σ ; gc ; pc ⊢ app✓ L M ⦂ stamp B (l ℓ)
 
-  ⊢if : ∀ {Γ Σ gc pc A L M N g}
-    → Γ ; Σ ; gc     ; pc ⊢ L ⦂ ` Bool of g
-    → (∀ {pc} → Γ ; Σ ; gc ⋎̃ g ; pc ⊢ M ⦂ A)
-    → (∀ {pc} → Γ ; Σ ; gc ⋎̃ g ; pc ⊢ N ⦂ A)
+  ⊢if : ∀ {Γ Σ pc pc′ A L M N ℓ}
+    → Γ ; Σ ; l pc′ ; pc ⊢ L ⦂ ` Bool of l ℓ
+    → (∀ {pc} → Γ ; Σ ; l (pc′ ⋎ ℓ) ; pc ⊢ M ⦂ A)
+    → (∀ {pc} → Γ ; Σ ; l (pc′ ⋎ ℓ) ; pc ⊢ N ⦂ A)
       --------------------------------------------------------- CCIf
-    → Γ ; Σ ; gc ; pc ⊢ if L A M N ⦂ stamp A g
+    → Γ ; Σ ; l pc′ ; pc ⊢ if L A M N ⦂ stamp A (l ℓ)
+
+  ⊢if⋆ : ∀ {Γ Σ gc pc A L M N}
+    → Γ ; Σ ; gc ; pc ⊢ L ⦂ ` Bool of ⋆
+    → (∀ {pc} → Γ ; Σ ; ⋆ ; pc ⊢ M ⦂ A)
+    → (∀ {pc} → Γ ; Σ ; ⋆ ; pc ⊢ N ⦂ A)
+      --------------------------------------------------------- CCIf⋆
+    → Γ ; Σ ; gc ; pc ⊢ if⋆ L A M N ⦂ stamp A ⋆
 
   ⊢let : ∀ {Γ Σ gc pc M N A B}
     → Γ       ; Σ ; gc ; pc ⊢ M ⦂ A
@@ -114,21 +121,16 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       --------------------------------------------- CCAssignChecked
     → Γ ; Σ ; gc ; pc ⊢ assign✓ L M ⦂ ` Unit of l low
 
-  ⊢prot : ∀ {Γ Σ gc pc A M ℓ}
-    → Γ ; Σ ; gc ⋎̃ l ℓ ; pc ⋎ ℓ ⊢ M ⦂ A
+  ⊢prot : ∀ {Γ Σ gc pc A M g ℓ}
+    → Γ ; Σ ; g ⋎̃ l ℓ ; pc ⋎ ℓ ⊢ M ⦂ A
+    → l pc ~ₗ g
       ----------------------------------------------- CCProt
-    → Γ ; Σ ; gc ; pc ⊢ prot ℓ M ⦂ stamp A (l ℓ)
+    → Γ ; Σ ; gc ; pc ⊢ prot g ℓ M ⦂ stamp A (l ℓ)
 
   ⊢cast : ∀ {Γ Σ gc pc A B M} {c : Cast A ⇒ B}
     → Γ ; Σ ; gc ; pc ⊢ M ⦂ A
       ----------------------------------------- CCCast
     → Γ ; Σ ; gc ; pc ⊢ M ⟨ c ⟩ ⦂ B
-
-  ⊢cast-pc : ∀ {Γ Σ gc pc A M g}
-    → Γ ; Σ ; g ; pc ⊢ M ⦂ A
-    → l pc ~ₗ g
-      ----------------------------------------- CCCastPC
-    → Γ ; Σ ; gc ; pc ⊢ cast-pc g M ⦂ A
 
   ⊢err : ∀ {Γ Σ gc pc A e p}
       ------------------------------------ CCError

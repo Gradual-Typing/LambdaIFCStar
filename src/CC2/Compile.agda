@@ -42,19 +42,22 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
       let c~₂ : stamp B ⋆ ~ stamp B g
           c~₂ = stamp-~ ~-refl ⋆~ in
       (app? (compile L ⊢L ⟨ cast _ _ p c~₁ ⟩) (compile M ⊢M ⟨ cast A′ C p A′~C ⟩) p) ⟨ cast _ _ p c~₂ ⟩
-compile (if L then M else N at p) (⊢if {A = A} {B} {C} ⊢L ⊢M ⊢N A∨̃B≡C) =
+compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) =
   case consis-join-≲-inv {A} {B} A∨̃B≡C of λ where
   ⟨ A≲C , B≲C ⟩ →
     case ⟨ ≲-prop A≲C , ≲-prop B≲C ⟩ of λ where
     ⟨ ⟨ A′ , A~A′ , A′<:C ⟩ , ⟨ B′ , B~B′ , B′<:C ⟩ ⟩ →
       let L′ = compile L ⊢L in
-      let M′ = case A ≡? A′ of λ where
-               (yes refl) → compile M ⊢M {- skip id cast -}
-               (no  _   ) → compile M ⊢M ⟨ cast A A′ p A~A′ ⟩ in
-      let N′ = case B ≡? B′ of λ where
-               (yes refl) → compile N ⊢N {- skip id cast -}
-               (no  _   ) → compile N ⊢N ⟨ cast B B′ p B~B′ ⟩ in
-      if L′ C M′ N′
+      let M′ = compile M ⊢M ⟨ cast A A′ p A~A′ ⟩ in
+      let N′ = compile N ⊢N ⟨ cast B B′ p B~B′ ⟩ in
+      case ⟨ gc , g ⟩ of λ where
+      ⟨ l _ , l _ ⟩ → if L′ C M′ N′
+      ⟨   _ ,   _ ⟩ →
+        let c~₁ : ` Bool of g ~ ` Bool of ⋆
+            c~₁ = ~-ty ~⋆ ~-ι in
+        let c~₂ : stamp C ⋆ ~ stamp C g
+            c~₂ = stamp-~ ~-refl ⋆~ in
+        (if⋆ (L′ ⟨ cast _ _ p c~₁ ⟩) C M′ N′) ⟨ cast _ _ p c~₂ ⟩
 compile (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A) =
   case ≲-prop A′≲A of λ where
   ⟨ B , A′~B , B<:A ⟩ →
@@ -110,28 +113,25 @@ compile-preserve (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {g = g} 
 ...   | ≾-⋆l  | ≾-⋆r  = ⊢cast (⊢app? (⊢cast (compile-preserve L ⊢L)) (⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A))
 ...   | ≾-⋆r  | ≾-⋆l  = ⊢cast (⊢app? (⊢cast (compile-preserve L ⊢L)) (⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A))
 ...   | ≾-⋆r  | ≾-⋆r  = ⊢cast (⊢app? (⊢cast (compile-preserve L ⊢L)) (⊢sub (⊢cast (compile-preserve M ⊢M)) B<:A))
-compile-preserve (if L then M else N at p) (⊢if {A = A} {B} {C} ⊢L ⊢M ⊢N A∨̃B≡C)
+compile-preserve (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C)
   with consis-join-≲-inv {A} {B} A∨̃B≡C
 ... | ⟨ A≲C , B≲C ⟩
   with ≲-prop A≲C | ≲-prop B≲C
 ... | ⟨ A′ , A~A′ , A′<:C ⟩ | ⟨ B′ , B~B′ , B′<:C ⟩
-  with A ≡? A′ | B ≡? B′
-... | yes refl | yes refl =
-  ⊢if (compile-preserve L ⊢L)
-      (⊢sub (compile-preserve M ⊢M) A′<:C)
-      (⊢sub (compile-preserve N ⊢N) B′<:C)
-... | yes refl | no _ =
-  ⊢if (compile-preserve L ⊢L)
-      (⊢sub (compile-preserve M ⊢M) A′<:C)
-      (⊢sub (⊢cast (compile-preserve N ⊢N)) B′<:C)
-... | no _ | yes refl =
-  ⊢if (compile-preserve L ⊢L)
-      (⊢sub (⊢cast (compile-preserve M ⊢M)) A′<:C)
-      (⊢sub (compile-preserve N ⊢N) B′<:C)
-... | no _ | no _ =
+  with gc | g
+... | l _ | l _ =
   ⊢if (compile-preserve L ⊢L)
       (⊢sub (⊢cast (compile-preserve M ⊢M)) A′<:C)
       (⊢sub (⊢cast (compile-preserve N ⊢N)) B′<:C)
+... | l pc′ | ⋆ =
+  ⊢cast (⊢if⋆ (⊢cast (compile-preserve L ⊢L))
+    (⊢sub (⊢cast (compile-preserve M ⊢M)) A′<:C) (⊢sub (⊢cast (compile-preserve N ⊢N)) B′<:C))
+... | ⋆ | l ℓ =
+  ⊢cast (⊢if⋆ (⊢cast (compile-preserve L ⊢L))
+    (⊢sub (⊢cast (compile-preserve M ⊢M)) A′<:C) (⊢sub (⊢cast (compile-preserve N ⊢N)) B′<:C))
+... | ⋆ | ⋆ =
+  ⊢cast (⊢if⋆ (⊢cast (compile-preserve L ⊢L))
+    (⊢sub (⊢cast (compile-preserve M ⊢M)) A′<:C) (⊢sub (⊢cast (compile-preserve N ⊢N)) B′<:C))
 compile-preserve {Γ} {Σ} {A = A} (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A)
   with ≲-prop A′≲A
 ... | ⟨ B , A′~B , B<:A ⟩

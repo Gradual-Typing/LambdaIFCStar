@@ -46,36 +46,36 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ---------------------------------------------- ξ-error
     → plug (blame e p) F ∣ μ ∣ pc —→ blame e p ∣ μ
 
-  prot-val : ∀ {V μ pc ℓ}
+  prot-val : ∀ {V μ pc g ℓ}
     → (v : Value V)
       --------------------------------------------------- ProtectVal
-    → prot ℓ V ∣ μ ∣ pc —→ stamp-val V v ℓ ∣ μ
+    → prot g ℓ V ∣ μ ∣ pc —→ stamp-val V v ℓ ∣ μ
 
-  prot-ctx : ∀ {M M′ μ μ′ pc ℓ}
+  prot-ctx : ∀ {M M′ μ μ′ pc g ℓ}
     → M        ∣ μ ∣ pc ⋎ ℓ —→ M′        ∣ μ′
       --------------------------------------------------- ProtectContext
-    → prot ℓ M ∣ μ ∣ pc     —→ prot ℓ M′ ∣ μ′
+    → prot g ℓ M ∣ μ ∣ pc     —→ prot g ℓ M′ ∣ μ′
 
-  prot-err : ∀ {μ pc ℓ e p}
+  prot-err : ∀ {μ pc g ℓ e p}
       --------------------------------------------------- ProtectContext
-    → prot ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
+    → prot g ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
 
   app-static : ∀ {L M μ pc}
       ------------------------------------- AppStatic
     → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
 
-  β : ∀ {V N μ pc pc′ A ℓ}
+  β : ∀ {V N μ pc A ℓ ℓᶜ}
     → Value V
       ------------------------------------------------------------------- β
-    → app✓ (ƛ⟦ pc′ ⟧ A ˙ N of ℓ) V ∣ μ ∣ pc —→ prot ℓ (N [ V ]) ∣ μ
+    → app✓ (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ) V ∣ μ ∣ pc —→ prot (l pc) ℓ (N [ V ]) ∣ μ
 
   β-if-true : ∀ {M N μ pc A ℓ}
       ----------------------------------------------------------------------- IfTrue
-    → if ($ true of ℓ) A M N ∣ μ ∣ pc —→ prot ℓ M ∣ μ
+    → if ($ true of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ M ∣ μ
 
   β-if-false : ∀ {M N μ pc A ℓ}
       ----------------------------------------------------------------------- IfFalse
-    → if ($ false of ℓ) A M N ∣ μ ∣ pc —→ prot ℓ N ∣ μ
+    → if ($ false of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ N ∣ μ
 
   β-let : ∀ {V N μ pc}
     → Value V
@@ -105,7 +105,7 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
   deref : ∀ {V μ pc v n ℓ ℓ̂}
     → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
       --------------------------------------------------------------------- Deref
-    → ! (addr (a⟦ ℓ̂ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (ℓ̂ ⋎ ℓ) V ∣ μ
+    → ! (addr (a⟦ ℓ̂ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (l pc) (ℓ̂ ⋎ ℓ) V ∣ μ
 
   assign-static : ∀ {L M μ pc}
       ------------------------------------------------------- AssignStatic
@@ -122,15 +122,15 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ----------------------------------- Cast
     → V ⟨ c ⟩ ∣ μ ∣ pc —→ M ∣ μ
 
-  if-cast-true : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
+  β-if⋆-true : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
     → Inert c
       --------------------------------------------------------------------------------------------- IfCastTrue
-    → if ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ M) ⟨ branch/c A c ⟩ ∣ μ
+    → if⋆ ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ M) ⟨ branch/c A c ⟩ ∣ μ
 
-  if-cast-false : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
+  β-if⋆-false : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
     → Inert c
       --------------------------------------------------------------------------------------------- IfCastFalse
-    → if ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ prot ℓ (cast-pc ⋆ N) ⟨ branch/c A c ⟩ ∣ μ
+    → if⋆ ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ N) ⟨ branch/c A c ⟩ ∣ μ
 
   app?-ok : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q} {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
     → Value V
@@ -178,8 +178,3 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
     → (i : Inert c)
       ------------------------------------------------------------------------ AssignCast
     → assign✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ assign✓ V (W ⟨ in/c c ⟩) ∣ μ
-
-  β-cast-pc : ∀ {V μ pc g}
-    → Value V
-      ------------------------------------- CastPC
-    → cast-pc g V ∣ μ ∣ pc —→ V ∣ μ

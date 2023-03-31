@@ -36,6 +36,8 @@ rename-pres (⊢app? ⊢L ⊢M) ⊢ρ = ⊢app? (rename-pres ⊢L ⊢ρ) (rename
 rename-pres (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) ⊢ρ = ⊢app✓ (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) pc≼ℓᶜ ℓ≼ℓᶜ
 rename-pres (⊢if ⊢L ⊢M ⊢N) ⊢ρ =
   ⊢if (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N ⊢ρ)
+rename-pres (⊢if⋆ ⊢L ⊢M ⊢N) ⊢ρ =
+  ⊢if⋆ (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N ⊢ρ)
 rename-pres {Γ} {Δ} (⊢let ⊢M ⊢N) ⊢ρ =
   ⊢let (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N (λ {x} {A} → ext-pres {Γ} {Δ} ⊢ρ {x} {A}))
 rename-pres (⊢ref ⊢M pc′≼ℓ) ⊢ρ = ⊢ref (rename-pres ⊢M ⊢ρ) pc′≼ℓ
@@ -45,9 +47,8 @@ rename-pres (⊢deref ⊢M) ⊢ρ = ⊢deref (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢assign ⊢L ⊢M ℓ≼ℓ̂ pc′≼ℓ̂) ⊢ρ = ⊢assign (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) ℓ≼ℓ̂ pc′≼ℓ̂
 rename-pres (⊢assign? ⊢L ⊢M) ⊢ρ = ⊢assign? (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢assign✓ ⊢L ⊢M ℓ≼ℓ̂ pc≼ℓ̂) ⊢ρ = ⊢assign✓ (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) ℓ≼ℓ̂ pc≼ℓ̂
-rename-pres (⊢prot ⊢M) ⊢ρ = ⊢prot (rename-pres ⊢M ⊢ρ)
+rename-pres (⊢prot ⊢M pc~g) ⊢ρ = ⊢prot (rename-pres ⊢M ⊢ρ) pc~g
 rename-pres (⊢cast ⊢M) ⊢ρ = ⊢cast (rename-pres ⊢M ⊢ρ)
-rename-pres (⊢cast-pc ⊢M pc~g) ⊢ρ = ⊢cast-pc (rename-pres ⊢M ⊢ρ) pc~g
 rename-pres ⊢err ⊢ρ = ⊢err
 rename-pres (⊢sub ⊢M A<:B) ⊢ρ = ⊢sub (rename-pres ⊢M ⊢ρ) A<:B
 rename-pres (⊢sub-pc ⊢M gc<:gc′) ⊢ρ = ⊢sub-pc (rename-pres ⊢M ⊢ρ) gc<:gc′
@@ -81,6 +82,8 @@ subst-pres (⊢app? ⊢L ⊢M) ⊢σ = ⊢app? (subst-pres ⊢L ⊢σ) (subst-pr
 subst-pres (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) ⊢σ = ⊢app✓ (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) pc≼ℓᶜ ℓ≼ℓᶜ
 subst-pres (⊢if ⊢L ⊢M ⊢N) ⊢σ =
   ⊢if (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) (subst-pres ⊢N ⊢σ)
+subst-pres (⊢if⋆ ⊢L ⊢M ⊢N) ⊢σ =
+  ⊢if⋆ (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) (subst-pres ⊢N ⊢σ)
 subst-pres {Γ} {Δ} (⊢let ⊢M ⊢N) ⊢σ =
   ⊢let (subst-pres ⊢M ⊢σ) (subst-pres ⊢N (λ {x} {A} → exts-pres {Γ} {Δ} ⊢σ {x} {A}))
 subst-pres (⊢ref ⊢M pc′≼ℓ) ⊢ρ = ⊢ref (subst-pres ⊢M ⊢ρ) pc′≼ℓ
@@ -90,9 +93,8 @@ subst-pres (⊢deref ⊢M) ⊢ρ = ⊢deref (subst-pres ⊢M ⊢ρ)
 subst-pres (⊢assign ⊢L ⊢M ℓ≼ℓ̂ pc′≼ℓ̂) ⊢ρ = ⊢assign (subst-pres ⊢L ⊢ρ) (subst-pres ⊢M ⊢ρ) ℓ≼ℓ̂ pc′≼ℓ̂
 subst-pres (⊢assign? ⊢L ⊢M) ⊢ρ = ⊢assign? (subst-pres ⊢L ⊢ρ) (subst-pres ⊢M ⊢ρ)
 subst-pres (⊢assign✓ ⊢L ⊢M ℓ≼ℓ̂ pc≼ℓ̂) ⊢ρ = ⊢assign✓ (subst-pres ⊢L ⊢ρ) (subst-pres ⊢M ⊢ρ) ℓ≼ℓ̂ pc≼ℓ̂
-subst-pres (⊢prot ⊢M) ⊢ρ = ⊢prot (subst-pres ⊢M ⊢ρ)
+subst-pres (⊢prot ⊢M pc~g) ⊢ρ = ⊢prot (subst-pres ⊢M ⊢ρ) pc~g
 subst-pres (⊢cast ⊢M) ⊢ρ = ⊢cast (subst-pres ⊢M ⊢ρ)
-subst-pres (⊢cast-pc ⊢M pc~g) ⊢ρ = ⊢cast-pc (subst-pres ⊢M ⊢ρ) pc~g
 subst-pres ⊢err ⊢ρ = ⊢err
 subst-pres (⊢sub ⊢M A<:B) ⊢ρ = ⊢sub (subst-pres ⊢M ⊢ρ) A<:B
 subst-pres (⊢sub-pc ⊢M gc<:gc′) ⊢ρ = ⊢sub-pc (subst-pres ⊢M ⊢ρ) gc<:gc′
