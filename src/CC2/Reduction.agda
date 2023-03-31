@@ -122,15 +122,15 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
       ----------------------------------- Cast
     → V ⟨ c ⟩ ∣ μ ∣ pc —→ M ∣ μ
 
-  β-if⋆-true : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
-    → Inert c
+  β-if⋆-true : ∀ {M N μ pc A g ℓ} {p} {c~ : (` Bool of g) ~ (` Bool of ⋆)}
       --------------------------------------------------------------------------------------------- IfCastTrue
-    → if⋆ ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ M) ⟨ branch/c A c ⟩ ∣ μ
+    → let c = cast _ _ p c~ in
+       if⋆ ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ M) ⟨ branch/c A c ⟩ ∣ μ
 
-  β-if⋆-false : ∀ {M N μ pc A g ℓ} {c : Cast (` Bool of g) ⇒ (` Bool of ⋆)}
-    → Inert c
+  β-if⋆-false : ∀ {M N μ pc A g ℓ} {p} {c~ : (` Bool of g) ~ (` Bool of ⋆)}
       --------------------------------------------------------------------------------------------- IfCastFalse
-    → if⋆ ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ N) ⟨ branch/c A c ⟩ ∣ μ
+    → let c = cast _ _ p c~ in
+       if⋆ ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ N) ⟨ branch/c A c ⟩ ∣ μ
 
   app?-ok : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q} {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
     → Value V
@@ -146,17 +146,17 @@ data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → 
     → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
        app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
 
-  fun-cast : ∀ {V W μ pc A B C D gc₁ gc₂ g₁ g₂} {c : Cast (⟦ gc₁ ⟧ A ⇒ B of g₁) ⇒ (⟦ gc₂ ⟧ C ⇒ D of g₂)}
+  fun-cast : ∀ {V W μ pc A B C D ℓᶜ₁ ℓᶜ₂ ℓ₁ ℓ₂} {p} {c~ : (⟦ l ℓᶜ₁ ⟧ A ⇒ B of l ℓ₁) ~ (⟦ l ℓᶜ₂ ⟧ C ⇒ D of l ℓ₂)}
     → Value V → Value W
-    → (i : Inert c)
       ----------------------------------------------------------------------------- FunCast
-    → app✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ (app✓ V (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
+    → let c = cast (⟦ l ℓᶜ₁ ⟧ A ⇒ B of l ℓ₁) (⟦ l ℓᶜ₂ ⟧ C ⇒ D of l ℓ₂) p c~ in
+       app✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ (app✓ V (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
 
-  deref-cast : ∀ {V μ pc A B g₁ g₂} {c : Cast (Ref A of g₁) ⇒ (Ref B of g₂)}
+  deref-cast : ∀ {V μ pc S T ℓ ℓ̂ g ĝ} {p} {c~ : (Ref (S of l ℓ̂) of l ℓ) ~ (Ref (T of ĝ) of g)}
     → Value V
-    → Inert c
-      ------------------------------------------------------ DerefCast
-    → ! (V ⟨ c ⟩) ∣ μ ∣ pc —→ ! V ⟨ out/c c ⟩ ∣ μ
+      --------------------------------------------------------------------- DerefCast
+    → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ĝ) of g) p c~ in
+       ! (V ⟨ c ⟩) ∣ μ ∣ pc —→ ! V ⟨ out/c c ⟩ ∣ μ
 
   assign?-ok : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
     → Value V

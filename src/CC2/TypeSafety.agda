@@ -62,7 +62,9 @@ progress pc (app✓ L M) (⊢app✓ ⊢L ⊢M _ _) μ ⊢μ =
     (done w) →
       case canonical-fun ⊢L v of λ where
       (Fun-ƛ _ _) → step (β w)
-      (Fun-proxy f i _) → step (fun-cast (fun-is-value f) w i)
+      (Fun-proxy f (I-fun (cast (⟦ l _ ⟧ _ ⇒ _ of l _) (⟦ l _ ⟧ _ ⇒ _ of l _) _ _) I-label I-label)
+        (<:-ty (<:-l _) (<:-fun (<:-l _) _ _))) →
+        step (fun-cast (fun-is-value f) w)
     (err (E-error {e})) → step (ξ-err {F = (app✓ L □) v} {e = e})
   (err (E-error {e})) → step (ξ-err {F = app✓□ M} {e = e})
 progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
@@ -78,8 +80,8 @@ progress pc (if⋆ L A M N) (⊢if⋆ ⊢L ⊢M ⊢N) μ ⊢μ =
   (step L→L′) → step (ξ {F = if⋆□ A M N} L→L′)
   (done v) →
     case canonical-const ⊢L v of λ where
-    (Const-inj  {𝔹} {true} _)  → step (β-if⋆-true (I-base-inj _))
-    (Const-inj  {𝔹} {false} _) → step (β-if⋆-false (I-base-inj _))
+    (Const-inj {𝔹} {true}  {c = cast (` ι of l ℓ′) (` ι of ⋆) _ _} _) → step β-if⋆-true
+    (Const-inj {𝔹} {false} {c = cast (` ι of l ℓ′) (` ι of ⋆) _ _} _) → step β-if⋆-false
   (err (E-error {e})) → step (ξ-err {F = if⋆□ A M N} {e = e})
 progress pc (`let M N) (⊢let ⊢M ⊢N) μ ⊢μ =
   case progress pc M ⊢M μ ⊢μ of λ where
@@ -107,7 +109,8 @@ progress pc (! M) (⊢deref ⊢M) μ ⊢μ =
     (Ref-addr {n = n} {ℓ₁ = ℓ₁} eq _) →
       let ⟨ wf , V₁ , v₁ , eq , ⊢V₁ ⟩ = ⊢μ n ℓ₁ eq in
       step (deref {v = v₁} eq)
-    (Ref-proxy r i _) → step (deref-cast (ref-is-value r) i)
+    (Ref-proxy r (I-ref (cast (Ref (_ of l _) of l _) _ _ _) I-label I-label) _) →
+      step (deref-cast (ref-is-value r))
   (err (E-error {e})) → step (ξ-err {F = !□} {e = e})
 progress pc (assign L M) (⊢assign ⊢L ⊢M ℓ≼ℓ̂ pc′≼ℓ̂) μ ⊢μ =
   step assign-static
@@ -152,11 +155,6 @@ progress pc (M ⟨ c ⟩) (⊢cast ⊢M) μ ⊢μ =
       ⟨ N , M⟨c⟩↝N ⟩ → step (cast v a M⟨c⟩↝N)
     (inj₂ i) → done (V-cast v i)
   (err (E-error {e})) → step (ξ-err {F = □⟨ c ⟩} {e = e})
--- progress pc (cast-pc g M) (⊢cast-pc ⊢M pc~g) μ ⊢μ =
---   case progress pc M ⊢M μ ⊢μ of λ where
---   (step M→N) → step (ξ {F = cast-pc g □} M→N)
---   (done v) → step (β-cast-pc v)
---   (err E-error) → step (ξ-err {F = cast-pc g □})
 progress pc (blame e p) ⊢blame μ ⊢μ = err E-error
 progress pc M (⊢sub ⊢M _) μ ⊢μ = progress pc M ⊢M μ ⊢μ
 progress pc M (⊢sub-pc ⊢M _) μ ⊢μ = progress pc M ⊢M μ ⊢μ
@@ -250,10 +248,10 @@ preserve {Σ} (⊢cast ⊢V) ⊢μ pc≾gc (cast v a V⟨c⟩↝M) =
 --         ⊢N† = subst (λ □ → [] ; Σ ; □ ; pc ⋎ ℓ ⊢ N ⦂ A) g⋎̃⋆≡⋆ (⊢N {pc ⋎ ℓ}) in
 --     let A⋎ℓ<:A⋎ℓ′ = stamp-<: <:-refl (<:-l ℓ≼ℓ′) in
 --     ⟨ Σ , ⊇-refl Σ , ⊢cast (⊢sub (⊢prot ⊢N† {!!}) A⋎ℓ<:A⋎ℓ′) , ⊢μ ⟩
-preserve {Σ} {gc} {pc} (⊢app✓ ⊢L ⊢M _ _) ⊢μ pc≾gc (fun-cast {V} {W} {pc = pc} v w i) =
+preserve {Σ} {gc} {pc} (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) ⊢μ pc≾gc (fun-cast {V} {W} {pc = pc} v w) =
   ⟨ Σ , ⊇-refl Σ , {!!} , ⊢μ ⟩
-preserve {Σ} (⊢deref {A = A′} ⊢M) ⊢μ pc≾gc (deref-cast v i) =
-  case canonical-ref ⊢M (V-cast v i) of λ where
+preserve {Σ} (⊢deref {A = A′} ⊢M) ⊢μ pc≾gc (deref-cast v) =
+  case canonical-ref ⊢M (V-cast v (I-ref _ I-label I-label)) of λ where
   (Ref-proxy r _ (<:-ty g₂<:g (<:-ref B<:A′ A′<:B))) →
     case <:-antisym B<:A′ A′<:B of λ where
     refl →
@@ -275,8 +273,6 @@ preserve {Σ} {gc} (⊢assign✓ ⊢L ⊢M ℓ≼ℓ̂ pc′≼ℓ) ⊢μ pc≾g
     case ⟨ c~ , <:-antisym A<:B B<:A ⟩ of λ where
     ⟨ ~-ty l~ (~-ref (~-ty l~ _)) , refl ⟩ →
       ⟨ Σ , ⊇-refl Σ , ⊢assign✓ (⊢sub (ref-wt r) (<:-ty ℓ<:ℓ′ <:ᵣ-refl)) (⊢cast ⊢M) ℓ≼ℓ̂ pc′≼ℓ , ⊢μ ⟩
--- preserve {Σ} (⊢cast-pc ⊢V _) ⊢μ pc≾gc (β-cast-pc v) =
---   ⟨ Σ , ⊇-refl Σ , ⊢value-pc ⊢V v , ⊢μ ⟩
 preserve (⊢sub ⊢M A<:B) ⊢μ pc≾gc M→M′ =
   let ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩ = preserve ⊢M ⊢μ pc≾gc M→M′ in
   ⟨ Σ′ , Σ′⊇Σ , ⊢sub ⊢M′ A<:B , ⊢μ′ ⟩
