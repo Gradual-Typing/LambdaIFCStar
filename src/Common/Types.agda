@@ -3,7 +3,7 @@ module Common.Types where
 open import Data.Maybe
 open import Data.Bool renaming (Bool to 𝔹; _≟_ to _≟ᵇ_)
 open import Data.Unit using (⊤; tt)
-open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
+open import Data.Product using (_×_; ∃; ∃-syntax; Σ; Σ-syntax) renaming (_,_ to ⟨_,_⟩)
 open import Data.List using (List)
 open import Function using (case_of_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
@@ -47,6 +47,34 @@ data RawType where
 
 data Type where
   _of_ : RawType → Label → Type
+
+-- Well-formed types
+data Ty : Type → Set
+
+data Ty where
+  base : ∀ ι g                                        → Ty (` ι of g)
+  ref  : ∀ {T} {ĝ} {g}      → Ty (T of ĝ)  → g ≾ ĝ  → Ty (Ref (T of ĝ) of g)
+  fun  : ∀ {A} {B} {gᶜ} {g} → Ty A → Ty B → g ≾ gᶜ → Ty (⟦ gᶜ ⟧ A ⇒ B of g)
+
+ty? : ∀ A → Dec (Ty A)
+ty? (` ι of g) = yes (base ι g)
+ty? (Ref (T of ĝ) of g) =
+  case ty? (T of ĝ) of λ where
+  (yes τ) →
+    case g ≾? ĝ of λ where
+    (yes g≾ĝ) → yes (ref τ g≾ĝ)
+    (no  g⋨ĝ) → no λ { (ref _ g≾ĝ) → contradiction g≾ĝ g⋨ĝ }
+  (no ¬τ) → no λ { (ref τ _) → contradiction τ ¬τ }
+ty? (⟦ gᶜ ⟧ A ⇒ B of g) =
+  case ty? A of λ where
+  (yes τA) →
+    case ty? B of λ where
+    (yes τB) →
+      case g ≾? gᶜ of λ where
+      (yes g≾gᶜ) → yes (fun τA τB g≾gᶜ)
+      (no  g⋨gᶜ) → no λ { (fun _ _ g≾gᶜ) → contradiction g≾gᶜ g⋨gᶜ }
+    (no ¬τB) → no λ { (fun _ τB _) → contradiction τB ¬τB }
+  (no ¬τA) → no λ { (fun τA _ _) → contradiction τA ¬τA }
 
 infix 4 _≡ᵣ?_
 infix 4 _≡?_
@@ -781,6 +809,12 @@ stamp-<: (<:-ty g₁′<:g₂′ S<:T) g₁<:g₂ = <:-ty (consis-join-<:ₗ g�
 stamp-⊑ : ∀ {A B g₁ g₂} → A ⊑ B → g₁ ⊑ₗ g₂ → stamp A g₁ ⊑ stamp B g₂
 stamp-⊑ (⊑-ty g₁′⊑g₂′ S⊑T) g₁⊑g₂ = ⊑-ty (consis-join-⊑ₗ g₁′⊑g₂′ g₁⊑g₂) S⊑T
 
+stamp? : ∀ A → Ty A → ∀ g → Dec (∃[ B ] (B ≡ stamp A g) × (Ty B))
+stamp? A τA g =
+  case ty? (stamp A g) of λ where
+  (yes τB) → yes ⟨ stamp A g , refl , τB ⟩
+  (no ¬τB) → no λ { ⟨ B , refl , τB ⟩ → contradiction τB ¬τB }
 
 {- **** Typing contexts **** -}
 Context = List Type
+Ctxt    = List (Σ[ A ∈ Type ] Ty A)

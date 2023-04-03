@@ -141,6 +141,15 @@ data _≾_ : Label → Label → Set where
   ≾-⋆l : ∀ {g}     → ⋆ ≾ g
   ≾-l  : ∀ {ℓ₁ ℓ₂} → ℓ₁ ≼ ℓ₂ → l ℓ₁ ≾ l ℓ₂
 
+_≾?_ : ∀ g₁ g₂ → Dec (g₁ ≾ g₂)
+⋆ ≾? ⋆ = yes ≾-⋆r
+⋆ ≾? l _ = yes ≾-⋆l
+l _ ≾? ⋆ = yes ≾-⋆r
+l ℓ₁ ≾? l ℓ₂ =
+  case ℓ₁ ≼? ℓ₂ of λ where
+  (yes ℓ₁≼ℓ₂) → yes (≾-l ℓ₁≼ℓ₂)
+  (no  ℓ₁⋠ℓ₂) → no λ { (≾-l ℓ₁≼ℓ₂) → contradiction ℓ₁≼ℓ₂ ℓ₁⋠ℓ₂ }
+
 low≾ : ∀ g → l low ≾ g
 low≾ ⋆ = ≾-⋆r
 low≾ (l ℓ) = ≾-l (low≼ ℓ)
