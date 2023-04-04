@@ -49,32 +49,46 @@ data Type where
   _of_ : RawType → Label → Type
 
 -- Well-formed types
-data Ty : Type → Set
+infix 4 ⊢_
 
-data Ty where
-  base : ∀ ι g                                        → Ty (` ι of g)
-  ref  : ∀ {T} {ĝ} {g}      → Ty (T of ĝ)  → g ≾ ĝ  → Ty (Ref (T of ĝ) of g)
-  fun  : ∀ {A} {B} {gᶜ} {g} → Ty A → Ty B → g ≾ gᶜ → Ty (⟦ gᶜ ⟧ A ⇒ B of g)
+data ⊢_ : Type → Set where
 
-ty? : ∀ A → Dec (Ty A)
-ty? (` ι of g) = yes (base ι g)
-ty? (Ref (T of ĝ) of g) =
-  case ty? (T of ĝ) of λ where
-  (yes τ) →
+  ⊢ι    : ∀ ι g
+      -----------------
+    → ⊢ ` ι of g
+
+  ⊢ref  : ∀ {T} {ĝ} {g}
+    → ⊢ T of ĝ
+    → g ≾ ĝ
+      -----------------------------
+    → ⊢ Ref (T of ĝ) of g
+
+  ⊢fun  : ∀ {A} {B} {gᶜ} {g}
+    → ⊢ A
+    → ⊢ B
+    → g ≾ gᶜ
+      -----------------------------
+    → ⊢ ⟦ gᶜ ⟧ A ⇒ B of g
+
+⊢? : ∀ A → Dec (⊢ A)
+⊢? (` ι of g) = yes (⊢ι ι g)
+⊢? (Ref (T of ĝ) of g) =
+  case ⊢? (T of ĝ) of λ where
+  (yes ⊢Tg) →
     case g ≾? ĝ of λ where
-    (yes g≾ĝ) → yes (ref τ g≾ĝ)
-    (no  g⋨ĝ) → no λ { (ref _ g≾ĝ) → contradiction g≾ĝ g⋨ĝ }
-  (no ¬τ) → no λ { (ref τ _) → contradiction τ ¬τ }
-ty? (⟦ gᶜ ⟧ A ⇒ B of g) =
-  case ty? A of λ where
-  (yes τA) →
-    case ty? B of λ where
-    (yes τB) →
+    (yes g≾ĝ) → yes (⊢ref ⊢Tg g≾ĝ)
+    (no  g⋨ĝ) → no λ { (⊢ref _ g≾ĝ) → contradiction g≾ĝ g⋨ĝ }
+  (no ¬⊢Tg) → no λ { (⊢ref ⊢Tg _) → contradiction ⊢Tg ¬⊢Tg }
+⊢? (⟦ gᶜ ⟧ A ⇒ B of g) =
+  case ⊢? A of λ where
+  (yes ⊢A) →
+    case ⊢? B of λ where
+    (yes ⊢B) →
       case g ≾? gᶜ of λ where
-      (yes g≾gᶜ) → yes (fun τA τB g≾gᶜ)
-      (no  g⋨gᶜ) → no λ { (fun _ _ g≾gᶜ) → contradiction g≾gᶜ g⋨gᶜ }
-    (no ¬τB) → no λ { (fun _ τB _) → contradiction τB ¬τB }
-  (no ¬τA) → no λ { (fun τA _ _) → contradiction τA ¬τA }
+      (yes g≾gᶜ) → yes (⊢fun ⊢A ⊢B g≾gᶜ)
+      (no  g⋨gᶜ) → no λ { (⊢fun _ _ g≾gᶜ) → contradiction g≾gᶜ g⋨gᶜ }
+    (no ¬⊢B) → no λ { (⊢fun _ ⊢B _) → contradiction ⊢B ¬⊢B }
+  (no ¬⊢A) → no λ { (⊢fun ⊢A _ _) → contradiction ⊢A ¬⊢A }
 
 infix 4 _≡ᵣ?_
 infix 4 _≡?_
@@ -809,12 +823,7 @@ stamp-<: (<:-ty g₁′<:g₂′ S<:T) g₁<:g₂ = <:-ty (consis-join-<:ₗ g�
 stamp-⊑ : ∀ {A B g₁ g₂} → A ⊑ B → g₁ ⊑ₗ g₂ → stamp A g₁ ⊑ stamp B g₂
 stamp-⊑ (⊑-ty g₁′⊑g₂′ S⊑T) g₁⊑g₂ = ⊑-ty (consis-join-⊑ₗ g₁′⊑g₂′ g₁⊑g₂) S⊑T
 
-stamp? : ∀ A → Ty A → ∀ g → Dec (∃[ B ] (B ≡ stamp A g) × (Ty B))
-stamp? A τA g =
-  case ty? (stamp A g) of λ where
-  (yes τB) → yes ⟨ stamp A g , refl , τB ⟩
-  (no ¬τB) → no λ { ⟨ B , refl , τB ⟩ → contradiction τB ¬τB }
 
 {- **** Typing contexts **** -}
 Context = List Type
-Ctxt    = List (Σ[ A ∈ Type ] Ty A)
+Ctxt    = List (∃[ A ] (⊢ A))
