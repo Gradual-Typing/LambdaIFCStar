@@ -2,7 +2,7 @@
 
 open import Common.Types
 
-module CC2.CCTyping (Cast_⇒_ : Type → Type → Set) where
+module CC2.Typing (Cast_⇒_ : Type → Type → Set) where
 
 open import Data.Nat
 open import Data.Product renaming (_,_ to ⟨_,_⟩)
@@ -14,7 +14,7 @@ open import Syntax
 open import Common.Utils
 open import Common.Types
 open import Memory.HeapContext
-open import CC2.CCSyntax Cast_⇒_
+open import CC2.Syntax Cast_⇒_
 
 infix 4 _;_;_;_⊢_⦂_
 
@@ -34,10 +34,10 @@ data _;_;_;_⊢_⦂_ : Context → HeapContext → Label → StaticLabel → 
       ----------------------------- CCVar
     → Γ ; Σ ; gc ; pc ⊢ ` x ⦂ A
 
-  ⊢lam : ∀ {Γ Σ gc pc pc′ A B N ℓ}
-    → (∀ {pc} → A ∷ Γ ; Σ ; l pc′ ; pc ⊢ N ⦂ B)
+  ⊢lam : ∀ {Γ Σ gc pc g A B N ℓ}
+    → (∀ {pc} → A ∷ Γ ; Σ ; g ; pc ⊢ N ⦂ B)
       ------------------------------------------------------------------- CCLam
-    → Γ ; Σ ; gc ; pc ⊢ ƛ⟦ pc′ ⟧ A ˙ N of ℓ ⦂ ⟦ l pc′ ⟧ A ⇒ B of l ℓ
+    → Γ ; Σ ; gc ; pc ⊢ ƛ g , A ˙ N of ℓ ⦂ ⟦ g ⟧ A ⇒ B of l ℓ
 
   ⊢app : ∀ {Γ Σ pc pc′ A B L M ℓ ℓᶜ}
     → Γ ; Σ ; l pc′ ; pc ⊢ L ⦂ ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ

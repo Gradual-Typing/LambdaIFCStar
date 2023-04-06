@@ -1,6 +1,6 @@
 open import Common.Types
 
-module CC2.CCSyntax (Cast_⇒_ : Type → Type → Set) where
+module CC2.Syntax (Cast_⇒_ : Type → Type → Set) where
 
 open import Data.List
 open import Data.Bool renaming (Bool to 𝔹)
@@ -13,7 +13,7 @@ open import CC2.Errors public
 
 data Op : Set where
   op-addr         : (a : Addr) → (ℓ : StaticLabel) → Op
-  op-lam          : (pc : StaticLabel) → Type → (ℓ : StaticLabel) → Op
+  op-lam          : (g : Label) → Type → (ℓ : StaticLabel) → Op
   op-app          : Op
   op-app?         : BlameLabel → Op
   op-app✓        : Op
@@ -36,7 +36,7 @@ data Op : Set where
 
 sig : Op → List Sig
 sig (op-addr a ℓ)      = []
-sig (op-lam pc A ℓ)    = (ν ■) ∷ []
+sig (op-lam g A ℓ)     = (ν ■) ∷ []
 sig op-app             = ■ ∷ ■ ∷ []
 sig (op-app? p)        = ■ ∷ ■ ∷ []
 sig op-app✓           = ■ ∷ ■ ∷ []
@@ -61,7 +61,7 @@ open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug) public
 infix 8 _⟨_⟩
 
 pattern addr_of_ a ℓ             = (op-addr a ℓ) ⦅ nil ⦆
-pattern ƛ⟦_⟧_˙_of_ pc A N ℓ      = (op-lam pc A ℓ) ⦅ cons (bind (ast N)) nil ⦆
+pattern ƛ_,_˙_of_ g A N ℓ        = (op-lam g A ℓ) ⦅ cons (bind (ast N)) nil ⦆
 pattern app L M                  = op-app ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern app? L M p               = (op-app? p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern app✓ L M                = op-app✓ ⦅ cons (ast L) (cons (ast M) nil) ⦆
