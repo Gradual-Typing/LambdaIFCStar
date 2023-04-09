@@ -131,10 +131,11 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
       ----------------------------------------------- CCProt
     → Γ ; Σ ; gc ; pc ⊢ prot g ℓ A M ⇐ stamp A (l ℓ)
 
-  ⊢cast : ∀ {Γ Σ gc pc A B M} {c : Cast A ⇒ B}
+  ⊢cast : ∀ {Γ Σ gc pc A B C M} {c : Cast A ⇒ B}
     → Γ ; Σ ; gc ; pc ⊢ M ⇐ A
+    → B <: C
       ----------------------------------------- CCCast
-    → Γ ; Σ ; gc ; pc ⊢ M ⟨ c ⟩ ⇐ B
+    → Γ ; Σ ; gc ; pc ⊢ M ⟨ c ⟩ ⇐ C
 
   ⊢err : ∀ {Γ Σ gc pc A e p}
       ------------------------------------ CCError
