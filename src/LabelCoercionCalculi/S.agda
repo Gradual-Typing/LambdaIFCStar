@@ -50,63 +50,64 @@ data Canonical : ∀ {g₁ g₂} → ⊢ g₁ ⇒ g₂ → Set where
     (c₁ ; c₂) ; c₃ = c₁ ; (c₂ ; c₃)
 -}
 
-_⨟_ : ∀ {g₁ g₂ g₃} (c : ⊢ g₁ ⇒ g₂) (d : ⊢ g₂ ⇒ g₃)
-  → Canonical c → Canonical d
-  → ⊢ g₁ ⇒ g₃
-((id g) ⨟ d) id _ = d
-(c ⨟ (id g)) _ id = c
-((⊥ p) ⨟ d) bot _ = ⊥ p
-(c ⨟ (⊥ p)) _ bot = ⊥ p
-(↑ ⨟ (high !)) up inj = ↑ ; high !
+_⨟_ : ∀ {g₁ g₂ g₃} (c₁ : ⊢ g₁ ⇒ g₂) (c₂ : ⊢ g₂ ⇒ g₃)
+  → Canonical c₁
+  → Canonical c₂
+  → Σ[ d ∈ ⊢ g₁ ⇒ g₃ ] (Canonical d)
+((id g) ⨟ d) id cd = ⟨ d , cd ⟩
+(c ⨟ (id g)) cc id = ⟨ c , cc ⟩
+((⊥ p) ⨟ d) bot _ = ⟨ ⊥ p , bot ⟩
+(c ⨟ (⊥ p)) _ bot = ⟨ ⊥ p , bot ⟩
+(↑ ⨟ (high !)) up inj = ⟨ ↑ ; high ! , up-inj ⟩
 ((ℓ₁ !) ⨟ (ℓ₂ ?? p)) inj proj with ℓ₁ | ℓ₂
-... | low  | low  = id (l low)
-... | high | high = id (l high)
-... | low  | high = ↑
-... | high | low  = ⊥ p
+... | low  | low  = ⟨ id (l low) , id ⟩
+... | high | high = ⟨ id (l high) , id ⟩
+... | low  | high = ⟨ ↑ , up ⟩
+... | high | low  = ⟨ ⊥ p , bot ⟩
 ((ℓ !) ⨟ (low ?? p ; ↑)) inj proj-up with ℓ
-... | low = ↑
-... | high = ⊥ p
+... | low = ⟨ ↑ , up ⟩
+... | high = ⟨ ⊥ p , bot ⟩
 ((ℓ₁ !) ⨟ (ℓ₂ ?? p ; ℓ₂ !)) inj proj-inj with ℓ₁ | ℓ₂
-... | low  | low  = low !
-... | high | high = high !
-... | low  | high = ↑ ; high !
-... | high | low  = ⊥ p
+... | low  | low  = ⟨ low ! , inj ⟩
+... | high | high = ⟨ high ! , inj ⟩
+... | low  | high = ⟨ ↑ ; high ! , up-inj ⟩
+... | high | low  = ⟨ ⊥ p , bot ⟩
 ((ℓ !) ⨟ (low ?? p ; ↑ ; high !)) inj proj-up-inj with ℓ
-... | low  = ↑ ; high !
-... | high = ⊥ p
-((low ?? p) ⨟ ↑) proj up = low ?? p ; ↑
-((ℓ ?? p) ⨟ (ℓ !)) proj inj = ℓ ?? p ; ℓ !
-((low ?? p) ⨟ (↑ ; high !)) proj up-inj = low ?? p ; ↑ ; high !
+... | low  = ⟨ ↑ ; high ! , up-inj ⟩
+... | high = ⟨ ⊥ p , bot ⟩
+((low ?? p) ⨟ ↑) proj up = ⟨ low ?? p ; ↑ , proj-up ⟩
+((ℓ ?? p) ⨟ (ℓ !)) proj inj = ⟨ ℓ ?? p ; ℓ ! , proj-inj ⟩
+((low ?? p) ⨟ (↑ ; high !)) proj up-inj = ⟨ low ?? p ; ↑ ; high ! , proj-up-inj ⟩
 ((↑ ; high !) ⨟ (ℓ ?? p)) up-inj proj with ℓ
-... | low  = ⊥ p
-... | high = ↑
-((↑ ; high !) ⨟ (low ?? p ; ↑)) up-inj proj-up = ⊥ p
+... | low  = ⟨ ⊥ p , bot ⟩
+... | high = ⟨ ↑ , up ⟩
+((↑ ; high !) ⨟ (low ?? p ; ↑)) up-inj proj-up = ⟨ ⊥ p , bot ⟩
 ((↑ ; high !) ⨟ (ℓ ?? p ; ℓ !)) up-inj proj-inj with ℓ
-... | low  = ⊥ p
-... | high = ↑ ; high !
-((↑ ; high !) ⨟ (low ?? p ; ↑ ; high !)) up-inj proj-up-inj = ⊥ p
-((low ?? p ; ↑) ⨟ (high !)) proj-up inj = low ?? p ; ↑ ; high !
+... | low  = ⟨ ⊥ p , bot ⟩
+... | high = ⟨ ↑ ; high ! , up-inj ⟩
+((↑ ; high !) ⨟ (low ?? p ; ↑ ; high !)) up-inj proj-up-inj = ⟨ ⊥ p , bot ⟩
+((low ?? p ; ↑) ⨟ (high !)) proj-up inj = ⟨ low ?? p ; ↑ ; high ! , proj-up-inj ⟩
 ((ℓ₁ ?? p ; ℓ₁ !) ⨟ (ℓ₂ ?? q)) proj-inj proj with ℓ₁ | ℓ₂
-... | low  | low  = low ?? p
-... | high | high = high ?? p
-... | low  | high = low ?? p ; ↑
-... | high | low  = ⊥ q
+... | low  | low  = ⟨ low ?? p , proj ⟩
+... | high | high = ⟨ high ?? p , proj ⟩
+... | low  | high = ⟨ low ?? p ; ↑ , proj-up ⟩
+... | high | low  = ⟨ ⊥ q , bot ⟩
 ((ℓ ?? p ; ℓ !) ⨟ (low ?? q ; ↑)) proj-inj proj-up with ℓ
-... | low  = low ?? p ; ↑
-... | high = ⊥ q
+... | low  = ⟨ low ?? p ; ↑ , proj-up ⟩
+... | high = ⟨ ⊥ q , bot ⟩
 ((ℓ₁ ?? p ; ℓ₁ !) ⨟ (ℓ₂ ?? q ; ℓ₂ !)) proj-inj proj-inj with ℓ₁ | ℓ₂
-... | low  | low  = low ?? p ; low !
-... | high | high = high ?? p ; high !
-... | low  | high = low ?? p ; ↑ ; high !
-... | high | low  = ⊥ q
+... | low  | low  = ⟨ low ?? p ; low ! , proj-inj ⟩
+... | high | high = ⟨ high ?? p ; high ! , proj-inj ⟩
+... | low  | high = ⟨ low ?? p ; ↑ ; high ! , proj-up-inj ⟩
+... | high | low  = ⟨ ⊥ q , bot ⟩
 ((ℓ ?? p ; ℓ !) ⨟ (low ?? q ; ↑ ; high !)) proj-inj proj-up-inj with ℓ
-... | low  = low ?? p ; ↑ ; high !
-... | high = ⊥ q
+... | low  = ⟨ low ?? p ; ↑ ; high ! , proj-up-inj ⟩
+... | high = ⟨ ⊥ q , bot ⟩
 ((low ?? p ; ↑ ; high !) ⨟ (ℓ ?? q)) proj-up-inj proj with ℓ
-... | low  = ⊥ q
-... | high = low ?? p ; ↑
-((low ?? p ; ↑ ; high !) ⨟ (low ?? q ; ↑)) proj-up-inj proj-up = ⊥ q
+... | low  = ⟨ ⊥ q , bot ⟩
+... | high = ⟨ low ?? p ; ↑ , proj-up ⟩
+((low ?? p ; ↑ ; high !) ⨟ (low ?? q ; ↑)) proj-up-inj proj-up = ⟨ ⊥ q , bot ⟩
 ((low ?? p ; ↑ ; high !) ⨟ (ℓ ?? q ; ℓ !)) proj-up-inj proj-inj with ℓ
-... | low  = ⊥ q
-... | high = low ?? p ; ↑ ; high !
-((low ?? p ; ↑ ; high !) ⨟ (low ?? q ; ↑ ; high !)) proj-up-inj proj-up-inj = ⊥ q
+... | low  = ⟨ ⊥ q , bot ⟩
+... | high = ⟨ low ?? p ; ↑ ; high ! , proj-up-inj ⟩
+((low ?? p ; ↑ ; high !) ⨟ (low ?? q ; ↑ ; high !)) proj-up-inj proj-up-inj = ⟨ ⊥ q , bot ⟩
