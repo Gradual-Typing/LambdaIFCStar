@@ -51,7 +51,7 @@ data _⟶_ : ∀ {g} → LabelExp g → LabelExp g → Set where
   seq : ∀ {g₁ g₂ g₃} {e : LabelExp g₁} {c : ⊢ g₁ ⇒ g₂} {d : ⊢ g₂ ⇒ g₃}
     → LabelVal e
       -----------------------------------
-    → e ⟨ seq c d ⟩ ⟶ (e ⟨ c ⟩) ⟨ d ⟩
+    → e ⟨ c ; d ⟩ ⟶ (e ⟨ c ⟩) ⟨ d ⟩
 
   ?-id : ∀ {p} {ℓ} {e : LabelExp (l ℓ)}
     → LabelVal e
@@ -94,11 +94,11 @@ progress {g} (e ⟨ c ⟩) with progress e
 ...   | id _ = step (id v-l)
 ...   | ℓ ! = done v-!
 ...   | ↑ = step ↑
-...   | seq c d = step (seq v-l)
+...   | c ; d = step (seq v-l)
 ...   | ⊥ p = step (bl v-l)
 progress {g} (e ⟨ c ⟩) | done (v-! {ℓ₁}) with c
 ... | id _ = step (id v-!)
-... | seq c d = step (seq v-!)
+... | c ; d = step (seq v-!)
 ... | ⊥ p = step (bl v-!)
 ... | ℓ₂ ?? p with ℓ₁ | ℓ₂
 ...   | low | low = step (?-id v-l)

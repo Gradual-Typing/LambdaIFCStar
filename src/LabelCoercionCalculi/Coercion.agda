@@ -14,6 +14,8 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 
+infixr 10 _;_
+
 data ⊢_⇒_ : Label → Label → Set where
 
   id : ∀ g → ⊢ g ⇒ g
@@ -24,6 +26,6 @@ data ⊢_⇒_ : Label → Label → Set where
 
   _??_ : ∀ ℓ (p : BlameLabel) → ⊢ ⋆ ⇒ l ℓ
 
-  seq : ∀ {g₁ g₂ g₃} → ⊢ g₁ ⇒ g₂ → ⊢ g₂ ⇒ g₃ → ⊢ g₁ ⇒ g₃
+  _;_ : ∀ {g₁ g₂ g₃} → ⊢ g₁ ⇒ g₂ → ⊢ g₂ ⇒ g₃ → ⊢ g₁ ⇒ g₃
 
   ⊥_ : ∀ {g₁ g₂} (p : BlameLabel) → ⊢ g₁ ⇒ g₂
