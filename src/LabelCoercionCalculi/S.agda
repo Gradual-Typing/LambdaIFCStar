@@ -10,7 +10,8 @@ open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Nullary.Negation using (contradiction)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Function using (case_of_)
 
 open import Common.Utils
@@ -111,3 +112,15 @@ _⨟_ : ∀ {g₁ g₂ g₃} (c₁ : ⊢ g₁ ⇒ g₂) (c₂ : ⊢ g₂ ⇒ g�
 ... | low  = ⟨ ⊥ q , bot ⟩
 ... | high = ⟨ low ?? p ; ↑ ; high ! , proj-up-inj ⟩
 ((low ?? p ; ↑ ; high !) ⨟ (low ?? q ; ↑ ; high !)) proj-up-inj proj-up-inj = ⟨ ⊥ q , bot ⟩
+
+
+Irreducible : ∀ {g₁ g₂} → ⊢ g₁ ⇒ g₂ → Set
+Irreducible c = (∀ {p} → c ≢ (⊥ p)) × Canonical c
+
+-- Security level
+∥_∥ : ∀ {ℓ g} → (c : ⊢ l ℓ ⇒ g) → Irreducible c → StaticLabel
+∥ id (l ℓ) ∥ ⟨ _ , id ⟩ = ℓ
+∥ ↑ ∥ ⟨ _ , up ⟩ = high
+∥ ℓ ! ∥ ⟨ _ , inj ⟩ = ℓ
+∥ ↑ ; high ! ∥ ⟨ _ , up-inj ⟩ = high
+∥ ⊥ p ∥ ⟨ c≢⊥ , bot ⟩ = contradiction refl c≢⊥
