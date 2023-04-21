@@ -11,19 +11,6 @@ label coercion typing:
       --------------------------------             -----------------
             c ; d : g₁ ⇒ g₃                       ⊥ᵖ : g₁ ⇒ g₂
 
-label coercion reduction (similar to λS):
-
-id(g) ; c = c            c ; id(g) = c
-
-⊥ᵖ    ; c = ⊥ᵖ           c ; ⊥ᵖ    = ⊥ᵖ
-
-ℓ    ! ; ℓ    ?ᵖ = id(ℓ)
-low  ! ; high ?ᵖ = ↑
-high ! ; low  ?ᵖ = ⊥ᵖ
-
-(c₁ ; c₂) ; c₃ = c₁ ; (c₂ ; c₃)
-
-composition function c ⨟ d is based on the rules above
 
 label expressions (representation of our runtime PC):
 
@@ -47,6 +34,21 @@ low ⟨ ↑ ⟩               —→ high
 𝓋 ⟨ low !  ⟩ ⟨ high ?ᵖ ⟩ —→ high
 𝓋 ⟨ high ! ⟩ ⟨ low ?ᵖ ⟩  —→ blame p
 𝓋 ⟨ ⊥ᵖ ⟩                 —→ blame p
+
+
+label coercion reduction (similar to λS):
+
+id(g) ; c = c            c ; id(g) = c
+
+⊥ᵖ    ; c = ⊥ᵖ           c ; ⊥ᵖ    = ⊥ᵖ
+
+ℓ    ! ; ℓ    ?ᵖ = id(ℓ)
+low  ! ; high ?ᵖ = ↑
+high ! ; low  ?ᵖ = ⊥ᵖ
+
+(c₁ ; c₂) ; c₃ = c₁ ; (c₂ ; c₃)
+
+composition function c ⨟ d is based on the rules above
 
 normal forms of coercions:
 
