@@ -52,8 +52,8 @@ composition function c ⨟ d is based on the rules above
 
 normal forms of coercions:
 
-dₗ-pc ::= ⊥ᵖ | id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
-        | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
+cₗ, dₗ ::= ⊥ᵖ | id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
+         | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
 
 value-forming coercions:
 
