@@ -55,7 +55,7 @@
     Γ ; Σ ; ⋆ ; pc ⊢ M ⇐ T of l ℓ
       A = Ref (T of l ℓ) of low
 -------------------------------------- Ref?
-    Γ ; Σ ; ⋆ ; pc ⊢ ref?⟦ ℓ ⟧ T M ⇐ A
+    Γ ; Σ ; ⋆ ; pc ⊢ ref?⟦ ℓ ⟧ T M p ⇐ A
 
     Γ ; Σ ; gc ; pc ⊢ M ⇐ T of l ℓ
                pc ≼ ℓ
