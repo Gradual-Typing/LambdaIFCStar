@@ -25,7 +25,7 @@ high ! ; low  ?ᵖ = ⊥ᵖ
 
 composition function c ⨟ d is based on the rules above
 
-label expressions:
+label expressions (representation of our runtime PC):
 
 e ::= ℓ | e ⟨ c ⟩ | blame p
 
@@ -47,3 +47,27 @@ low ⟨ ↑ ⟩               —→ high
 𝓋 ⟨ low !  ⟩ ⟨ high ?ᵖ ⟩ —→ high
 𝓋 ⟨ high ! ⟩ ⟨ low ?ᵖ ⟩  —→ blame p
 𝓋 ⟨ ⊥ᵖ ⟩                 —→ blame p
+
+normal forms of coercions:
+
+dₗ-pc ::= ⊥ᵖ | id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
+        | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
+
+value-forming coercions:
+
+normal forms of security level coercions for constants:
+
+cₗ-ι ::= ↑ | ℓ ! | ↑ ; high !
+
+normal forms of security level coercions for functions and addresses:
+
+cₗ ::= id(ℓ) | cₗ-ι
+
+normal forms of label coercions in PC position:
+
+dₗ-pc ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
+        | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
+
+normal forms of label coercions in reference cell position:
+
+dₗ-ref ::= id(ℓ) | ℓ ?ᵖ
