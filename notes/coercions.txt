@@ -1,20 +1,23 @@
-label coercions:
+++++ Coercions on Labels ++++
 
-c , d ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | c ; d | ⊥ᵖ
+cₗ , dₗ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | c ; d | ⊥ᵖ
 
-label coercion typing:
+label coercion typing ⊢ cₗ : g₁ ⇒ g₂
 
--------------------    ---------------------    ------------------    -----------------
-  id(g) : g ⇒ g         ↑ : low ⇒ high          ℓ ! : ℓ ⇒ ⋆         ℓ ?ᵖ : ⋆ ⇒ ℓ
+-------------------    ---------------------
+ ⊢ id(g) : g ⇒ g       ⊢ ↑ : low ⇒ high
 
-        c : g₁ ⇒ g₂  d : g₂ ⇒ g₃
-      --------------------------------             -----------------
-            c ; d : g₁ ⇒ g₃                       ⊥ᵖ : g₁ ⇒ g₂
+------------------    -----------------
+  ⊢ ℓ ! : ℓ ⇒ ⋆       ⊢ ℓ ?ᵖ : ⋆ ⇒ ℓ
+
+ ⊢ c : g₁ ⇒ g₂  ⊢ d : g₂ ⇒ g₃
+--------------------------------   -------------------
+     ⊢ c ; d : g₁ ⇒ g₃              ⊢ ⊥ᵖ : g₁ ⇒ g₂
 
 
 label expressions (representation of our runtime PC):
 
-e ::= ℓ | e ⟨ c ⟩ | blame p
+e ::= ℓ | e ⟨ cₗ ⟩ | blame p
 
 𝓋 ::= ℓ | ℓ ⟨ ℓ ! ⟩
 
@@ -29,18 +32,18 @@ label expression reduction (similar to λC):
 
 𝓋 ⟨ id(g) ⟩              —→ 𝓋
 low ⟨ ↑ ⟩               —→ high
-𝓋 ⟨ c ; d ⟩              —→ 𝓋 ⟨ c ⟩ ⟨ d ⟩
+𝓋 ⟨ cₗ ; dₗ ⟩            —→ 𝓋 ⟨ cₗ ⟩ ⟨ dₗ ⟩
 𝓋 ⟨ ℓ !    ⟩ ⟨ ℓ ?ᵖ    ⟩ —→ ℓ
 𝓋 ⟨ low !  ⟩ ⟨ high ?ᵖ ⟩ —→ high
 𝓋 ⟨ high ! ⟩ ⟨ low ?ᵖ ⟩  —→ blame p
 𝓋 ⟨ ⊥ᵖ ⟩                 —→ blame p
 
 
-label coercion reduction (similar to λS):
+label coercion equational theory (similar to λS):
 
-id(g) ; c = c            c ; id(g) = c
+id(g) ; cₗ = cₗ           cₗ ; id(g) = cₗ
 
-⊥ᵖ    ; c = ⊥ᵖ           c ; ⊥ᵖ    = ⊥ᵖ
+⊥ᵖ    ; cₗ = ⊥ᵖ           cₗ ; ⊥ᵖ    = ⊥ᵖ
 
 ℓ    ! ; ℓ    ?ᵖ = id(ℓ)
 low  ! ; high ?ᵖ = ↑
@@ -48,28 +51,67 @@ high ! ; low  ?ᵖ = ⊥ᵖ
 
 (c₁ ; c₂) ; c₃ = c₁ ; (c₂ ; c₃)
 
-composition function c ⨟ d is based on the rules above
+composition function cₗ ⨟ dₗ is based on the rules above
 
 normal forms of coercions:
 
-cₗ, dₗ ::= ⊥ᵖ | id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
-         | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
+cₗⁿᶠ ::= ⊥ᵖ | id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high !
+       | low ?ᵖ ; ↑ | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
 
-value-forming coercions:
+value-forming coercions (will be referenced in the definition of values):
 
 normal forms of security level coercions for constants:
 
-cₗ-ι ::= ↑ | ℓ ! | ↑ ; high !
+cₗℓι ::= ↑ | ℓ ! | ↑ ; high !
 
 normal forms of security level coercions for functions and addresses:
 
-cₗ ::= id(ℓ) | cₗ-ι
+cₗℓ ::= id(ℓ) | cₗ-ℓι
 
 normal forms of label coercions in PC position:
 
-dₗ-pc ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
-        | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
+cₗᵖᶜ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
+       | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
 
 normal forms of label coercions in reference cell position:
 
-dₗ-ref ::= id(ℓ) | ℓ ?ᵖ
+cₗ̂ ::= id(ℓ) | ℓ ?ᵖ
+
+
+++++ Coercions on Values ++++
+
+between raw types: cᵣ, dᵣ ::= id(ι) | (dₗ | c → d) | (dₗ | in: c; out: d)
+between types:     c, d   ::= (cᵣ | cₗ)
+
+composition, note that the `dₗ`s in function and reference coercions are contravariant:
+
+id(ι) ⨟ id(ι) = id(ι)
+(dₗ₁ | c₁ → d₁) ⨟ (dₗ₂ | c₂ → d₂) =
+     (dₗ₂ ⨟ dₗ₁ | (c₂ ⨟ c₁) → (d₁ ⨟ d₂))
+(dₗ₁ | in: c₁; out: d₁) ⨟ (dₗ₂ | in: c₂; out: d₂) =
+     (dₗ₂ ⨟ dₗ₁ | in: (c₂ ⨟ c₁); out: (d₁ ⨟ d₂))
+
+(cᵣ₁ | cₗ₁) ⨟ (cᵣ₂ | cₗ₂) = (cᵣ₁ ⨟ cᵣ₂ | cₗ₁ ⨟ cₗ₂)
+
+normal forms of coercions on values:
+
+cᵣⁿᶠ ::= id(ι) | ( dₗⁿᶠ | cⁿᶠ → dⁿᶠ) | (dₗⁿᶠ | in: cⁿᶠ; out: dⁿᶠ)
+cⁿᶠ  ::= (cᵣⁿᶠ | cₗⁿᶠ)
+
+typing rules of coercions on values ⊢ c : A :
+
+            ⊢ cₗ : g₁ ⇒ g₂
+----------------------------------------
+ ⊢ ( id(ι) | cₗ ) : ι of g₁ ⇒ ι of g₂
+
+
+             ⊢ dₗ : gᶜ₂ ⇒ gᶜ₁       ⊢ cₗ : g₁ ⇒ g₂
+             ⊢ c  : C   ⇒ A         ⊢ d  : B  ⇒ D
+------------------------------------------------------------------------
+ ⊢ ( dₗ | c → d | cₗ ) : ⟦ gᶜ₁ ⟧ A → B of g₁ ⇒ ⟦ gᶜ₂ ⟧ C → D of g₂
+
+
+                  ⊢ dₗ : ĝ₂ ⇒ ĝ₁   ⊢ cₗ : g₁ ⇒ g₂
+      ⊢ c : (T of ĝ₂) ⇒ (S of ĝ₁) ⊢ d : (S of ĝ₁) ⇒ (T of ĝ₂)
+----------------------------------------------------------------------------
+ ⊢ ( dₗ | in: c; out: d | cₗ) : Ref (S of ĝ₁) of g₁ ⇒ Ref (T of ĝ₂) of g₂
