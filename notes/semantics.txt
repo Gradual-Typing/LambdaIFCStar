@@ -80,7 +80,7 @@ ref?⟦ ℓ ⟧ T M p ∣ μ ∣ ℓ′ ⟨ ℓ′ ! ⟩ —→ blame p ∣ μ
 
 ref✓⟦ ℓ ⟧ T V ∣ μ ∣ 𝓋 —→ addr n ℓ ∣ (n ℓ ↦ V) ∷ μ   , n is fresh
 
-Alternative rules for reference creation:
+* Alternative rules for reference creation:
 
 ref⟦ ℓ ⟧ T V ∣ μ ∣ pc —→ addr n ℓ ∣ (n ℓ ↦ V) ∷ μ   , n is fresh
 
@@ -124,6 +124,30 @@ assign✓ (addr n ℓ̂) V T ℓ̂ ℓ ∣ μ ∣ 𝓋 —→ unit ∣ μ(n ℓ�
 
 assign✓ (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T ℓ̂ ℓ ∣ μ ∣ 𝓋 —→
         unit ∣ μ(n ℓ̂) = (V ⟨ c ⟩)
+
+* Alternative rules for assignment:
+
+assign (addr n ℓ̂) V T ℓ̂ ℓ ∣ μ ∣ pc —→ unit ∣ μ(n ℓ̂) = V
+
+assign (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T ℓ̂ ℓ ∣ μ ∣ pc —→ unit ∣ μ(n ℓ̂) = V
+
+Note: in this case dₗ must be id(ℓ̂). from typing we know pc ⋎ ℓ ≼ ℓ̂, which
+implies that the assignment is safe
+
+                         ℓ = ∥ cₗ ∥
+          stamp 𝓋 ℓ ⟨ ty(𝓋) ⋎̃ ℓ ⇒ ⋆ ⟩ ⟨ dₗ ⟩ —→ 𝓋′
+-----------------------------------------------------------------------
+assign? (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T p ∣ μ | 𝓋 —→
+        unit | μ(n ℓ̂) = V
+
+⊢ dₗ : ⋆ ⇒ ℓ̂
+
+                         ℓ = ∥ cₗ ∥
+          stamp 𝓋 ℓ ⟨ ty(𝓋) ⋎̃ ℓ ⇒ ⋆ ⟩ ⟨ dₗ ⟩ —→ err p
+----------------------------------------------------------------------------
+assign? (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T p ∣ μ | 𝓋 —→ blame p
+
+Note: `dₗ` is projecting, where the blame label `p` comes from
 
 
 V ⟨ c ⟩ ⟨ d ⟩ ∣ μ ∣ 𝓋 —→ V ⟨ c ⨟ d ⟩ ∣ μ
