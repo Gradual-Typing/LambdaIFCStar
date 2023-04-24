@@ -129,7 +129,7 @@ assign✓ (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T ℓ̂ ℓ ∣ �
 
 assign (addr n ℓ̂) V T ℓ̂ ℓ ∣ μ ∣ pc —→ unit ∣ μ(n ℓ̂) = V
 
-assign (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T ℓ̂ ℓ ∣ μ ∣ pc —→ unit ∣ μ(n ℓ̂) = V
+assign (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T ℓ̂ ℓ ∣ μ ∣ pc —→ unit ∣ μ(n ℓ̂) = (V ⟨ c ⟩)
 
 Note: in this case dₗ must be id(ℓ̂). from typing we know pc ⋎ ℓ ≼ ℓ̂, which
 implies that the assignment is safe
@@ -138,7 +138,7 @@ implies that the assignment is safe
           stamp 𝓋 ℓ ⟨ ty(𝓋) ⋎̃ ℓ ⇒ ⋆ ⟩ ⟨ dₗ ⟩ —→ 𝓋′
 -----------------------------------------------------------------------
 assign? (addr n ℓ̂ ⟨ dₗ | in: c; out: d | cₗ ⟩) V T p ∣ μ | 𝓋 —→
-        unit | μ(n ℓ̂) = V
+        unit | μ(n ℓ̂) = (V ⟨ c ⟩)
 
 ⊢ dₗ : ⋆ ⇒ ℓ̂
 

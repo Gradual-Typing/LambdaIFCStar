@@ -62,10 +62,26 @@
 ---------------------------------------------------------- Ref✓
     Γ ; Σ ; gc ; pc ⊢ ref✓⟦ ℓ ⟧ T M ⇐ A
 
+* Alternative rules for reference creation:
+
+    Γ ; Σ ; pc′ ; pc ⊢ M ⇐ T of l ℓ
+               pc′ ≼ ℓ
+      A = Ref (T of l ℓ) of low
+-------------------------------------- RefStatic
+    Γ ; Σ ; pc′ ; pc ⊢ ref⟦ ℓ ⟧ T M ⇐ A
+
+    Γ ; Σ ; ⋆ ; pc ⊢ M ⇐ T of l ℓ
+      A = Ref (T of l ℓ) of low
+-------------------------------------- Ref?
+    Γ ; Σ ; ⋆ ; pc ⊢ ref?⟦ ℓ ⟧ T M p ⇐ A
+
+
+
    Γ ; Σ ; gc ; pc ⊢ M ⇐ Ref A of g
              B = stamp A g
 --------------------------------------------- Deref
    Γ ; Σ ; gc ; pc ⊢ ! M A g ⇐ B
+
 
    Γ ; Σ ; l pc′ ; pc ⊢ L ⇐ Ref (T of l ℓ̂) of l ℓ
    Γ ; Σ ; l pc′ ; pc ⊢ M ⇐ T of l ℓ̂
@@ -86,6 +102,22 @@
              A = Unit
 --------------------------------------------- Assign✓
    Γ ; Σ ; gc ; pc ⊢ assign✓ L M T ℓ̂ ℓ ⇐ A
+
+
+* Alternative rules for assignment:
+
+   Γ ; Σ ; l pc′ ; pc ⊢ L ⇐ Ref (T of l ℓ̂) of l ℓ
+   Γ ; Σ ; l pc′ ; pc ⊢ M ⇐ T of l ℓ̂
+            pc′ ⋎ ℓ ≼ ℓ̂
+             A = Unit
+--------------------------------------------- AssignStatic
+   Γ ; Σ ; l pc′ ; pc ⊢ assign L M T ℓ̂ ℓ ⇐ A
+
+   Γ ; Σ ; gc ; pc ⊢ L ⇐ Ref (T of ⋆) of g
+   Γ ; Σ ; gc ; pc ⊢ M ⇐ T of ⋆
+             A = Unit
+---------------------------------------------------- Assign?
+   Γ ; Σ ; gc ; pc ⊢ assign? L M T p ⇐ A
 
    Γ ; Σ ; ℓ ; ℓ ⊢ M ⇐ A
 ----------------------------------- ProtPC
