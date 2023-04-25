@@ -17,7 +17,7 @@ label coercion typing ⊢ cₗ : g₁ ⇒ g₂
 
 label expressions (representation of our runtime PC):
 
-e ::= ℓ | e ⟨ cₗ ⟩ | blame p
+e ::= ℓ | e ⟨ cₗ ⟩ | err p
 
 𝓋 ::= ℓ | ℓ ⟨ ℓ ! ⟩
 
@@ -28,15 +28,15 @@ label expression reduction (similar to λC):
   e ⟨ c ⟩ —→ e′ ⟨ c ⟩
 
 ---------------------------------
-  (blame p) ⟨ c ⟩ —→ blame p
+  (err p) ⟨ c ⟩ —→ err p
 
 𝓋 ⟨ id(g) ⟩              —→ 𝓋
 low ⟨ ↑ ⟩               —→ high
 𝓋 ⟨ cₗ ; dₗ ⟩            —→ 𝓋 ⟨ cₗ ⟩ ⟨ dₗ ⟩
 𝓋 ⟨ ℓ !    ⟩ ⟨ ℓ ?ᵖ    ⟩ —→ ℓ
 𝓋 ⟨ low !  ⟩ ⟨ high ?ᵖ ⟩ —→ high
-𝓋 ⟨ high ! ⟩ ⟨ low ?ᵖ ⟩  —→ blame p
-𝓋 ⟨ ⊥ᵖ ⟩                 —→ blame p
+𝓋 ⟨ high ! ⟩ ⟨ low ?ᵖ ⟩  —→ err p
+𝓋 ⟨ ⊥ᵖ ⟩                 —→ err p
 
 
 label coercion equational theory (similar to λS):
