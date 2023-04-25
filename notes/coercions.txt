@@ -53,30 +53,14 @@ high ! ; low  ?ᵖ = ⊥ᵖ
 
 composition function cₗ ⨟ dₗ is based on the rules above
 
+normal forms of coercions (invariant, no subtype coercion):
+
+cₗⁿᶠi ::= ⊥ᵖ | id(g) | ℓ ! | ℓ ?ᵖ | ℓ ?ᵖ ; ℓ !
+
 normal forms of coercions:
 
 cₗⁿᶠ ::= ⊥ᵖ | id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high !
        | low ?ᵖ ; ↑ | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
-
-value-forming coercions (will be referenced in the definition of values):
-
-normal forms of security level coercions for constants:
-
-cₗℓι ::= ↑ | ℓ ! | ↑ ; high !
-
-normal forms of security level coercions for functions and addresses:
-
-cₗℓ ::= id(ℓ) | cₗℓι
-
-normal forms of label coercions in PC position:
-
-cₗᵖᶜ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
-       | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
-
-normal forms of label coercions in reference cell position:
-
-cₗ̂ ::= id(ℓ) | ℓ ?ᵖ
-
 
 ++++ Coercions on Values ++++
 
@@ -95,7 +79,7 @@ id(ι) ⨟ id(ι) = id(ι)
 
 normal forms of coercions on values:
 
-cᵣⁿᶠ ::= id(ι) | ( dₗⁿᶠ | cⁿᶠ → dⁿᶠ) | (dₗⁿᶠ | in: cⁿᶠ; out: dⁿᶠ)
+cᵣⁿᶠ ::= id(ι) | ( dₗⁿᶠ | cⁿᶠ → dⁿᶠ) | (dₗⁿᶠi | in: cⁿᶠ; out: dⁿᶠ)
 cⁿᶠ  ::= (cᵣⁿᶠ | cₗⁿᶠ)
 
 typing rules of coercions on values ⊢ c : A :

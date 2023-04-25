@@ -1,3 +1,22 @@
+value-forming coercions:
+
+normal forms of security level coercions for constants:
+
+cₗℓι ::= ↑ | ℓ ! | ↑ ; high !
+
+normal forms of security level coercions for functions and addresses:
+
+cₗℓ ::= id(ℓ) | cₗℓι
+
+normal forms of label coercions in PC position:
+
+cₗᵖᶜ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
+       | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
+
+normal forms of label coercions in reference cell position:
+
+cₗ̂ ::= id(ℓ) | ℓ ?ᵖ
+
 V ::= k | ƛ N | addr n ℓ̂
     | k ⟨ id(ι) | cₗℓι ⟩
     | ƛ N ⟨ cₗᵖᶜ | c → d | cₗℓ ⟩
