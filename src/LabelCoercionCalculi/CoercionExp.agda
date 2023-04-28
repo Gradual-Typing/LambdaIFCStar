@@ -146,40 +146,41 @@ progress (_ ∘ c) | done proj-up-inj | high ?? p = step (?-id proj-up)
 progress (err g₁ g₂ p) = error
 
 
--- data ⊢_⊑_⦂_;_ : ∀ {g₁ g₁′ g₂ g₂′}
---   → (CoercionExp g₁ ⇒ g₂) → (CoercionExp g₁′ ⇒ g₂′)
---   → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′ → Set where
+data ⊢_⊑_⦂_;_ : ∀ {g₁ g₁′ g₂ g₂′}
+  → (CoercionExp g₁ ⇒ g₂) → (CoercionExp g₁′ ⇒ g₂′)
+  → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′ → Set where
 
---   ⊑-∘ : ∀ {g g′}
---     → (g⊑g′ : g ⊑ₗ g′)
---       ---------------------------------
---     → ⊢ ∘ g ⊑ ∘ g′ ⦂ g⊑g′ ; g⊑g′
+  ⊑-id : ∀ {g g′}
+    → (g⊑g′ : g ⊑ₗ g′)
+      ---------------------------------
+    → ⊢ id g ⊑ id g′ ⦂ g⊑g′ ; g⊑g′
 
---   ⊑-cast : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
---              {e : CoercionExp g₁ ⇒ g₂} {e′ : CoercionExp g₁′ ⇒ g₂′}
---              {c : ⊢ g₂ ⇒ g₃} {c′ : ⊢ g₂′ ⇒ g₃′} {g₁⊑g₁′} {g₂⊑g₂′}
---     → ⊢ e ⊑ e′ ⦂ g₁⊑g₁′ ; g₂⊑g₂′
---     → (g₃⊑g₃′ : g₃ ⊑ₗ g₃′)
---       -------------------------------------------
---     → ⊢ _ ∘ c ⊑ e′ ⟨ c′ ⟩ ⦂ g₁⊑g₁′ ; g₃⊑g₃′
+  ⊑-cast : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
+             {c̅ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+             {c : ⊢ g₂ ⇒ g₃} {c′ : ⊢ g₂′ ⇒ g₃′} {g₁⊑g₁′} {g₂⊑g₂′}
+    → ⊢ c̅ ⊑ c̅′ ⦂ g₁⊑g₁′ ; g₂⊑g₂′
+    → (g₃⊑g₃′ : g₃ ⊑ₗ g₃′)
+      -------------------------------------------
+    → ⊢ c̅ ∘ c ⊑ c̅′ ∘ c′ ⦂ g₁⊑g₁′ ; g₃⊑g₃′
 
---   ⊑-castl : ∀ {g₁ g₁′ g₂ g₂′ g₃}
---              {e : CoercionExp g₁ ⇒ g₂} {e′ : CoercionExp g₁′ ⇒ g₂′}
---              {c : ⊢ g₂ ⇒ g₃} {g₁⊑g₁′} {g₂⊑g₂′}
---     → ⊢ e ⊑ e′ ⦂ g₁⊑g₁′ ; g₂⊑g₂′
---     → (g₃⊑g₂′ : g₃ ⊑ₗ g₂′)
---       -------------------------------------------
---     → ⊢ _ ∘ c ⊑ e′ ⦂ g₁⊑g₁′ ; g₃⊑g₂′
+  ⊑-castl : ∀ {g₁ g₁′ g₂ g₂′ g₃}
+              {c̅ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+              {c : ⊢ g₂ ⇒ g₃} {g₁⊑g₁′} {g₂⊑g₂′}
+    → ⊢ c̅ ⊑ c̅′ ⦂ g₁⊑g₁′ ; g₂⊑g₂′
+    → (g₃⊑g₂′ : g₃ ⊑ₗ g₂′)
+      -------------------------------------------
+    → ⊢ c̅ ∘ c ⊑ c̅′ ⦂ g₁⊑g₁′ ; g₃⊑g₂′
 
---   ⊑-castr : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
---              {e : CoercionExp g₁ ⇒ g₂} {e′ : CoercionExp g₁′ ⇒ g₂′}
---              {c′ : ⊢ g₂′ ⇒ g₃′} {g₁⊑g₁′} {g₂⊑g₂′}
---     → ⊢ e ⊑ e′ ⦂ g₁⊑g₁′ ; g₂⊑g₂′
---     → (g₂⊑g₃′ : g₂ ⊑ₗ g₃′)
---       -------------------------------------------
---     → ⊢ e ⊑ e′ ⟨ c′ ⟩ ⦂ g₁⊑g₁′ ; g₂⊑g₃′
+  ⊑-castr : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
+              {c̅ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+              {c′ : ⊢ g₂′ ⇒ g₃′} {g₁⊑g₁′} {g₂⊑g₂′}
+    → ⊢ c̅ ⊑ c̅′ ⦂ g₁⊑g₁′ ; g₂⊑g₂′
+    → (g₂⊑g₃′ : g₂ ⊑ₗ g₃′)
+      -------------------------------------------
+    → ⊢ c̅ ⊑ c̅′ ∘ c′ ⦂ g₁⊑g₁′ ; g₂⊑g₃′
 
---   ⊑-err : ∀ {g g′} {e : }
---     → (g⊑g′ : g ⊑ₗ g′)
---       ---------------------------------
---     → ⊢ e ⊑ err g₁ g₂ p ⦂ g⊑g′ ; g⊑g′
+  ⊑-err : ∀ {g₁ g₁′ g₂ g₂′} {c̅ : CoercionExp g₁ ⇒ g₂} {p}
+    → (g₁⊑g₁′ : g₁ ⊑ₗ g₁′)
+    → (g₂⊑g₂′ : g₂ ⊑ₗ g₂′)
+      ---------------------------------
+    → ⊢ c̅ ⊑ err g₁′ g₂′ p ⦂ g₁⊑g₁′ ; g₂⊑g₂′
