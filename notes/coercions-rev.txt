@@ -1,9 +1,7 @@
 ++++ Coercions on Labels ++++
 
-coercions             cₗ , dₗ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ
-coercion expressions  c̅ , d̅   ::= ID(g) | c̅ ∘ cₗ | ⊥ᵖ
-
-values                v̅ ::= ID(g) | ID(⋆) ∘ (ℓ ?ᵖ) | v̅ ∘ (ℓ !) | v̅ ∘ ↑
+coercions        cₗ , dₗ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ
+coercion list    c̅ , d̅   ::= ID(g) | c̅ ; cₗ | ⊥ᵖ
 
 typing:
 
@@ -18,24 +16,80 @@ typing:
 
   ⊢ c̅ : g₁ ⇒ g₂    ⊢ cₗ : g₂ ⇒ g₃
  ----------------------------------
-       ⊢ c̅ ∘ cₗ : g₁ ⇒ g₃
+       ⊢ c̅ ; cₗ : g₁ ⇒ g₃
 
 
 semantics:
 
-        c̅ —→ c̅′
---------------------------
-  c̅ ⟨ c ⟩ —→ c̅′ ⟨ c ⟩
+coercion values         c̅ₙ ::= ID(g) | ID(⋆) ; (ℓ ?ᵖ) | c̅ₙ ; (ℓ !) | c̅ₙ ; ↑
 
-----------------------
-  ⊥ᵖ ⟨ c ⟩ —→ ⊥ᵖ
+      c̅ —→ c̅′
+  ----------------
+  c̅ ; c  —→ c̅′ ; c 
 
-v̅ ⟨ id(g) ⟩              —→ v̅
-v̅ ⟨ ℓ !    ⟩ ⟨ ℓ ?ᵖ    ⟩ —→ v̅
-v̅ ⟨ low !  ⟩ ⟨ high ?ᵖ ⟩ —→ v̅ ⟨ ↑ ⟩
-v̅ ⟨ high ! ⟩ ⟨ low ?ᵖ ⟩  —→ ⊥ᵖ
+  -------------
+  ⊥ᵖ ; c  —→ ⊥ᵖ
 
-++++ Coercions on Values ++++
+
+c̅ₙ ; id(g)               —→ c̅ₙ
+c̅ₙ ; ℓ !    ; ℓ ?ᵖ       —→ c̅ₙ
+c̅ₙ ; low !  ; high ?ᵖ    —→ c̅ₙ ; ↑
+c̅ₙ ; high ! ; low ?ᵖ     —→ ⊥ᵖ
+
+Precision for Coercions on Labels
+
+   ⊢ cₗ : g₁ ⇒ g₂        g₁ ⊑ g₁′
+   ⊢ dₗ : g₁′ ⇒ g₂′      g₂ ⊑ g₂′
+----------------------------------
+             cₗ ⊑ dₗ
+
+  ⊢ cₗ : g₁ ⇒ g₂
+  g₁ ⊑ g₃   g₂ ⊑ g₃
+  -----------------
+       cₗ ⊑ g₃
+
+  ⊢ dₗ : g₁ ⇒ g₂
+  h ⊑ g₁   h₂ ⊑ g₂
+  -----------------
+       h ⊑ dₗ
+
+Precision for Coercion Lists (on Labels)
+
+       g ⊑ h
+   -------------
+   ID(g) ⊑ ID(h)
+
+   -------
+    c̅ ⊑ ⊥
+
+   c̅ ⊑ d̅  c ⊑ d
+   --------------
+   c̅ ; c ⊑ d̅ ; d
+
+   c̅ ⊑ d̅  ⊢ d̅ : g ⇒ h   c ⊑ h
+   ---------------------------
+   c̅ ; c ⊑ d̅
+
+   c̅ ⊑ d̅  ⊢ c̅ : g ⇒ h   h ⊑ d
+   ---------------------------
+   c̅ ⊑ d̅ ; d
+  
+
+
+Lemma (Catchup)
+If  c̅ ⊑ d̅ₙ,
+then c̅ —→* c̅ₙ and c̅ₙ ⊑ d̅ₙ for some c̅ₙ.
+
+Lemma (Simulation)
+If  c̅ ⊑ d̅ and d̅ —→ d̅′
+then c̅ —→* c̅′ and c̅′ ⊑ d̅′ for some c̅′.
+
+Theorem (Gradual Guarantee)
+If  c̅ ⊑ d̅ and d̅  —→* d̅ₙ
+then c̅ —→* c̅ₙ and c̅ₙ ⊑ d̅ₙ for some c̅ₙ.
+
+
+++++ Coercions on Terms ++++
 
 between raw types: cᵣ, dᵣ ::= id(ι) | (d̅ | c → d) | (d̅ | in: c; out: d)
 between types:     c, d   ::= (cᵣ | c̅)
