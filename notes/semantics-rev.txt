@@ -1,26 +1,7 @@
-value-forming coercions:
-
-normal forms of security level coercions for constants:
-
-cₗℓι ::= ↑ | ℓ ! | ↑ ; high !
-
-normal forms of security level coercions for functions and addresses:
-
-cₗℓ ::= id(ℓ) | cₗℓι
-
-normal forms of label coercions in PC position:
-
-cₗᵖᶜ ::= id(g) | ↑ | ℓ ! | ℓ ?ᵖ | ↑ ; high ! | low ?ᵖ ; ↑
-       | ℓ ?ᵖ ; ℓ ! | low ?ᵖ ; ↑ ; high !
-
-normal forms of label coercions in reference cell position:
-
-cₗ̂ ::= id(ℓ) | ℓ ?ᵖ
-
 V ::= k | ƛ N | addr n ℓ̂
-    | k ⟨ id(ι) | cₗℓι ⟩
-    | ƛ N ⟨ cₗᵖᶜ | c → d | cₗℓ ⟩
-    | addr n ℓ̂ ⟨ cₗ̂ | in: c; out: d | cₗℓ ⟩
+    | k ⟨ id(ι) | c̅ ⟩                    , c̅ is irreducible
+    | ƛ N ⟨ d̅ | c → d | c̅ ⟩             , c̅ and d̅ are irreducible
+    | addr n ℓ̂ ⟨ d̅ | in: c; out: d | c̅ ⟩ , c̅ and d̅ are irreducible
 
 F ::= app □ M ℓᶜ A B ℓ | app V □ ℓᶜ A B ℓ
     | app! □ M A B g | app! V □ A B g
