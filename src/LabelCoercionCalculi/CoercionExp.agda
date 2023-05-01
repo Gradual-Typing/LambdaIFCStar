@@ -333,7 +333,7 @@ catchup-to-id⨾? (c̅ ⨾ ℓ ?? p) (⊑-cast c̅⊑c̅ₙ′ ⋆⊑ l⊑l)
   with catchup-to-id c̅ c̅⊑c̅ₙ′
 ... | ⟨ id ⋆ , id , c̅↠c̅ₙ , ⊑-id ⋆⊑ ⟩ =
   ⟨ id ⋆ ⨾ ℓ ?? p , id⨾? , plug-cong c̅↠c̅ₙ , ⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l ⟩
-... | ⟨ c̅ₙ ⨾ ℓ₀ ! , inj v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ = {!!}
+... | ⟨ c̅ₙ ⨾ ℓ₀ ! , inj v , c̅↠c̅ₙ , ⊑-castl _ () ⋆⊑ ⟩  {- impossible -}
 catchup-to-id⨾? (c̅ ⨾ c) (⊑-castl c̅⊑c̅ₙ′ x x₁) = {!!}
 catchup-to-id⨾? c̅ (⊑-castr c̅⊑c̅ₙ′ ⋆⊑ ⋆⊑)
   with catchup-to-id c̅ c̅⊑c̅ₙ′
