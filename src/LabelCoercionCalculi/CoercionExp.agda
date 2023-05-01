@@ -282,13 +282,13 @@ catchup-to-id (c̅ ⨾ ↑) (⊑-castl c̅⊑id low⊑g′ high⊑g′) =
 catchup-to-id (c̅ ⨾ ℓ ?? p) (⊑-castl c̅⊑id ⋆⊑ (l⊑l {ℓ}))
   with catchup-to-id c̅ c̅⊑id
 ... | ⟨ c̅ₙ , id {⋆} , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ =
-  ⟨ id ⋆ ⨾ ℓ ?? p , id⨾? , ↠-trans (plug-cong c̅↠c̅ₙ) (_ ∎) , ⊑-castl c̅ₙ⊑id ⋆⊑ l⊑l ⟩
+  ⟨ id ⋆ ⨾ ℓ ?? p , id⨾? , plug-cong c̅↠c̅ₙ , ⊑-castl c̅ₙ⊑id ⋆⊑ l⊑l ⟩
 ... | ⟨ c̅ₙ ⨾ ℓ₀ ! , inj v , c̅↠c̅ₙ , ⊑-castl c̅ₙ⊑id l⊑l ⋆⊑ ⟩ =
   ⟨ c̅ₙ , v , ↠-trans (plug-cong c̅↠c̅ₙ) (_ —→⟨ ?-id v ⟩ _ ∎) , c̅ₙ⊑id ⟩
 catchup-to-id (c̅ ⨾ ℓ !) (⊑-castl c̅⊑id (l⊑l {ℓ}) ⋆⊑)
   with catchup-to-id c̅ c̅⊑id
 ... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ =
-  ⟨ c̅ₙ ⨾ ℓ ! , inj v , ↠-trans (plug-cong c̅↠c̅ₙ) (_ ∎) , ⊑-castl c̅ₙ⊑id l⊑l ⋆⊑ ⟩
+  ⟨ c̅ₙ ⨾ ℓ ! , inj v , plug-cong c̅↠c̅ₙ , ⊑-castl c̅ₙ⊑id l⊑l ⋆⊑ ⟩
 catchup-to-id (c̅ ⨾ id g) (⊑-castl c̅⊑id _ _)
   with catchup-to-id c̅ c̅⊑id
 ... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑id ⟩  =
@@ -305,7 +305,7 @@ catchup-to-inj : ∀ {g₁ g₂ g′ ℓ′}
 catchup-to-inj (c̅ ⨾ ℓ !) c̅ₙ′ v′ (⊑-cast c̅⊑c̅ₙ′ (l⊑l {ℓ}) ⋆⊑)
   with catchup c̅ c̅ₙ′ v′ c̅⊑c̅ₙ′
 ... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩  =
-  ⟨ c̅ₙ ⨾ ℓ ! , inj v , ↠-trans (plug-cong c̅↠c̅ₙ) (_ ∎) , ⊑-cast c̅ₙ⊑c̅ₙ′ l⊑l ⋆⊑ ⟩
+  ⟨ c̅ₙ ⨾ ℓ ! , inj v , plug-cong c̅↠c̅ₙ , ⊑-cast c̅ₙ⊑c̅ₙ′ l⊑l ⋆⊑ ⟩
 catchup-to-inj (c̅ ⨾ id ⋆) c̅ₙ′ v′ (⊑-cast  c̅⊑c̅ₙ′ ⋆⊑ ⋆⊑)
   with catchup-to-inj c̅ c̅ₙ′ v′ (⊑-castr c̅⊑c̅ₙ′ ⋆⊑ ⋆⊑)
 ... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩  =
@@ -329,7 +329,11 @@ catchup-to-id⨾? (c̅ ⨾ id ⋆) (⊑-cast c̅⊑c̅ₙ′ ⋆⊑ ⋆⊑)
   with catchup-to-id c̅ c̅⊑c̅ₙ′
 ... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ =
   ⟨ c̅ₙ , v , ↠-trans (plug-cong c̅↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , ⊑-castr c̅ₙ⊑id ⋆⊑ ⋆⊑ ⟩
-catchup-to-id⨾? (c̅ ⨾ c) (⊑-cast c̅⊑c̅ₙ′ ⋆⊑ l⊑l) = {!!}
+catchup-to-id⨾? (c̅ ⨾ ℓ ?? p) (⊑-cast c̅⊑c̅ₙ′ ⋆⊑ l⊑l)
+  with catchup-to-id c̅ c̅⊑c̅ₙ′
+... | ⟨ id ⋆ , id , c̅↠c̅ₙ , ⊑-id ⋆⊑ ⟩ =
+  ⟨ id ⋆ ⨾ ℓ ?? p , id⨾? , plug-cong c̅↠c̅ₙ , ⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ ℓ₀ ! , inj v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ = {!!}
 catchup-to-id⨾? (c̅ ⨾ c) (⊑-castl c̅⊑c̅ₙ′ x x₁) = {!!}
 catchup-to-id⨾? c̅ (⊑-castr c̅⊑c̅ₙ′ ⋆⊑ ⋆⊑)
   with catchup-to-id c̅ c̅⊑c̅ₙ′
