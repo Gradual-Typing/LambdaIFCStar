@@ -334,7 +334,18 @@ catchup-to-id⨾? (c̅ ⨾ ℓ ?? p) (⊑-cast c̅⊑c̅ₙ′ ⋆⊑ l⊑l)
 ... | ⟨ id ⋆ , id , c̅↠c̅ₙ , ⊑-id ⋆⊑ ⟩ =
   ⟨ id ⋆ ⨾ ℓ ?? p , id⨾? , plug-cong c̅↠c̅ₙ , ⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l ⟩
 ... | ⟨ c̅ₙ ⨾ ℓ₀ ! , inj v , c̅↠c̅ₙ , ⊑-castl _ () ⋆⊑ ⟩  {- impossible -}
-catchup-to-id⨾? (c̅ ⨾ c) (⊑-castl c̅⊑c̅ₙ′ x x₁) = {!!}
+catchup-to-id⨾? (c̅ ⨾ c) (⊑-castl c̅⊑c̅ₙ′ g₃⊑ℓ′ g₂⊑ℓ′)
+  with catchup-to-id⨾? c̅ c̅⊑c̅ₙ′ | g₃⊑ℓ′ | g₂⊑ℓ′ | c
+... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | ⋆⊑ | ⋆⊑ | c = {!!}
+... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | l⊑l {ℓ′} | ⋆⊑ | c = {!!}
+... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | l⊑l {ℓ′} | l⊑l {ℓ′} | c = {!!}
+... | ⟨ id ⋆ , id , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | ⋆⊑ | l⊑l {ℓ′} | c = {!!}
+... | ⟨ c̅ₙ ⨾ low ! , inj v , c̅↠c̅ₙ , ⊑-castr (⊑-castl _ () ⋆⊑) ⋆⊑ ⋆⊑ ⟩ | ⋆⊑ | l⊑l {low} | low ?? p {- impossible -}
+... | ⟨ c̅ₙ ⨾ low ! , inj v , c̅↠c̅ₙ , ⊑-castl c̅ₙ⊑id⨾? _ _ ⟩ | ⋆⊑ | l⊑l {low} | low ?? p =
+  ⟨ c̅ₙ , v , ↠-trans (plug-cong c̅↠c̅ₙ) (_ —→⟨ ?-id v ⟩ _ ∎) , c̅ₙ⊑id⨾? ⟩
+... | ⟨ c̅ₙ ⨾ low ! , inj v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | ⋆⊑ | l⊑l {high} | c = {!!}
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | ⋆⊑ | l⊑l {low} | c = {!!}
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ | ⋆⊑ | l⊑l {high} | c = {!!}
 catchup-to-id⨾? c̅ (⊑-castr c̅⊑c̅ₙ′ ⋆⊑ ⋆⊑)
   with catchup-to-id c̅ c̅⊑c̅ₙ′
 ... | ⟨ c̅ₙ , v , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ = ⟨ c̅ₙ , v , c̅↠c̅ₙ , ⊑-castr c̅ₙ⊑id ⋆⊑ ⋆⊑ ⟩
