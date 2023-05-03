@@ -47,8 +47,38 @@ sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = id (l ℓ)} c̅₁⊑c̅₁′ l⊑l
   with catchup c̅₁ c̅₁′ v′ c̅₁⊑c̅₁′
 ... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
   ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , c̅ₙ⊑c̅₁′ ⟩
-sim-cast c̅₁⊑c̅₁′ ⋆⊑ l⊑l (id v) = {!!}
-sim-cast c̅₁⊑c̅₁′ l⊑l ⋆⊑ (id v) = {!!}
+sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = ℓ !} c̅₁⊑c̅₁′ l⊑l ⋆⊑ (id v′)
+  with catchup c̅₁ c̅₁′ v′ c̅₁⊑c̅₁′
+... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
+  ⟨ c̅ₙ ⨾ ℓ ! , plug-cong c̅₁↠c̅ₙ , ⊑-castl c̅ₙ⊑c̅₁′ l⊑l ⋆⊑ ⟩
+sim-cast {c̅₁ = c̅₁} {id (l low)} {c = low ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (id id)
+  with catchup c̅₁ _ id c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
+  ⟨ id ⋆ ⨾ low ?? p , plug-cong c̅₁↠c̅ₙ , ⊑-castl c̅ₙ⊑c̅₁′ ⋆⊑ l⊑l ⟩
+... | ⟨ id (l low) ⨾ low  ! , inj id , c̅₁↠id⨾! , id⨾!⊑c̅₁′ ⟩ =
+  ⟨ id (l low) , ↠-trans (plug-cong c̅₁↠id⨾!) (_ —→⟨ ?-id id ⟩ _ ∎) , ⊑-id l⊑l ⟩
+... | ⟨ id ⋆ ⨾ low ?? p ⨾ low  ! , inj id⨾? , c̅₁↠id⨾?⨾! , id⨾?⨾!⊑c̅₁′ ⟩ =
+  ⟨ id ⋆ ⨾ low ?? p , ↠-trans (plug-cong c̅₁↠id⨾?⨾!) (_ —→⟨ ?-id id⨾? ⟩ _ ∎) , ⊑-castl (⊑-id ⋆⊑) ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castl _ () _ ⟩
+sim-cast {c̅₁ = c̅₁} {id ⋆ ⨾ low ?? q} {c = low ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (id id⨾?)
+  with catchup c̅₁ _ id⨾? c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
+  ⟨ id ⋆ ⨾ low ?? p , plug-cong c̅₁↠c̅ₙ , ⊑-castl c̅ₙ⊑c̅₁′ ⋆⊑ l⊑l ⟩
+... | ⟨ id (l low) ⨾ low  ! , inj id , c̅₁↠id⨾! , id⨾!⊑id⨾? ⟩ =
+  case id⨾!⊑id⨾? of λ where  {- all impossible -}
+  (⊑-cast (⊑-id ()) _ _)
+  (⊑-castl (⊑-castr (⊑-id ()) y z) l⊑l ⋆⊑)
+  (⊑-castr (⊑-castl _ () _) ⋆⊑ ⋆⊑)
+... | ⟨ id ⋆ ⨾ low ?? p ⨾ low  ! , inj id⨾? , c̅₁↠id⨾?⨾! , id⨾?⨾!⊑c̅₁′ ⟩ =
+  ⟨ id ⋆ ⨾ low ?? p , ↠-trans (plug-cong c̅₁↠id⨾?⨾!) (_ —→⟨ ?-id id⨾? ⟩ _ ∎) , ⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , c̅ₙ⨾!⊑c̅₁′ ⟩ = {!!}
+sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = high ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (id v′)
+  with catchup c̅₁ c̅₁′ v′ c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
+  ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠c̅ₙ , ⊑-castl c̅ₙ⊑c̅₁′ ⋆⊑ l⊑l ⟩
+... | ⟨ id (l low) ⨾ low  ! , inj id , c̅₁↠c̅ₙ⨾! , c̅ₙ⨾!⊑c̅₁′ ⟩ = {!!}
+... | ⟨ id ⋆ ⨾ low ?? p ⨾ low  ! , inj id⨾? , c̅₁↠c̅ₙ⨾! , c̅ₙ⨾!⊑c̅₁′ ⟩ = {!!}
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , c̅ₙ⨾!⊑c̅₁′ ⟩ = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-id x) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ x) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥ x) = {!!}
