@@ -36,8 +36,19 @@ sim-cast : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
 sim-cast {c = c} {c′} c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (ξ c̅₁′→c̅′)
   with sim c̅₁⊑c̅₁′ c̅₁′→c̅′
 ... | ⟨ c̅ , c̅₁↠c̅ , c̅⊑c̅′ ⟩ = ⟨ c̅ ⨾ c , plug-cong c̅₁↠c̅ , ⊑-cast c̅⊑c̅′ g₂⊑g₂′ g₃⊑g₃′ ⟩
-sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ ξ-⊥ = {!!}
-sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (id x) = {!!}
+sim-cast {c̅₁ = c̅₁} {c = c} {c′} c̅₁⊑⊥ g₂⊑g₂′ g₃⊑g₃′ ξ-⊥ =
+  let ⟨ g₁⊑g₁′ , _ ⟩ = prec→⊑ c̅₁ _ c̅₁⊑⊥ in
+  ⟨ c̅₁ ⨾ c , _ ∎ , ⊑-⊥ g₁⊑g₁′ g₃⊑g₃′ ⟩
+sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = id ⋆} c̅₁⊑c̅₁′ ⋆⊑ ⋆⊑ (id v′)
+  with catchup c̅₁ c̅₁′ v′ c̅₁⊑c̅₁′
+... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , c̅ₙ⊑c̅₁′ ⟩
+sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = id (l ℓ)} c̅₁⊑c̅₁′ l⊑l l⊑l (id v′)
+  with catchup c̅₁ c̅₁′ v′ c̅₁⊑c̅₁′
+... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , c̅ₙ⊑c̅₁′ ⟩
+sim-cast c̅₁⊑c̅₁′ ⋆⊑ l⊑l (id v) = {!!}
+sim-cast c̅₁⊑c̅₁′ l⊑l ⋆⊑ (id v) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-id x) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ x) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥ x) = {!!}
