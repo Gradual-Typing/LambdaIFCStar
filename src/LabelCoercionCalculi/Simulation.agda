@@ -15,6 +15,7 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import LabelCoercionCalculi.CoercionExp
+open import LabelCoercionCalculi.Precision
 open import LabelCoercionCalculi.CatchUp
 
 
