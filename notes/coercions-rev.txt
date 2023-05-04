@@ -25,7 +25,7 @@ coercion values         c̅ₙ ::= ID(g) | ID(⋆) ; (ℓ ?ᵖ) | c̅ₙ ; (ℓ 
 
       c̅ —→ c̅′
   ----------------
-  c̅ ; c  —→ c̅′ ; c 
+  c̅ ; c  —→ c̅′ ; c
 
   -------------
   ⊥ᵖ ; c  —→ ⊥ᵖ
@@ -73,7 +73,7 @@ Precision for Coercion Lists (on Labels)
    c̅ ⊑ d̅  ⊢ c̅ : g ⇒ h   h ⊑ d
    ---------------------------
    c̅ ⊑ d̅ ; d
-  
+
 
 
 Lemma (Catchup)
@@ -95,4 +95,6 @@ between raw types: cᵣ, dᵣ ::= id(ι) | (d̅ | c → d) | (d̅ | in: c; out: 
 between types:     c, d   ::= (cᵣ | c̅)
 
 irreducible coercions:
-top-level label coercion expressions are irreducible (v̅ or ⊥ᵖ).
+top-level coercion lists are coercion values
+
+cᵢ, dᵢ ::= (id(ι) | c̅ₙ) | (d̅ₙ | c → d | c̅ₙ) | (d̅ₙ | in: c; out: d | c̅ₙ)
