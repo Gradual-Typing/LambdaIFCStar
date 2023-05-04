@@ -22,3 +22,21 @@ _⨟_ : ∀ {g₁ g₂ g₃} (c̅₁ : CoercionExp g₁ ⇒ g₂) (c̅₂ : Coer
 c̅₁ ⨟ ⊥ g₂ g₃ p = ⊥ _ g₃ p
 c̅₁ ⨟ id g      = c̅₁ ⨾ id g
 c̅₁ ⨟ (c̅₂ ⨾ c)  = (c̅₁ ⨟ c̅₂) ⨾ c
+
+comp-pres-prec : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
+     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
+     {c̅₁′ : CoercionExp g₁′ ⇒ g₂′} {c̅₂′ : CoercionExp g₂′ ⇒ g₃′}
+  → ⊢ c̅₁ ⊑ c̅₁′
+  → ⊢ c̅₂ ⊑ c̅₂′
+    -----------------------------
+  → ⊢ (c̅₁ ⨟ c̅₂) ⊑ (c̅₁′ ⨟ c̅₂′)
+comp-pres-prec c̅₁⊑c̅₁′ (⊑-⊥ x g₃⊑g₃′) =
+  let ⟨ g₁⊑g₁′ , _ ⟩ = prec→⊑ _ _ c̅₁⊑c̅₁′ in
+  ⊑-⊥ g₁⊑g₁′ g₃⊑g₃′
+comp-pres-prec c̅₁⊑c̅₁′ (⊑-id g⊑g′) = ⊑-cast c̅₁⊑c̅₁′ g⊑g′ g⊑g′
+comp-pres-prec c̅₁⊑c̅₁′ (⊑-cast c̅₂⊑c̅₂′ g⊑g₃ g′⊑g₃′) =
+  ⊑-cast (comp-pres-prec c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃ g′⊑g₃′
+comp-pres-prec c̅₁⊑c̅₁′ (⊑-castl c̅₂⊑c̅₂′ g⊑g₃′ g₃⊑g₃′) =
+  ⊑-castl (comp-pres-prec c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃′ g₃⊑g₃′
+comp-pres-prec c̅₁⊑c̅₁′ (⊑-castr c̅₂⊑c̅₂′ g₃⊑g′ g₃⊑g₃′) =
+  ⊑-castr (comp-pres-prec c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g₃⊑g′ g₃⊑g₃′
