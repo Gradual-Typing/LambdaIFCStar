@@ -97,4 +97,6 @@ between types:     c, d   ::= (cᵣ | c̅)
 irreducible coercions:
 top-level coercion lists are coercion values
 
-cᵢ, dᵢ ::= (id(ι) | c̅ₙ) | (d̅ₙ | c → d | c̅ₙ) | (d̅ₙ | in: c; out: d | c̅ₙ)
+cᵢ, dᵢ ::= (id(ι) | c̅ₙ)   , c̅ₙ ≢ ID(g)
+         | (d̅ₙ | c → d | c̅ₙ)
+         | (d̅ₙ | in: c; out: d | c̅ₙ)
