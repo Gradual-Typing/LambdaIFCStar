@@ -1,12 +1,11 @@
-PC expressions e_pc ::= low ⟨ c̅  ⟩
-PC             v_pc ::= low ⟨ c̅ₙ ⟩
+PC             pc ::= low ⟨ c̅ₙ ⟩
 
 expressions
 M = app L M ℓᶜ A B ℓ | app! L M A B g
     | if L A ℓ M N | if! L A g M N
     | let M N | ref⟦ ℓ ⟧ T M | ref?⟦ ℓ ⟧ T M p | ! M
     | assign  L M T ℓ̂ ℓ | assign? L M T p
-    | □ ⟨ c ⟩ | ⦃ d̅ ⦄ M ⟪ ℓ ⟫ | blame p
+    | □ ⟨ c ⟩ | ⦃ pc ⦄ M ⟪ ℓ ⟫ | { c̅ } M ⟪ ℓ ⟫ | blame p
 
 raw values   Vᵣ, Wᵣ ::= k | ƛ N | addr n ℓ
 values       V, W   ::= Vᵣ | Vᵣ ⟨ cᵢ ⟩
@@ -21,36 +20,38 @@ F ::= app □ M ℓᶜ A B ℓ | app V □ ℓᶜ A B ℓ
     | □ ⟨ c ⟩
 
 
-       M ∣ μ ∣ v_pc —→ N ∣ μ′
+         M ∣ μ ∣ pc —→ N ∣ μ′
 -----------------------------------------
-plug M F ∣ μ ∣ v_pc —→ plug N F ∣ μ′
+  plug M F ∣ μ ∣ pc —→ plug N F ∣ μ′
 
 
-plug (blame p) F ∣ μ ∣ v_pc —→ blame p ∣ μ
+plug (blame p) F ∣ μ ∣ pc —→ blame p ∣ μ
 
 
-          ⊢ c̅ₙ : g₁ ⇒ g₂   ⊢ d̅ : g₃ ⇒ g₄
-       (((stamp c̅ₙ ℓ) ⨾ g₂ ⋎̃ ℓ ⇒ g₃) ⨟ d̅) —↠ c̅ₙ′
-             M ∣ μ ∣ c̅ₙ′ —→ N ∣ μ′
+       low ⟨ (stamp c̅ₙ ℓ) ⨾ (g₁ ⋎̃ ℓ ⇒ g₂) ⨟ c̅ ⟩ —↠ pc
+--------------------------------------------------------------  ⊢ c̅ₙ : low ⇒ g₁  ⊢ c̅ : g₂ ⇒ g₃
+   { c̅ } M ⟪ ℓ ⟫ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ ⦃ pc ⦄ M ⟪ ℓ ⟫ ∣ μ
+
+
+  low ⟨ (stamp c̅ₙ ℓ) ⨾ (g₁ ⋎̃ ℓ ⇒ g₂) ⨟ c̅ ⟩ —↠ low ⟨ ⊥ᵖ ⟩
+--------------------------------------------------------------  ⊢ c̅ₙ : low ⇒ g₁  ⊢ c̅ : g₂ ⇒ g₃
+   { c̅ } M ⟪ ℓ ⟫ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ blame p
+
+
+              M ∣ μ ∣ pc′ —→ N ∣ μ′
 ------------------------------------------------------------
-⦃ d̅ ⦄ M ⟪ ℓ ⟫ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ ⦃ d̅ ⦄ N ⟪ ℓ ⟫ ∣ μ′
+⦃ pc′ ⦄ M ⟪ ℓ ⟫ ∣ μ ∣ pc  —→ ⦃ pc′ ⦄ N ⟪ ℓ ⟫ ∣ μ′
 
 
-          ⊢ c̅ₙ : g₁ ⇒ g₂   ⊢ d̅ : g₃ ⇒ g₄
-       (((stamp c̅ₙ ℓ) ⨾ g₂ ⋎̃ ℓ ⇒ g₃) ⨟ d̅ₙ) —↠ ⊥ᵖ
-------------------------------------------------------------
-⦃ d̅ ⦄ M ⟪ ℓ ⟫ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ blame p ∣ μ′
+⦃ pc′ ⦄ blame p ⟪ ℓ ⟫ ∣ μ ∣ pc —→ blame p
 
 
-⦃ d̅ ⦄ blame p ⟪ ℓ ⟫ ∣ μ ∣ v_pc —→ blame p ∣ μ
+⦃ _ ⦄ V ⟪ ℓ ⟫ ∣ μ ∣ pc —→ stamp V ℓ ∣ μ
 
 
-⦃ _ ⦄ V ⟪ ℓ ⟫ ∣ μ ∣ v_pc —→ stamp V ℓ ∣ μ
-
-
-               c —↠ cᵢ
+                c —↠ cᵢ
 --------------------------------------------
-  Vᵣ ⟨ c ⟩ ∣ μ | v_pc —→ Vᵣ ⟨ cᵢ ⟩ ∣ μ
+  Vᵣ ⟨ c ⟩ ∣ μ | pc —→ Vᵣ ⟨ cᵢ ⟩ ∣ μ
 
 
             c —↠ (cᵣ | ⊥ᵖ)
@@ -58,24 +59,22 @@ plug (blame p) F ∣ μ ∣ v_pc —→ blame p ∣ μ
     Vᵣ ⟨ c ⟩ ∣ μ | v_pc —→ blame p
 
 
-k ⟨ id(ι) | id(ℓ) ⟩ ∣ μ ∣ v_pc —→ k ∣ μ
+k ⟨ id(ι) | id(ℓ) ⟩ ∣ μ ∣ pc —→ k ∣ μ
 
 
-(Vᵣ ⟨ cᵢ ⟩) ⟨ d ⟩ ∣ μ ∣ v_pc —→ V ⟨ cᵢ ⨟ d ⟩ ∣ μ
+(Vᵣ ⟨ cᵢ ⟩) ⟨ d ⟩ ∣ μ ∣ pc —→ V ⟨ cᵢ ⨟ d ⟩ ∣ μ
 
 
-app (ƛ N) V ℓᶜ A B ℓ ∣ μ ∣ v_pc —→ ⦃ id ⦄ (N[ V ]) ⟪ ℓ ⟫ ∣ μ
+app (ƛ N) V A B ℓ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ ⦃ low ⟨ stamp c̅ₙ ℓ ⟩ ⦄ (N[ V ]) ⟪ ℓ ⟫ ∣ μ
 
 
-app ((ƛ N) ⟨ d̅ | c → d | c̅ₙ ⟩) V ℓᶜ A B ℓ ∣ μ ∣ v_pc —→
-      let (V ⟨ c ⟩) in (⦃ d̅ ⦄ (N ⟨ d ⟩) ⟪ ∥ c̅ₙ ∥ ⟫) ∣ μ
+app ((ƛ N) ⟨ d̅ | c → d | c̅ₙ ⟩) V A B ℓ ∣ μ ∣ pc —→ let V ⟨ c ⟩ in ({ d̅ } (N ⟨ d ⟩) ⟪ ∥ c̅ₙ ∥ ⟫) ∣ μ
 
 
-app! (ƛ N) V A B ℓ ∣ μ ∣ v_pc —→ ⦃ id ⦄ (N[ V ]) ⟪ ℓ ⟫ ∣ μ
+app! (ƛ N) V A B ℓ ∣ μ ∣ pc —→ { id(⋆) } (N[ V ]) ⟪ ℓ ⟫ ∣ μ
 
 
-app! ((ƛ N) ⟨ d̅ | c → d | c̅ₙ ⟩) V A B g ∣ μ ∣ v_pc —→
-    let (V ⟨ c ⟩) in (⦃ d̅ ⦄ (N ⟨ d ⟩) ⟪ ∥ c̅ₙ ∥ ⟫) ∣ μ
+app! ((ƛ N) ⟨ d̅ | c → d | c̅ₙ ⟩) V A B g ∣ μ ∣ pc —→ let V ⟨ c ⟩ in ({ d̅ } (N ⟨ d ⟩) ⟪ ∥ c̅ₙ ∥ ⟫) ∣ μ
 
 
 if true A ℓ M N ∣ μ ∣ v_pc —→ ⦃ id ⦄ M ⟪ ℓ ⟫ ∣ μ
