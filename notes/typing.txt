@@ -13,11 +13,11 @@
 ---------------------------------------------- Lambda
     Γ ; Σ ; gc ⊢ ƛ N ⇐ ⟦ g ⟧ A → B of ℓ
 
-    Γ ; Σ ; pc ⊢ L ⇐ ⟦ pc ⋎ ℓ ⟧ A → B of ℓ
-    Γ ; Σ ; pc ⊢ M ⇐ A
+    Γ ; Σ ; ℓᶜ ⊢ L ⇐ ⟦ ℓᶜ ⋎ ℓ ⟧ A → B of ℓ
+    Γ ; Σ ; ℓᶜ ⊢ M ⇐ A
                C = stamp B ℓ
 ---------------------------------------------- App
-    Γ ; Σ ; pc ⊢ app L M A B ℓ ⇐ C
+    Γ ; Σ ; ℓᶜ ⊢ app L M A B ℓ ⇐ C
 
     Γ ; Σ ; gc ⊢ L ⇐ ⟦ ⋆ ⟧ A → B of g
     Γ ; Σ ; gc ⊢ M ⇐ A
@@ -25,12 +25,12 @@
 ----------------------------------------------- App!
     Γ ; Σ ; gc ⊢ app! L M A B g ⇐ C
 
-    Γ ; Σ ; pc     ⊢ L ⇐ ` Bool of ℓ
-    Γ ; Σ ; pc ⋎ ℓ ⊢ M ⇐ A
-    Γ ; Σ ; pc ⋎ ℓ ⊢ N ⇐ A
+    Γ ; Σ ; ℓᶜ     ⊢ L ⇐ ` Bool of ℓ
+    Γ ; Σ ; ℓᶜ ⋎ ℓ ⊢ M ⇐ A
+    Γ ; Σ ; ℓᶜ ⋎ ℓ ⊢ N ⇐ A
                B = stamp A ℓ
 ---------------------------------------- If
-    Γ ; Σ ; pc ⊢ if L A ℓ M N ⇐ B
+    Γ ; Σ ; ℓᶜ ⊢ if L A ℓ M N ⇐ B
 
     Γ ; Σ ; gc ⊢ L ⇐ ` Bool of g
     Γ ; Σ ;  ⋆ ⊢ M ⇐ A
@@ -44,11 +44,11 @@
 ----------------------------------------- Let
         Γ ; Σ ; gc ⊢ `let M A N ⇐ B
 
-    Γ ; Σ ; pc ⊢ M ⇐ T of l ℓ
-               pc ≼ ℓ
+    Γ ; Σ ; ℓᶜ ⊢ M ⇐ T of l ℓ
+               ℓᶜ ≼ ℓ
       A = Ref (T of l ℓ) of low
 -------------------------------------- RefStatic
-    Γ ; Σ ; pc ⊢ ref⟦ ℓ ⟧ T M ⇐ A
+    Γ ; Σ ; ℓᶜ ⊢ ref⟦ ℓ ⟧ T M ⇐ A
 
     Γ ; Σ ; ⋆ ⊢ M ⇐ T of l ℓ
       A = Ref (T of l ℓ) of low
@@ -63,12 +63,12 @@
    Γ ; Σ ; gc ⊢ ! M A g ⇐ B
 
 
-   Γ ; Σ ; pc ⊢ L ⇐ Ref (T of l ℓ̂) of l ℓ
-   Γ ; Σ ; pc ⊢ M ⇐ T of l ℓ̂
-            pc ⋎ ℓ ≼ ℓ̂
+   Γ ; Σ ; ℓᶜ ⊢ L ⇐ Ref (T of l ℓ̂) of l ℓ
+   Γ ; Σ ; ℓᶜ ⊢ M ⇐ T of l ℓ̂
+            ℓᶜ ⋎ ℓ ≼ ℓ̂
              A = Unit
 --------------------------------------------- AssignStatic
-   Γ ; Σ ; pc ⊢ assign L M T ℓ̂ ℓ ⇐ A
+   Γ ; Σ ; ℓᶜ ⊢ assign L M T ℓ̂ ℓ ⇐ A
 
    Γ ; Σ ; gc ⊢ L ⇐ Ref (T of ⋆) of g
    Γ ; Σ ; gc ⊢ M ⇐ T of ⋆
