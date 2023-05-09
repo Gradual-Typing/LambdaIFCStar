@@ -1,19 +1,19 @@
-PC             pc ::= low ⟨ c̅ₙ ⟩
+PC           pc ::= low ⟨ c̅ₙ ⟩
 
 expressions
-M = app L M ℓᶜ A B ℓ | app! L M A B g
-    | if L A ℓ M N | if! L A g M N
+M ::= app L M A B ℓ | app! L M A B g
+    | if  L A ℓ M N | if!  L A g M N
     | let M N | ref⟦ ℓ ⟧ T M | ref?⟦ ℓ ⟧ T M p | ! M
     | assign  L M T ℓ̂ ℓ | assign? L M T p
     | □ ⟨ c ⟩ | ⦃ pc ⦄ M ⟪ ℓ ⟫ | { c̅ } M ⟪ ℓ ⟫ | blame p
 
-raw values   Vᵣ, Wᵣ ::= k | ƛ N | addr n ℓ
+raw values   Vᵣ, Wᵣ ::= k  | ƛ N | addr n ℓ
 values       V, W   ::= Vᵣ | Vᵣ ⟨ cᵢ ⟩
 
 
-F ::= app □ M ℓᶜ A B ℓ | app V □ ℓᶜ A B ℓ
+F ::= app  □ M A B ℓ | app  V □ A B ℓ
     | app! □ M A B g | app! V □ A B g
-    | if □ A ℓ M N | if! □ A g M N
+    | if   □ A ℓ M N | if!  □ A g M N
     | let □ N | ref⟦ ℓ ⟧ T □ | ref?⟦ ℓ ⟧ T □ p | ! □
     | assign  □ M T ℓ̂ ℓ | assign  V □ T ℓ̂ ℓ
     | assign? □ M T p   | assign? V □ T p
