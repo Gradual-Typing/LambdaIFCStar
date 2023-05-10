@@ -116,7 +116,43 @@ sim-cast {c̅₁ = c̅₁} {c = id ⋆} c̅₁⊑c̅₁′ ⋆⊑ ⋆⊑ (?-id v
   with catchup c̅₁ _ (inj v′) c̅₁⊑c̅₁′
 ... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
   ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , prec-inj-left _ _ v v′ c̅ₙ⊑c̅₁′ ⟩
-sim-cast {c = ℓ ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id v′) = {!!}
+sim-cast {c̅₁ = c̅₁} {c = low ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id v′)
+  with catchup c̅₁ _ (inj v′) c̅₁⊑c̅₁′
+... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , _ ⟩ = {!!}
+sim-cast {c̅₁ = c̅₁} {c̅₂′ = id (l high)} {c = high ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id id)
+  with catchup c̅₁ _ (inj id) c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠id , ⊑-castr id⊑c̅₂′ ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠id , ⊑-castl id⊑c̅₂′ ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castl _ () _) ⋆⊑ ⋆⊑ ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-cast x l⊑l ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , x ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castl c̅ₙ⊑id l⊑l ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , c̅ₙ⊑id ⟩
+sim-cast {c̅₁ = c̅₁} {c̅₂′ = id (l low) ⨾ ↑} {c = high ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id (up id))
+  with catchup c̅₁ _ (inj (up id)) c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠id , ⊑-castr id⊑c̅₂′ ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠id , ⊑-castl id⊑c̅₂′ ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-cast x l⊑l ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ ⨾ ↑ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-↑ v ⟩ _ ∎) , ⊑-cast x l⊑l l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castl c̅ₙ⊑id l⊑l ⋆⊑) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ ⨾ ↑ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-↑ v ⟩ _ ∎) , ⊑-cast c̅ₙ⊑id l⊑l l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-cast x y z ⟩ = {!!}
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castl c̅ₙ⊑id⨾↑ l⊑l ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , c̅ₙ⊑id⨾↑ ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castl _ () _) y z) ⋆⊑ ⋆⊑ ⟩
+sim-cast {c̅₁ = c̅₁} {c̅₂′ = id ⋆ ⨾ low ?? p′ ⨾ ↑} {c = high ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id (up id⨾?))
+  with catchup c̅₁ _ (inj (up id⨾?)) c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠id , ⊑-castr id⊑c̅₂′ ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠id , ⊑-castl id⊑c̅₂′ ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr x ⋆⊑ ⋆⊑ ⟩ = {!!}
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , _ ⟩ = {!!}
+sim-cast {c̅₁ = c̅₁} {c̅₂′ = id ⋆ ⨾ high ?? p′} {c = high ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id id⨾?)
+  with catchup c̅₁ _ (inj id⨾?) c̅₁⊑c̅₁′
+... | ⟨ id ⋆ , id , c̅₁↠id , ⊑-castr id⊑c̅₂′ ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠id , ⊑-castl id⊑c̅₂′ ⋆⊑ l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr x ⋆⊑ ⋆⊑ ⟩ = {!!}
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , _ ⟩ = {!!}
+
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ x) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥ x) = {!!}
 
