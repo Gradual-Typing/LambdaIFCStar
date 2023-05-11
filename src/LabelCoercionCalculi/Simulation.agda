@@ -145,17 +145,29 @@ sim-cast {c̅₁ = c̅₁} {c̅₂′ = id ⋆ ⨾ low ?? p′ ⨾ ↑} {c = hig
   with catchup c̅₁ _ (inj (up id⨾?)) c̅₁⊑c̅₁′
 ... | ⟨ id ⋆ , id , c̅₁↠id , ⊑-castr id⊑c̅₂′ ⋆⊑ ⋆⊑ ⟩ =
   ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠id , ⊑-castl id⊑c̅₂′ ⋆⊑ l⊑l ⟩
-... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr x ⋆⊑ ⋆⊑ ⟩ = {!!}
-... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , _ ⟩ = {!!}
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-cast x l⊑l ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ ⨾ ↑ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-↑ v ⟩ _ ∎) , ⊑-cast x l⊑l l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castl x l⊑l ⋆⊑) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ ⨾ ↑ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-↑ v ⟩ _ ∎) , ⊑-cast x l⊑l l⊑l ⟩
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castr (⊑-castl _ () _) y z) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑ ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-cast x l⊑l ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , x ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castl x l⊑l ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , x ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castr (⊑-castl _ () _) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑ ⟩
 sim-cast {c̅₁ = c̅₁} {c̅₂′ = id ⋆ ⨾ high ?? p′} {c = high ?? p} c̅₁⊑c̅₁′ ⋆⊑ l⊑l (?-id id⨾?)
   with catchup c̅₁ _ (inj id⨾?) c̅₁⊑c̅₁′
 ... | ⟨ id ⋆ , id , c̅₁↠id , ⊑-castr id⊑c̅₂′ ⋆⊑ ⋆⊑ ⟩ =
   ⟨ id ⋆ ⨾ high ?? p , plug-cong c̅₁↠id , ⊑-castl id⊑c̅₂′ ⋆⊑ l⊑l ⟩
-... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr x ⋆⊑ ⋆⊑ ⟩ = {!!}
-... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , _ ⟩ = {!!}
-
+... | ⟨ c̅ₙ ⨾ low  ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castl _ () _) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑ ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-cast x l⊑l ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , x ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castl x l⊑l ⋆⊑) ⋆⊑ ⋆⊑ ⟩ =
+  ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ⨾!) (_ —→⟨ ?-id v ⟩ _ ∎) , x ⟩
+... | ⟨ c̅ₙ ⨾ high ! , inj v , c̅₁↠c̅ₙ⨾! , ⊑-castr (⊑-castr (⊑-castl _ () _) y z) ⋆⊑ ⋆⊑ ⟩
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ x) = {!!}
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥ x) = {!!}
+
 
 
 sim (⊑-cast c̅₁⊑c̅₁′ g₃⊑g₃′ g₂⊑g₂′) c̅₁′→c̅₂′ = sim-cast c̅₁⊑c̅₁′ g₃⊑g₃′ g₂⊑g₂′ c̅₁′→c̅₂′
