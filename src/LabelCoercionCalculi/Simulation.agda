@@ -33,7 +33,7 @@ sim-cast : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → g₂ ⊑ₗ g₂′ → g₃ ⊑ₗ g₃′     {- c ⊑ c′ -}
   → c̅₁′ ⨾ c′ —→ c̅₂′
-    ------------------------------------------
+    ---------------------------------------------
   → ∃[ c̅₂ ] (c̅₁ ⨾ c —↠ c̅₂) × (⊢ c̅₂ ⊑ c̅₂′)
 sim-cast {c = c} {c′} c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (ξ c̅₁′→c̅′)
   with sim c̅₁⊑c̅₁′ c̅₁′→c̅′
@@ -47,8 +47,10 @@ sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = id ⋆} c̅₁⊑c̅₁′ ⋆⊑ �
   ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , c̅ₙ⊑c̅₁′ ⟩
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (id   v′) = sim-cast-id c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-id v′) = sim-cast-id? c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
-sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ x) = {!!}
-sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥ x) = {!!}
+sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ v′) = {!!}
+sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥  v′) =
+  let ⟨ g₁⊑g₁′ , _ ⟩ = prec→⊑ _ _ c̅₁⊑c̅₁′ in
+  ⟨ _ , _ ∎ , ⊑-⊥ g₁⊑g₁′ g₃⊑g₃′ ⟩
 
 
 
