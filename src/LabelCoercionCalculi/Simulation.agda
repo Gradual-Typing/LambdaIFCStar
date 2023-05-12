@@ -65,7 +65,7 @@ sim-castr {c′ = c′} c̅₁⊑c̅₁′ g₂⊑g₂′ g₂⊑g₃′ (ξ c̅
 sim-castr {c̅₁ = c̅₁} {c′ = c′} c̅₁⊑⊥ g₂⊑g₂′ g₂⊑g₃′ ξ-⊥ =
   let ⟨ g₁⊑g₁′ , _ ⟩ = prec→⊑ c̅₁ _ c̅₁⊑⊥ in
   ⟨ c̅₁ , _ ∎ , ⊑-⊥ g₁⊑g₁′ g₂⊑g₃′ ⟩
--- sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (id   v′) = sim-cast-id  c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
+sim-castr c̅₁⊑c̅₁′ g₂⊑g₂′ g₂⊑g₃′ (id   v′) = ⟨ _ , _ ∎ , c̅₁⊑c̅₁′ ⟩
 -- sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-id v′) = sim-cast-id? c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
 -- sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ v′) = sim-cast-↑  c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
 sim-castr c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥  v′) =
