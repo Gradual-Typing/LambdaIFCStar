@@ -45,9 +45,9 @@ sim-cast {c̅₁ = c̅₁} {c̅₁′} {c = id ⋆} c̅₁⊑c̅₁′ ⋆⊑ �
   with catchup c̅₁ c̅₁′ v′ c̅₁⊑c̅₁′
 ... | ⟨ c̅ₙ , v , c̅₁↠c̅ₙ , c̅ₙ⊑c̅₁′ ⟩ =
   ⟨ c̅ₙ , ↠-trans (plug-cong c̅₁↠c̅ₙ) (_ —→⟨ id v ⟩ _ ∎) , c̅ₙ⊑c̅₁′ ⟩
-sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (id   v′) = sim-cast-id c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
+sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (id   v′) = sim-cast-id  c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-id v′) = sim-cast-id? c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
-sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ v′) = {!!}
+sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-↑ v′) = sim-cast-↑  c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ v′
 sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥  v′) =
   let ⟨ g₁⊑g₁′ , _ ⟩ = prec→⊑ _ _ c̅₁⊑c̅₁′ in
   ⟨ _ , _ ∎ , ⊑-⊥ g₁⊑g₁′ g₃⊑g₃′ ⟩
