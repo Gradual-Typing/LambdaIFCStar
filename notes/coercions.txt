@@ -91,11 +91,11 @@ then c̅ —→* c̅ₙ and c̅ₙ ⊑ d̅ₙ for some c̅ₙ.
 
 ++++ Coercions on Terms ++++
 
-between raw types: cᵣ, dᵣ ::= id(ι) | (d̅ | c → d) | (d̅ | in: c; out: d)
+between raw types: cᵣ, dᵣ ::= id(ι) | (d̅ | c → d) | (in: c; out: d)
 between types:     c, d   ::= (cᵣ | c̅)
 
 irreducible coercions:
 
-cᵢ, dᵢ ::= (id(ι) | c̅ₙ)   , c̅ₙ ≢ ID(g)
+cᵢ, dᵢ ::= (id(ι) | c̅ₙ)       , c̅ₙ ≢ ID(g)
          | (d̅ | c → d | c̅ₙ)
-         | (d̅ | in: c; out: d | c̅ₙ)
+         | (in: c; out: d | c̅ₙ)

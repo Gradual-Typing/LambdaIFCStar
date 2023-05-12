@@ -60,10 +60,10 @@
     Γ ; Σ ; ℓc ; ℓv ⊢ ref⟦ ℓ ⟧ T M ⇐ A
 
 
-       Γ ; Σ ; ⋆ ; ℓv ⊢ M ⇐ T of l ℓ
+       Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of l ℓ
          A = Ref (T of l ℓ) of low
 --------------------------------------------- Ref?
-    Γ ; Σ ; ⋆ ; ℓv ⊢ ref?⟦ ℓ ⟧ T M p ⇐ A
+    Γ ; Σ ; gc ; ℓv ⊢ ref?⟦ ℓ ⟧ T M p ⇐ A
 
 
      Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of g
@@ -80,9 +80,9 @@
    Γ ; Σ ; ℓc ; ℓv ⊢ assign L M T ℓ̂ ℓ ⇐ A
 
 
-   Γ ; Σ ; gc ; ℓv ⊢ L ⇐ Ref (T of ⋆) of g
-       Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of ⋆
-                A = Unit
+   Γ ; Σ ; gc ; ℓv ⊢ L ⇐ Ref (T of ĝ) of g
+       Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of ĝ
+                   A = Unit
 ---------------------------------------------- Assign?
    Γ ; Σ ; gc ; ℓv ⊢ assign? L M T p ⇐ A
 
@@ -90,14 +90,14 @@
                 Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
   pc = low ⟨ cₙ ⟩   ⊢ cₙ : low ⇒ gc′   ∥ cₙ ∥ = ℓv′
                    ℓv ⋎ ℓ ≼ ℓv′
-                  B = stamp A ℓ
+                   B = stamp A ℓ
 -------------------------------------------------------- Protect
           Γ ; Σ ; gc ; ℓv ⊢ ⦃ pc ⦄ M ⟪ ℓ ⟫ ⇐ B
 
 
             Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
          ⊢ c̅ : gc″ ⇒ gc′   gc ⋎̃ ℓ ≾ gc″
-                  B = stamp A ℓ
+                   B = stamp A ℓ
 --------------------------------------------------- ProtectCast
         Γ ; Σ ; gc ; ℓv ⊢ { c̅ } M ⟪ ℓ ⟫ ⇐ B
 
