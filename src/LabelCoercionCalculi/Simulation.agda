@@ -54,6 +54,8 @@ sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥  v′) =
 
 
 
-sim (⊑-cast c̅₁⊑c̅₁′ g₃⊑g₃′ g₂⊑g₂′) c̅₁′→c̅₂′ = sim-cast c̅₁⊑c̅₁′ g₃⊑g₃′ g₂⊑g₂′ c̅₁′→c̅₂′
-sim (⊑-castl c̅₁⊑c̅₁′ x x₁) c̅₁′→c̅₂′ = {!!}
+sim (⊑-cast  c̅₁⊑c̅₁′ g₃⊑g₃′ g₂⊑g₂′) c̅₁′→c̅₂′ = sim-cast c̅₁⊑c̅₁′ g₃⊑g₃′ g₂⊑g₂′ c̅₁′→c̅₂′
+sim (⊑-castl {c = c} c̅₁⊑c̅₁′ g₃⊑g₂′ g₂⊑g₂′) c̅₁′→c̅₂′
+  with sim c̅₁⊑c̅₁′ c̅₁′→c̅₂′
+... | ⟨ c̅ , c̅₁↠c̅ , c̅⊑c̅′ ⟩ = ⟨ c̅ ⨾ c , plug-cong c̅₁↠c̅ , ⊑-castl c̅⊑c̅′ g₃⊑g₂′ g₂⊑g₂′ ⟩
 sim (⊑-castr c̅₁⊑c̅₁′ x x₁) c̅₁′→c̅₂′ = {!!}
