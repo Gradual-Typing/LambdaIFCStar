@@ -56,12 +56,12 @@
               Γ ; Σ ; ℓc ; ℓv ⊢ M ⇐ T of l ℓ
                         ℓc ≼ ℓ
 ---------------------------------------------------------------- RefStatic
-  Γ ; Σ ; ℓc ; ℓv ⊢ ref⟦ ℓ ⟧ T M ⇐ Ref (T of l ℓ) of low
+  Γ ; Σ ; ℓc ; ℓv ⊢ ref⟦ ℓ ⟧ M ⇐ Ref (T of l ℓ) of low
 
 
               Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of l ℓ
 ----------------------------------------------------------------- Ref?
-  Γ ; Σ ; gc ; ℓv ⊢ ref?⟦ ℓ ⟧ T M p ⇐ Ref (T of l ℓ) of low
+  Γ ; Σ ; gc ; ℓv ⊢ ref?⟦ ℓ ⟧ M p ⇐ Ref (T of l ℓ) of low
 
 
      Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of g
