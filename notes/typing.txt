@@ -53,17 +53,15 @@
       Γ ; Σ ; gc ; ℓv ⊢ `let M A N ⇐ B
 
 
-    Γ ; Σ ; ℓc ; ℓv ⊢ M ⇐ T of l ℓ
-                ℓc ≼ ℓ
-      A = Ref (T of l ℓ) of low
--------------------------------------- RefStatic
-    Γ ; Σ ; ℓc ; ℓv ⊢ ref⟦ ℓ ⟧ T M ⇐ A
+              Γ ; Σ ; ℓc ; ℓv ⊢ M ⇐ T of l ℓ
+                        ℓc ≼ ℓ
+---------------------------------------------------------------- RefStatic
+  Γ ; Σ ; ℓc ; ℓv ⊢ ref⟦ ℓ ⟧ T M ⇐ Ref (T of l ℓ) of low
 
 
-       Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of l ℓ
-         A = Ref (T of l ℓ) of low
---------------------------------------------- Ref?
-    Γ ; Σ ; gc ; ℓv ⊢ ref?⟦ ℓ ⟧ T M p ⇐ A
+              Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of l ℓ
+----------------------------------------------------------------- Ref?
+  Γ ; Σ ; gc ; ℓv ⊢ ref?⟦ ℓ ⟧ T M p ⇐ Ref (T of l ℓ) of low
 
 
      Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of g
@@ -75,16 +73,14 @@
    Γ ; Σ ; ℓc ; ℓv ⊢ L ⇐ Ref (T of l ℓ̂) of l ℓ
          Γ ; Σ ; ℓc ; ℓv ⊢ M ⇐ T of l ℓ̂
                   ℓc ⋎ ℓ ≼ ℓ̂
-                   A = Unit
 --------------------------------------------------- AssignStatic
-   Γ ; Σ ; ℓc ; ℓv ⊢ assign L M T ℓ̂ ℓ ⇐ A
+   Γ ; Σ ; ℓc ; ℓv ⊢ assign L M T ℓ̂ ℓ ⇐ Unit
 
 
    Γ ; Σ ; gc ; ℓv ⊢ L ⇐ Ref (T of ĝ) of g
        Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of ĝ
-                   A = Unit
 ---------------------------------------------- Assign?
-   Γ ; Σ ; gc ; ℓv ⊢ assign? L M T p ⇐ A
+   Γ ; Σ ; gc ; ℓv ⊢ assign? L M T p ⇐ Unit
 
 
                 Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
