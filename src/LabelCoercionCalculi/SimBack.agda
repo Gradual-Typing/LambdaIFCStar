@@ -16,6 +16,7 @@ open import Common.SecurityLabels
 open import Common.BlameLabels
 open import LabelCoercionCalculi.CoercionExp
 open import LabelCoercionCalculi.Precision
+open import LabelCoercionCalculi.SimBackLemmas
 
 
 sim-back : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CoercionExp (l ℓ) ⇒ g} {c̅₁′ : CoercionExp (l ℓ′) ⇒ g′}
@@ -35,11 +36,14 @@ sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (ξ c̅→c̅₁)
   with sim-back c̅⊑c̅₁′ c̅→c̅₁
 ... | ⟨ c̅₂′ , c̅₂ , c̅₁′↠c̅₂′ , c̅₁↠c̅₂ , c̅₂⊑c̅₂′ ⟩ =
   ⟨ c̅₂′ , c̅₂ ⨾ _ , c̅₁′↠c̅₂′ , plug-cong c̅₁↠c̅₂ , ⊑-castl c̅₂⊑c̅₂′ g₁⊑g′ g₂⊑g′ ⟩
-sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ ξ-⊥ = {!!}
+sim-back-castl ⊥⊑c̅₁′ g₁⊑g′ g₂⊑g′ ξ-⊥
+  with sim-back-blame ⊥⊑c̅₁′ | prec→⊑ _ _ ⊥⊑c̅₁′
+... | ⟨ q , c̅₁′↠⊥ , ⊥⊑⊥ ⟩ | ⟨ ℓ⊑ℓ′ , _ ⟩ =
+  ⟨ ⊥ _ _ q , _ , c̅₁′↠⊥ , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ g₂⊑g′ ⟩
 sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (id x) = {!!}
 sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-id x) = {!!}
 sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-↑ x) = {!!}
-sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-⊥ x) = {!!}
+sim-back-castl c̅⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v) = {!!}
 
 
 sim-back (⊑-cast c̅⊑c̅′ g₁⊑g₁′ g⊑g′) c̅₁→c̅₂   = {!!}
