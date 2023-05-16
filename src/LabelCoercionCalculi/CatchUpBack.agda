@@ -78,7 +78,12 @@ catchup-back (c̅ ⨾ ℓ !) (c̅′ ⨾ ↑) (inj v) (⊑-castr x ⋆⊑ ⋆⊑
   ⟨ ⊥ _ _ _ , ↠-trans (plug-cong c̅′↠c̅₂′) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , v-⊥ (⊑-⊥ ℓ⊑ℓ′ ⋆⊑) ⟩
 catchup-back (c̅ ⨾ ℓ !) (c̅′ ⨾ ℓ′ !) (inj v) (⊑-castr x ⋆⊑ ⋆⊑)
   with catchup-back (c̅ ⨾ ℓ !) c̅′ (inj v) x
-... | ⟨ c̅₂′ , c̅′↠c̅₂′ , _ ⟩ = {!!}
+... | ⟨ c̅₂′ , c̅′↠c̅₂′ , v-v v y ⟩ =
+  ⟨ c̅₂′ ⨾ ℓ′ ! , plug-cong c̅′↠c̅₂′ , v-v (inj v) (⊑-castr y ⋆⊑ ⋆⊑) ⟩
+... | ⟨ c̅₂′ , c̅′↠c̅₂′ , v-⊥ y ⟩
+  with prec→⊑ _ _ y
+... | ⟨ ℓ⊑ℓ′ , _ ⟩ =
+  ⟨ ⊥ _ _ _ , ↠-trans (plug-cong c̅′↠c̅₂′) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , v-⊥ (⊑-⊥ ℓ⊑ℓ′ ⋆⊑) ⟩
 catchup-back (c̅ ⨾ ℓ !) (c̅′ ⨾ low ?? p) (inj v) (⊑-castr x ⋆⊑ ⋆⊑)
   with catchup-back (c̅ ⨾ ℓ !) c̅′ (inj v) x
 ... | ⟨ c̅ₙ′ ⨾ low ! , c̅′↠c̅₂′ , v-v (inj v′) y ⟩ =
