@@ -23,6 +23,25 @@ sim-back : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CoercionExp (l ℓ) ⇒ g} {
   → c̅₁ —→ c̅₂
     -----------------------------------------------------------------
   → ∃[ c̅₂′ ] ∃[ c̅₃ ] (c̅₁′ —↠ c̅₂′) × (c̅₂ —↠ c̅₃) × (⊢ c̅₃ ⊑ c̅₂′)
+
+
+sim-back-castl : ∀ {ℓ ℓ′ g₁ g₂ g′} {c̅ : CoercionExp (l ℓ) ⇒ g₁} {c : ⊢ g₁ ⇒ g₂} {c̅₁} {c̅₁′ : CoercionExp (l ℓ′) ⇒ g′}
+  → ⊢ c̅ ⊑ c̅₁′
+  → g₁ ⊑ₗ g′ → g₂ ⊑ₗ g′  {- c ⊑ g′ -}
+  → c̅ ⨾ c —→ c̅₁
+    -----------------------------------------------------------------
+  → ∃[ c̅₂′ ] ∃[ c̅₂ ] (c̅₁′ —↠ c̅₂′) × (c̅₁ —↠ c̅₂) × (⊢ c̅₂ ⊑ c̅₂′)
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (ξ c̅→c̅₁)
+  with sim-back c̅⊑c̅₁′ c̅→c̅₁
+... | ⟨ c̅₂′ , c̅₂ , c̅₁′↠c̅₂′ , c̅₁↠c̅₂ , c̅₂⊑c̅₂′ ⟩ =
+  ⟨ c̅₂′ , c̅₂ ⨾ _ , c̅₁′↠c̅₂′ , plug-cong c̅₁↠c̅₂ , ⊑-castl c̅₂⊑c̅₂′ g₁⊑g′ g₂⊑g′ ⟩
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ ξ-⊥ = {!!}
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (id x) = {!!}
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-id x) = {!!}
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-↑ x) = {!!}
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-⊥ x) = {!!}
+
+
 sim-back (⊑-cast c̅⊑c̅′ g₁⊑g₁′ g⊑g′) c̅₁→c̅₂   = {!!}
 sim-back (⊑-castl c̅⊑c̅₁′ g₁⊑g′ g⊑g′) c̅⨾c→c̅₂ = {!!}
 sim-back (⊑-castr {c′ = c′} c̅₁⊑c̅′ g⊑g₁′ g⊑g′) c̅₁→c̅₂
