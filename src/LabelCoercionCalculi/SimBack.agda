@@ -40,14 +40,19 @@ sim-back-castl ⊥⊑c̅₁′ g₁⊑g′ g₂⊑g′ ξ-⊥
   with sim-back-blame ⊥⊑c̅₁′ | prec→⊑ _ _ ⊥⊑c̅₁′
 ... | ⟨ q , c̅₁′↠⊥ , ⊥⊑⊥ ⟩ | ⟨ ℓ⊑ℓ′ , _ ⟩ =
   ⟨ ⊥ _ _ q , _ , c̅₁′↠⊥ , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ g₂⊑g′ ⟩
-sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (id x) = {!!}
+sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (id v) = {!!}
 sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-id x) = {!!}
 sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-↑ x) = {!!}
-sim-back-castl c̅⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v) = {!!}
+sim-back-castl c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v)
+  with catchup-back _ _ (inj v) c̅⨾!⊑c̅₁′
+... | ⟨ id (l low) , c̅₁′↠c̅₂′ , v-v id (⊑-castl _ () _) ⟩
+... | ⟨ ⊥ _ _ p , c̅₁′↠⊥ , v-⊥ _ ⟩ =
+  let ⟨ ℓ⊑ℓ′ , _ ⟩ = prec→⊑ _ _ c̅⨾!⊑c̅₁′ in
+  ⟨ ⊥ _ _ p , _ , c̅₁′↠⊥ , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ l⊑l ⟩
 
 
 sim-back (⊑-cast c̅⊑c̅′ g₁⊑g₁′ g⊑g′) c̅₁→c̅₂   = {!!}
-sim-back (⊑-castl c̅⊑c̅₁′ g₁⊑g′ g⊑g′) c̅⨾c→c̅₂ = {!!}
+sim-back (⊑-castl c̅⊑c̅₁′ g₁⊑g′ g⊑g′) c̅⨾c→c̅₂ = sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g⊑g′ c̅⨾c→c̅₂
 sim-back (⊑-castr {c′ = c′} c̅₁⊑c̅′ g⊑g₁′ g⊑g′) c̅₁→c̅₂
   with sim-back c̅₁⊑c̅′ c̅₁→c̅₂
 ... | ⟨ c̅₂′ , c̅₃ , c̅₁′↠c̅₂′ , c̅₂↠c̅₃ , c̅₃⊑c̅₂′ ⟩ =

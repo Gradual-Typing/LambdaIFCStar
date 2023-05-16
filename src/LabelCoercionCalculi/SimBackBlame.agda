@@ -25,21 +25,3 @@ sim-back-blame (⊑-castr ⊥⊑c̅′ x g⊑g′)
 ... | ⟨ q , c̅′↠⊥ , leq ⟩ | ⟨ ℓ⊑ℓ′ , _ ⟩ =
   ⟨ q , ↠-trans (plug-cong c̅′↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , ⊑-⊥ ℓ⊑ℓ′ g⊑g′ ⟩
 sim-back-blame (⊑-⊥ ℓ⊑ℓ′ g⊑g′) = ⟨ _ , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ g⊑g′ ⟩
-
-collide-castr : ∀ {ℓ ℓ′ g′} {c̅ : CoercionExp l ℓ ⇒ l high} {c̅′ : CoercionExp l ℓ′ ⇒ g′} {c′ : ⊢ g′ ⇒ l low} {p}
-  → ⊢ c̅ ⨾ high ! ⊑ c̅′
-  → 𝒱 c̅
-  → ∃[ q ] (c̅′ ⨾ c′ —↠ ⊥ (l ℓ′) (l low) q) × (⊢ ⊥ (l ℓ) (l low) p ⊑ ⊥ (l ℓ′) (l low) q)
-collide-castr (⊑-cast leq l⊑l ⋆⊑) v = {!!}
-collide-castr (⊑-castl leq x x₁) v = {!!}
-collide-castr (⊑-castr leq x x₁) v = {!!}
-collide-castr (⊑-⊥ x x₁) v = {!!}
-
-
-sim-back-collide : ∀ {ℓ ℓ′} {c̅ : CoercionExp l ℓ ⇒ l high} {c̅′ : CoercionExp l ℓ′ ⇒ l low} {p}
-  → ⊢ c̅ ⨾ high ! ⊑ c̅′
-  → 𝒱 c̅
-  → ∃[ q ] (c̅′ —↠ ⊥ (l ℓ′) (l low) q) × (⊢ ⊥ (l ℓ) (l low) p ⊑ ⊥ (l ℓ′) (l low) q)
-sim-back-collide (⊑-cast {c′ = ()} leq l⊑l ⋆⊑) v
-sim-back-collide (⊑-castr {c′ = c′} prec ⋆⊑ ⋆⊑) v = {!!}
-sim-back-collide (⊑-⊥ l⊑l ⋆⊑) v = ⟨ _ , ⊥ _ _ _ ∎ , ⊑-⊥ l⊑l l⊑l ⟩
