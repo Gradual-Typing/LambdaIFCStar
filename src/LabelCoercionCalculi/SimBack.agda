@@ -48,7 +48,9 @@ sim-back-castl c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-id v)
 ... | ⟨ id (l low) ⨾ ↑ , c̅₁′↠c̅₂′ , v-v (up id) (⊑-castl c̅₁⊑id⨾↑ l⊑l ⋆⊑) ⟩ =
   ⟨ id (l low) ⨾ ↑ , _ , c̅₁′↠c̅₂′ , _ ∎ , c̅₁⊑id⨾↑ ⟩
 ... | ⟨ id (l low) ⨾ ↑ , c̅₁′↠c̅₂′ , v-v (up id) (⊑-castr (⊑-castl _ () _) _ _) ⟩
-... | ⟨ ⊥ _ _ p , c̅₁′↠⊥ , v-⊥ x ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , c̅₁′↠⊥ , v-⊥ x ⟩ =
+  let ⟨ ℓ⊑ℓ′ , _ ⟩ = prec→⊑ _ _ c̅⨾!⊑c̅₁′ in
+  ⟨ ⊥ _ _ p , _ , c̅₁′↠⊥ , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ l⊑l ⟩
 sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g₂⊑g′ (?-↑ x) = {!!}
 sim-back-castl c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v)
   with catchup-back _ _ (inj v) c̅⨾!⊑c̅₁′
