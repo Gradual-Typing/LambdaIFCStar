@@ -68,6 +68,33 @@ sim-back-castl c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v)
   let ⟨ ℓ⊑ℓ′ , _ ⟩ = prec→⊑ _ _ c̅⨾!⊑c̅₁′ in
   ⟨ ⊥ _ _ p , _ , c̅₁′↠⊥ , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ l⊑l ⟩
 
+sim-back-cast : ∀ {ℓ ℓ′ g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp (l ℓ) ⇒ g₁} {c̅₂}
+                  {c̅₁′ : CoercionExp (l ℓ′) ⇒ g₁′} {c : ⊢ g₁ ⇒ g₂} {c′ : ⊢ g₁′ ⇒ g₂′}
+  → ⊢ c̅₁ ⊑ c̅₁′
+  → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′  {- c ⊑ c′ -}
+  → c̅₁ ⨾ c —→ c̅₂
+    -----------------------------------------------------------------
+  → ∃[ c̅₂′ ] ∃[ c̅₃ ] (c̅₁′ ⨾ c′ —↠ c̅₂′) × (c̅₂ —↠ c̅₃) × (⊢ c̅₃ ⊑ c̅₂′)
+sim-back-cast {c = c} {c′} c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (ξ c̅₁→c̅₂)
+  with sim-back c̅₁⊑c̅₁′ c̅₁→c̅₂
+... | ⟨ c̅₂′ , c̅₃ , c̅₁′↠c̅₂′ , c̅₂↠c̅₃ , c̅₃⊑c̅₂′ ⟩ =
+  ⟨ c̅₂′ ⨾ c′ , c̅₃ ⨾ c , plug-cong c̅₁′↠c̅₂′ , plug-cong c̅₂↠c̅₃ , ⊑-cast c̅₃⊑c̅₂′ g₁⊑g₁′ g₂⊑g₂′ ⟩
+sim-back-cast {c = c} {c′} ⊥⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ ξ-⊥
+  with sim-back-blame ⊥⊑c̅₁′ | prec→⊑ _ _ ⊥⊑c̅₁′
+... | ⟨ q , c̅₁′↠⊥ , ⊥⊑⊥ ⟩ | ⟨ ℓ⊑ℓ′ , _ ⟩ =
+  ⟨ ⊥ _ _ q , _ , ↠-trans (plug-cong c̅₁′↠⊥) (⊥ _ _ q ⨾ c′ —→⟨ ξ-⊥ ⟩ ⊥ _ _ q ∎) ,
+    _ ∎ , ⊑-⊥ ℓ⊑ℓ′ g₂⊑g₂′ ⟩
+sim-back-cast c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (id x) = {!!}
+sim-back-cast c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (?-id x) = {!!}
+sim-back-cast c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (?-↑ x) = {!!}
+sim-back-cast c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v)
+  with catchup-back _ _ (inj v) c̅⨾!⊑c̅₁′
+... | ⟨ id (l low) , c̅⨾!↠c̅₂′ , v-v id (⊑-castl _ () _) ⟩
+... | ⟨ id (l low) ⨾ ↑ , c̅⨾!↠c̅₂′ , v-v (up id) (⊑-castr (⊑-castl _ () _) _ _) ⟩
+... | ⟨ id (l ℓ′) ⨾ ℓ′ ! , c̅⨾!↠c̅₂′ , v-v (inj id) x ⟩ = {!!}
+... | ⟨ id (l low) ⨾ ↑ ⨾ high ! , c̅⨾!↠c̅₂′ , v-v (inj (up id)) x ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , c̅⨾!↠⊥ , v-⊥ x ⟩ = {!!}
+
 
 sim-back (⊑-cast c̅⊑c̅′ g₁⊑g₁′ g⊑g′) c̅₁→c̅₂   = {!!}
 sim-back (⊑-castl c̅⊑c̅₁′ g₁⊑g′ g⊑g′) c̅⨾c→c̅₂ = sim-back-castl c̅⊑c̅₁′ g₁⊑g′ g⊑g′ c̅⨾c→c̅₂
