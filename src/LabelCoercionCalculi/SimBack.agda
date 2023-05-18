@@ -88,8 +88,8 @@ sim-back-cast {c′ = c′} c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (id
   with catchup-back _ _ v (⊑-castr {c′ = c′} c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′)
 ... | ⟨ c̅₂′ , c̅₁′⨾c′↠c̅₂′ , v-v v′ x ⟩ = ⟨ c̅₂′ , _ , c̅₁′⨾c′↠c̅₂′ , _ ∎ , x ⟩
 ... | ⟨ c̅₂′ , c̅₁′⨾c′↠c̅₂′ , v-⊥ x ⟩ = ⟨ c̅₂′ , _ , c̅₁′⨾c′↠c̅₂′ , _ ∎ , x ⟩
-sim-back-cast c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (?-id x) = {!!}
-sim-back-cast c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (?-↑ x) = {!!}
+sim-back-cast c̅₁⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-id v) = {!!}
+sim-back-cast c̅₁⊑c̅₁′ g₁⊑g₁′ g₂⊑g₂′ (?-↑ v) = {!!}
 sim-back-cast {c = c} {c′} c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v)
   with catchup-back _ _ (inj v) c̅⨾!⊑c̅₁′ | c′
 ... | ⟨ id (l low) , c̅⨾!↠c̅₂′ , v-v id (⊑-castl _ () _) ⟩ | _
