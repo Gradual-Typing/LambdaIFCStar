@@ -58,7 +58,12 @@ sim-back-cast-id? {c′ = ↑} c̅₁⨾!⊑c̅₁′ id
 ... | ⟨ ⊥ _ _ _ , c̅₁′↠⊥ , v-⊥ x ⟩ =
   let ⟨ ℓ⊑ℓ′ , _ ⟩ = prec→⊑ _ _ c̅₁⨾!⊑c̅₁′ in
   ⟨ ⊥ _ _ _ , _ , ↠-trans (plug-cong c̅₁′↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ l⊑l ⟩
-sim-back-cast-id? {c′ = ↑} c̅₁⨾!⊑c̅₁′ (up id) = {!!}
+sim-back-cast-id? {c′ = ↑} c̅₁⨾!⊑c̅₁′ (up id)
+  with catchup-back _ _ (inj (up id)) c̅₁⨾!⊑c̅₁′
+... | ⟨ id (l low) , c̅₁′↠c̅₂′ , v-v id (⊑-castl _ () _) ⟩
+... | ⟨ ⊥ _ _ _ , c̅₁′↠⊥ , v-⊥ x ⟩ =
+  let ⟨ ℓ⊑ℓ′ , _ ⟩ = prec→⊑ _ _ c̅₁⨾!⊑c̅₁′ in
+  ⟨ ⊥ _ _ _ , _ , ↠-trans (plug-cong c̅₁′↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , _ ∎ , ⊑-⊥ ℓ⊑ℓ′ l⊑l ⟩
 sim-back-cast-id? {c′ = low ?? p} c̅₁⨾!⊑c̅₁′ id
   with catchup-back _ _ (inj id) c̅₁⨾!⊑c̅₁′
 ... | ⟨ id (l low) ⨾ low ! , c̅₁′↠c̅₂′ , v-v (inj id) x ⟩ =
