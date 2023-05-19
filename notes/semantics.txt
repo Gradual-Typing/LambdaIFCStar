@@ -1,18 +1,52 @@
-PC           pc      ::= low ⟨ c̅ₙ ⟩
-PC error     pc_errᵖ   = low ⟨ ⊥ᵖ ⟩
+PC and PC Expressions
+
+PC Expr  e_pc    ::= low ⟨ c̅  ⟩
+PC       pc      ::= low ⟨ c̅ₙ ⟩
+
+Shorthands for PC expressions:
+
+     ⊢ c̅ : low ⇒ g   e_pc=low⟨c̅⟩
+  ----------------------------------
+           ⊢ e_pc : g
+
+       c̅₁ —→ c̅₂   e_pc₁=low⟨c̅₁⟩  e_pc₂=low⟨c̅₂⟩
+  ---------------------------------------------------
+              e_pc₁ —→ e_pc₂
+
+stamp : (c̅ₙ : ⊢ ℓ₁ ⇒ g) → (ℓ₂ : StaticLabel) → ⊢ ℓ₁ ⇒ g ⋎̃ ℓ₂
+stamp c̅ₙ low = c̅ₙ
+stamp ID(low)                 high = ID(low) ⨾ ↑
+stamp ID(high)                high = ID(high)
+stamp (ID(low) ⨾ ↑)          high = ID(low) ⨾ ↑
+stamp (ID(low) ⨾ low !)       high = ID(low) ⨾ ↑ ⨾ high !
+stamp (ID(high) ⨾ high !)     high = ID(high) ⨾ high !
+stamp (ID(low) ⨾ ↑ ; high !) high = ID(low) ⨾ ↑ ; high !
+
+stamp : PC → StaticLabel → PC
+stamp (low ⟨ c̅ₙ ⟩) ℓ = low ⟨ stamp c̅ₙ ℓ ⟩
+
+pc_err : BlameLabel → PCExpr
+pc_err p = low ⟨ ⊥ᵖ ⟩
+
+_⟨_⟩ : PCExpr → (c : ⊢ g₁ ⇒ g₂) → PCExpr
+(low ⟨ c̅ ⟩) ⟨ c ⟩ = low ⟨ c̅ ⨾ c ⟩
+
+_⟨_⟩ : PCExpr → (c̅ : ⊢ g₁ ⇒ g₂) → PCExpr
+(low ⟨ c̅₁ ⟩) ⟨ c̅₂ ⟩ = low ⟨ c̅₁ ⨟ c̅₂ ⟩
 
 
-expressions
+Expressions
 M ::= app L M A B ℓ | app! L M A B g
     | if  L A ℓ M N | if!  L A g M N
     | let M N | ref⟦ ℓ ⟧ M | ref?⟦ ℓ ⟧ M p | ! M
     | assign  L M T ℓ̂ ℓ | assign? L M T p
     | □ ⟨ c ⟩ | ⦃ pc ⦄ M ⟪ ℓ ⟫ | { c̅ } M ⟪ ℓ ⟫ | blame p
 
-raw values   Vᵣ, Wᵣ ::= k  | ƛ N | addr n ℓ
-values       V, W   ::= Vᵣ | Vᵣ ⟨ cᵢ ⟩
+Raw values   Vᵣ, Wᵣ ::= k  | ƛ N | addr n ℓ
+Values       V, W   ::= Vᵣ | Vᵣ ⟨ cᵢ ⟩
 
 
+Frames
 F ::= app  □ M A B ℓ | app  V □ A B ℓ
     | app! □ M A B g | app! V □ A B g
     | if   □ A ℓ M N | if!  □ A g M N
@@ -30,14 +64,14 @@ F ::= app  □ M A B ℓ | app  V □ A B ℓ
 plug (blame p) F ∣ μ ∣ pc —→ blame p ∣ μ
 
 
-       low ⟨ (stamp c̅ₙ ℓ) ⨾ (g₁ ⋎̃ ℓ ⇒ g₂) ⨟ c̅ ⟩ —↠ pc
---------------------------------------------------------------  ⊢ c̅ₙ : low ⇒ g₁  ⊢ c̅ : g₂ ⇒ g₃
-   { c̅ } M ⟪ ℓ ⟫ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ ⦃ pc ⦄ M ⟪ ℓ ⟫ ∣ μ
+      (stamp pc ℓ) ⟨ g₁ ⋎̃ ℓ ⇒ g₂ ⟩ ⟨ c̅ ⟩ —↠ pc′
+-------------------------------------------------------------- ⊢ pc : g₁  ⊢ c̅ : g₂ ⇒ g₃
+   { c̅ } M ⟪ ℓ ⟫ ∣ μ ∣ pc —→ ⦃ pc′ ⦄ M ⟪ ℓ ⟫ ∣ μ
 
 
-  low ⟨ (stamp c̅ₙ ℓ) ⨾ (g₁ ⋎̃ ℓ ⇒ g₂) ⨟ c̅ ⟩ —↠ pc_errᵖ
---------------------------------------------------------------  ⊢ c̅ₙ : low ⇒ g₁  ⊢ c̅ : g₂ ⇒ g₃
-   { c̅ } M ⟪ ℓ ⟫ ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ blame p
+      (stamp pc ℓ) ⟨ g₁ ⋎̃ ℓ ⇒ g₂ ⟩ ⟨ c̅ ⟩ —↠ pc_err p
+-------------------------------------------------------------- ⊢ pc : g₁  ⊢ c̅ : g₂ ⇒ g₃
+   { c̅ } M ⟪ ℓ ⟫ ∣ μ ∣ pc —→ blame p
 
 
               M ∣ μ ∣ pc′ —→ N ∣ μ′
@@ -97,14 +131,14 @@ let V A N ∣ μ ∣ pc —→ N[ V ] ∣ μ
 ref⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr n ℓ ∣ μ(ℓ ↦ μ(ℓ)(n ↦ V))   , n is fresh
 
 
-                         low ⟨ c̅ₙ ⨾ ℓ ?ᵖ ⟩ —↠ pc
+                         pc ⟨ ℓ ?ᵖ ⟩ —↠ pc′
 --------------------------------------------------------------------------------------
-  ref?⟦ ℓ ⟧ V p ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ addr n ℓ ∣ μ(ℓ ↦ μ(ℓ)(n ↦ V)) , n is fresh
+  ref?⟦ ℓ ⟧ V p ∣ μ ∣ pc —→ addr n ℓ ∣ μ(ℓ ↦ μ(ℓ)(n ↦ V)) , n is fresh
 
 
-                       low ⟨ c̅ₙ ⨾ ℓ ?ᵖ ⟩ —↠ pc_errᵖ
+                         pc ⟨ ℓ ?ᵖ ⟩ —↠ pc_err p
 ---------------------------------------------------------------------------------
-                  ref?⟦ ℓ ⟧ V p ∣ μ ∣ low ⟨ c̅ₙ ⟩ —→ blame p
+                  ref?⟦ ℓ ⟧ V p ∣ μ ∣ pc —→ blame p
 
 
                                 μ(ℓ̂)(n) = V
@@ -120,18 +154,18 @@ ref⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr n ℓ ∣ μ(ℓ ↦ μ(ℓ)(n ↦ V)
 assign (addr n ℓ̂) V T ℓ̂ ℓ ∣ μ ∣ pc —→ unit ∣ μ(ℓ̂ ↦ μ(ℓ̂)(n ↦ V))
 
 
------------------------------------------------------------------------- ⊢ c̅ₙ′ : low ⇒ ℓ′
-assign (addr n ℓ̂ ⟨ in: c; out: d | c̅ₙ ⟩) V T ℓ̂ ℓ ∣ μ ∣ low ⟨ c̅ₙ′ ⟩ —→
+------------------------------------------------------------------------
+assign (addr n ℓ̂ ⟨ in: c; out: d | c̅ₙ ⟩) V T ℓ̂ ℓ ∣ μ ∣ pc —→
        unit ∣ μ(ℓ̂ ↦ μ(ℓ̂)(n ↦ V⟨c⟩))
 
 
-   low ⟨ (stamp c̅ₙ′ ∥ c̅ₙ ∥) ⨾ (g ⋎̃ ∥ c̅ₙ ∥ ⇒ ⋆) ⨟ ℓ̂ ?ᵖ ⟩ —↠ pc
------------------------------------------------------------------------- ⊢ c̅ₙ′ : low ⇒ g
-assign? (addr n ℓ̂ ⟨ in: c; out: d | c̅ₙ ⟩) V T p ∣ μ | low ⟨ c̅ₙ′ ⟩ —→
+     (stamp pc ∥ c̅ₙ ∥) ⟨ g ⋎̃ ∥ c̅ₙ ∥ ⇒ ⋆ ⟩ ⟨ ℓ̂ ?ᵖ ⟩ —↠ pc′
+------------------------------------------------------------------------ ⊢ pc : g
+assign? (addr n ℓ̂ ⟨ in: c; out: d | c̅ₙ ⟩) V T p ∣ μ | pc —→
         unit | μ(ℓ̂ ↦ μ(ℓ̂)(n ↦ V⟨c⟩))
 
 
-   low ⟨ (stamp c̅ₙ′ ∥ c̅ₙ ∥) ⨾ (g ⋎̃ ∥ c̅ₙ ∥ ⇒ ⋆) ⨟ ℓ̂ ?ᵖ ⟩ —↠ pc_errᵖ
------------------------------------------------------------------------- ⊢ c̅ₙ′ : low ⇒ g
-assign? (addr n ℓ̂ ⟨ in: c; out: d | c̅ₙ ⟩) V T p ∣ μ | low ⟨ c̅ₙ′ ⟩ —→
+     (stamp pc ∥ c̅ₙ ∥) ⟨ g ⋎̃ ∥ c̅ₙ ∥ ⇒ ⋆ ⟩ ⟨ ℓ̂ ?ᵖ ⟩ —↠ pc_err p
+------------------------------------------------------------------------ ⊢ pc : g
+assign? (addr n ℓ̂ ⟨ in: c; out: d | c̅ₙ ⟩) V T p ∣ μ | pc —→
         blame p
