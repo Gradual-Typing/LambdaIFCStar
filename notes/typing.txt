@@ -83,8 +83,8 @@
    Γ ; Σ ; gc ; ℓv ⊢ assign? L M T p ⇐ Unit
 
 
-                Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
-  pc = low ⟨ cₙ ⟩   ⊢ cₙ : low ⇒ gc′   ∥ cₙ ∥ = ℓv′
+               Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
+              ⊢ pc : gc′      ∥ pc ∥ = ℓv′
                    ℓv ⋎ ℓ ≼ ℓv′
                    B = stamp A ℓ
 -------------------------------------------------------- Protect
