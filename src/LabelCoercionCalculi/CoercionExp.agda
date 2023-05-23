@@ -14,17 +14,7 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-
-
-data ⊢_⇒_ : Label → Label → Set where
-
-  id : ∀ g → ⊢ g ⇒ g
-
-  ↑ : ⊢ l low ⇒ l high
-
-  _! : ∀ ℓ → ⊢ l ℓ ⇒ ⋆
-
-  _??_ : ∀ ℓ (p : BlameLabel) → ⊢ ⋆ ⇒ l ℓ
+open import LabelCoercionCalculi.Coercions
 
 
 infixl 8 _⨾_  {- syntactic composition -}
