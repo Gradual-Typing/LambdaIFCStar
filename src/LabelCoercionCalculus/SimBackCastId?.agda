@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.SimBackCastId? where
+module LabelCoercionCalculus.SimBackCastId? where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,9 +14,9 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
-open import LabelCoercionCalculi.Precision
-open import LabelCoercionCalculi.CatchUpBack
+open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.Precision
+open import LabelCoercionCalculus.CatchUpBack
 
 
 sim-back-cast-id? : ∀ {ℓ₁ ℓ₂ ℓ′ g′}

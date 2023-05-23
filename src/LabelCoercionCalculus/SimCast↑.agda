@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.SimCast↑ where
+module LabelCoercionCalculus.SimCast↑ where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,9 +14,9 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
-open import LabelCoercionCalculi.Precision
-open import LabelCoercionCalculi.CatchUp
+open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.Precision
+open import LabelCoercionCalculus.CatchUp
 
 
 sim-cast-↑-proj : ∀ {g g′} {p} {c̅₁ : CoercionExp g ⇒ ⋆} {c̅′ : CoercionExp g′ ⇒ l low}

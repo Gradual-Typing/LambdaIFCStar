@@ -1,9 +1,9 @@
-module LabelCoercionCalculi.SecurityLevel where
+module LabelCoercionCalculus.SecurityLevel where
 
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
+open import LabelCoercionCalculus.CoercionExp
 
 
 ∥_∥ : ∀ {ℓ g} → (c̅ : CoercionExp l ℓ ⇒ g) → 𝒱 c̅ → StaticLabel

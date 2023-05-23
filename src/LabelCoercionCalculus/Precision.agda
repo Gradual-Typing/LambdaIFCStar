@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.Precision where
+module LabelCoercionCalculus.Precision where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,7 +14,7 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
+open import LabelCoercionCalculus.CoercionExp
 
 
 infix 4 ⊢_⊑_

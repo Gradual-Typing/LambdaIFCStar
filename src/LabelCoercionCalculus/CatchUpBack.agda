@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.CatchUpBack where
+module LabelCoercionCalculus.CatchUpBack where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,8 +14,8 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
-open import LabelCoercionCalculi.Precision
+open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.Precision
 
 data InSync : ∀ {g₁ g₁′ g₂ g₂′} (c̅₁ : CoercionExp g₁ ⇒ g₂) (c̅₂ : CoercionExp g₁′ ⇒ g₂′) → Set where
   v-v : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅₂ : CoercionExp g₁′ ⇒ g₂′}

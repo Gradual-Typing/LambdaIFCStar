@@ -1,5 +1,6 @@
-module LabelCoercionCalculi.SimLemmas where
+module LabelCoercionCalculus.SimLemmas where
 
-open import LabelCoercionCalculi.SimCastId public
-open import LabelCoercionCalculi.SimCastId? public
-open import LabelCoercionCalculi.SimCast↑ public
+open import LabelCoercionCalculus.CatchUp public
+open import LabelCoercionCalculus.SimCastId public
+open import LabelCoercionCalculus.SimCastId? public
+open import LabelCoercionCalculus.SimCast↑ public

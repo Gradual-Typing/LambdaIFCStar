@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.Coercions where
+module LabelCoercionCalculus.Coercions where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

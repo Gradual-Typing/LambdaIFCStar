@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.CoercionExp where
+module LabelCoercionCalculus.CoercionExp where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,7 +14,7 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.Coercions
+open import LabelCoercionCalculus.Coercions public
 
 
 infixl 8 _⨾_  {- syntactic composition -}

@@ -1,11 +1,12 @@
-module LabelCoercionCalculi.Stamping where
+module LabelCoercionCalculus.Stamping where
+
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
-open import LabelCoercionCalculi.SecurityLevel
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.SecurityLevel
 
 
 stamp : ∀ {ℓ g} → (c̅ : CoercionExp l ℓ ⇒ g) → 𝒱 c̅ → (ℓ′ : StaticLabel)

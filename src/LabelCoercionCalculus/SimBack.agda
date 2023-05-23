@@ -1,4 +1,4 @@
-module LabelCoercionCalculi.SimBack where
+module LabelCoercionCalculus.SimBack where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,9 +14,9 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
-open import LabelCoercionCalculi.Precision
-open import LabelCoercionCalculi.SimBackLemmas
+open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.Precision
+open import LabelCoercionCalculus.SimBackLemmas
 
 
 sim-back : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CoercionExp (l ℓ) ⇒ g} {c̅₁′ : CoercionExp (l ℓ′) ⇒ g′}

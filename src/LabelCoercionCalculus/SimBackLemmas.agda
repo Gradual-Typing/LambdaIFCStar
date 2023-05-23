@@ -1,6 +1,6 @@
-module LabelCoercionCalculi.SimBackLemmas where
+module LabelCoercionCalculus.SimBackLemmas where
 
-open import LabelCoercionCalculi.SimBackBlame public
-open import LabelCoercionCalculi.CatchUpBack public
-open import LabelCoercionCalculi.SimBackCastId? public
-open import LabelCoercionCalculi.SimBackCast↑ public
+open import LabelCoercionCalculus.CatchUpBack public
+open import LabelCoercionCalculus.SimBackBlame public
+open import LabelCoercionCalculus.SimBackCastId? public
+open import LabelCoercionCalculus.SimBackCast↑ public

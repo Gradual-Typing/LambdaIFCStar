@@ -1,6 +1,6 @@
 {- Syntactical composition of coercion expressions -}
 
-module LabelCoercionCalculi.SyntacComp where
+module LabelCoercionCalculus.SyntacComp where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -16,8 +16,8 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculi.CoercionExp
-open import LabelCoercionCalculi.Precision
+open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.Precision
 
 
 _⨟_ : ∀ {g₁ g₂ g₃} (c̅₁ : CoercionExp g₁ ⇒ g₂) (c̅₂ : CoercionExp g₂ ⇒ g₃) → CoercionExp g₁ ⇒ g₃
