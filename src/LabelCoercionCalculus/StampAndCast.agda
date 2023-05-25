@@ -67,11 +67,28 @@ stamp-cast-prec (inj id) (inj (up v′)) c~ c~′ (⊑-cast (⊑-castr _ l⊑l (
 stamp-cast-prec (inj id) (inj (up id)) c~ c~′ (⊑-castr (⊑-cast _ l⊑l _) _ _) g⊑g′ h≼h =
   ⊑-cast (⊑-cast (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) ⋆⊑ g⊑g′
 stamp-cast-prec (inj id) (inj (up v′)) c~ c~′ (⊑-castr (⊑-castl (⊑-castr _ l⊑l ()) _ _) _ _) g⊑g′ h≼h
-stamp-cast-prec (inj id) (inj (up v′)) c~ c~′ (⊑-castr (⊑-castr prec x₂ x₃) x x₁) g⊑g′ h≼h = {!!}
-stamp-cast-prec (inj (up v)) (inj v′) c~ c~′ prec g⊑g′ h≼h = {!!}
-stamp-cast-prec (inj id) (up v′) c~ c~′ prec g⊑g′ h≼h = {!!}
-stamp-cast-prec (inj (up v)) (up v′) c~ c~′ prec g⊑g′ h≼h = {!!}
-stamp-cast-prec (up v) v′ c~ c~′ prec g⊑g′ h≼h = {!!}
+stamp-cast-prec (inj id) (inj (up id)) c~ c~′ (⊑-castr (⊑-castr (⊑-castl _ l⊑l _) _ _) _ _) g⊑g′ h≼h =
+  ⊑-cast (⊑-cast (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) ⋆⊑ g⊑g′
+stamp-cast-prec (inj (up id)) (inj id) c~ c~′ (⊑-cast (⊑-castl _ l⊑l ()) _ _) g⊑g′ h≼h
+stamp-cast-prec (inj (up id)) (inj id) c~ c~′ (⊑-castr (⊑-castl (⊑-castl _ l⊑l ()) _ _) _ _) g⊑g′ h≼h
+stamp-cast-prec (inj (up id)) (inj (up id)) c~ c~′ prec g⊑g′ h≼h =
+  ⊑-cast (⊑-cast (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) ⋆⊑ g⊑g′
+stamp-cast-prec (inj id) (up id) c~ c~′ (⊑-cast _ l⊑l _) g⊑g′ h≼h =
+  ⊑-cast (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) ⋆⊑ g⊑g′
+stamp-cast-prec (inj id) (up id) c~ c~′ (⊑-castl (⊑-castr _ () _) l⊑l _) g⊑g′ h≼h
+stamp-cast-prec (inj id) (up id) c~ c~′ (⊑-castr (⊑-castl _ l⊑l _) _ _) g⊑g′ h≼h =
+  ⊑-cast (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) ⋆⊑ g⊑g′
+stamp-cast-prec (inj (up id)) (up id) c~ c~′ prec g⊑g′ h≼h =
+  ⊑-cast (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) ⋆⊑ g⊑g′
+stamp-cast-prec (up id) id c~ c~′ (⊑-castl _ l⊑l ()) g⊑g′ h≼h
+stamp-cast-prec (up id) (inj id) c~ c~′ (⊑-cast _ _ ()) g⊑g′ h≼h
+stamp-cast-prec (up id) (inj id) c~ c~′ (⊑-castl _ () _) g⊑g′ h≼h
+stamp-cast-prec (up id) (inj id) c~ c~′ (⊑-castr _ _ ()) g⊑g′ h≼h
+stamp-cast-prec (up id) (inj (up id)) c~ c~′ (⊑-cast _ _ ()) g⊑g′ h≼h
+stamp-cast-prec (up id) (inj (up id)) c~ c~′ (⊑-castl _ _ ()) g⊑g′ h≼h
+stamp-cast-prec (up id) (inj (up id)) c~ c~′ (⊑-castr _ _ ()) g⊑g′ h≼h
+stamp-cast-prec (up id) (up id) c~ c~′ prec g⊑g′ h≼h =
+  ⊑-cast (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l g⊑g′
 {- stamping low on less precise and high on more precise side -}
 stamp-cast-prec {low}  id id c~ c~′ (⊑-id l⊑l) ⋆⊑ l≼h =
   ⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑
