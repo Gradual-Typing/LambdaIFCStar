@@ -53,25 +53,22 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ app L M A B ℓ ⇐ C
 
 
-  -- ⊢app? : ∀ {Γ Σ gc pc A B L M p}
-  --   → Γ ; Σ ; gc ; pc ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ B of ⋆
-  --   → Γ ; Σ ; gc ; pc ⊢ M ⇐ A
-  --     --------------------------------------- CCAppUnchecked
-  --   → Γ ; Σ ; gc ; pc ⊢ app? L M A B p ⇐ stamp B ⋆
+  ⊢app! : ∀ {Γ Σ gc ℓv A B C L M g}
+    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ B of g
+    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
+    → C ≡ stamp B g
+      ------------------------------------------------------ App!
+    → Γ ; Σ ; gc ; ℓv ⊢ app! L M A B g ⇐ C
 
-  -- ⊢app✓ : ∀ {Γ Σ gc pc A B L M ℓ ℓᶜ}
-  --   → Γ ; Σ ; gc ; pc ⊢ L ⇐ ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ
-  --   → Γ ; Σ ; gc ; pc ⊢ M ⇐ A
-  --   → pc ≼ ℓᶜ → ℓ ≼ ℓᶜ
-  --     --------------------------------------- CCAppChecked
-  --   → Γ ; Σ ; gc ; pc ⊢ app✓ L M ℓᶜ A B ℓ ⇐ stamp B (l ℓ)
 
-  -- ⊢if : ∀ {Γ Σ pc pc′ A L M N ℓ}
-  --   → Γ ; Σ ; l pc′ ; pc ⊢ L ⇐ ` Bool of l ℓ
-  --   → (∀ {pc} → Γ ; Σ ; l (pc′ ⋎ ℓ) ; pc ⊢ M ⇐ A)
-  --   → (∀ {pc} → Γ ; Σ ; l (pc′ ⋎ ℓ) ; pc ⊢ N ⇐ A)
-  --     --------------------------------------------------------- CCIf
-  --   → Γ ; Σ ; l pc′ ; pc ⊢ if L A ℓ M N ⇐ stamp A (l ℓ)
+  ⊢if : ∀ {Γ Σ ℓc ℓv A B L M N ℓ}
+    → Γ ; Σ ; l ℓc ; ℓv ⊢ L ⇐ ` Bool of l ℓ
+    → (∀ {ℓv} → Γ ; Σ ; l (ℓc ⋎ ℓ) ; ℓv ⊢ M ⇐ A)
+    → (∀ {ℓv} → Γ ; Σ ; l (ℓc ⋎ ℓ) ; ℓv ⊢ N ⇐ A)
+    → B ≡ stamp A (l ℓ)
+      --------------------------------------------------------- CCIf
+    → Γ ; Σ ; l ℓc ; ℓv ⊢ if L A ℓ M N ⇐ B
+
 
   -- ⊢if⋆ : ∀ {Γ Σ gc pc A L M N}
   --   → Γ ; Σ ; gc ; pc ⊢ L ⇐ ` Bool of ⋆
