@@ -1,82 +1,79 @@
 open import Common.Types
 
-module CC2.Syntax (Cast_⇒_ : Type → Type → Set) where
+module CC2.Syntax where
 
 open import Data.List
 open import Data.Bool renaming (Bool to 𝔹)
 
 open import Syntax
 open import Common.BlameLabels
+open import Common.Coercions
+open import LabelCoercionCalculus.CoercionExp
 open import Memory.Addr
-open import CC2.Errors public
 
 
 data Op : Set where
-  op-addr         : (a : Addr) → (ℓ : StaticLabel) → Op
-  op-lam          : (g : Label) → Type → Type → (ℓ : StaticLabel) → Op
-  op-app          : (ℓᶜ : StaticLabel) → Type → Type → (ℓ : StaticLabel) → Op
-  op-app?         : Type → Type → BlameLabel → Op
-  op-app✓        : (ℓᶜ : StaticLabel) → Type → Type → (ℓ : StaticLabel) → Op
-  op-const        : ∀ {ι} → rep ι → StaticLabel → Op
-  op-if           : Type → (ℓ : StaticLabel) → Op
-  op-if⋆          : Type → Op
-  op-let          : Type → Op
-  op-ref          : StaticLabel → RawType → Op
-  op-ref?         : StaticLabel → RawType → BlameLabel → Op
-  op-ref✓        : StaticLabel → RawType → Op
-  op-deref        : Type → Label → Op
-  op-assign       : RawType → StaticLabel → StaticLabel → Op
-  op-assign?      : RawType → BlameLabel → Op
-  op-assign✓     : RawType → StaticLabel → StaticLabel → Op
+  op-addr         : (n : RawAddr) → Op
+  op-lam          : Op
+  op-app          : (A B : Type) → (ℓ : StaticLabel) → Op
+  op-app!         : (A B : Type) → (g :       Label) → Op
+  op-const        : ∀ {ι} (k : rep ι) → Op
+  op-if           : (A : Type) → (ℓ : StaticLabel) → Op
+  op-if!          : (A : Type) → (g :       Label) → Op
+  op-let          : (A : Type) → Op
+  op-ref          : (ℓ : StaticLabel) → Op
+  op-ref?         : (ℓ : StaticLabel) → (p : BlameLabel) → Op
+  op-deref        : (A : Type) → (g : Label) → Op
+  op-assign       : (T : RawType) → (ℓ̂ ℓ : StaticLabel) → Op
+  op-assign?      : (T : RawType) → BlameLabel → Op
   op-cast         : ∀ {A B} → Cast A ⇒ B → Op
-  op-prot         : Label → StaticLabel → Type → Op
-  op-blame        : Error → BlameLabel → Op
+  op-prot         : ∀ {g} (pc : CoercionExp l low ⇒ g)
+    → 𝒱 pc → (ℓ : StaticLabel) → Op
+  op-prot-cast    : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂)
+    → (ℓ : StaticLabel) → Op
+  op-blame        : BlameLabel → Op
   {- Terms that only appear in erasure -}
   op-opaque       : Op
 
 sig : Op → List Sig
-sig (op-addr a ℓ)      = []
-sig (op-lam g A B ℓ)   = (ν ■) ∷ []
-sig (op-app ℓᶜ A B ℓ)  = ■ ∷ ■ ∷ []
-sig (op-app? A B p)    = ■ ∷ ■ ∷ []
-sig (op-app✓ ℓᶜ A B ℓ) = ■ ∷ ■ ∷ []
-sig (op-const k ℓ)     = []
-sig (op-if A ℓ)        = ■ ∷ ■ ∷ ■ ∷ []
-sig (op-if⋆ A)         = ■ ∷ ■ ∷ ■ ∷ []
+sig (op-addr n)        = []
+sig op-lam             = (ν ■) ∷ []
+sig (op-app  A B ℓ)    = ■ ∷ ■ ∷ []
+sig (op-app! A B g)    = ■ ∷ ■ ∷ []
+sig (op-const k)       = []
+sig (op-if  A ℓ)       = ■ ∷ ■ ∷ ■ ∷ []
+sig (op-if! A g)       = ■ ∷ ■ ∷ ■ ∷ []
 sig (op-let A)         = ■ ∷ (ν ■) ∷ []
-sig (op-ref ℓ T)       = ■ ∷ []
-sig (op-ref? ℓ T p)    = ■ ∷ []
-sig (op-ref✓ ℓ T)     = ■ ∷ []
+sig (op-ref ℓ)         = ■ ∷ []
+sig (op-ref? ℓ p)      = ■ ∷ []
 sig (op-deref A g)     = ■ ∷ []
 sig (op-assign T ℓ̂ ℓ)  = ■ ∷ ■ ∷ []
 sig (op-assign? T p)   = ■ ∷ ■ ∷ []
-sig (op-assign✓ T ℓ̂ ℓ) = ■ ∷ ■ ∷ []
 sig (op-cast c)        = ■ ∷ []
-sig (op-prot g ℓ A)    = ■ ∷ []
-sig (op-blame e p)     = []
+sig (op-prot pc 𝓋 ℓ)   = ■ ∷ []
+sig (op-prot-cast c̅ ℓ) = ■ ∷ []
+sig (op-blame p)       = []
 sig op-opaque          = []
 
 open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug) public
 
 infix 8 _⟨_⟩
 
-pattern addr_of_ a ℓ             = (op-addr a ℓ) ⦅ nil ⦆
-pattern ƛ_˙_∶_⇒_of_ g N A B ℓ   = (op-lam g A B ℓ) ⦅ cons (bind (ast N)) nil ⦆
-pattern app L M ℓᶜ A B ℓ         = (op-app ℓᶜ A B ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern app? L M A B p           = (op-app? A B p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern app✓ L M ℓᶜ A B ℓ       = (op-app✓ ℓᶜ A B ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern $_of_ k ℓ                = (op-const k ℓ) ⦅ nil ⦆
-pattern if L A ℓ M N             = (op-if A ℓ) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
-pattern if⋆ L A M N              = (op-if⋆ A) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
-pattern `let M A N               = (op-let A) ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
-pattern ref⟦_⟧ ℓ T M             = (op-ref ℓ T) ⦅ cons (ast M) nil ⦆
-pattern ref?⟦_⟧ ℓ T M p          = (op-ref? ℓ T p) ⦅ cons (ast M) nil ⦆
-pattern ref✓⟦_⟧ ℓ T M           = (op-ref✓ ℓ T) ⦅ cons (ast M) nil ⦆
-pattern ! M A g                  = (op-deref A g) ⦅ cons (ast M) nil ⦆
-pattern assign L M T ℓ̂ ℓ         = (op-assign T ℓ̂ ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern assign? L M T p          = (op-assign? T p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern assign✓ L M T ℓ̂ ℓ       = (op-assign✓ T ℓ̂ ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern _⟨_⟩ M c                 = (op-cast c) ⦅ cons (ast M) nil ⦆
-pattern prot g ℓ A M             = (op-prot g ℓ A) ⦅ cons (ast M) nil ⦆    {- protection term -}
-pattern blame e p                = (op-blame e p) ⦅ nil ⦆                {- cast or NSU errors -}
-pattern ●                       = op-opaque ⦅ nil ⦆                     {- opaque value -}
+pattern addr n             = (op-addr n) ⦅ nil ⦆
+pattern ƛ N                = (op-lam) ⦅ cons (bind (ast N)) nil ⦆
+pattern app L M A B ℓ      = (op-app A B ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern app! L M A B g     = (op-app! A B g) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern $_ k               = (op-const k) ⦅ nil ⦆
+pattern if L A ℓ M N       = (op-if A ℓ) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
+pattern if! L A g M N      = (op-if! A g) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
+pattern `let M A N         = (op-let A) ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
+pattern ref⟦_⟧ ℓ M         = (op-ref ℓ) ⦅ cons (ast M) nil ⦆
+pattern ref?⟦_⟧ ℓ M p      = (op-ref? ℓ p) ⦅ cons (ast M) nil ⦆
+pattern ! M A g            = (op-deref A g) ⦅ cons (ast M) nil ⦆
+pattern assign L M T ℓ̂ ℓ   = (op-assign T ℓ̂ ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern assign? L M T p    = (op-assign? T p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern _⟨_⟩ M c           = (op-cast c) ⦅ cons (ast M) nil ⦆
+pattern prot pc 𝓋 ℓ M      = (op-prot pc 𝓋 ℓ) ⦅ cons (ast M) nil ⦆
+pattern prot-cast c̅ ℓ M    = (op-prot c̅ ℓ) ⦅ cons (ast M) nil ⦆
+pattern blame p            = (op-blame p) ⦅ nil ⦆
+pattern ●                 = op-opaque ⦅ nil ⦆                     {- opaque value -}
