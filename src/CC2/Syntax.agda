@@ -8,7 +8,6 @@ open import Data.Bool renaming (Bool to 𝔹)
 open import Syntax
 open import Common.BlameLabels
 open import Common.Coercions
-open import LabelCoercionCalculus.CoercionExp
 open import Memory.Addr
 
 

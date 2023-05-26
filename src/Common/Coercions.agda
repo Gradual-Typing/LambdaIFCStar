@@ -10,7 +10,7 @@ open import Function using (case_of_; case_return_of_)
 
 open import Common.Types
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
+open import LabelCoercionCalculus.CoercionExp public
 
 
 infix 6 Castᵣ_⇒_
