@@ -24,14 +24,14 @@ data Castᵣ_⇒_ where
   id  : ∀ ι → Castᵣ ` ι ⇒ ` ι
 
   ref : ∀ {A B}
-    → (i : Cast B ⇒ A)
-    → (o : Cast A ⇒ B)
+    → (c : Cast B ⇒ A)  {- in  -}
+    → (d : Cast A ⇒ B)  {- out -}
     → Castᵣ Ref A ⇒ Ref B
 
   fun : ∀ {g₁ g₂} {A B C D}
     → CoercionExp g₂ ⇒ g₁
-    → (i : Cast C ⇒ A)
-    → (o : Cast B ⇒ D)
+    → (c : Cast C ⇒ A)  {- in  -}
+    → (d : Cast B ⇒ D)  {- out -}
     → Castᵣ ⟦ g₁ ⟧ A ⇒ B ⇒ ⟦ g₂ ⟧ C ⇒ D
 
 
@@ -40,3 +40,22 @@ data Cast_⇒_ where
     → Castᵣ S ⇒ T
     → CoercionExp g₁ ⇒ g₂
     → Cast S of g₁ ⇒ T of g₂
+
+
+{- Irreducible coercions -}
+data Irreducible : ∀ {A B} → Cast A ⇒ B → Set where
+  ir-base : ∀ {ι g₁ g₂} {c̅ : CoercionExp g₁ ⇒ g₂}
+    → 𝒱 c̅
+    → g₁ ≢ g₂  {- c̅ ≢ id -}
+    → Irreducible (cast (id ι) c̅)
+
+  ir-ref : ∀ {A B g₁ g₂}
+      {c : Cast B ⇒ A} {d : Cast A ⇒ B} {c̅ : CoercionExp g₁ ⇒ g₂}
+    → 𝒱 c̅
+    → Irreducible (cast (ref c d) c̅)
+
+  ir-fun : ∀ {A B C D g₁ g₂ gᶜ₁ gᶜ₂}
+      {c : Cast C ⇒ A} {d : Cast B ⇒ D}
+      {c̅ : CoercionExp g₁ ⇒ g₂} {d̅ : CoercionExp gᶜ₁ ⇒ gᶜ₂}
+    → 𝒱 c̅
+    → Irreducible (cast (fun d̅ c d) c̅)
