@@ -10,7 +10,7 @@ open import Function using (case_of_; case_return_of_)
 
 open import Common.Types
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp public
+open import LabelCoercionCalculus.CoercionExp hiding (coerce) public
 
 
 infix 6 Castᵣ_⇒_
@@ -59,3 +59,16 @@ data Irreducible : ∀ {A B} → Cast A ⇒ B → Set where
       {c̅ : CoercionExp g₁ ⇒ g₂} {d̅ : CoercionExp gᶜ₁ ⇒ gᶜ₂}
     → 𝒱 c̅
     → Irreducible (cast (fun d̅ c d) c̅)
+
+
+coerceᵣ : ∀ {S T} → S ≲ᵣ T → BlameLabel → Castᵣ S ⇒ T
+coerce : ∀ {A B} → A ≲ B → BlameLabel → Cast A ⇒ B
+
+coerceᵣ {` ι} {` ι} ≲-ι p = id ι
+coerceᵣ {Ref A} {Ref B} (≲-ref A≲B B≲A) p =
+  ref (coerce B≲A p) (coerce A≲B p)
+coerceᵣ {⟦ g₁ ⟧ A ⇒ B} {⟦ g₂ ⟧ C ⇒ D} (≲-fun g₂≾g₁ C≲A B≲D) p =
+  fun (coerceₗ g₂≾g₁ p) (coerce C≲A p) (coerce B≲D p)
+
+coerce {S of g₁} {T of g₂} (≲-ty g₁≾g₂ S≲T) p =
+  cast (coerceᵣ S≲T p) (coerceₗ g₁≾g₂ p)
