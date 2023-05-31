@@ -72,3 +72,13 @@ coerceᵣ {⟦ g₁ ⟧ A ⇒ B} {⟦ g₂ ⟧ C ⇒ D} (≲-fun g₂≾g₁ C�
 
 coerce {S of g₁} {T of g₂} (≲-ty g₁≾g₂ S≲T) p =
   cast (coerceᵣ S≲T p) (coerceₗ g₁≾g₂ p)
+
+
+coerceᵣ-id : ∀ T → Castᵣ T ⇒ T
+coerce-id : ∀ A → Cast A ⇒ A
+
+coerceᵣ-id (` ι) = id ι
+coerceᵣ-id (Ref A) = ref (coerce-id A) (coerce-id A)
+coerceᵣ-id (⟦ g ⟧ A ⇒ B) = fun (id g) (coerce-id A) (coerce-id B)
+
+coerce-id (T of g) = cast (coerceᵣ-id T) (id g)
