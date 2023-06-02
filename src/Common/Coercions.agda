@@ -42,21 +42,21 @@ data Cast_⇒_ where
     → Cast S of g₁ ⇒ T of g₂
 
 
-{- Irreducible coercions -}
+{- Irreducible coercions form values -}
 data Irreducible : ∀ {A B} → Cast A ⇒ B → Set where
-  ir-base : ∀ {ι g₁ g₂} {c̅ : CoercionExp g₁ ⇒ g₂}
+  ir-base : ∀ {ι ℓ g} {c̅ : CoercionExp l ℓ ⇒ g}
     → 𝒱 c̅
-    → g₁ ≢ g₂  {- c̅ ≢ id -}
+    → l ℓ ≢ g  {- c̅ ≢ id -}
     → Irreducible (cast (id ι) c̅)
 
-  ir-ref : ∀ {A B g₁ g₂}
-      {c : Cast B ⇒ A} {d : Cast A ⇒ B} {c̅ : CoercionExp g₁ ⇒ g₂}
+  ir-ref : ∀ {A B ℓ g}
+      {c : Cast B ⇒ A} {d : Cast A ⇒ B} {c̅ : CoercionExp l ℓ ⇒ g}
     → 𝒱 c̅
     → Irreducible (cast (ref c d) c̅)
 
-  ir-fun : ∀ {A B C D g₁ g₂ gᶜ₁ gᶜ₂}
+  ir-fun : ∀ {A B C D ℓ g gᶜ₁ gᶜ₂}
       {c : Cast C ⇒ A} {d : Cast B ⇒ D}
-      {c̅ : CoercionExp g₁ ⇒ g₂} {d̅ : CoercionExp gᶜ₁ ⇒ gᶜ₂}
+      {c̅ : CoercionExp l ℓ ⇒ g} {d̅ : CoercionExp gᶜ₁ ⇒ gᶜ₂}
     → 𝒱 c̅
     → Irreducible (cast (fun d̅ c d) c̅)
 

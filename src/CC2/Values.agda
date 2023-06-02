@@ -13,6 +13,7 @@ open import Common.Coercions
 open import Memory.HeapContext
 open import CC2.Syntax
 open import CC2.Typing
+open import LabelCoercionCalculus.Stamping renaming (stamp to stampₗ)
 
 
 data Err : Term → Set where
@@ -102,10 +103,19 @@ stamp-val (addr n) (V-raw V-addr) (⊢addr {T = T} {low} {ℓ̂} x) high =
   addr n ⟨ cast (coerceᵣ-id (Ref (T of l ℓ̂))) (id (l low) ⨾ ↑) ⟩
 stamp-val (addr n) (V-raw V-addr) (⊢addr {ℓ = high} x) high = addr n
 stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam ⊢N) low = ƛ N
-stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {ℓ = low} ⊢N) high = {!!}
-stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {ℓ = high} ⊢N) high = {!!}
-stamp-val ($ k) (V-raw V-const) ⊢V ℓ = {!!} -- $ k of (ℓ₁ ⋎ ℓ)
-stamp-val (V ⟨ c ⟩) (V-cast v i) ⊢V ℓ = {!!} -- stamp-val V v ℓ ⟨ stamp-inert c i ℓ ⟩
+stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {g = g} {A} {B} {ℓ = low} ⊢N) high =
+  ƛ N ⟨ cast (coerceᵣ-id (⟦ g ⟧ A ⇒ B)) (id (l low) ⨾ ↑) ⟩
+stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {ℓ = high} ⊢N) high = ƛ N
+stamp-val ($ k) (V-raw V-const) (⊢const) low = $ k
+stamp-val ($ k) (V-raw V-const) (⊢const {ι = ι} {ℓ = low}) high =
+  $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
+stamp-val ($ k) (V-raw V-const) (⊢const {ℓ = high}) high = $ k
+stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-base 𝓋 _)) ⊢V ℓ =
+  V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
+stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-ref 𝓋)) ⊢V ℓ =
+  V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
+stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-fun 𝓋)) ⊢V ℓ =
+  V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
 
 
 -- -- A stamped value is value

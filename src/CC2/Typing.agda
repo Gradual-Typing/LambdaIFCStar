@@ -25,7 +25,7 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
 
   ⊢const : ∀ {Γ Σ gc ℓv ι} {k : rep ι} {ℓ}
       -------------------------------------------- Const
-    → Γ ; Σ ; gc ; ℓv ⊢ $ k ⇐ ` ι of ℓ
+    → Γ ; Σ ; gc ; ℓv ⊢ $ k ⇐ ` ι of l ℓ
 
 
   ⊢addr : ∀ {Γ Σ gc ℓv n T ℓ ℓ̂}
