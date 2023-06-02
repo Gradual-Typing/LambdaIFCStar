@@ -98,15 +98,15 @@ data Value : Term → Set where
 
 
 stamp-val : ∀ {Σ gc ℓv A} V → Value V → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A → StaticLabel → Term
-stamp-val (addr n) (V-raw V-addr) (⊢addr x) low = addr n
+stamp-val (addr n) (V-raw V-addr) ⊢V low = addr n
 stamp-val (addr n) (V-raw V-addr) (⊢addr {T = T} {low} {ℓ̂} x) high =
   addr n ⟨ cast (coerceᵣ-id (Ref (T of l ℓ̂))) (id (l low) ⨾ ↑) ⟩
 stamp-val (addr n) (V-raw V-addr) (⊢addr {ℓ = high} x) high = addr n
-stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam ⊢N) low = ƛ N
+stamp-val (ƛ N) (V-raw V-ƛ) ⊢V low = ƛ N
 stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {g = g} {A} {B} {ℓ = low} ⊢N) high =
   ƛ N ⟨ cast (coerceᵣ-id (⟦ g ⟧ A ⇒ B)) (id (l low) ⨾ ↑) ⟩
 stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {ℓ = high} ⊢N) high = ƛ N
-stamp-val ($ k) (V-raw V-const) (⊢const) low = $ k
+stamp-val ($ k) (V-raw V-const) ⊢V low = $ k
 stamp-val ($ k) (V-raw V-const) (⊢const {ι = ι} {ℓ = low}) high =
   $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
 stamp-val ($ k) (V-raw V-const) (⊢const {ℓ = high}) high = $ k
@@ -118,14 +118,29 @@ stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-fun 𝓋)) ⊢V ℓ =
   V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
 
 
--- -- A stamped value is value
--- stamp-val-value : ∀ {V ℓ} (v : Value V) → Value (stamp-val V v ℓ)
--- stamp-val-value V-addr = V-addr
--- stamp-val-value V-ƛ = V-ƛ
--- stamp-val-value V-const = V-const
--- stamp-val-value (V-cast v i) =
---   V-cast (stamp-val-value v) (stamp-inert-inert i)
--- stamp-val-value V-● = V-●
+-- A stamped value is value
+stamp-val-value : ∀ {Σ gc ℓv A V ℓ}
+  → (v : Value V)
+  → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
+  → Value (stamp-val V v ⊢V ℓ)
+stamp-val-value {ℓ = low} (V-raw V-addr) ⊢V = V-raw V-addr
+stamp-val-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = low} _) =
+  V-cast V-addr (ir-ref (up id))
+stamp-val-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = high} _) = V-raw V-addr
+stamp-val-value {ℓ = low} (V-raw V-ƛ) ⊢V = V-raw V-ƛ
+stamp-val-value {ℓ = high} (V-raw V-ƛ) (⊢lam {ℓ = low} _) =
+  V-cast V-ƛ (ir-fun (up id))
+stamp-val-value {ℓ = high} (V-raw V-ƛ) (⊢lam {ℓ = high} _) = V-raw V-ƛ
+stamp-val-value {ℓ = low} (V-raw V-const) ⊢V = V-raw V-const
+stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
+  V-cast V-const (ir-base (up id) (λ ()))
+stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-raw V-const
+stamp-val-value (V-cast v (ir-base 𝓋 _)) ⊢V =
+  V-cast v (ir-base {!!} {!!})
+stamp-val-value (V-cast v (ir-ref 𝓋)) ⊢V = {!!}
+stamp-val-value (V-cast v (ir-fun 𝓋)) ⊢V = {!!}
+  -- V-cast (stamp-val-value v) (stamp-inert-inert i)
+
 
 -- stamp-val-low : ∀ {V} (v : Value V) → stamp-val V v low ≡ V
 -- stamp-val-low (V-addr {ℓ = ℓ}) with ℓ
