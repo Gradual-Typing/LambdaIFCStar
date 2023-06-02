@@ -108,12 +108,7 @@ stamp-val ($ k) (V-raw V-const) ⊢V low = $ k
 stamp-val ($ k) (V-raw V-const) (⊢const {ι = ι} {ℓ = low}) high =
   $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
 stamp-val ($ k) (V-raw V-const) (⊢const {ℓ = high}) high = $ k
-stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-base 𝓋 _)) ⊢V ℓ =
-  V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
-stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-ref 𝓋)) ⊢V ℓ =
-  V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
-stamp-val (V ⟨ cast cᵣ c̅ ⟩) (V-cast v (ir-fun 𝓋)) ⊢V ℓ =
-  V ⟨ cast cᵣ (stampₗ c̅ 𝓋 ℓ) ⟩
+stamp-val (V ⟨ c ⟩) (V-cast v i) ⊢V ℓ = V ⟨ stamp-ir c i ℓ ⟩
 
 
 -- A stamped value is value
@@ -133,11 +128,7 @@ stamp-val-value {ℓ = low} (V-raw V-const) ⊢V = V-raw V-const
 stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
   V-cast V-const (ir-base (up id) (λ ()))
 stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-raw V-const
-stamp-val-value (V-cast v (ir-base 𝓋 _)) ⊢V =
-  V-cast v (ir-base {!!} {!!})
-stamp-val-value (V-cast v (ir-ref 𝓋)) ⊢V = {!!}
-stamp-val-value (V-cast v (ir-fun 𝓋)) ⊢V = {!!}
-  -- V-cast (stamp-val-value v) (stamp-inert-inert i)
+stamp-val-value (V-cast v i) ⊢V = V-cast v (stamp-ir-irreducible i)
 
 
 -- stamp-val-low : ∀ {V} (v : Value V) → stamp-val V v low ≡ V
