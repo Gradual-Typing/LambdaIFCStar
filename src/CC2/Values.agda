@@ -13,7 +13,6 @@ open import Common.Coercions
 open import Memory.HeapContext
 open import CC2.Syntax
 open import CC2.Typing
-open import LabelCoercionCalculus.Stamping renaming (stamp to stampₗ)
 
 
 data Err : Term → Set where
@@ -94,7 +93,6 @@ data Value : Term → Set where
 --   case canonical-ref⋆ ⊢V v of λ where
 --   ⟨ A , B , c , W , refl , i , ⊢W , B<:RefT ⟩ →
 --     ⟨ A , B , c , W , refl , i , ⊢sub-pc ⊢W gc<:gc′ , B<:RefT ⟩
-
 
 
 stamp-val : ∀ {Σ gc ℓv A} V → Value V → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A → StaticLabel → Term

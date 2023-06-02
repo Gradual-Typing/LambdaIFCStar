@@ -8,9 +8,11 @@ open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Function using (case_of_; case_return_of_)
 
+open import Common.Utils
 open import Common.Types
 open import Common.BlameLabels
 open import LabelCoercionCalculus.CoercionExp hiding (coerce) public
+open import LabelCoercionCalculus.Stamping renaming (stamp to stampₗ)
 
 
 infix 6 Castᵣ_⇒_
@@ -82,3 +84,28 @@ coerceᵣ-id (Ref A) = ref (coerce-id A) (coerce-id A)
 coerceᵣ-id (⟦ g ⟧ A ⇒ B) = fun (id g) (coerce-id A) (coerce-id B)
 
 coerce-id (T of g) = cast (coerceᵣ-id T) (id g)
+
+
+stamp-ir : ∀ {A B} (c : Cast A ⇒ B) → Irreducible c → ∀ ℓ → Cast A ⇒ stamp B (l ℓ)
+stamp-ir (cast cᵣ c̅) (ir-base 𝓋 _) ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
+stamp-ir (cast cᵣ c̅) (ir-ref  𝓋)   ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
+stamp-ir (cast cᵣ c̅) (ir-fun  𝓋)   ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
+
+stamp-not-id : ∀ {ℓ ℓ′ g} {c̅ : CoercionExp l ℓ ⇒ g}
+  → 𝒱 c̅
+  → l ℓ ≢ g
+  → l ℓ ≢ g ⋎̃ l ℓ′
+stamp-not-id {low} {low} id neq = neq
+stamp-not-id {low} {high} id neq = λ ()
+stamp-not-id {high} id neq = neq
+stamp-not-id (inj id) neq = neq
+stamp-not-id (inj (up id)) neq = neq
+stamp-not-id (up id) neq = neq
+
+stamp-ir-irreducible : ∀ {A B} {c : Cast A ⇒ B} {ℓ}
+  → (i : Irreducible c)
+  → Irreducible (stamp-ir c i ℓ)
+stamp-ir-irreducible {ℓ = ℓ′} (ir-base {ι} {ℓ} {g} 𝓋 x) =
+  ir-base (stamp-𝒱 _ 𝓋 _) (stamp-not-id 𝓋 x)
+stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stamp-𝒱 _ 𝓋 _)
+stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stamp-𝒱 _ 𝓋 _)
