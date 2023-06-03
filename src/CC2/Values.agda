@@ -162,13 +162,11 @@ stamp-val-value (V-cast v i) ⊢V = V-cast v (stamp-ir-irreducible i)
 -- ... | low  | l low  | l~ = refl
 -- stamp-val-low V-● = refl
 
--- ⊢value-pc : ∀ {Γ Σ gc gc′ pc pc′ V A}
---   → Γ ; Σ ; gc  ; pc ⊢ V ⦂ A
---   → Value V
---   → Γ ; Σ ; gc′ ; pc′ ⊢ V ⦂ A
--- ⊢value-pc (⊢addr eq) V-addr = ⊢addr eq
--- ⊢value-pc (⊢lam ⊢N) V-ƛ = ⊢lam ⊢N
--- ⊢value-pc ⊢const V-const = ⊢const
--- ⊢value-pc (⊢cast ⊢V) (V-cast v i) = ⊢cast (⊢value-pc ⊢V v)
--- ⊢value-pc (⊢sub ⊢V A<:B) v = ⊢sub (⊢value-pc ⊢V v) A<:B
--- ⊢value-pc (⊢sub-pc ⊢V gc<:gc′) v = ⊢value-pc ⊢V v
+⊢value-pc : ∀ {Γ Σ gc gc′ ℓv ℓv′ V A}
+  → Γ ; Σ ; gc  ; ℓv ⊢ V ⇐ A
+  → Value V
+  → Γ ; Σ ; gc′ ; ℓv′ ⊢ V ⇐ A
+⊢value-pc (⊢addr eq) (V-raw V-addr) = ⊢addr eq
+⊢value-pc (⊢lam ⊢N) (V-raw V-ƛ) = ⊢lam ⊢N
+⊢value-pc ⊢const (V-raw V-const) = ⊢const
+⊢value-pc (⊢cast ⊢V) (V-cast v i) = ⊢cast (⊢value-pc ⊢V (V-raw v))
