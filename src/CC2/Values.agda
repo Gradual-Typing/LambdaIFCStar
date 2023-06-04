@@ -131,36 +131,15 @@ stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-raw V-c
 stamp-val-value (V-cast v i) ⊢V = V-cast v (stamp-ir-irreducible i)
 
 
--- stamp-val-low : ∀ {V} (v : Value V) → stamp-val V v low ≡ V
--- stamp-val-low (V-addr {ℓ = ℓ}) with ℓ
--- ... | low  = refl
--- ... | high = refl
--- stamp-val-low (V-ƛ {ℓ = ℓ}) with ℓ
--- ... | low  = refl
--- ... | high = refl
--- stamp-val-low (V-const {ℓ = ℓ}) with ℓ
--- ... | low  = refl
--- ... | high = refl
--- stamp-val-low (V-cast v (I-base-inj (cast (` ι of l ℓ) (` ι of ⋆) p (~-ty ℓ~⋆ ~-ι))))
---   rewrite stamp-val-low v
---   with ℓ   | ℓ~⋆
--- ... | low  | ~⋆ = refl
--- ... | high | ~⋆ = refl
--- stamp-val-low (V-cast v (I-fun (cast (_ of l ℓ₁) (_ of g₂) p (~-ty ℓ₁~g₂ _)) I-label I-label))
---   rewrite stamp-val-low v
---   with ℓ₁  | g₂     | ℓ₁~g₂
--- ... | high | ⋆      | ~⋆ = refl
--- ... | high | l high | l~ = refl
--- ... | low  | ⋆      | ~⋆ = refl
--- ... | low  | l low  | l~ = refl
--- stamp-val-low (V-cast v (I-ref (cast (_ of l ℓ₁) (_ of g₂) p (~-ty ℓ₁~g₂ _)) I-label I-label))
---   rewrite stamp-val-low v
---   with ℓ₁  | g₂     | ℓ₁~g₂
--- ... | high | ⋆      | ~⋆ = refl
--- ... | high | l high | l~ = refl
--- ... | low  | ⋆      | ~⋆ = refl
--- ... | low  | l low  | l~ = refl
--- stamp-val-low V-● = refl
+stamp-val-low : ∀ {Σ gc ℓv A V}
+  → (v : Value V)
+  → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
+  → stamp-val V v ⊢V low ≡ V
+stamp-val-low (V-raw V-addr) ⊢V = refl
+stamp-val-low (V-raw V-ƛ) ⊢V = refl
+stamp-val-low (V-raw V-const) ⊢V = refl
+stamp-val-low (V-cast v i) ⊢V = {!!}
+
 
 ⊢value-pc : ∀ {Γ Σ gc gc′ ℓv ℓv′ V A}
   → Γ ; Σ ; gc  ; ℓv ⊢ V ⇐ A

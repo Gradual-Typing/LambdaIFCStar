@@ -5,14 +5,14 @@ module Common.Coercions where
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst)
 open import Function using (case_of_; case_return_of_)
 
 open import Common.Utils
 open import Common.Types
 open import Common.BlameLabels
 open import LabelCoercionCalculus.CoercionExp hiding (coerce) public
-open import LabelCoercionCalculus.Stamping renaming (stamp to stampₗ)
+open import LabelCoercionCalculus.Stamping
 
 
 infix 6 Castᵣ_⇒_
@@ -106,6 +106,6 @@ stamp-ir-irreducible : ∀ {A B} {c : Cast A ⇒ B} {ℓ}
   → (i : Irreducible c)
   → Irreducible (stamp-ir c i ℓ)
 stamp-ir-irreducible {ℓ = ℓ′} (ir-base {ι} {ℓ} {g} 𝓋 x) =
-  ir-base (stamp-𝒱 _ 𝓋 _) (stamp-not-id 𝓋 x)
-stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stamp-𝒱 _ 𝓋 _)
-stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stamp-𝒱 _ 𝓋 _)
+  ir-base (stampₗ-𝒱 _ 𝓋 _) (stamp-not-id 𝓋 x)
+stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stampₗ-𝒱 _ 𝓋 _)
+stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stampₗ-𝒱 _ 𝓋 _)
