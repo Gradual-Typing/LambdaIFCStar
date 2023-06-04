@@ -138,7 +138,21 @@ stamp-val-low : ∀ {Σ gc ℓv A V}
 stamp-val-low (V-raw V-addr) ⊢V = refl
 stamp-val-low (V-raw V-ƛ) ⊢V = refl
 stamp-val-low (V-raw V-const) ⊢V = refl
-stamp-val-low (V-cast v i) ⊢V = {!!}
+stamp-val-low (V-cast v (ir-base (id {l low}) x₁)) ⊢V = refl
+stamp-val-low (V-cast v (ir-base (id {l high}) x₁)) ⊢V = refl
+stamp-val-low (V-cast v (ir-base (inj id) x₁)) ⊢V = refl
+stamp-val-low (V-cast v (ir-base (inj (up id)) x₁)) ⊢V = refl
+stamp-val-low (V-cast v (ir-base (up id) x₁)) ⊢V = refl
+stamp-val-low (V-cast v (ir-ref (id {l low}))) ⊢V = refl
+stamp-val-low (V-cast v (ir-ref (id {l high}))) ⊢V = refl
+stamp-val-low (V-cast v (ir-ref (inj id))) ⊢V = refl
+stamp-val-low (V-cast v (ir-ref (inj (up id)))) ⊢V = refl
+stamp-val-low (V-cast v (ir-ref (up id))) ⊢V = refl
+stamp-val-low (V-cast v (ir-fun (id {l low}))) ⊢V = refl
+stamp-val-low (V-cast v (ir-fun (id {l high}))) ⊢V = refl
+stamp-val-low (V-cast v (ir-fun (inj id))) ⊢V = refl
+stamp-val-low (V-cast v (ir-fun (inj (up id)))) ⊢V = refl
+stamp-val-low (V-cast v (ir-fun (up id))) ⊢V = refl
 
 
 ⊢value-pc : ∀ {Γ Σ gc gc′ ℓv ℓv′ V A}
