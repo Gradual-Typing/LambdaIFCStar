@@ -150,3 +150,39 @@ plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ (pl
 ↠-trans (L —→⟨ L→ ⟩ ↠M) (M ∎) = L —→⟨ L→ ⟩ ↠M
 ↠-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) =
   L —→⟨ L→ ⟩ ↠-trans ↠M (M —→⟨ M→ ⟩ ↠N)
+
+
+open import LabelCoercionCalculus.Precision
+
+data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → g₁ ⊑ₗ g₂ → Set where
+
+  ⊑-l : ∀ {ℓ} → ⊢ l ℓ ⊑ l ℓ ⇐ l⊑l {ℓ}
+
+  ⊑-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′}
+             {c̅ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+             {g₁⊑g₁′ : g₁ ⊑ₗ g₁′} {g₂⊑g₂′ : g₂ ⊑ₗ g₂′}
+    → ⊢ M ⊑ M′ ⇐ g₁⊑g₁′
+    → ⊢ c̅ ⊑ c̅′
+      --------------------------------------
+    → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⟪ c̅′ ⟫ ⇐ g₂⊑g₂′
+
+  ⊑-castl : ∀ {g₁ g₂ g′} {M M′}
+              {c̅ : CoercionExp g₁ ⇒ g₂}
+              {g₁⊑g′ : g₁ ⊑ₗ g′} {g₂⊑g′ : g₂ ⊑ₗ g′}
+    → ⊢ M ⊑ M′ ⇐ g₁⊑g′
+    → ⊢ c̅ ⊑ id g′
+      --------------------------------------
+    → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⇐ g₂⊑g′
+
+  ⊑-castr : ∀ {g g₁′ g₂′} {M M′}
+              {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+              {g⊑g₁′ : g ⊑ₗ g₁′} {g⊑g₂′ : g ⊑ₗ g₂′}
+    → ⊢ M ⊑ M′ ⇐ g⊑g₁′
+    → ⊢ id g ⊑ c̅′
+      --------------------------------------
+    → ⊢ M ⊑ M′ ⟪ c̅′ ⟫ ⇐ g⊑g₂′
+
+  ⊑-blame : ∀ {g g′} {M} {g⊑g′ : g ⊑ₗ g′} {p}
+    → ⊢ M ⇐ g
+      --------------------------
+    → ⊢ M ⊑ blame p ⇐ g⊑g′
