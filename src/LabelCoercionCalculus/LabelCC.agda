@@ -109,3 +109,14 @@ progress (⊢cast {c̅ = c̅} ⊢M) =
   (error) → step ξ-blame
   (step M→N) → step (ξ M→N)
 progress ⊢blame = error
+
+preserve : ∀ {g M N}
+  → ⊢ M ⇐ g
+  → M —→ₑ N
+  → ⊢ N ⇐ g
+preserve (⊢cast ⊢M) (ξ M→N) = ⊢cast (preserve ⊢M M→N)
+preserve (⊢cast ⊢M) ξ-blame = ⊢blame
+preserve (⊢cast ⊢M) β-id = ⊢l
+preserve (⊢cast ⊢M) (cast x x₁) = ⊢cast ⊢l
+preserve (⊢cast ⊢M) (blame _) = ⊢blame
+preserve (⊢cast ⊢M) (comp _) = ⊢cast ⊢l
