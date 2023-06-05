@@ -15,6 +15,7 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import LabelCoercionCalculus.CoercionExp
+  renaming (progress to progressₗ)
 open import LabelCoercionCalculus.SyntacComp
 
 
@@ -80,5 +81,31 @@ data _—→ₑ_ : (M N : LCCExpr) → Set where
     → l ℓ ⟪ c̅ ⟫ —→ₑ blame p
 
   comp : ∀ {ℓ g₁ g₂} {c̅ᵢ : CoercionExp l ℓ ⇒ g₁} {d̅ : CoercionExp g₁ ⇒ g₂}
+    → Irreducible c̅ᵢ
       -------------------------------------------
     → l ℓ ⟪ c̅ᵢ ⟫ ⟪ d̅ ⟫ —→ₑ l ℓ ⟪ c̅ᵢ ⨟ d̅ ⟫
+
+
+
+data LCCProgress : LCCExpr → Set where
+
+  done : ∀ {M} → LCCVal M → LCCProgress M
+
+  error : ∀ {p} → LCCProgress (blame p)
+
+  step : ∀ {M N} → M  —→ₑ N → LCCProgress M
+
+progress : ∀ {g M} → ⊢ M ⇐ g → LCCProgress M
+progress ⊢l = done v-l
+progress (⊢cast {c̅ = c̅} ⊢M) =
+  case progress ⊢M of λ where
+  (done v) →
+    case ⟨ v , ⊢M ⟩ of λ where
+    ⟨ v-l , ⊢l ⟩ →
+      case result c̅ of λ where
+      (success c̅↠d̅ 𝓋) → step (cast c̅↠d̅ 𝓋)
+      (fail c̅↠⊥)      → step (blame c̅↠⊥)
+    ⟨ v-cast {c̅ = c̅′} i , ⊢cast _ ⟩ → step (comp i)
+  (error) → step ξ-blame
+  (step M→N) → step (ξ M→N)
+progress ⊢blame = error
