@@ -186,3 +186,19 @@ data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → g₁ ⊑ₗ g₂ → 
     → ⊢ M ⇐ g
       --------------------------
     → ⊢ M ⊑ blame p ⇐ g⊑g′
+
+{- Precision implies that both sides are well-typed -}
+prec→⊢ : ∀ {g g′} {M M′} {g⊑g′ : g ⊑ₗ g′}
+  → ⊢ M ⊑ M′ ⇐ g⊑g′
+  → (⊢ M ⇐ g) × (⊢ M′ ⇐ g′)
+prec→⊢ ⊑-l = ⟨ ⊢l , ⊢l ⟩
+prec→⊢ (⊑-cast M⊑M′ c̅⊑c̅′) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
+  ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ ⟩
+prec→⊢ (⊑-castl M⊑M′ _) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
+  ⟨ ⊢cast ⊢M , ⊢M′ ⟩
+prec→⊢ (⊑-castr M⊑M′ _) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
+  ⟨ ⊢M , ⊢cast ⊢M′ ⟩
+prec→⊢ (⊑-blame ⊢M) = ⟨ ⊢M , ⊢blame ⟩
