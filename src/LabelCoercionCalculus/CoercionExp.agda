@@ -143,48 +143,6 @@ data Progress : ∀ {g₁ g₂} → (c̅ : CoercionExp g₁ ⇒ g₂) → Set wh
     → Progress c̅
 
 
--- progress : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂) → Progress c̅
--- progress (id g) = done id
--- progress (c̅ ⨾ c) with progress c̅
--- ... | step c̅→c̅′ = step (ξ c̅→c̅′)
--- ... | error = step ξ-⊥
--- ... | done id with c
--- progress (_ ⨾ c) | done id | id g = step (id id)
--- progress (_ ⨾ c) | done id | ↑ = done up
--- progress (_ ⨾ c) | done id | ℓ ! = done inj
--- progress (_ ⨾ c) | done id | ℓ ?? p = done proj
--- progress (_ ⨾ c) | done up with c
--- progress (_ ⨾ c) | done up | id (l high) = step (id up)
--- progress (_ ⨾ c) | done up | high ! = done up-inj
--- progress (_ ⨾ c) | done inj with c
--- progress (_ ⨾ c) | done inj | id ⋆ = step (id inj)
--- progress (_ ⨾ c) | done (inj {low})  | low ?? p  = step (?-id id)
--- progress (_ ⨾ c) | done (inj {high}) | high ?? p = step (?-id id)
--- progress (_ ⨾ c) | done (inj {low})  | high ?? p = step (?-↑ id)
--- progress (_ ⨾ c) | done (inj {high}) | low ?? p  = step (?-⊥ id)
--- progress (_ ⨾ c) | done proj with c
--- progress (_ ⨾ c) | done proj | id (l ℓ) = step (id proj)
--- progress (_ ⨾ c) | done proj | ℓ ! = done proj-inj
--- progress (_ ⨾ c) | done proj | ↑ = done proj-up
--- progress (_ ⨾ c) | done up-inj with c
--- progress (_ ⨾ c) | done up-inj | id ⋆ = step (id up-inj)
--- progress (_ ⨾ c) | done up-inj | low ?? p = step (?-⊥ up)
--- progress (_ ⨾ c) | done up-inj | high ?? p = step (?-id up)
--- progress (_ ⨾ c) | done proj-up with c
--- progress (_ ⨾ c) | done proj-up | id _ = step (id proj-up)
--- progress (_ ⨾ c) | done proj-up | high ! = done proj-up-inj
--- progress (_ ⨾ c) | done proj-inj with c
--- progress (_ ⨾ c) | done proj-inj | id ⋆ = step (id proj-inj)
--- progress (_ ⨾ c) | done (proj-inj {low}) | low ?? p = step (?-id proj)
--- progress (_ ⨾ c) | done (proj-inj {high}) | low ?? p = step (?-⊥ proj)
--- progress (_ ⨾ c) | done (proj-inj {low}) | high ?? p = step (?-↑ proj)
--- progress (_ ⨾ c) | done (proj-inj {high}) | high ?? p = step (?-id proj)
--- progress (_ ⨾ c) | done proj-up-inj with c
--- progress (_ ⨾ c) | done proj-up-inj | id ⋆ = step (id proj-up-inj)
--- progress (_ ⨾ c) | done proj-up-inj | low ?? p = step (?-⊥ proj-up)
--- progress (_ ⨾ c) | done proj-up-inj | high ?? p = step (?-id proj-up)
--- progress (⊥ g₁ g₂ p) = error
-
 progress : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂) → Progress c̅
 progress (id g) = done id
 progress (c̅ ⨾ c) with progress c̅
