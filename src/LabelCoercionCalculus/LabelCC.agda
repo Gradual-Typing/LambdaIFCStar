@@ -15,7 +15,7 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import LabelCoercionCalculus.CoercionExp
-  renaming (progress to progressₗ)
+  hiding (progress; plug-cong; ↠-trans)
 open import LabelCoercionCalculus.SyntacComp
 
 
@@ -120,3 +120,33 @@ preserve (⊢cast ⊢M) β-id = ⊢l
 preserve (⊢cast ⊢M) (cast x x₁) = ⊢cast ⊢l
 preserve (⊢cast ⊢M) (blame _) = ⊢blame
 preserve (⊢cast ⊢M) (comp _) = ⊢cast ⊢l
+
+
+infix  2 _—↠ₑ_
+infixr 2 _—→⟨_⟩_
+infix  3 _∎
+
+data _—↠ₑ_ : ∀ (M N : LCCExpr) → Set where
+  _∎ : ∀ M → M —↠ₑ M
+
+  _—→⟨_⟩_ : ∀ L {M N : LCCExpr}
+    → L —→ₑ M
+    → M —↠ₑ N
+      ---------------
+    → L —↠ₑ N
+
+plug-cong : ∀ {g₁ g₂} {M N } {c̅ : CoercionExp g₁ ⇒ g₂}
+  → M —↠ₑ N
+  → M ⟪ c̅ ⟫ —↠ₑ N ⟪ c̅ ⟫
+plug-cong (M ∎) = (M ⟪ _ ⟫) ∎
+plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ (plug-cong L↠N)
+
+↠-trans : ∀ {L M N}
+  → L —↠ₑ M
+  → M —↠ₑ N
+  → L —↠ₑ N
+↠-trans (L ∎) (._ ∎) = L ∎
+↠-trans (L ∎) (.L —→⟨ M→ ⟩ ↠N) = L —→⟨ M→ ⟩ ↠N
+↠-trans (L —→⟨ L→ ⟩ ↠M) (M ∎) = L —→⟨ L→ ⟩ ↠M
+↠-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) =
+  L —→⟨ L→ ⟩ ↠-trans ↠M (M —→⟨ M→ ⟩ ↠N)
