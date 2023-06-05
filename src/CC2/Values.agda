@@ -60,39 +60,15 @@ data Value : Term → Set where
 --   Fun-proxy (Fun-ƛ ⊢N) i
 
 
--- canonical⋆ : ∀ {Γ Σ gc pc V T}
---   → Γ ; Σ ; gc ; pc ⊢ V ⦂ T of ⋆
---   → Value V
---   → ∃[ A ] ∃[ B ] Σ[ c ∈ Cast A ⇒ B ] ∃[ W ]
---        (V ≡ W ⟨ c ⟩) × (Inert c) × (Γ ; Σ ; gc ; pc ⊢ W ⦂ A) × (B <: T of ⋆)
--- canonical⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) =
---   ⟨ _ , _ , c , W , refl , i , ⊢W , <:-ty <:-⋆ <:ᵣ-refl ⟩
--- canonical⋆ (⊢sub ⊢V (<:-ty {S = T′} <:-⋆ T′<:T)) v =
---   case canonical⋆ ⊢V v of λ where
---     ⟨ A , B , c , W , refl , i , ⊢W , B<:T′⋆ ⟩ →
---       ⟨ A , B , c , W , refl , i , ⊢W , <:-trans B<:T′⋆ (<:-ty <:-⋆ T′<:T) ⟩
--- canonical⋆ (⊢sub-pc ⊢V gc<:gc′) v =
---   case canonical⋆ ⊢V v of λ where
---     ⟨ A , B , c , W , refl , i , ⊢W , B<:T⋆ ⟩ →
---       ⟨ A , B , c , W , refl , i , ⊢sub-pc ⊢W gc<:gc′ , B<:T⋆ ⟩
-
--- canonical-ref⋆ : ∀ {Γ Σ gc pc V T g}
---   → Γ ; Σ ; gc ; pc ⊢ V ⦂ Ref (T of ⋆) of g
---   → Value V
---   → ∃[ A ] ∃[ B ] Σ[ c ∈ Cast A ⇒ B ] ∃[ W ]
---        (V ≡ W ⟨ c ⟩) × (Inert c) × (Γ ; Σ ; gc ; pc ⊢ W ⦂ A) × (B <: Ref (T of ⋆) of g)
--- canonical-ref⋆ (⊢cast ⊢W) (V-cast {V = W} {c} w i) =
---   ⟨ _ , _ , c , W , refl , i , ⊢W , <:-refl ⟩
--- canonical-ref⋆ (⊢sub ⊢V sub) v =
---   case sub of λ where
---     (<:-ty _ (<:-ref (<:-ty <:-⋆ S<:T) (<:-ty <:-⋆ T<:S))) →
---       case canonical-ref⋆ ⊢V v of λ where
---         ⟨ A , B , c , W , refl , i , ⊢W , B<:RefS ⟩ →
---           ⟨ A , B , c , W , refl , i , ⊢W , <:-trans B<:RefS sub ⟩
--- canonical-ref⋆ (⊢sub-pc ⊢V gc<:gc′) v =
---   case canonical-ref⋆ ⊢V v of λ where
---   ⟨ A , B , c , W , refl , i , ⊢W , B<:RefT ⟩ →
---     ⟨ A , B , c , W , refl , i , ⊢sub-pc ⊢W gc<:gc′ , B<:RefT ⟩
+canonical⋆ : ∀ {Γ Σ gc ℓv V T}
+  → Value V
+  → Γ ; Σ ; gc ; ℓv ⊢ V ⇐ T of ⋆
+  → ∃[ A ] Σ[ c ∈ Cast A ⇒ T of ⋆ ] ∃[ W ]
+       (V ≡ W ⟨ c ⟩) × (Irreducible c) × (Γ ; Σ ; gc ; ℓv ⊢ W ⇐ A)
+canonical⋆ (V-raw V-addr) ()
+canonical⋆ (V-raw V-ƛ) ()
+canonical⋆ (V-raw V-const) ()
+canonical⋆ (V-cast {V = W} {c} w i) (⊢cast ⊢W) = ⟨ _ , c , _ , refl , i , ⊢W ⟩
 
 
 stamp-val : ∀ {Σ gc ℓv A} V → Value V → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A → StaticLabel → Term
