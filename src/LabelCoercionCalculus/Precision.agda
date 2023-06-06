@@ -18,6 +18,8 @@ open import LabelCoercionCalculus.CoercionExp
 
 
 infix 4 ⊢_⊑_
+infix 4 ⊢l_⊑_
+infix 4 ⊢r_⊑_
 
 data ⊢_⊑_ : ∀ {g₁ g₁′ g₂ g₂′} (c̅ : CoercionExp g₁ ⇒ g₂) (c̅′ : CoercionExp g₁′ ⇒ g₂′) → Set where
 
@@ -56,9 +58,48 @@ data ⊢_⊑_ : ∀ {g₁ g₁′ g₂ g₂′} (c̅ : CoercionExp g₁ ⇒ g₂
       ---------------------------------
     → ⊢ c̅ ⊑ ⊥ g₁′ g₂′ p
 
+
+data ⊢l_⊑_ : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂) (g : Label) → Set where
+
+  ⊑-id : ∀ {g g′}
+    → (g⊑g′ : g ⊑ₗ g′)
+      ---------------------------------
+    → ⊢l id g ⊑ g′
+
+  ⊑-cast : ∀ {g₁ g₂ g₃ g′}
+             {c̅ : CoercionExp g₁ ⇒ g₂}
+             {c : ⊢ g₂ ⇒ g₃}
+    → ⊢l c̅ ⊑ g′
+    → g₂ ⊑ₗ g′ → g₃ ⊑ₗ g′ {- c ⊑ g′ -}
+      -------------------------------------------
+    → ⊢l c̅ ⨾ c ⊑ g′
+
+
+data ⊢r_⊑_ : ∀ {g₁′ g₂′} (g : Label) (c̅′ : CoercionExp g₁′ ⇒ g₂′) → Set where
+
+  ⊑-id : ∀ {g g′}
+    → (g⊑g′ : g ⊑ₗ g′)
+      ---------------------------------
+    → ⊢r g ⊑ id g′
+
+  ⊑-cast : ∀ {g g₁′ g₂′ g₃′}
+             {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+             {c′ : ⊢ g₂′ ⇒ g₃′}
+    → ⊢r g ⊑ c̅′
+    → g ⊑ₗ g₂′ → g ⊑ₗ g₃′ {- g ⊑ c′ -}
+      -------------------------------------------
+    → ⊢r g ⊑ c̅′ ⨾ c′
+
+  ⊑-⊥ : ∀ {g g₁′ g₂′} {p}
+    → g ⊑ₗ g₁′
+    → g ⊑ₗ g₂′
+      ---------------------------------
+    → ⊢r g ⊑ ⊥ g₁′ g₂′ p
+
+
 prec→⊑ : ∀ {g₁ g₁′ g₂ g₂′} (c̅ : CoercionExp g₁ ⇒ g₂) (c̅′ : CoercionExp g₁′ ⇒ g₂′)
   → ⊢ c̅ ⊑ c̅′
-  → ((g₁ ⊑ₗ g₁′) × (g₂ ⊑ₗ g₂′))
+  → (g₁ ⊑ₗ g₁′) × (g₂ ⊑ₗ g₂′)
 prec→⊑ (id g) (id g′) (⊑-id g⊑g′) = ⟨ g⊑g′ , g⊑g′ ⟩
 prec→⊑ (c̅ ⨾ c) (c̅′ ⨾ c′) (⊑-cast c̅⊑c̅′ _ g₂⊑g₂′) =
   case prec→⊑ c̅ c̅′ c̅⊑c̅′ of λ where
@@ -70,6 +111,33 @@ prec→⊑ c̅ (c̅′ ⨾ c′) (⊑-castr c̅⊑c̅′ g₂⊑g₂′ g₂⊑g
   case prec→⊑ c̅ c̅′ c̅⊑c̅′ of λ where
   ⟨ g₁⊑g₁′ , _ ⟩ → ⟨ g₁⊑g₁′ , g₂⊑g₃′ ⟩
 prec→⊑ c̅ (⊥ _ _ _) (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = ⟨ g₁⊑g₁′ , g₂⊑g₂′ ⟩
+
+
+⊑-left-expand : ∀ {g₁ g₂ g′} {c̅ : CoercionExp g₁ ⇒ g₂}
+  → ⊢l c̅ ⊑ g′
+  → ⊢  c̅ ⊑ id g′
+⊑-left-expand (⊑-id g⊑g′) = ⊑-id g⊑g′
+⊑-left-expand (⊑-cast c̅⊑g′ g₁⊑g′ g₂⊑g′) = ⊑-castl (⊑-left-expand c̅⊑g′) g₁⊑g′ g₂⊑g′
+
+⊑-left-contract : ∀ {g₁ g₂ g′} {c̅ : CoercionExp g₁ ⇒ g₂}
+  → ⊢  c̅ ⊑ id g′
+  → ⊢l c̅ ⊑ g′
+⊑-left-contract (⊑-id g⊑g′) = ⊑-id g⊑g′
+⊑-left-contract (⊑-castl c̅⊑id g₁⊑g′ g₂⊑g′) = ⊑-cast (⊑-left-contract c̅⊑id) g₁⊑g′ g₂⊑g′
+
+⊑-right-expand : ∀ {g g₁′ g₂′} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+  → ⊢r g ⊑ c̅′
+  → ⊢  id g ⊑ c̅′
+⊑-right-expand (⊑-id g⊑g′) = ⊑-id g⊑g′
+⊑-right-expand (⊑-cast g⊑c̅′ g⊑g₁′ g⊑g₂′) = ⊑-castr (⊑-right-expand g⊑c̅′) g⊑g₁′ g⊑g₂′
+⊑-right-expand (⊑-⊥ g⊑g₁′ g⊑g₂′) = ⊑-⊥ g⊑g₁′ g⊑g₂′
+
+⊑-right-contract : ∀ {g g₁′ g₂′} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+  → ⊢ id g ⊑ c̅′
+  → ⊢r   g ⊑ c̅′
+⊑-right-contract (⊑-id g⊑g′) = ⊑-id g⊑g′
+⊑-right-contract (⊑-castr id⊑c̅′ g⊑g₁′ g⊑g₂′) = ⊑-cast (⊑-right-contract id⊑c̅′) g⊑g₁′ g⊑g₂′
+⊑-right-contract (⊑-⊥ g⊑g₁′ g⊑g₂′) = ⊑-⊥ g⊑g₁′ g⊑g₂′
 
 
 prec-inj-left : ∀ {g g′ ℓ}

@@ -27,10 +27,10 @@ catchup : ∀ {g g′} {M V′} {g⊑g′ : g ⊑ₗ g′}
     -------------------------------------------------------
   → ∃[ V ] (LCCVal V) × (M —↠ₑ V) × (⊢ V ⊑ V′ ⇐ g⊑g′)
 catchup v-l ⊑-l = ⟨ _ , v-l , _ ∎ , ⊑-l ⟩
-catchup v-l (⊑-castl {g₁} {g₂} {g′} {M} {M′} {c̅} {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} M⊑ℓ c̅⊑id)
+catchup v-l (⊑-castl {g₁} {g₂} {g′} {M} {M′} {c̅} {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} M⊑ℓ c̅⊑ℓ)
   with catchup {g⊑g′ = g₁⊑g′} v-l M⊑ℓ
 ... | ⟨ l ℓ , v-l , M↠V , ⊑-l ⟩ =
-  case catchupₗ c̅ (id g′) id c̅⊑id of λ where
+  case catchupₗ c̅ (id g′) id (⊑-left-expand c̅⊑ℓ) of λ where
   ⟨ id _ , id , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
     let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
             (l ℓ ⟪ c̅ ⟫        —→⟨ cast c̅↠c̅ₙ id ⟩
@@ -41,12 +41,13 @@ catchup v-l (⊑-castl {g₁} {g₂} {g′} {M} {M′} {c̅} {g₁⊑g′ = g₁
     let ♥ = ↠ₑ-trans (plug-congₑ M↠V)
             (l ℓ ⟪ c̅ ⟫ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩
              l ℓ ⟪ c̅ₙ ⟫ ∎) in
-    ⟨ l ℓ ⟪ c̅ₙ ⟫ , v-cast ⟨ inj 𝓋 , (λ ()) ⟩ , ♥ , ⊑-castl {g₁⊑g′ = l⊑l} {⋆⊑} ⊑-l c̅ₙ⊑id ⟩
+    ⟨ l ℓ ⟪ c̅ₙ ⟫ , v-cast ⟨ inj 𝓋 , (λ ()) ⟩ , ♥ ,
+      ⊑-castl {g₁⊑g′ = l⊑l} {⋆⊑} ⊑-l (⊑-left-contract c̅ₙ⊑id) ⟩
   ⟨ c̅ₙ , up 𝓋 , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
     case ⟨ g₂⊑g′ , 𝓋 ⟩ of λ where
     ⟨ l⊑l , () ⟩  {- a coercion value from high ⇒ low is impossible -}
-... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , ⊑-castl ⊑-l c̅₁⊑id ⟩ =
-  case catchupₗ (c̅₁ ⨟ c̅) (id g′) id (comp-pres-⊑id c̅₁⊑id c̅⊑id) of λ where
+... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , ⊑-castl ⊑-l c̅₁⊑ℓ ⟩ =
+  case catchupₗ (c̅₁ ⨟ c̅) (id g′) id (⊑-left-expand (comp-pres-⊑-left c̅₁⊑ℓ c̅⊑ℓ)) of λ where
   ⟨ id _ , id , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
     let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
             (l ℓ ⟪ c̅₁ ⟫ ⟪ c̅ ⟫ —→⟨ comp i ⟩
@@ -59,8 +60,29 @@ catchup v-l (⊑-castl {g₁} {g₂} {g′} {M} {M′} {c̅} {g₁⊑g′ = g₁
             (l ℓ ⟪ c̅₁ ⟫ ⟪ c̅ ⟫ —→⟨ comp i ⟩
              l ℓ ⟪ c̅₁ ⨟ c̅ ⟫   —→⟨ cast c̅₁⨟c̅↠c̅ₙ (inj 𝓋) ⟩
              l ℓ ⟪ c̅ₙ ⟫ ∎) in
-    ⟨ l ℓ ⟪ c̅ₙ ⟫ , v-cast ⟨ inj 𝓋 , (λ ()) ⟩ , ♥ , ⊑-castl {g₁⊑g′ = l⊑l} {⋆⊑} ⊑-l c̅ₙ⊑id ⟩
+    ⟨ l ℓ ⟪ c̅ₙ ⟫ , v-cast ⟨ inj 𝓋 , (λ ()) ⟩ , ♥ ,
+      ⊑-castl {g₁⊑g′ = l⊑l} {⋆⊑} ⊑-l (⊑-left-contract c̅ₙ⊑id) ⟩
   ⟨ c̅ₙ , up 𝓋 , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
     case ⟨ g₂⊑g′ , 𝓋 ⟩ of λ where
     ⟨ l⊑l , () ⟩  {- a coercion value from high ⇒ low is impossible -}
-catchup (v-cast x) M⊑V′ = {!!}
+catchup (v-cast i) (⊑-cast {g₁} {g₁′} {g₂} {g₂′} {M} {M′} {c̅} {c̅′} {g₁⊑g₁′} {g₂⊑g₂′} M⊑V′ c̅⊑c̅′)
+  with catchup {g⊑g′ = g₁⊑g₁′} v-l M⊑V′
+... | ⟨ l ℓ , v-l , M↠V , V⊑ℓ ⟩ = {!!}
+--   case catchupₗ c̅ (id g₁′) id {!!} of λ where
+--   ⟨ id _ , id , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ → {!!}
+--     -- let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
+--     --         (l ℓ ⟪ c̅ ⟫        —→⟨ cast c̅↠c̅ₙ id ⟩
+--     --          l ℓ ⟪ id (l ℓ) ⟫ —→⟨ β-id ⟩
+--     --          l ℓ ∎) in
+--     -- ⟨ l ℓ , v-l , ♣ , ⊑-l ⟩
+--   ⟨ c̅ₙ , inj 𝓋 , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ → {!!}
+--     -- let ♥ = ↠ₑ-trans (plug-congₑ M↠V)
+--     --         (l ℓ ⟪ c̅ ⟫ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩
+--     --          l ℓ ⟪ c̅ₙ ⟫ ∎) in
+--     -- ⟨ l ℓ ⟪ c̅ₙ ⟫ , v-cast ⟨ inj 𝓋 , (λ ()) ⟩ , ♥ , ⊑-castl {g₁⊑g′ = l⊑l} {⋆⊑} ⊑-l c̅ₙ⊑id ⟩
+--   ⟨ c̅ₙ , up 𝓋 , c̅↠c̅ₙ , c̅ₙ⊑id ⟩ → {!!}
+--     -- case ⟨ g₂⊑g₂′ , 𝓋 ⟩ of λ where
+--     -- ⟨ l⊑l , () ⟩  {- a coercion value from high ⇒ low is impossible -}
+... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , ⊑-castl ⊑-l c̅₁⊑id ⟩ = {!!}
+catchup (v-cast i) (⊑-castl M⊑V′ x) = {!!}
+catchup (v-cast i) (⊑-castr M⊑V′ x) = {!!}
