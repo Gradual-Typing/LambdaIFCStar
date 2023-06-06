@@ -154,7 +154,7 @@ plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ (pl
 
 open import LabelCoercionCalculus.Precision
 
-data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → g₁ ⊑ₗ g₂ → Set where
+data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → .(g₁ ⊑ₗ g₂) → Set where
 
   ⊑-l : ∀ {ℓ} → ⊢ l ℓ ⊑ l ℓ ⇐ l⊑l {ℓ}
 
@@ -192,13 +192,13 @@ prec→⊢ : ∀ {g g′} {M M′} {g⊑g′ : g ⊑ₗ g′}
   → ⊢ M ⊑ M′ ⇐ g⊑g′
   → (⊢ M ⇐ g) × (⊢ M′ ⇐ g′)
 prec→⊢ ⊑-l = ⟨ ⊢l , ⊢l ⟩
-prec→⊢ (⊑-cast M⊑M′ c̅⊑c̅′) =
-  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
+prec→⊢ (⊑-cast {g₁⊑g₁′ = g⊑g′} M⊑M′ c̅⊑c̅′) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
   ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ ⟩
-prec→⊢ (⊑-castl M⊑M′ _) =
-  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
+prec→⊢ (⊑-castl {g₁⊑g′ = g⊑g′} M⊑M′ _) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
   ⟨ ⊢cast ⊢M , ⊢M′ ⟩
-prec→⊢ (⊑-castr M⊑M′ _) =
-  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
+prec→⊢ (⊑-castr {g⊑g₁′ = g⊑g′} M⊑M′ _) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
   ⟨ ⊢M , ⊢cast ⊢M′ ⟩
 prec→⊢ (⊑-blame ⊢M) = ⟨ ⊢M , ⊢blame ⟩
