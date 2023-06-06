@@ -43,3 +43,14 @@ comp-pres-prec c̅₁⊑c̅₁′ (⊑-castl c̅₂⊑c̅₂′ g⊑g₃′ g₃
   ⊑-castl (comp-pres-prec c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃′ g₃⊑g₃′
 comp-pres-prec c̅₁⊑c̅₁′ (⊑-castr c̅₂⊑c̅₂′ g₃⊑g′ g₃⊑g₃′) =
   ⊑-castr (comp-pres-prec c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g₃⊑g′ g₃⊑g₃′
+
+
+comp-pres-⊑id : ∀ {g₁ g₂ g₃ g′}
+     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
+  → ⊢ c̅₁ ⊑ id g′
+  → ⊢ c̅₂ ⊑ id g′
+    -----------------------------
+  → ⊢ c̅₁ ⨟ c̅₂ ⊑ id g′
+comp-pres-⊑id c̅₁⊑c̅₁′ (⊑-id g⊑g′) = ⊑-castl c̅₁⊑c̅₁′ g⊑g′ g⊑g′
+comp-pres-⊑id c̅₁⊑c̅₁′ (⊑-castl c̅₂⊑c̅₂′ g⊑g₃′ g₃⊑g₃′) =
+  ⊑-castl (comp-pres-⊑id c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃′ g₃⊑g₃′

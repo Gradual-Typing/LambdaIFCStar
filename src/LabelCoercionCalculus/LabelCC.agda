@@ -135,21 +135,21 @@ data _—↠ₑ_ : ∀ (M N : LCCExpr) → Set where
       ---------------
     → L —↠ₑ N
 
-plug-cong : ∀ {g₁ g₂} {M N } {c̅ : CoercionExp g₁ ⇒ g₂}
+plug-congₑ : ∀ {g₁ g₂} {M N } {c̅ : CoercionExp g₁ ⇒ g₂}
   → M —↠ₑ N
   → M ⟪ c̅ ⟫ —↠ₑ N ⟪ c̅ ⟫
-plug-cong (M ∎) = (M ⟪ _ ⟫) ∎
-plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ (plug-cong L↠N)
+plug-congₑ (M ∎) = (M ⟪ _ ⟫) ∎
+plug-congₑ (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ (plug-congₑ L↠N)
 
-↠-trans : ∀ {L M N}
+↠ₑ-trans : ∀ {L M N}
   → L —↠ₑ M
   → M —↠ₑ N
   → L —↠ₑ N
-↠-trans (L ∎) (._ ∎) = L ∎
-↠-trans (L ∎) (.L —→⟨ M→ ⟩ ↠N) = L —→⟨ M→ ⟩ ↠N
-↠-trans (L —→⟨ L→ ⟩ ↠M) (M ∎) = L —→⟨ L→ ⟩ ↠M
-↠-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) =
-  L —→⟨ L→ ⟩ ↠-trans ↠M (M —→⟨ M→ ⟩ ↠N)
+↠ₑ-trans (L ∎) (._ ∎) = L ∎
+↠ₑ-trans (L ∎) (.L —→⟨ M→ ⟩ ↠N) = L —→⟨ M→ ⟩ ↠N
+↠ₑ-trans (L —→⟨ L→ ⟩ ↠M) (M ∎) = L —→⟨ L→ ⟩ ↠M
+↠ₑ-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) =
+  L —→⟨ L→ ⟩ ↠ₑ-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
 
 open import LabelCoercionCalculus.Precision
