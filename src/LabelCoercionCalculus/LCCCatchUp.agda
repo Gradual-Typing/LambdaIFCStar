@@ -47,7 +47,7 @@ catchup v-l (⊑-castl {g₁} {g₂} {g′} {M} {M′} {c̅} {g₁⊑g′ = g₁
     case ⟨ g₂⊑g′ , 𝓋 ⟩ of λ where
     ⟨ l⊑l , () ⟩  {- a coercion value from high ⇒ low is impossible -}
 ... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , ⊑-castl ⊑-l c̅₁⊑ℓ ⟩ =
-  case catchupₗ (c̅₁ ⨟ c̅) (id g′) id (⊑-left-expand (comp-pres-⊑-left c̅₁⊑ℓ c̅⊑ℓ)) of λ where
+  case catchupₗ (c̅₁ ⨟ c̅) (id g′) id (⊑-left-expand (comp-pres-⊑-ll c̅₁⊑ℓ c̅⊑ℓ)) of λ where
   ⟨ id _ , id , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
     let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
             (l ℓ ⟪ c̅₁ ⟫ ⟪ c̅ ⟫ —→⟨ comp i ⟩
@@ -87,7 +87,7 @@ catchup (v-cast ⟨ 𝓋′ , x ⟩) (⊑-cast {g₁} {g₁′} {g₂} {g₂′}
     case g₂⊑g₂′ of λ where
     l⊑l → ⟨ l ℓ ⟪ c̅ₙ ⟫ , v-cast ⟨ up 𝓋 , x ⟩ , ♥ , ⊑-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} ⊑-l c̅ₙ⊑c̅′ ⟩
 ... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , ⊑-castl ⊑-l c̅₁⊑ℓ ⟩ =
-  case catchupₗ (c̅₁ ⨟ c̅) c̅′ 𝓋′ {!!} of λ where
+  case catchupₗ (c̅₁ ⨟ c̅) c̅′ 𝓋′ (comp-pres-⊑-l c̅₁⊑ℓ c̅⊑c̅′) of λ where
   ⟨ id _ , id , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ → {!!}
     -- let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
     --         (l ℓ ⟪ c̅₁ ⟫ ⟪ c̅ ⟫ —→⟨ comp i ⟩
