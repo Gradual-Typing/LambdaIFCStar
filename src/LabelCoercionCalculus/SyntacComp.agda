@@ -66,4 +66,4 @@ comp-pres-⊑-l c̅₁⊑g₁ (⊑-id g⊑g′) = ⊑-castl (⊑-left-expand c̅
 comp-pres-⊑-l c̅₁⊑g₁ (⊑-cast c̅⊑c̅′ g₁⊑g₁′ g₂⊑g₂′) = ⊑-cast (comp-pres-⊑-l c̅₁⊑g₁ c̅⊑c̅′) g₁⊑g₁′ g₂⊑g₂′
 comp-pres-⊑-l c̅₁⊑g₁ (⊑-castl c̅⊑c̅′ g₁⊑g′ g₂⊑g′) = ⊑-castl (comp-pres-⊑-l c̅₁⊑g₁ c̅⊑c̅′) g₁⊑g′ g₂⊑g′
 comp-pres-⊑-l c̅₁⊑g₁ (⊑-castr c̅⊑c̅′ g⊑g₁′ g⊑g₂′) = ⊑-castr (comp-pres-⊑-l c̅₁⊑g₁ c̅⊑c̅′) g⊑g₁′ g⊑g₂′
-comp-pres-⊑-l c̅₁⊑g₁ (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = {!!}
+comp-pres-⊑-l c̅₁⊑g₁ (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = ⊑-⊥ (proj₁ (prec-left→⊑ _ c̅₁⊑g₁)) g₂⊑g₂′

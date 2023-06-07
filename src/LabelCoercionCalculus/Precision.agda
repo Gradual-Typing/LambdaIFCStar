@@ -113,6 +113,14 @@ prec→⊑ c̅ (c̅′ ⨾ c′) (⊑-castr c̅⊑c̅′ g₂⊑g₂′ g₂⊑g
 prec→⊑ c̅ (⊥ _ _ _) (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = ⟨ g₁⊑g₁′ , g₂⊑g₂′ ⟩
 
 
+prec-left→⊑ : ∀ {g₁ g₂ g′} (c̅ : CoercionExp g₁ ⇒ g₂)
+  → ⊢l c̅ ⊑ g′
+  → (g₁ ⊑ₗ g′) × (g₂ ⊑ₗ g′)
+prec-left→⊑ (id g) (⊑-id g⊑g′) = ⟨ g⊑g′ , g⊑g′ ⟩
+prec-left→⊑ (c̅ ⨾ c) (⊑-cast c̅⊑g′ g₁⊑g′ g₂⊑g′) =
+  ⟨ proj₁ (prec-left→⊑ c̅ c̅⊑g′) , g₂⊑g′ ⟩
+
+
 ⊑-left-expand : ∀ {g₁ g₂ g′} {c̅ : CoercionExp g₁ ⇒ g₂}
   → ⊢l c̅ ⊑ g′
   → ⊢  c̅ ⊑ id g′
