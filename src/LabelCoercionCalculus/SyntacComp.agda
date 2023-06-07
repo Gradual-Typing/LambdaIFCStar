@@ -32,7 +32,7 @@ comp-pres-prec : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → ⊢ c̅₂ ⊑ c̅₂′
     -----------------------------
-  → ⊢ (c̅₁ ⨟ c̅₂) ⊑ (c̅₁′ ⨟ c̅₂′)
+  → ⊢ c̅₁ ⨟ c̅₂ ⊑ c̅₁′ ⨟ c̅₂′
 comp-pres-prec c̅₁⊑c̅₁′ (⊑-⊥ x g₃⊑g₃′) =
   let ⟨ g₁⊑g₁′ , _ ⟩ = prec→⊑ _ _ c̅₁⊑c̅₁′ in
   ⊑-⊥ g₁⊑g₁′ g₃⊑g₃′
@@ -45,12 +45,25 @@ comp-pres-prec c̅₁⊑c̅₁′ (⊑-castr c̅₂⊑c̅₂′ g₃⊑g′ g₃
   ⊑-castr (comp-pres-prec c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g₃⊑g′ g₃⊑g₃′
 
 
-comp-pres-⊑-left : ∀ {g₁ g₂ g₃ g′}
+comp-pres-⊑-ll : ∀ {g₁ g₂ g₃ g′}
      {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
   → ⊢l c̅₁ ⊑ g′
   → ⊢l c̅₂ ⊑ g′
     -----------------------------
   → ⊢l c̅₁ ⨟ c̅₂ ⊑ g′
-comp-pres-⊑-left c̅₁⊑c̅₁′ (⊑-id g⊑g′) = ⊑-cast c̅₁⊑c̅₁′ g⊑g′ g⊑g′
-comp-pres-⊑-left c̅₁⊑c̅₁′ (⊑-cast c̅₂⊑c̅₂′ g⊑g₃′ g₃⊑g₃′) =
-  ⊑-cast (comp-pres-⊑-left c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃′ g₃⊑g₃′
+comp-pres-⊑-ll c̅₁⊑c̅₁′ (⊑-id g⊑g′) = ⊑-cast c̅₁⊑c̅₁′ g⊑g′ g⊑g′
+comp-pres-⊑-ll c̅₁⊑c̅₁′ (⊑-cast c̅₂⊑c̅₂′ g⊑g₃′ g₃⊑g₃′) =
+  ⊑-cast (comp-pres-⊑-ll c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃′ g₃⊑g₃′
+
+comp-pres-⊑-l : ∀ {g₁ g₁′ g₂ g₂′ g₃}
+     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
+     {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+  → ⊢l c̅₁ ⊑ g₁′
+  → ⊢  c̅₂ ⊑ c̅′
+    -----------------------------
+  → ⊢ c̅₁ ⨟ c̅₂ ⊑ c̅′
+comp-pres-⊑-l c̅₁⊑g₁ (⊑-id g⊑g′) = ⊑-castl (⊑-left-expand c̅₁⊑g₁) g⊑g′ g⊑g′
+comp-pres-⊑-l c̅₁⊑g₁ (⊑-cast c̅⊑c̅′ g₁⊑g₁′ g₂⊑g₂′) = ⊑-cast (comp-pres-⊑-l c̅₁⊑g₁ c̅⊑c̅′) g₁⊑g₁′ g₂⊑g₂′
+comp-pres-⊑-l c̅₁⊑g₁ (⊑-castl c̅⊑c̅′ g₁⊑g′ g₂⊑g′) = ⊑-castl (comp-pres-⊑-l c̅₁⊑g₁ c̅⊑c̅′) g₁⊑g′ g₂⊑g′
+comp-pres-⊑-l c̅₁⊑g₁ (⊑-castr c̅⊑c̅′ g⊑g₁′ g⊑g₂′) = ⊑-castr (comp-pres-⊑-l c̅₁⊑g₁ c̅⊑c̅′) g⊑g₁′ g⊑g₂′
+comp-pres-⊑-l c̅₁⊑g₁ (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = {!!}
