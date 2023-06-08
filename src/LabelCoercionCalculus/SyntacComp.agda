@@ -87,6 +87,19 @@ comp-pres-⊑-lb c̅₁⊑g₁ (⊑-castl c̅⊑c̅′ g₁⊑g′ g₂⊑g′) 
 comp-pres-⊑-lb c̅₁⊑g₁ (⊑-castr c̅⊑c̅′ g⊑g₁′ g⊑g₂′) = ⊑-castr (comp-pres-⊑-lb c̅₁⊑g₁ c̅⊑c̅′) g⊑g₁′ g⊑g₂′
 comp-pres-⊑-lb c̅₁⊑g₁ (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = ⊑-⊥ (proj₁ (prec-left→⊑ _ c̅₁⊑g₁)) g₂⊑g₂′
 
+comp-pres-⊑-rb : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
+     {c̅   : CoercionExp g₁  ⇒ g₂}
+     {c̅₁′ : CoercionExp g₁′ ⇒ g₂′}    {c̅₂′ : CoercionExp g₂′ ⇒ g₃′}
+  → ⊢r g₁ ⊑ c̅₁′
+  → ⊢  c̅  ⊑ c̅₂′
+    -----------------------------
+  → ⊢ c̅ ⊑ c̅₁′ ⨟ c̅₂′
+comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-id g⊑g′) = ⊑-castr (⊑-right-expand g₁⊑c̅₁′) g⊑g′ g⊑g′
+comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-cast c̅⊑c̅₂′ x y) = ⊑-cast (comp-pres-⊑-rb g₁⊑c̅₁′ c̅⊑c̅₂′) x y
+comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-castl c̅⊑c̅₂′ x y) = ⊑-castl (comp-pres-⊑-rb g₁⊑c̅₁′ c̅⊑c̅₂′) x y
+comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-castr c̅⊑c̅₂′ x y) = ⊑-castr (comp-pres-⊑-rb g₁⊑c̅₁′ c̅⊑c̅₂′) x y
+comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-⊥ x y) = ⊑-⊥ (proj₁ (prec-right→⊑ _ g₁⊑c̅₁′)) y
+
 comp-pres-⊑-bl : ∀ {g₁ g₁′ g₂ g₂′ g₃}
      {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
      {c̅′ : CoercionExp g₁′ ⇒ g₂′}

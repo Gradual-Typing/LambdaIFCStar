@@ -41,10 +41,19 @@ sim-cast M⊑M′ c̅⊑c̅′ ξ-blame = {!!}
 sim-cast M⊑M′ c̅⊑c̅′ β-id = {!!}
 sim-cast M⊑M′ c̅⊑c̅′ (cast x x₁) = {!!}
 sim-cast M⊑M′ c̅⊑c̅′ (blame x) = {!!}
-sim-cast {g₁⊑g₁′ = g₁⊑g₁′} M⊑M′ c̅⊑c̅′ (comp i′)
+sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅ = c̅} {c̅′} M⊑M′ c̅⊑c̅′ (comp i′)
   with catchup {g⊑g′ = g₁⊑g₁′} (v-cast i′) M⊑M′
-... | ⟨ l ℓ , v-l , M↠V , prec ⟩  = {!!}
-... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , prec ⟩  = {!!}
+... | ⟨ l ℓ , v-l , M↠V , ⊑-castr ⊑-l ℓ⊑c̅ᵢ ⟩ =
+  ⟨ l ℓ ⟪ c̅ ⟫ , plug-congₑ M↠V , ⊑-cast {g₁⊑g₁′ = l⊑l} {g₂⊑g₂′} ⊑-l (comp-pres-⊑-rb ℓ⊑c̅ᵢ c̅⊑c̅′) ⟩
+... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , prec ⟩
+  with prec→⊢ {g⊑g′ = g₁⊑g₁′} prec
+... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
+  with prec-inv {g⊑g′ = g₁⊑g₁′} prec
+... | ⟨ refl , c̅₁⊑c̅ᵢ ⟩ =
+  let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
+                    (l ℓ ⟪ c̅₁ ⟫ ⟪ c̅ ⟫ —→⟨ comp i ⟩ _ ∎) in
+  ⟨ l ℓ ⟪ c̅₁ ⨟ c̅ ⟫ , ♣ ,
+    ⊑-cast {g₁⊑g₁′ = l⊑l} {g₂⊑g₂′} ⊑-l (comp-pres-prec c̅₁⊑c̅ᵢ c̅⊑c̅′) ⟩
 
 
 sim (⊑-cast M⊑M′ x) M′→N′ = {!!}

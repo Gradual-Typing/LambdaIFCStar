@@ -120,6 +120,12 @@ prec-left→⊑ (id g) (⊑-id g⊑g′) = ⟨ g⊑g′ , g⊑g′ ⟩
 prec-left→⊑ (c̅ ⨾ c) (⊑-cast c̅⊑g′ g₁⊑g′ g₂⊑g′) =
   ⟨ proj₁ (prec-left→⊑ c̅ c̅⊑g′) , g₂⊑g′ ⟩
 
+prec-right→⊑ : ∀ {g g₁′ g₂′} (c̅′ : CoercionExp g₁′ ⇒ g₂′)
+  → ⊢r g ⊑ c̅′
+  → (g ⊑ₗ g₁′) × (g ⊑ₗ g₂′)
+prec-right→⊑ (id _) (⊑-id g⊑g′) = ⟨ g⊑g′ , g⊑g′ ⟩
+prec-right→⊑ (_ ⨾ _) (⊑-cast g⊑c̅′ x y) = ⟨ proj₁ (prec-right→⊑ _ g⊑c̅′) , y ⟩
+prec-right→⊑ (⊥ _ _ _) (⊑-⊥ x y) = ⟨ x , y ⟩
 
 ⊑-left-expand : ∀ {g₁ g₂ g′} {c̅ : CoercionExp g₁ ⇒ g₂}
   → ⊢l c̅ ⊑ g′
