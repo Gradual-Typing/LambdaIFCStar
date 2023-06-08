@@ -202,3 +202,13 @@ prec→⊢ (⊑-castr {g⊑g₁′ = g⊑g′} M⊑M′ _) =
   let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
   ⟨ ⊢M , ⊢cast ⊢M′ ⟩
 prec→⊢ (⊑-blame ⊢M) = ⟨ ⊢M , ⊢blame ⟩
+
+
+{- Precision of LCC expressions implies the precision of coercion expressions -}
+prec-inv : ∀ {ℓ ℓ′ g g′} {g⊑g′ : g ⊑ₗ g′}
+             {c̅ : CoercionExp l ℓ ⇒ g} {c̅′ : CoercionExp l ℓ′ ⇒ g′}
+  → ⊢ l ℓ ⟪ c̅ ⟫ ⊑ l ℓ′ ⟪ c̅′ ⟫ ⇐ g⊑g′
+  → (ℓ ≡ ℓ′) × (⊢ c̅ ⊑ c̅′)
+prec-inv (⊑-cast ⊑-l c̅⊑c̅′)                 = ⟨ refl , c̅⊑c̅′ ⟩
+prec-inv (⊑-castl (⊑-castr ⊑-l ℓ⊑c̅′) c̅⊑g′) = ⟨ refl , comp-pres-⊑-rl ℓ⊑c̅′ c̅⊑g′ ⟩
+prec-inv (⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′)  = ⟨ refl , comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′  ⟩

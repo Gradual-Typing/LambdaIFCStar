@@ -65,6 +65,15 @@ comp-pres-⊑-lr c̅⊑g₁′ (⊑-id g⊑g′) = ⊑-left-expand c̅⊑g₁′
 comp-pres-⊑-lr c̅⊑g₁′ (⊑-cast g₂⊑c̅′ x y) = ⊑-castr (comp-pres-⊑-lr c̅⊑g₁′ g₂⊑c̅′) x y
 comp-pres-⊑-lr c̅⊑g₁′ (⊑-⊥ x y) = ⊑-⊥ (proj₁ (prec-left→⊑ _ c̅⊑g₁′)) y
 
+comp-pres-⊑-rl : ∀ {g₁ g₁′ g₂ g₂′}
+     {c̅ : CoercionExp g₁ ⇒ g₂}    {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+  → ⊢r g₁ ⊑ c̅′
+  → ⊢l c̅ ⊑ g₂′
+    -----------------------------
+  → ⊢ c̅ ⊑ c̅′
+comp-pres-⊑-rl g₁⊑c̅′ (⊑-id g⊑g′) = ⊑-right-expand g₁⊑c̅′
+comp-pres-⊑-rl g₁⊑c̅′ (⊑-cast c̅⊑g₂′ g₁⊑g₂′ g₂⊑g₂′) = ⊑-castl (comp-pres-⊑-rl g₁⊑c̅′ c̅⊑g₂′) g₁⊑g₂′ g₂⊑g₂′
+
 comp-pres-⊑-lb : ∀ {g₁ g₁′ g₂ g₂′ g₃}
      {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
      {c̅′ : CoercionExp g₁′ ⇒ g₂′}
