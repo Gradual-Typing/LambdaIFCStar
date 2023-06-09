@@ -103,9 +103,35 @@ sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅ = c̅} {c̅′}
     ⊑-cast {g₁⊑g₁′ = l⊑l} {g₂⊑g₂′} ⊑-l (comp-pres-prec c̅₁⊑c̅ᵢ c̅⊑c̅′) ⟩
 
 
+sim-castr : ∀ {g g₁′ g₂′} {M M′ N′} {g⊑g₁′ : g ⊑ₗ g₁′} {g⊑g₂′ : g ⊑ₗ g₂′}
+              {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+  → ⊢ M ⊑ M′ ⇐ g⊑g₁′
+  → ⊢r g ⊑ c̅′
+  → M′ ⟪ c̅′ ⟫ —→ₑ N′
+    ---------------------------------------------------
+  → ∃[ N ] (M —↠ₑ N) × (⊢ N ⊑ N′ ⇐ g⊑g₂′)
+sim-castr M⊑M′ g⊑c̅′ (ξ M′→N′) = {!!}
+sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ ξ-blame =
+  ⟨ _ , _ ∎ , ⊑-blame {g⊑g′ = g⊑g₂′} (proj₁ (prec→⊢ {g⊑g′ = g⊑g₁′} M⊑M′)) ⟩
+sim-castr M⊑M′ g⊑c̅′ β-id = {!!}
+sim-castr M⊑M′ g⊑c̅′ (cast x x₁) = {!!}
+sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ (blame _) =
+  ⟨ _ , _ ∎ , ⊑-blame {g⊑g′ = g⊑g₂′} (proj₁ (prec→⊢ {g⊑g′ = g⊑g₁′} M⊑M′)) ⟩
+sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ (comp i′)
+  with catchup {g⊑g′ = g⊑g₁′} (v-cast i′) M⊑M′
+... | ⟨ l ℓ , v-l , M↠V , ⊑-castr ⊑-l ℓ⊑c̅ᵢ ⟩ =
+  ⟨ l ℓ , M↠V , ⊑-castr {g⊑g₁′ = l⊑l} {g⊑g₂′} ⊑-l (comp-pres-⊑-rr ℓ⊑c̅ᵢ g⊑c̅′) ⟩
+... | ⟨ l ℓ ⟪ c̅ ⟫ , v-cast i , M↠V , prec ⟩
+  with prec→⊢ {g⊑g′ = g⊑g₁′} prec
+... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
+  with prec-inv {g⊑g′ = g⊑g₁′} prec
+... | ⟨ refl , c̅⊑c̅ᵢ ⟩ =
+  ⟨ l ℓ ⟪ c̅ ⟫ , M↠V , ⊑-cast {g₁⊑g₁′ = l⊑l} {g⊑g₂′} ⊑-l (comp-pres-⊑-br c̅⊑c̅ᵢ g⊑c̅′) ⟩
+
+
 sim (⊑-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′) M′→N′ =
   sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′ M′→N′
 sim (⊑-castl {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} M⊑M′ c̅⊑g′) M′→N′
   with sim {g⊑g′ = g₁⊑g′} M⊑M′ M′→N′
 ... | ⟨ N , M↠N , N⊑N′ ⟩ = ⟨ N ⟪ _ ⟫ , plug-congₑ M↠N , ⊑-castl {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} N⊑N′ c̅⊑g′ ⟩
-sim (⊑-castr M⊑M′ x) M′→N′ = {!!}
+sim (⊑-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′) M′→N′ = sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ M′→N′
