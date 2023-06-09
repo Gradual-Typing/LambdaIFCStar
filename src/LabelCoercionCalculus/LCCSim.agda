@@ -37,8 +37,12 @@ sim-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′ N′} {g₁⊑g₁′ : g₁ 
   → M′ ⟪ c̅′ ⟫ —→ₑ N′
     ---------------------------------------------------
   → ∃[ N ] (M ⟪ c̅ ⟫ —↠ₑ N) × (⊢ N ⊑ N′ ⇐ g₂⊑g₂′)
-sim-cast M⊑M′ c̅⊑c̅′ (ξ R) = {!!}
-sim-cast M⊑M′ c̅⊑c̅′ ξ-blame = {!!}
+sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅} {c̅′} M⊑M′ c̅⊑c̅′ (ξ M′→N′)
+  with sim {g⊑g′ = g₁⊑g₁′} M⊑M′ M′→N′
+... | ⟨ N , M→N , N⊑N′ ⟩ =
+  ⟨ N ⟪ c̅ ⟫ , plug-congₑ M→N , ⊑-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} N⊑N′ c̅⊑c̅′ ⟩
+sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′ ξ-blame =
+  ⟨ _ , _ ∎ , ⊑-blame {g⊑g′ = g₂⊑g₂′} (⊢cast (proj₁ (prec→⊢ {g⊑g′ = g₁⊑g₁′} M⊑M′))) ⟩
 sim-cast M⊑M′ c̅⊑c̅′ β-id = {!!}
 sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅} {c̅′} M⊑M′ c̅⊑c̅′ (cast c̅′↠c̅ₙ 𝓋′)
   with catchup {g⊑g′ = g₁⊑g₁′} v-l M⊑M′
@@ -71,6 +75,7 @@ sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅ = c̅} {c̅′}
     ⊑-cast {g₁⊑g₁′ = l⊑l} {g₂⊑g₂′} ⊑-l (comp-pres-prec c̅₁⊑c̅ᵢ c̅⊑c̅′) ⟩
 
 
-sim (⊑-cast M⊑M′ x) M′→N′ = {!!}
+sim (⊑-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′) M′→N′ =
+  sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′ M′→N′
 sim (⊑-castl M⊑M′ x) M′→N′ = {!!}
 sim (⊑-castr M⊑M′ x) M′→N′ = {!!}
