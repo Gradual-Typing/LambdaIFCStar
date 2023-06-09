@@ -17,7 +17,7 @@ open import Common.BlameLabels
 open import LabelCoercionCalculus.CoercionExp
 open import LabelCoercionCalculus.Precision
 
-open import LabelCoercionCalculus.CatchUp
+open import LabelCoercionCalculus.CatchUp using (catchup) public
 open import LabelCoercionCalculus.Simulation
 
 
