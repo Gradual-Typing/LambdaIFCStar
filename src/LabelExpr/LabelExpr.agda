@@ -19,30 +19,30 @@ open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision
 
 
-data LCCExpr : Set where
+data LExpr : Set where
 
-  l : StaticLabel → LCCExpr
+  l : StaticLabel → LExpr
 
-  _⟪_⟫ : ∀ {g₁ g₂} → LCCExpr → CExpr g₁ ⇒ g₂ → LCCExpr
+  _⟪_⟫ : ∀ {g₁ g₂} → LExpr → CExpr g₁ ⇒ g₂ → LExpr
 
-  blame : BlameLabel → LCCExpr
+  blame : BlameLabel → LExpr
 
 
 Irreducible : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Set
 Irreducible {g₁} {g₂} c̅ = 𝒱 c̅ × g₁ ≢ g₂
 
 
-data LCCVal : LCCExpr → Set where
+data LVal : LExpr → Set where
 
   {- raw value -}
-  v-l : ∀ {ℓ} → LCCVal (l ℓ)
+  v-l : ∀ {ℓ} → LVal (l ℓ)
 
   {- wrapped value (one cast) -}
   v-cast : ∀ {ℓ g} {c̅ : CExpr l ℓ ⇒ g}
     → Irreducible c̅
-    → LCCVal (l ℓ ⟪ c̅ ⟫)
+    → LVal (l ℓ ⟪ c̅ ⟫)
 
-data ⊢_⇐_ : LCCExpr → Label → Set where
+data ⊢_⇐_ : LExpr → Label → Set where
 
   ⊢l : ∀ {ℓ} → ⊢ l ℓ ⇐ l ℓ
 
@@ -56,7 +56,7 @@ data ⊢_⇐_ : LCCExpr → Label → Set where
 
 infix 2 _—→ₑ_
 
-data _—→ₑ_ : (M N : LCCExpr) → Set where
+data _—→ₑ_ : (M N : LExpr) → Set where
 
   ξ : ∀ {g₁ g₂} {M N} {c̅ : CExpr g₁ ⇒ g₂}
     → M —→ₑ N
@@ -87,9 +87,9 @@ data _—→ₑ_ : (M N : LCCExpr) → Set where
 
 
 
-data LCCProgress : LCCExpr → Set where
+data LCCProgress : LExpr → Set where
 
-  done : ∀ {M} → LCCVal M → LCCProgress M
+  done : ∀ {M} → LVal M → LCCProgress M
 
   error : ∀ {p} → LCCProgress (blame p)
 
@@ -126,10 +126,10 @@ infix  2 _—↠ₑ_
 infixr 2 _—→⟨_⟩_
 infix  3 _∎
 
-data _—↠ₑ_ : ∀ (M N : LCCExpr) → Set where
+data _—↠ₑ_ : ∀ (M N : LExpr) → Set where
   _∎ : ∀ M → M —↠ₑ M
 
-  _—→⟨_⟩_ : ∀ L {M N : LCCExpr}
+  _—→⟨_⟩_ : ∀ L {M N : LExpr}
     → L —→ₑ M
     → M —↠ₑ N
       ---------------
@@ -152,7 +152,7 @@ plug-congₑ (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ 
   L —→⟨ L→ ⟩ ↠ₑ-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
 
-data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → .(g₁ ⊑ₗ g₂) → Set where
+data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LExpr) → .(g₁ ⊑ₗ g₂) → Set where
 
   ⊑-l : ∀ {ℓ} → ⊢ l ℓ ⊑ l ℓ ⇐ l⊑l {ℓ}
 

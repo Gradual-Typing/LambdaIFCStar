@@ -24,10 +24,10 @@ open import CoercionExpr.CatchUp renaming (catchup to catchupₗ)
 
 
 catchup : ∀ {g g′} {M V′} {g⊑g′ : g ⊑ₗ g′}
-  → LCCVal V′
+  → LVal V′
   → ⊢ M ⊑ V′ ⇐ g⊑g′
     -----------------------------------------------------------
-  → ∃[ V ] (LCCVal V) × (M —↠ₑ V) × (⊢ V ⊑ V′ ⇐ g⊑g′)
+  → ∃[ V ] (LVal V) × (M —↠ₑ V) × (⊢ V ⊑ V′ ⇐ g⊑g′)
 catchup v-l ⊑-l = ⟨ _ , v-l , _ ∎ , ⊑-l ⟩
 catchup v-l (⊑-castl {g₁} {g₂} {g′} {M} {M′} {c̅} {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} M⊑ℓ c̅⊑ℓ)
   with catchup {g⊑g′ = g₁⊑g′} v-l M⊑ℓ
