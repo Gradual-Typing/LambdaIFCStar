@@ -19,6 +19,7 @@ open import LabelCoercionCalculus.Precision
 open import LabelCoercionCalculus.LabelCC
 
 open import LabelCoercionCalculus.SyntacComp
+open import LabelCoercionCalculus.GG
 open import LabelCoercionCalculus.LCCCatchUp
 
 
@@ -39,7 +40,19 @@ sim-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′ N′} {g₁⊑g₁′ : g₁ 
 sim-cast M⊑M′ c̅⊑c̅′ (ξ R) = {!!}
 sim-cast M⊑M′ c̅⊑c̅′ ξ-blame = {!!}
 sim-cast M⊑M′ c̅⊑c̅′ β-id = {!!}
-sim-cast M⊑M′ c̅⊑c̅′ (cast c̅′↠c̅ₙ 𝓋′) = {!!}
+sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅} {c̅′} M⊑M′ c̅⊑c̅′ (cast c̅′↠c̅ₙ 𝓋′)
+  with catchup {g⊑g′ = g₁⊑g₁′} v-l M⊑M′
+... | ⟨ l ℓ , v-l , M↠V , ⊑-l ⟩ =
+  let ⟨ c̅₁ , 𝓋 , c̅↠c̅₁ , c̅₁⊑c̅ₙ ⟩ = sim-mult c̅⊑c̅′ 𝓋′ c̅′↠c̅ₙ in
+  let ♣ = ↠ₑ-trans (plug-congₑ M↠V) (_ —→⟨ cast c̅↠c̅₁ 𝓋 ⟩ _ ∎) in
+  ⟨ l ℓ ⟪ c̅₁ ⟫ , ♣ , ⊑-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} ⊑-l c̅₁⊑c̅ₙ ⟩
+... | ⟨ l ℓ ⟪ c̅₁ ⟫ , v-cast i , M↠V , ⊑-castl ⊑-l c̅₁⊑ℓ ⟩ =
+  let c̅₁⨟c̅⊑c̅′ : ⊢ c̅₁ ⨟ c̅ ⊑ c̅′
+      c̅₁⨟c̅⊑c̅′ = comp-pres-⊑-lb c̅₁⊑ℓ c̅⊑c̅′ in
+  let ⟨ c̅₂ , 𝓋 , c̅₁⨟c̅↠c̅₂ , c̅₂⊑c̅ₙ ⟩ = sim-mult c̅₁⨟c̅⊑c̅′ 𝓋′ c̅′↠c̅ₙ in
+  let ♥ = ↠ₑ-trans (plug-congₑ M↠V)
+                    (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅₁⨟c̅↠c̅₂ 𝓋 ⟩ _ ∎) in
+  ⟨ l ℓ ⟪ c̅₂ ⟫ , ♥ , ⊑-cast {g₁⊑g₁′ = l⊑l} {g₂⊑g₂′} ⊑-l c̅₂⊑c̅ₙ ⟩
 sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′ (blame x)
   with prec→⊢ {g⊑g′ = g₁⊑g₁′} M⊑M′
 ... | ⟨ ⊢M , ⊢l ⟩ = ⟨ _ , _ ∎ , ⊑-blame {g⊑g′ = g₂⊑g₂′} (⊢cast ⊢M) ⟩
