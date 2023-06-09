@@ -105,5 +105,7 @@ sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅ = c̅} {c̅′}
 
 sim (⊑-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′) M′→N′ =
   sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} M⊑M′ c̅⊑c̅′ M′→N′
-sim (⊑-castl M⊑M′ x) M′→N′ = {!!}
+sim (⊑-castl {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} M⊑M′ c̅⊑g′) M′→N′
+  with sim {g⊑g′ = g₁⊑g′} M⊑M′ M′→N′
+... | ⟨ N , M↠N , N⊑N′ ⟩ = ⟨ N ⟪ _ ⟫ , plug-congₑ M↠N , ⊑-castl {g₁⊑g′ = g₁⊑g′} {g₂⊑g′} N⊑N′ c̅⊑g′ ⟩
 sim (⊑-castr M⊑M′ x) M′→N′ = {!!}
