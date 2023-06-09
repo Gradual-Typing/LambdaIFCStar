@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.LCC where
+module LabelExpr.LabelExpr where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

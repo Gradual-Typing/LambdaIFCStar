@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.CatchUp where
+module LabelExpr.CatchUp where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -15,7 +15,7 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 
-open import LabelCoercionCalculus.LCC
+open import LabelExpr.LabelExpr
 
 open import CoercionExpr.CoercionExpr
 open import CoercionExpr.Precision
