@@ -110,11 +110,19 @@ sim-castr : ∀ {g g₁′ g₂′} {M M′ N′} {g⊑g₁′ : g ⊑ₗ g₁�
   → M′ ⟪ c̅′ ⟫ —→ₑ N′
     ---------------------------------------------------
   → ∃[ N ] (M —↠ₑ N) × (⊢ N ⊑ N′ ⇐ g⊑g₂′)
-sim-castr M⊑M′ g⊑c̅′ (ξ M′→N′) = {!!}
+sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ (ξ M′→N′)
+  with sim {g⊑g′ = g⊑g₁′} M⊑M′ M′→N′
+... | ⟨ N , M↠N , N⊑N′ ⟩ = ⟨ N , M↠N , ⊑-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} N⊑N′ g⊑c̅′ ⟩
 sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ ξ-blame =
   ⟨ _ , _ ∎ , ⊑-blame {g⊑g′ = g⊑g₂′} (proj₁ (prec→⊢ {g⊑g′ = g⊑g₁′} M⊑M′)) ⟩
-sim-castr M⊑M′ g⊑c̅′ β-id = {!!}
-sim-castr M⊑M′ g⊑c̅′ (cast x x₁) = {!!}
+sim-castr M⊑M′ (⊑-id g⊑ℓ) β-id
+  with catchup {g⊑g′ = g⊑ℓ} v-l M⊑M′
+... | ⟨ V , v , M↠V , V⊑M′ ⟩ = ⟨ V , M↠V , V⊑M′ ⟩
+sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ (cast c̅′↠c̅ₙ 𝓋′) =
+  let id⊑c̅′ = ⊑-right-expand g⊑c̅′ in
+  case sim-mult id⊑c̅′ 𝓋′ c̅′↠c̅ₙ of λ where
+  ⟨ _ , _ , _ ∎ , id⊑c̅ₙ ⟩ →
+    ⟨ _ , _ ∎ , ⊑-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ (⊑-right-contract id⊑c̅ₙ) ⟩
 sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ (blame _) =
   ⟨ _ , _ ∎ , ⊑-blame {g⊑g′ = g⊑g₂′} (proj₁ (prec→⊢ {g⊑g′ = g⊑g₁′} M⊑M′)) ⟩
 sim-castr {g⊑g₁′ = g⊑g₁′} {g⊑g₂′} M⊑M′ g⊑c̅′ (comp i′)
