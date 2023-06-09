@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.SimBack where
+module CoercionExpr.SimBack where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,19 +14,19 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
-open import LabelCoercionCalculus.SimBackLemmas
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
+open import CoercionExpr.SimBackLemmas
 
 
-sim-back : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CoercionExp (l ℓ) ⇒ g} {c̅₁′ : CoercionExp (l ℓ′) ⇒ g′}
+sim-back : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CExpr (l ℓ) ⇒ g} {c̅₁′ : CExpr (l ℓ′) ⇒ g′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → c̅₁ —→ c̅₂
     -----------------------------------------------------------------
   → ∃[ c̅₂′ ] (c̅₁′ —↠ c̅₂′) × (⊢ c̅₂ ⊑ c̅₂′)
 
 
-sim-back-castl : ∀ {ℓ ℓ′ g₁ g₂ g′} {c̅ : CoercionExp (l ℓ) ⇒ g₁} {c : ⊢ g₁ ⇒ g₂} {c̅₁} {c̅₁′ : CoercionExp (l ℓ′) ⇒ g′}
+sim-back-castl : ∀ {ℓ ℓ′ g₁ g₂ g′} {c̅ : CExpr (l ℓ) ⇒ g₁} {c : ⊢ g₁ ⇒ g₂} {c̅₁} {c̅₁′ : CExpr (l ℓ′) ⇒ g′}
   → ⊢ c̅ ⊑ c̅₁′
   → g₁ ⊑ₗ g′ → g₂ ⊑ₗ g′  {- c ⊑ g′ -}
   → c̅ ⨾ c —→ c̅₁
@@ -68,8 +68,8 @@ sim-back-castl c̅⨾!⊑c̅₁′ ⋆⊑ l⊑l (?-⊥ v)
   let ⟨ ℓ⊑ℓ′ , _ ⟩ = prec→⊑ _ _ c̅⨾!⊑c̅₁′ in
   ⟨ ⊥ _ _ p , c̅₁′↠⊥ , ⊑-⊥ ℓ⊑ℓ′ l⊑l ⟩
 
-sim-back-cast : ∀ {ℓ ℓ′ g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp (l ℓ) ⇒ g₁} {c̅₂}
-                  {c̅₁′ : CoercionExp (l ℓ′) ⇒ g₁′} {c : ⊢ g₁ ⇒ g₂} {c′ : ⊢ g₁′ ⇒ g₂′}
+sim-back-cast : ∀ {ℓ ℓ′ g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr (l ℓ) ⇒ g₁} {c̅₂}
+                  {c̅₁′ : CExpr (l ℓ′) ⇒ g₁′} {c : ⊢ g₁ ⇒ g₂} {c′ : ⊢ g₁′ ⇒ g₂′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′  {- c ⊑ c′ -}
   → c̅₁ ⨾ c —→ c̅₂

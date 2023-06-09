@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.Simulation where
+module CoercionExpr.Simulation where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,12 +14,12 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
-open import LabelCoercionCalculus.SimLemmas
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
+open import CoercionExpr.SimLemmas
 
 
-sim : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅₁′ c̅₂′ : CoercionExp g₁′ ⇒ g₂′}
+sim : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₁′ c̅₂′ : CExpr g₁′ ⇒ g₂′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → c̅₁′ —→ c̅₂′
     --------------------------------------
@@ -27,8 +27,8 @@ sim : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅�
 
 
 sim-cast : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
-             {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅₁′ : CoercionExp g₁′ ⇒ g₂′}
-             {c̅₂′ : CoercionExp g₁′ ⇒ g₃′}
+             {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₁′ : CExpr g₁′ ⇒ g₂′}
+             {c̅₂′ : CExpr g₁′ ⇒ g₃′}
              {c  : ⊢ g₂ ⇒ g₃} {c′  : ⊢ g₂′ ⇒ g₃′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → g₂ ⊑ₗ g₂′ → g₃ ⊑ₗ g₃′     {- c ⊑ c′ -}
@@ -50,8 +50,8 @@ sim-cast c̅₁⊑c̅₁′ g₂⊑g₂′ g₃⊑g₃′ (?-⊥  v′) =
 
 
 sim-castr : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
-             {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅₁′ : CoercionExp g₁′ ⇒ g₂′}
-             {c̅₂′ : CoercionExp g₁′ ⇒ g₃′}
+             {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₁′ : CExpr g₁′ ⇒ g₂′}
+             {c̅₂′ : CExpr g₁′ ⇒ g₃′}
              {c′  : ⊢ g₂′ ⇒ g₃′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → g₂ ⊑ₗ g₂′ → g₂ ⊑ₗ g₃′

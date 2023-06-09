@@ -1,6 +1,6 @@
 {- Syntactical composition of coercion expressions -}
 
-module LabelCoercionCalculus.SyntacComp where
+module CoercionExpr.SyntacComp where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -16,19 +16,19 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
 
 
-_⨟_ : ∀ {g₁ g₂ g₃} (c̅₁ : CoercionExp g₁ ⇒ g₂) (c̅₂ : CoercionExp g₂ ⇒ g₃) → CoercionExp g₁ ⇒ g₃
+_⨟_ : ∀ {g₁ g₂ g₃} (c̅₁ : CExpr g₁ ⇒ g₂) (c̅₂ : CExpr g₂ ⇒ g₃) → CExpr g₁ ⇒ g₃
 c̅₁ ⨟ ⊥ g₂ g₃ p = ⊥ _ g₃ p
 c̅₁ ⨟ id g      = c̅₁ ⨾ id g
 c̅₁ ⨟ (c̅₂ ⨾ c)  = (c̅₁ ⨟ c̅₂) ⨾ c
 
 
 comp-pres-prec : ∀ {g₁ g₁′ g₂ g₂′ g₃ g₃′}
-     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
-     {c̅₁′ : CoercionExp g₁′ ⇒ g₂′} {c̅₂′ : CoercionExp g₂′ ⇒ g₃′}
+     {c̅₁ : CExpr g₁ ⇒ g₂}    {c̅₂ : CExpr g₂ ⇒ g₃}
+     {c̅₁′ : CExpr g₁′ ⇒ g₂′} {c̅₂′ : CExpr g₂′ ⇒ g₃′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → ⊢ c̅₂ ⊑ c̅₂′
     -----------------------------
@@ -46,7 +46,7 @@ comp-pres-prec c̅₁⊑c̅₁′ (⊑-castr c̅₂⊑c̅₂′ g₃⊑g′ g₃
 
 
 comp-pres-⊑-ll : ∀ {g₁ g₂ g₃ g′}
-     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
+     {c̅₁ : CExpr g₁ ⇒ g₂}    {c̅₂ : CExpr g₂ ⇒ g₃}
   → ⊢l c̅₁ ⊑ g′
   → ⊢l c̅₂ ⊑ g′
     -----------------------------
@@ -56,7 +56,7 @@ comp-pres-⊑-ll c̅₁⊑c̅₁′ (⊑-cast c̅₂⊑c̅₂′ g⊑g₃′ g�
   ⊑-cast (comp-pres-⊑-ll c̅₁⊑c̅₁′ c̅₂⊑c̅₂′) g⊑g₃′ g₃⊑g₃′
 
 comp-pres-⊑-rr : ∀ {g g₁′ g₂′ g₃′}
-     {c̅₁′ : CoercionExp g₁′ ⇒ g₂′} {c̅₂′ : CoercionExp g₂′ ⇒ g₃′}
+     {c̅₁′ : CExpr g₁′ ⇒ g₂′} {c̅₂′ : CExpr g₂′ ⇒ g₃′}
   → ⊢r g ⊑ c̅₁′
   → ⊢r g ⊑ c̅₂′
     -----------------------------
@@ -66,7 +66,7 @@ comp-pres-⊑-rr g⊑c̅₁′ (⊑-cast g⊑c̅′ x y) = ⊑-cast (comp-pres-�
 comp-pres-⊑-rr g⊑c̅₁′ (⊑-⊥ _ x) = ⊑-⊥ (proj₁ (prec-right→⊑ _ g⊑c̅₁′)) x
 
 comp-pres-⊑-lr : ∀ {g₁ g₁′ g₂ g₂′}
-     {c̅ : CoercionExp g₁ ⇒ g₂}    {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+     {c̅ : CExpr g₁ ⇒ g₂}    {c̅′ : CExpr g₁′ ⇒ g₂′}
   → ⊢l c̅ ⊑ g₁′
   → ⊢r g₂ ⊑ c̅′
     -----------------------------
@@ -76,7 +76,7 @@ comp-pres-⊑-lr c̅⊑g₁′ (⊑-cast g₂⊑c̅′ x y) = ⊑-castr (comp-pr
 comp-pres-⊑-lr c̅⊑g₁′ (⊑-⊥ x y) = ⊑-⊥ (proj₁ (prec-left→⊑ _ c̅⊑g₁′)) y
 
 comp-pres-⊑-rl : ∀ {g₁ g₁′ g₂ g₂′}
-     {c̅ : CoercionExp g₁ ⇒ g₂}    {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+     {c̅ : CExpr g₁ ⇒ g₂}    {c̅′ : CExpr g₁′ ⇒ g₂′}
   → ⊢r g₁ ⊑ c̅′
   → ⊢l c̅ ⊑ g₂′
     -----------------------------
@@ -85,8 +85,8 @@ comp-pres-⊑-rl g₁⊑c̅′ (⊑-id g⊑g′) = ⊑-right-expand g₁⊑c̅�
 comp-pres-⊑-rl g₁⊑c̅′ (⊑-cast c̅⊑g₂′ g₁⊑g₂′ g₂⊑g₂′) = ⊑-castl (comp-pres-⊑-rl g₁⊑c̅′ c̅⊑g₂′) g₁⊑g₂′ g₂⊑g₂′
 
 comp-pres-⊑-lb : ∀ {g₁ g₁′ g₂ g₂′ g₃}
-     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
-     {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+     {c̅₁ : CExpr g₁ ⇒ g₂}    {c̅₂ : CExpr g₂ ⇒ g₃}
+     {c̅′ : CExpr g₁′ ⇒ g₂′}
   → ⊢l c̅₁ ⊑ g₁′
   → ⊢  c̅₂ ⊑ c̅′
     -----------------------------
@@ -98,8 +98,8 @@ comp-pres-⊑-lb c̅₁⊑g₁ (⊑-castr c̅⊑c̅′ g⊑g₁′ g⊑g₂′) 
 comp-pres-⊑-lb c̅₁⊑g₁ (⊑-⊥ g₁⊑g₁′ g₂⊑g₂′) = ⊑-⊥ (proj₁ (prec-left→⊑ _ c̅₁⊑g₁)) g₂⊑g₂′
 
 comp-pres-⊑-rb : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
-     {c̅   : CoercionExp g₁  ⇒ g₂}
-     {c̅₁′ : CoercionExp g₁′ ⇒ g₂′}    {c̅₂′ : CoercionExp g₂′ ⇒ g₃′}
+     {c̅   : CExpr g₁  ⇒ g₂}
+     {c̅₁′ : CExpr g₁′ ⇒ g₂′}    {c̅₂′ : CExpr g₂′ ⇒ g₃′}
   → ⊢r g₁ ⊑ c̅₁′
   → ⊢  c̅  ⊑ c̅₂′
     -----------------------------
@@ -111,8 +111,8 @@ comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-castr c̅⊑c̅₂′ x y) = ⊑-castr (c
 comp-pres-⊑-rb g₁⊑c̅₁′ (⊑-⊥ x y) = ⊑-⊥ (proj₁ (prec-right→⊑ _ g₁⊑c̅₁′)) y
 
 comp-pres-⊑-bl : ∀ {g₁ g₁′ g₂ g₂′ g₃}
-     {c̅₁ : CoercionExp g₁ ⇒ g₂}    {c̅₂ : CoercionExp g₂ ⇒ g₃}
-     {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+     {c̅₁ : CExpr g₁ ⇒ g₂}    {c̅₂ : CExpr g₂ ⇒ g₃}
+     {c̅′ : CExpr g₁′ ⇒ g₂′}
   → ⊢  c̅₁ ⊑ c̅′
   → ⊢l c̅₂ ⊑ g₂′
     -----------------------------
@@ -122,8 +122,8 @@ comp-pres-⊑-bl c̅₁⊑c̅′ (⊑-cast c̅₂⊑g₂′ g₁⊑g₂′ g₂�
   ⊑-castl (comp-pres-⊑-bl c̅₁⊑c̅′ c̅₂⊑g₂′) g₁⊑g₂′ g₂⊑g₂′
 
 comp-pres-⊑-br : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
-     {c̅ : CoercionExp g₁ ⇒ g₂}
-     {c̅₁′ : CoercionExp g₁′ ⇒ g₂′} {c̅₂′ : CoercionExp g₂′ ⇒ g₃′}
+     {c̅ : CExpr g₁ ⇒ g₂}
+     {c̅₁′ : CExpr g₁′ ⇒ g₂′} {c̅₂′ : CExpr g₂′ ⇒ g₃′}
   → ⊢  c̅  ⊑ c̅₁′
   → ⊢r g₂ ⊑ c̅₂′
     -----------------------------

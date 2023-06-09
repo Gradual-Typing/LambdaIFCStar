@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.GG where
+module CoercionExpr.GG where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,14 +14,16 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
 
-open import LabelCoercionCalculus.CatchUp using (catchup) public
-open import LabelCoercionCalculus.Simulation
+open import CoercionExpr.CatchUp     using (catchup) public
+open import CoercionExpr.Simulation  using (sim) public
+open import CoercionExpr.CatchUpBack using (catchup-back) public
+open import CoercionExpr.SimBack     using (sim-back) public
 
 
-sim-mult : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅₁′ c̅₂′ : CoercionExp g₁′ ⇒ g₂′}
+sim-mult : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₁′ c̅₂′ : CExpr g₁′ ⇒ g₂′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → 𝒱 c̅₂′
   → c̅₁′ —↠ c̅₂′

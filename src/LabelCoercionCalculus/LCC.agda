@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.LabelCC where
+module LabelCoercionCalculus.LCC where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,21 +14,21 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-  hiding (progress; plug-cong; ↠-trans)
-open import LabelCoercionCalculus.SyntacComp
+open import CoercionExpr.CoercionExpr hiding (progress; plug-cong; ↠-trans)
+open import CoercionExpr.SyntacComp
+open import CoercionExpr.Precision
 
 
 data LCCExpr : Set where
 
   l : StaticLabel → LCCExpr
 
-  _⟪_⟫ : ∀ {g₁ g₂} → LCCExpr → CoercionExp g₁ ⇒ g₂ → LCCExpr
+  _⟪_⟫ : ∀ {g₁ g₂} → LCCExpr → CExpr g₁ ⇒ g₂ → LCCExpr
 
   blame : BlameLabel → LCCExpr
 
 
-Irreducible : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂) → Set
+Irreducible : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Set
 Irreducible {g₁} {g₂} c̅ = 𝒱 c̅ × g₁ ≢ g₂
 
 
@@ -38,7 +38,7 @@ data LCCVal : LCCExpr → Set where
   v-l : ∀ {ℓ} → LCCVal (l ℓ)
 
   {- wrapped value (one cast) -}
-  v-cast : ∀ {ℓ g} {c̅ : CoercionExp l ℓ ⇒ g}
+  v-cast : ∀ {ℓ g} {c̅ : CExpr l ℓ ⇒ g}
     → Irreducible c̅
     → LCCVal (l ℓ ⟪ c̅ ⟫)
 
@@ -46,7 +46,7 @@ data ⊢_⇐_ : LCCExpr → Label → Set where
 
   ⊢l : ∀ {ℓ} → ⊢ l ℓ ⇐ l ℓ
 
-  ⊢cast : ∀ {g₁ g₂} {M} {c̅ : CoercionExp g₁ ⇒ g₂}
+  ⊢cast : ∀ {g₁ g₂} {M} {c̅ : CExpr g₁ ⇒ g₂}
     → ⊢ M ⇐ g₁
       ------------------
     → ⊢ M ⟪ c̅ ⟫ ⇐ g₂
@@ -58,29 +58,29 @@ infix 2 _—→ₑ_
 
 data _—→ₑ_ : (M N : LCCExpr) → Set where
 
-  ξ : ∀ {g₁ g₂} {M N} {c̅ : CoercionExp g₁ ⇒ g₂}
+  ξ : ∀ {g₁ g₂} {M N} {c̅ : CExpr g₁ ⇒ g₂}
     → M —→ₑ N
       --------------------------
     → M ⟪ c̅ ⟫ —→ₑ N ⟪ c̅ ⟫
 
-  ξ-blame : ∀ {g₁ g₂} {c̅ : CoercionExp g₁ ⇒ g₂} {p}
+  ξ-blame : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} {p}
       -----------------------------------------------
     → blame p ⟪ c̅ ⟫ —→ₑ blame p
 
   β-id : ∀ {ℓ} → l ℓ ⟪ id (l ℓ) ⟫ —→ₑ l ℓ
 
-  cast : ∀ {ℓ g} {c̅ c̅ₙ : CoercionExp l ℓ ⇒ g}
+  cast : ∀ {ℓ g} {c̅ c̅ₙ : CExpr l ℓ ⇒ g}
     → c̅ —↠ c̅ₙ
     → 𝒱 c̅ₙ
       -------------------------------
     → l ℓ ⟪ c̅ ⟫ —→ₑ l ℓ ⟪ c̅ₙ ⟫
 
-  blame : ∀ {ℓ g} {c̅ : CoercionExp l ℓ ⇒ g} {p}
+  blame : ∀ {ℓ g} {c̅ : CExpr l ℓ ⇒ g} {p}
     → c̅ —↠ ⊥ (l ℓ) g p
       --------------------------
     → l ℓ ⟪ c̅ ⟫ —→ₑ blame p
 
-  comp : ∀ {ℓ g₁ g₂} {c̅ᵢ : CoercionExp l ℓ ⇒ g₁} {d̅ : CoercionExp g₁ ⇒ g₂}
+  comp : ∀ {ℓ g₁ g₂} {c̅ᵢ : CExpr l ℓ ⇒ g₁} {d̅ : CExpr g₁ ⇒ g₂}
     → Irreducible c̅ᵢ
       -------------------------------------------
     → l ℓ ⟪ c̅ᵢ ⟫ ⟪ d̅ ⟫ —→ₑ l ℓ ⟪ c̅ᵢ ⨟ d̅ ⟫
@@ -135,7 +135,7 @@ data _—↠ₑ_ : ∀ (M N : LCCExpr) → Set where
       ---------------
     → L —↠ₑ N
 
-plug-congₑ : ∀ {g₁ g₂} {M N } {c̅ : CoercionExp g₁ ⇒ g₂}
+plug-congₑ : ∀ {g₁ g₂} {M N } {c̅ : CExpr g₁ ⇒ g₂}
   → M —↠ₑ N
   → M ⟪ c̅ ⟫ —↠ₑ N ⟪ c̅ ⟫
 plug-congₑ (M ∎) = (M ⟪ _ ⟫) ∎
@@ -152,14 +152,12 @@ plug-congₑ (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ 
   L —→⟨ L→ ⟩ ↠ₑ-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
 
-open import LabelCoercionCalculus.Precision
-
 data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → .(g₁ ⊑ₗ g₂) → Set where
 
   ⊑-l : ∀ {ℓ} → ⊢ l ℓ ⊑ l ℓ ⇐ l⊑l {ℓ}
 
   ⊑-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′}
-             {c̅ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+             {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
              {g₁⊑g₁′ : g₁ ⊑ₗ g₁′} {g₂⊑g₂′ : g₂ ⊑ₗ g₂′}
     → ⊢ M ⊑ M′ ⇐ g₁⊑g₁′
     → ⊢ c̅ ⊑ c̅′
@@ -167,7 +165,7 @@ data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → .(g₁ ⊑ₗ g₂) �
     → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⟪ c̅′ ⟫ ⇐ g₂⊑g₂′
 
   ⊑-castl : ∀ {g₁ g₂ g′} {M M′}
-              {c̅ : CoercionExp g₁ ⇒ g₂}
+              {c̅ : CExpr g₁ ⇒ g₂}
               {g₁⊑g′ : g₁ ⊑ₗ g′} {g₂⊑g′ : g₂ ⊑ₗ g′}
     → ⊢ M ⊑ M′ ⇐ g₁⊑g′
     → ⊢l c̅ ⊑ g′
@@ -175,7 +173,7 @@ data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LCCExpr) → .(g₁ ⊑ₗ g₂) �
     → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⇐ g₂⊑g′
 
   ⊑-castr : ∀ {g g₁′ g₂′} {M M′}
-              {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+              {c̅′ : CExpr g₁′ ⇒ g₂′}
               {g⊑g₁′ : g ⊑ₗ g₁′} {g⊑g₂′ : g ⊑ₗ g₂′}
     → ⊢ M ⊑ M′ ⇐ g⊑g₁′
     → ⊢r g ⊑ c̅′
@@ -206,7 +204,7 @@ prec→⊢ (⊑-blame ⊢M) = ⟨ ⊢M , ⊢blame ⟩
 
 {- Precision of LCC expressions implies the precision of coercion expressions -}
 prec-inv : ∀ {ℓ ℓ′ g g′} {g⊑g′ : g ⊑ₗ g′}
-             {c̅ : CoercionExp l ℓ ⇒ g} {c̅′ : CoercionExp l ℓ′ ⇒ g′}
+             {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g′}
   → ⊢ l ℓ ⟪ c̅ ⟫ ⊑ l ℓ′ ⟪ c̅′ ⟫ ⇐ g⊑g′
   → (ℓ ≡ ℓ′) × (⊢ c̅ ⊑ c̅′)
 prec-inv (⊑-cast ⊑-l c̅⊑c̅′)                 = ⟨ refl , c̅⊑c̅′ ⟩

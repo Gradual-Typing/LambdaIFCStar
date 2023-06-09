@@ -1,1 +1,2 @@
-A tiny coercion calculus of gradual security labels.
+A coercion calculus of gradual security labels.
+Coercions on labels are represented as coercion expressions.

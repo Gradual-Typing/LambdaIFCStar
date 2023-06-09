@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.CatchUpBack where
+module CoercionExpr.CatchUpBack where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,20 +14,20 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
 
-data InSync : ∀ {g₁ g₁′ g₂ g₂′} (c̅₁ : CoercionExp g₁ ⇒ g₂) (c̅₂ : CoercionExp g₁′ ⇒ g₂′) → Set where
-  v-v : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅₂ : CoercionExp g₁′ ⇒ g₂′}
+data InSync : ∀ {g₁ g₁′ g₂ g₂′} (c̅₁ : CExpr g₁ ⇒ g₂) (c̅₂ : CExpr g₁′ ⇒ g₂′) → Set where
+  v-v : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₂ : CExpr g₁′ ⇒ g₂′}
     → 𝒱 c̅₂
     → ⊢ c̅₁ ⊑ c̅₂
     → InSync c̅₁ c̅₂
 
-  v-⊥ : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CoercionExp g₁ ⇒ g₂} {p}
+  v-⊥ : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {p}
     → ⊢ c̅₁ ⊑ ⊥ g₁′ g₂′ p
     → InSync c̅₁ (⊥ g₁′ g₂′ p)
 
-catchup-back : ∀ {ℓ ℓ′ g g′} (c̅ : CoercionExp l ℓ ⇒ g) (c̅₁′ : CoercionExp l ℓ′ ⇒ g′)
+catchup-back : ∀ {ℓ ℓ′ g g′} (c̅ : CExpr l ℓ ⇒ g) (c̅₁′ : CExpr l ℓ′ ⇒ g′)
   → 𝒱 c̅
   → ⊢ c̅ ⊑ c̅₁′
   → ∃[ c̅₂′ ] (c̅₁′ —↠ c̅₂′) × (InSync c̅ c̅₂′)

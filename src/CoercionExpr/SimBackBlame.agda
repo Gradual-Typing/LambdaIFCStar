@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.SimBackBlame where
+module CoercionExpr.SimBackBlame where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,10 +14,11 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
 
-sim-back-blame : ∀ {ℓ ℓ′ g g′} {c̅′ : CoercionExp (l ℓ′) ⇒ g′} {p}
+
+sim-back-blame : ∀ {ℓ ℓ′ g g′} {c̅′ : CExpr (l ℓ′) ⇒ g′} {p}
   → ⊢ ⊥ (l ℓ) g p ⊑ c̅′
   → ∃[ q ] (c̅′ —↠ ⊥ (l ℓ′) g′ q) × (⊢ ⊥ (l ℓ) g p ⊑ ⊥ (l ℓ′) g′ q)
 sim-back-blame (⊑-castr ⊥⊑c̅′ x g⊑g′)

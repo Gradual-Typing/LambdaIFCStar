@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.LCCSim where
+module LabelCoercionCalculus.Sim where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,13 +14,14 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
-open import LabelCoercionCalculus.LabelCC
 
-open import LabelCoercionCalculus.SyntacComp
-open import LabelCoercionCalculus.GG renaming (catchup to catchupₗ)
-open import LabelCoercionCalculus.LCCCatchUp
+open import LabelCoercionCalculus.LCC
+open import LabelCoercionCalculus.CatchUp
+
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
+open import CoercionExpr.SyntacComp
+open import CoercionExpr.GG hiding (sim) renaming (catchup to catchupₗ)
 
 
 sim : ∀ {g g′} {M M′ N′} {g⊑g′ : g ⊑ₗ g′}
@@ -31,7 +32,7 @@ sim : ∀ {g g′} {M M′ N′} {g⊑g′ : g ⊑ₗ g′}
 
 
 sim-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′ N′} {g₁⊑g₁′ : g₁ ⊑ₗ g₁′} {g₂⊑g₂′ : g₂ ⊑ₗ g₂′}
-             {c̅ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+             {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
   → ⊢ M ⊑ M′ ⇐ g₁⊑g₁′
   → ⊢ c̅ ⊑ c̅′
   → M′ ⟪ c̅′ ⟫ —→ₑ N′
@@ -104,7 +105,7 @@ sim-cast {g₁⊑g₁′ = g₁⊑g₁′} {g₂⊑g₂′} {c̅ = c̅} {c̅′}
 
 
 sim-castr : ∀ {g g₁′ g₂′} {M M′ N′} {g⊑g₁′ : g ⊑ₗ g₁′} {g⊑g₂′ : g ⊑ₗ g₂′}
-              {c̅′ : CoercionExp g₁′ ⇒ g₂′}
+              {c̅′ : CExpr g₁′ ⇒ g₂′}
   → ⊢ M ⊑ M′ ⇐ g⊑g₁′
   → ⊢r g ⊑ c̅′
   → M′ ⟪ c̅′ ⟫ —→ₑ N′

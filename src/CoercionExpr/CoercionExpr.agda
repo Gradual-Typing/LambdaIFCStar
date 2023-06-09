@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.CoercionExp where
+module CoercionExpr.CoercionExpr where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,21 +14,21 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.Coercions public
+open import CoercionExpr.Coercions public
 
 
 infixl 8 _⨾_  {- syntactic composition -}
 
-data CoercionExp_⇒_ : Label → Label → Set where
+data CExpr_⇒_ : Label → Label → Set where
 
-  id : ∀ g → CoercionExp g ⇒ g
+  id : ∀ g → CExpr g ⇒ g
 
-  _⨾_ : ∀ {g₁ g₂ g₃} → CoercionExp g₁ ⇒ g₂ → ⊢ g₂ ⇒ g₃ → CoercionExp g₁ ⇒ g₃
+  _⨾_ : ∀ {g₁ g₂ g₃} → CExpr g₁ ⇒ g₂ → ⊢ g₂ ⇒ g₃ → CExpr g₁ ⇒ g₃
 
-  ⊥ : ∀ g₁ g₂ (p : BlameLabel) → CoercionExp g₁ ⇒ g₂
+  ⊥ : ∀ g₁ g₂ (p : BlameLabel) → CExpr g₁ ⇒ g₂
 
 
-coerceₗ : ∀ {g₁ g₂} → g₁ ≾ g₂ → (p : BlameLabel) → CoercionExp g₁ ⇒ g₂
+coerceₗ : ∀ {g₁ g₂} → g₁ ≾ g₂ → (p : BlameLabel) → CExpr g₁ ⇒ g₂
 coerceₗ {⋆} {⋆}   _ p = id ⋆
 coerceₗ {⋆} {l ℓ} ≾-⋆l p = id ⋆ ⨾ ℓ ?? p
 coerceₗ {l ℓ} {⋆} ≾-⋆r p = id (l ℓ) ⨾ ℓ !
@@ -37,7 +37,7 @@ coerceₗ {l low}  {l high} (≾-l l≼h) p = id (l low) ⨾ ↑
 coerceₗ {l high} {l high} (≾-l h≼h) p = id (l high)
 
 
--- data 𝒱 : ∀ {g₁ g₂} → CoercionExp g₁ ⇒ g₂ → Set where
+-- data 𝒱 : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
 
 --   id : ∀ {g} → 𝒱 (id g)
 
@@ -55,22 +55,22 @@ coerceₗ {l high} {l high} (≾-l h≼h) p = id (l high)
 
 --   proj-up-inj : ∀ {p} → 𝒱 ((id ⋆) ⨾ (low ?? p) ⨾ ↑ ⨾ (high !))
 
-data 𝒱 : ∀ {g₁ g₂} → CoercionExp g₁ ⇒ g₂ → Set where
+data 𝒱 : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
 
   id : ∀ {g} → 𝒱 (id g)
 
   id⨾? : ∀ {ℓ p} → 𝒱 ((id ⋆) ⨾ (ℓ ?? p))
 
-  inj : ∀ {g ℓ} {c̅ : CoercionExp g ⇒ l ℓ} → 𝒱 c̅ → 𝒱 (c̅ ⨾ (ℓ !))
+  inj : ∀ {g ℓ} {c̅ : CExpr g ⇒ l ℓ} → 𝒱 c̅ → 𝒱 (c̅ ⨾ (ℓ !))
 
-  up : ∀ {g} {c̅ : CoercionExp g ⇒ l low} → 𝒱 c̅ → 𝒱 (c̅ ⨾ ↑)
+  up : ∀ {g} {c̅ : CExpr g ⇒ l low} → 𝒱 c̅ → 𝒱 (c̅ ⨾ ↑)
 
 
 infix 2 _—→_
 
-data _—→_ : ∀ {g₁ g₂} → CoercionExp g₁ ⇒ g₂ → CoercionExp g₁ ⇒ g₂ → Set where
+data _—→_ : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → CExpr g₁ ⇒ g₂ → Set where
 
-  ξ : ∀ {g₁ g₂ g₃} {c̅ c̅′ : CoercionExp g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
+  ξ : ∀ {g₁ g₂ g₃} {c̅ c̅′ : CExpr g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
     → c̅  —→ c̅′
       ----------------------
     → c̅ ⨾ c  —→ c̅′ ⨾ c
@@ -79,22 +79,22 @@ data _—→_ : ∀ {g₁ g₂} → CoercionExp g₁ ⇒ g₂ → CoercionExp g�
       ------------------------------------------
     → (⊥ g₁ g₂ p) ⨾ c  —→ ⊥ g₁ g₃ p
 
-  id : ∀ {g₁ g₂} {c̅ : CoercionExp g₁ ⇒ g₂}
+  id : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂}
     → 𝒱 c̅
       --------------------------
     → c̅ ⨾ (id g₂)  —→ c̅
 
-  ?-id : ∀ {p} {g ℓ} {c̅ : CoercionExp g ⇒ (l ℓ)}
+  ?-id : ∀ {p} {g ℓ} {c̅ : CExpr g ⇒ (l ℓ)}
     → 𝒱 c̅
       ----------------------------------
     → c̅ ⨾ (ℓ !) ⨾ (ℓ ?? p)  —→ c̅
 
-  ?-↑ : ∀ {p} {g} {c̅ : CoercionExp g ⇒ (l low)}
+  ?-↑ : ∀ {p} {g} {c̅ : CExpr g ⇒ (l low)}
     → 𝒱 c̅
       ---------------------------------------
     → c̅ ⨾ (low !) ⨾ (high ?? p)  —→ c̅ ⨾ ↑
 
-  ?-⊥ : ∀ {p} {g} {c̅ : CoercionExp g ⇒ (l high)}
+  ?-⊥ : ∀ {p} {g} {c̅ : CExpr g ⇒ (l high)}
     → 𝒱 c̅
       -----------------------------------------------
     → c̅ ⨾ (high !) ⨾ (low ?? p)  —→ ⊥ g (l low) p
@@ -103,24 +103,24 @@ infix  2 _—↠_
 infixr 2 _—→⟨_⟩_
 infix  3 _∎
 
-data _—↠_ : ∀ {g₁ g₂} (c̅₁ c̅₂ : CoercionExp g₁ ⇒ g₂) → Set where
-  _∎ : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂)
+data _—↠_ : ∀ {g₁ g₂} (c̅₁ c̅₂ : CExpr g₁ ⇒ g₂) → Set where
+  _∎ : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂)
       ---------------
     → c̅ —↠ c̅
 
-  _—→⟨_⟩_ : ∀ {g₁ g₂} (c̅₁ : CoercionExp g₁ ⇒ g₂) {c̅₂ c̅₃}
+  _—→⟨_⟩_ : ∀ {g₁ g₂} (c̅₁ : CExpr g₁ ⇒ g₂) {c̅₂ c̅₃}
     → c̅₁ —→ c̅₂
     → c̅₂ —↠ c̅₃
       ---------------
     → c̅₁ —↠ c̅₃
 
-plug-cong : ∀ {g₁ g₂ g₃} {M N : CoercionExp g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
+plug-cong : ∀ {g₁ g₂ g₃} {M N : CExpr g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
   → M —↠ N
   → M ⨾ c —↠ N ⨾ c
 plug-cong (M ∎) = (M ⨾ _) ∎
 plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⨾ _ —→⟨ ξ M→L ⟩ (plug-cong L↠N)
 
-↠-trans : ∀ {g₁ g₂} {L M N : CoercionExp g₁ ⇒ g₂}
+↠-trans : ∀ {g₁ g₂} {L M N : CExpr g₁ ⇒ g₂}
   → L —↠ M
   → M —↠ N
   → L —↠ N
@@ -130,20 +130,20 @@ plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⨾ _ —→⟨ ξ M→L ⟩ (plug-c
 ↠-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) = L —→⟨ L→ ⟩ ↠-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
 
-data Progress : ∀ {g₁ g₂} → (c̅ : CoercionExp g₁ ⇒ g₂) → Set where
+data Progress : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
 
-  done : ∀ {g₁ g₂} {c̅ : CoercionExp g₁ ⇒ g₂}
+  done : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂}
     → 𝒱 c̅
     → Progress c̅
 
   error : ∀ {p} {g₁ g₂} → Progress (⊥ g₁ g₂ p)
 
-  step : ∀ {g₁ g₂} {c̅ c̅′ : CoercionExp g₁ ⇒ g₂}
+  step : ∀ {g₁ g₂} {c̅ c̅′ : CExpr g₁ ⇒ g₂}
     → c̅  —→ c̅′
     → Progress c̅
 
 
-progress : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂) → Progress c̅
+progress : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Progress c̅
 progress (id g) = done id
 progress (c̅ ⨾ c) with progress c̅
 ... | step c̅→c̅′ = step (ξ c̅→c̅′)
@@ -170,19 +170,19 @@ progress (⊥ g₁ g₂ p) = error
 
 
 
-data Result : ∀ {g₁ g₂} → (c̅ : CoercionExp g₁ ⇒ g₂) → Set where
+data Result : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
 
-  success : ∀ {g₁ g₂} {c̅ c̅′ : CoercionExp g₁ ⇒ g₂}
+  success : ∀ {g₁ g₂} {c̅ c̅′ : CExpr g₁ ⇒ g₂}
     → c̅ —↠ c̅′
     → 𝒱 c̅′
     → Result c̅
 
-  fail : ∀ {g₁ g₂} {c̅ : CoercionExp g₁ ⇒ g₂} {p}
+  fail : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} {p}
     → c̅ —↠ ⊥ g₁ g₂ p
     → Result c̅
 
 
-result : ∀ {g₁ g₂} (c̅ : CoercionExp g₁ ⇒ g₂) → Result c̅
+result : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Result c̅
 result (id g) = success (_ ∎) id
 result (⊥ g₁ g₂ p) = fail (_ ∎)
 result (c̅ ⨾ c) with result c̅

@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.StampAndCast where
+module CoercionExpr.StampAndCast where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,24 +14,24 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
-open import LabelCoercionCalculus.SyntacComp
-open import LabelCoercionCalculus.Stamping
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
+open import CoercionExpr.SyntacComp
+open import CoercionExpr.Stamping
 
 
-stamp-and-cast : ∀ {ℓ₁ g₁ g₂} (c̅ₙ : CoercionExp l ℓ₁ ⇒ g₁)
+stamp-and-cast : ∀ {ℓ₁ g₁ g₂} (c̅ₙ : CExpr l ℓ₁ ⇒ g₁)
   → 𝒱 c̅ₙ
   → (ℓ₂ : StaticLabel)
   → g₁ ⋎̃ l ℓ₂ ≾ g₂
   → NotProj (g₁ ⋎̃ l ℓ₂) g₂
-  → CoercionExp l ℓ₁ ⇒ g₂
+  → CExpr l ℓ₁ ⇒ g₂
 stamp-and-cast {ℓ₁} {g₁} {g₂} c̅ₙ v ℓ₂ lp np =
-  stamp c̅ₙ v ℓ₂ ⨾ coerce-nproj (g₁ ⋎̃ l ℓ₂) g₂ lp np
+  stampₗ c̅ₙ v ℓ₂ ⨾ coerce-nproj (g₁ ⋎̃ l ℓ₂) g₂ lp np
 
 stamp-cast-prec : ∀ {ℓ₁ ℓ₁′ ℓ₂ ℓ₂′ g₁ g₁′ g₂ g₂′}
      {np : NotProj (g₁ ⋎̃ l ℓ₂) g₂} {np′ : NotProj (g₁′ ⋎̃ l ℓ₂′) g₂′}
-     {c̅ₙ : CoercionExp l ℓ₁ ⇒ g₁} {c̅ₙ′ : CoercionExp l ℓ₁′ ⇒ g₁′}
+     {c̅ₙ : CExpr l ℓ₁ ⇒ g₁} {c̅ₙ′ : CExpr l ℓ₁′ ⇒ g₁′}
   → (v : 𝒱 c̅ₙ) → (v′ : 𝒱 c̅ₙ′)
   → (c~ : g₁ ⋎̃ l ℓ₂ ≾ g₂) → (c~′ : g₁′ ⋎̃ l ℓ₂′ ≾ g₂′)
   → ⊢ c̅ₙ ⊑ c̅ₙ′

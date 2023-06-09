@@ -1,22 +1,23 @@
-module LabelCoercionCalculus.SecurityLevel where
+module CoercionExpr.SecurityLevel where
 
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
 
 
-∥_∥ : ∀ {ℓ g} → (c̅ : CoercionExp l ℓ ⇒ g) → 𝒱 c̅ → StaticLabel
+∥_∥ : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → 𝒱 c̅ → StaticLabel
 ∥ id (l ℓ) ∥ id = ℓ
 ∥ id (l ℓ) ⨾ ℓ ! ∥ (inj id) = ℓ
 ∥ id (l low) ⨾ ↑ ⨾ high ! ∥ (inj (up v)) = high
 ∥ id (l low) ⨾ ↑ ∥ (up v) = high
 
-level-prec : ∀ {ℓ ℓ′ g g′}
-    (c̅ : CoercionExp l ℓ ⇒ g) (c̅′ : CoercionExp l ℓ′ ⇒ g′)
-  → (v : 𝒱 c̅) → (v′ : 𝒱 c̅′)
+level-prec : ∀ {ℓ ℓ′ g g′} (c̅ : CExpr l ℓ ⇒ g) (c̅′ : CExpr l ℓ′ ⇒ g′)
+  → (v : 𝒱 c̅)
+  → (v′ : 𝒱 c̅′)
   → ⊢ c̅ ⊑ c̅′
+    --------------------------------
   → ∥ c̅ ∥ v ≼ ∥ c̅′ ∥ v′
 level-prec (id (l _)) (id (l _)) id id (⊑-id l⊑l) = ≼-refl
 level-prec (id (l _)) (_ ⨾ (_ !)) id (inj v′) (⊑-castr _ _ ())

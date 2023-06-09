@@ -1,4 +1,4 @@
-module LabelCoercionCalculus.SimCast↑ where
+module CoercionExpr.SimCast↑ where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -14,12 +14,12 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp
-open import LabelCoercionCalculus.Precision
-open import LabelCoercionCalculus.CatchUp
+open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Precision
+open import CoercionExpr.CatchUp
 
 
-sim-cast-↑-proj : ∀ {g g′} {p} {c̅₁ : CoercionExp g ⇒ ⋆} {c̅′ : CoercionExp g′ ⇒ l low}
+sim-cast-↑-proj : ∀ {g g′} {p} {c̅₁ : CExpr g ⇒ ⋆} {c̅′ : CExpr g′ ⇒ l low}
   → ⊢ c̅₁ ⊑ c̅′ ⨾ low !
   → 𝒱 c̅′
     --------------------------------------------
@@ -46,7 +46,7 @@ sim-cast-↑-proj {p = p} {c̅₁ = c̅₁} {c̅′ = id ⋆ ⨾ low ?? p′} c�
 
 
 sim-cast-↑ : ∀ {g₁ g₂ g₃ g′}
-                {c̅₁ : CoercionExp g₁ ⇒ g₂} {c̅′ : CoercionExp g′ ⇒ l low}
+                {c̅₁ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g′ ⇒ l low}
                 {c  : ⊢ g₂ ⇒ g₃}
   → ⊢ c̅₁ ⊑ c̅′ ⨾ low !
   → g₂ ⊑ₗ ⋆ → g₃ ⊑ₗ l high  {- c ⊑ c₂′ -}
