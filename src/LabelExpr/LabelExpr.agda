@@ -14,7 +14,7 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import CoercionExpr.CoercionExpr hiding (progress; plug-cong; ↠-trans)
+open import CoercionExpr.CoercionExpr hiding (Progress; progress; plug-cong; ↠-trans)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision
 
@@ -29,7 +29,7 @@ data LExpr : Set where
 
 
 Irreducible : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Set
-Irreducible {g₁} {g₂} c̅ = 𝒱 c̅ × g₁ ≢ g₂
+Irreducible {g₁} {g₂} c̅ = CVal c̅ × g₁ ≢ g₂
 
 
 data LVal : LExpr → Set where
@@ -71,7 +71,7 @@ data _—→ₑ_ : (M N : LExpr) → Set where
 
   cast : ∀ {ℓ g} {c̅ c̅ₙ : CExpr l ℓ ⇒ g}
     → c̅ —↠ c̅ₙ
-    → 𝒱 c̅ₙ
+    → CVal c̅ₙ
       -------------------------------
     → l ℓ ⟪ c̅ ⟫ —→ₑ l ℓ ⟪ c̅ₙ ⟫
 
@@ -87,15 +87,15 @@ data _—→ₑ_ : (M N : LExpr) → Set where
 
 
 
-data LCCProgress : LExpr → Set where
+data Progress : LExpr → Set where
 
-  done : ∀ {M} → LVal M → LCCProgress M
+  done : ∀ {M} → LVal M → Progress M
 
-  error : ∀ {p} → LCCProgress (blame p)
+  error : ∀ {p} → Progress (blame p)
 
-  step : ∀ {M N} → M  —→ₑ N → LCCProgress M
+  step : ∀ {M N} → M  —→ₑ N → Progress M
 
-progress : ∀ {g M} → ⊢ M ⇐ g → LCCProgress M
+progress : ∀ {g M} → ⊢ M ⇐ g → Progress M
 progress ⊢l = done v-l
 progress (⊢cast {c̅ = c̅} ⊢M) =
   case progress ⊢M of λ where
@@ -202,7 +202,7 @@ prec→⊢ (⊑-castr {g⊑g₁′ = g⊑g′} M⊑M′ _) =
 prec→⊢ (⊑-blame ⊢M) = ⟨ ⊢M , ⊢blame ⟩
 
 
-{- Precision of LCC expressions implies the precision of coercion expressions -}
+{- Precision of label expressions implies the precision of coercion expressions -}
 prec-inv : ∀ {ℓ ℓ′ g g′} {g⊑g′ : g ⊑ₗ g′}
              {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g′}
   → ⊢ l ℓ ⟪ c̅ ⟫ ⊑ l ℓ′ ⟪ c̅′ ⟫ ⇐ g⊑g′
