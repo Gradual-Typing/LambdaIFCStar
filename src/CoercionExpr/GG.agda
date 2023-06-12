@@ -25,10 +25,10 @@ open import CoercionExpr.SimBack     using (sim-back) public
 
 sim-mult : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₁′ c̅₂′ : CExpr g₁′ ⇒ g₂′}
   → ⊢ c̅₁ ⊑ c̅₁′
-  → 𝒱 c̅₂′
+  → CVal c̅₂′
   → c̅₁′ —↠ c̅₂′
     ---------------------------------------------------
-  → ∃[ c̅₂ ] (𝒱 c̅₂) × (c̅₁ —↠ c̅₂) × (⊢ c̅₂ ⊑ c̅₂′)
+  → ∃[ c̅₂ ] (CVal c̅₂) × (c̅₁ —↠ c̅₂) × (⊢ c̅₂ ⊑ c̅₂′)
 sim-mult c̅₁⊑c̅₁′ 𝓋′ (_ ∎) = catchup _ _ 𝓋′ c̅₁⊑c̅₁′
 sim-mult {c̅₁ = c̅₁} c̅₁⊑c̅₁′ 𝓋′ (_ —→⟨ c̅₁′→c̅′ ⟩ c̅′↠c̅₂′) =
   let ⟨ c̅₂ ,     c̅₁↠c̅₂ , c̅₂⊑c̅′ ⟩  = sim c̅₁⊑c̅₁′ c̅₁′→c̅′ in

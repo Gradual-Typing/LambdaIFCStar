@@ -156,7 +156,7 @@ prec-right→⊑ (⊥ _ _ _) (⊑-⊥ x y) = ⟨ x , y ⟩
 
 prec-inj-left : ∀ {g g′ ℓ}
   (c̅ₙ : CExpr g ⇒ ⋆) (c̅ₙ′ : CExpr g′ ⇒ l ℓ)
-  → 𝒱 c̅ₙ → 𝒱 c̅ₙ′
+  → CVal c̅ₙ → CVal c̅ₙ′
   → ⊢ c̅ₙ ⊑ c̅ₙ′ ⨾ ℓ !
   → ⊢ c̅ₙ ⊑ c̅ₙ′
 prec-inj-left (c̅ₙ ⨾ c) c̅ₙ′ v v′ (⊑-cast c̅ₙ⊑c̅ₙ′ g₁⊑ℓ ⋆⊑) = ⊑-castl c̅ₙ⊑c̅ₙ′ g₁⊑ℓ ⋆⊑

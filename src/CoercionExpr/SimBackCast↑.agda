@@ -23,7 +23,7 @@ sim-back-cast-↑ : ∀ {ℓ ℓ′ g′}
     {c̅₁ : CExpr l ℓ ⇒ l low} {c̅₁′ : CExpr l ℓ′ ⇒ g′}
     {c′ : ⊢ g′ ⇒ l high}
   → ⊢ c̅₁ ⨾ low ! ⊑ c̅₁′
-  → 𝒱 c̅₁
+  → CVal c̅₁
     --------------------------------------------
   → ∃[ c̅₂′ ] (c̅₁′ ⨾ c′ —↠ c̅₂′) × (⊢ c̅₁ ⨾ ↑ ⊑ c̅₂′)
 sim-back-cast-↑ {c′ = c′} c̅₁⨾!⊑c̅₁′ id

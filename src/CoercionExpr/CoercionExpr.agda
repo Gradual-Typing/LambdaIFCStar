@@ -37,33 +37,33 @@ coerceₗ {l low}  {l high} (≾-l l≼h) p = id (l low) ⨾ ↑
 coerceₗ {l high} {l high} (≾-l h≼h) p = id (l high)
 
 
--- data 𝒱 : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
+-- data CVal : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
 
---   id : ∀ {g} → 𝒱 (id g)
+--   id : ∀ {g} → CVal (id g)
 
---   up : 𝒱 ((id (l low)) ⨾ ↑)
+--   up : CVal ((id (l low)) ⨾ ↑)
 
---   inj : ∀ {ℓ} → 𝒱 ((id (l ℓ)) ⨾ (ℓ !))
+--   inj : ∀ {ℓ} → CVal ((id (l ℓ)) ⨾ (ℓ !))
 
---   proj : ∀ {ℓ p} → 𝒱 ((id ⋆) ⨾ (ℓ ?? p))
+--   proj : ∀ {ℓ p} → CVal ((id ⋆) ⨾ (ℓ ?? p))
 
---   up-inj : 𝒱 ((id (l low)) ⨾ ↑ ⨾ (high !))
+--   up-inj : CVal ((id (l low)) ⨾ ↑ ⨾ (high !))
 
---   proj-up : ∀ {p} → 𝒱 ((id ⋆) ⨾ (low ?? p) ⨾ ↑)
+--   proj-up : ∀ {p} → CVal ((id ⋆) ⨾ (low ?? p) ⨾ ↑)
 
---   proj-inj : ∀ {ℓ p} → 𝒱 ((id ⋆) ⨾ (ℓ ?? p) ⨾ (ℓ !))
+--   proj-inj : ∀ {ℓ p} → CVal ((id ⋆) ⨾ (ℓ ?? p) ⨾ (ℓ !))
 
---   proj-up-inj : ∀ {p} → 𝒱 ((id ⋆) ⨾ (low ?? p) ⨾ ↑ ⨾ (high !))
+--   proj-up-inj : ∀ {p} → CVal ((id ⋆) ⨾ (low ?? p) ⨾ ↑ ⨾ (high !))
 
-data 𝒱 : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
+data CVal : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
 
-  id : ∀ {g} → 𝒱 (id g)
+  id : ∀ {g} → CVal (id g)
 
-  id⨾? : ∀ {ℓ p} → 𝒱 ((id ⋆) ⨾ (ℓ ?? p))
+  id⨾? : ∀ {ℓ p} → CVal ((id ⋆) ⨾ (ℓ ?? p))
 
-  inj : ∀ {g ℓ} {c̅ : CExpr g ⇒ l ℓ} → 𝒱 c̅ → 𝒱 (c̅ ⨾ (ℓ !))
+  inj : ∀ {g ℓ} {c̅ : CExpr g ⇒ l ℓ} → CVal c̅ → CVal (c̅ ⨾ (ℓ !))
 
-  up : ∀ {g} {c̅ : CExpr g ⇒ l low} → 𝒱 c̅ → 𝒱 (c̅ ⨾ ↑)
+  up : ∀ {g} {c̅ : CExpr g ⇒ l low} → CVal c̅ → CVal (c̅ ⨾ ↑)
 
 
 infix 2 _—→_
@@ -80,22 +80,22 @@ data _—→_ : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → CExpr g₁ ⇒ g₂ 
     → (⊥ g₁ g₂ p) ⨾ c  —→ ⊥ g₁ g₃ p
 
   id : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂}
-    → 𝒱 c̅
+    → CVal c̅
       --------------------------
     → c̅ ⨾ (id g₂)  —→ c̅
 
   ?-id : ∀ {p} {g ℓ} {c̅ : CExpr g ⇒ (l ℓ)}
-    → 𝒱 c̅
+    → CVal c̅
       ----------------------------------
     → c̅ ⨾ (ℓ !) ⨾ (ℓ ?? p)  —→ c̅
 
   ?-↑ : ∀ {p} {g} {c̅ : CExpr g ⇒ (l low)}
-    → 𝒱 c̅
+    → CVal c̅
       ---------------------------------------
     → c̅ ⨾ (low !) ⨾ (high ?? p)  —→ c̅ ⨾ ↑
 
   ?-⊥ : ∀ {p} {g} {c̅ : CExpr g ⇒ (l high)}
-    → 𝒱 c̅
+    → CVal c̅
       -----------------------------------------------
     → c̅ ⨾ (high !) ⨾ (low ?? p)  —→ ⊥ g (l low) p
 
@@ -133,7 +133,7 @@ plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⨾ _ —→⟨ ξ M→L ⟩ (plug-c
 data Progress : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
 
   done : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂}
-    → 𝒱 c̅
+    → CVal c̅
     → Progress c̅
 
   error : ∀ {p} {g₁ g₂} → Progress (⊥ g₁ g₂ p)
@@ -174,7 +174,7 @@ data Result : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
 
   success : ∀ {g₁ g₂} {c̅ c̅′ : CExpr g₁ ⇒ g₂}
     → c̅ —↠ c̅′
-    → 𝒱 c̅′
+    → CVal c̅′
     → Result c̅
 
   fail : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} {p}

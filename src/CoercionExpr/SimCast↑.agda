@@ -21,7 +21,7 @@ open import CoercionExpr.CatchUp
 
 sim-cast-↑-proj : ∀ {g g′} {p} {c̅₁ : CExpr g ⇒ ⋆} {c̅′ : CExpr g′ ⇒ l low}
   → ⊢ c̅₁ ⊑ c̅′ ⨾ low !
-  → 𝒱 c̅′
+  → CVal c̅′
     --------------------------------------------
   → ∃[ c̅₂ ] (c̅₁ ⨾ high ?? p —↠ c̅₂) × (⊢ c̅₂ ⊑ c̅′ ⨾ ↑)
 sim-cast-↑-proj {p = p} {c̅₁ = c̅₁} {c̅′ = id (l low)} c̅₁⊑c̅′⨾! id
@@ -50,7 +50,7 @@ sim-cast-↑ : ∀ {g₁ g₂ g₃ g′}
                 {c  : ⊢ g₂ ⇒ g₃}
   → ⊢ c̅₁ ⊑ c̅′ ⨾ low !
   → g₂ ⊑ₗ ⋆ → g₃ ⊑ₗ l high  {- c ⊑ c₂′ -}
-  → 𝒱 c̅′
+  → CVal c̅′
     --------------------------------------------
   → ∃[ c̅₂ ] (c̅₁ ⨾ c —↠ c̅₂) × (⊢ c̅₂ ⊑ c̅′ ⨾ ↑)
 sim-cast-↑ {c̅₁ = c̅₁} {c = id ⋆} c̅₁⊑c̅₁′ ⋆⊑ ⋆⊑ v′

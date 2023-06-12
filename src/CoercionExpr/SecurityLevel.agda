@@ -7,15 +7,15 @@ open import CoercionExpr.CoercionExpr
 open import CoercionExpr.Precision
 
 
-∥_∥ : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → 𝒱 c̅ → StaticLabel
+∥_∥ : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → CVal c̅ → StaticLabel
 ∥ id (l ℓ) ∥ id = ℓ
 ∥ id (l ℓ) ⨾ ℓ ! ∥ (inj id) = ℓ
 ∥ id (l low) ⨾ ↑ ⨾ high ! ∥ (inj (up v)) = high
 ∥ id (l low) ⨾ ↑ ∥ (up v) = high
 
 level-prec : ∀ {ℓ ℓ′ g g′} (c̅ : CExpr l ℓ ⇒ g) (c̅′ : CExpr l ℓ′ ⇒ g′)
-  → (v : 𝒱 c̅)
-  → (v′ : 𝒱 c̅′)
+  → (v : CVal c̅)
+  → (v′ : CVal c̅′)
   → ⊢ c̅ ⊑ c̅′
     --------------------------------
   → ∥ c̅ ∥ v ≼ ∥ c̅′ ∥ v′

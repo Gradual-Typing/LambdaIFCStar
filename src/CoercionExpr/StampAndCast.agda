@@ -21,7 +21,7 @@ open import CoercionExpr.Stamping
 
 
 stamp-and-cast : ∀ {ℓ₁ g₁ g₂} (c̅ₙ : CExpr l ℓ₁ ⇒ g₁)
-  → 𝒱 c̅ₙ
+  → CVal c̅ₙ
   → (ℓ₂ : StaticLabel)
   → g₁ ⋎̃ l ℓ₂ ≾ g₂
   → NotProj (g₁ ⋎̃ l ℓ₂) g₂
@@ -32,7 +32,7 @@ stamp-and-cast {ℓ₁} {g₁} {g₂} c̅ₙ v ℓ₂ lp np =
 stamp-cast-prec : ∀ {ℓ₁ ℓ₁′ ℓ₂ ℓ₂′ g₁ g₁′ g₂ g₂′}
      {np : NotProj (g₁ ⋎̃ l ℓ₂) g₂} {np′ : NotProj (g₁′ ⋎̃ l ℓ₂′) g₂′}
      {c̅ₙ : CExpr l ℓ₁ ⇒ g₁} {c̅ₙ′ : CExpr l ℓ₁′ ⇒ g₁′}
-  → (v : 𝒱 c̅ₙ) → (v′ : 𝒱 c̅ₙ′)
+  → (v : CVal c̅ₙ) → (v′ : CVal c̅ₙ′)
   → (c~ : g₁ ⋎̃ l ℓ₂ ≾ g₂) → (c~′ : g₁′ ⋎̃ l ℓ₂′ ≾ g₂′)
   → ⊢ c̅ₙ ⊑ c̅ₙ′
   → g₂ ⊑ₗ g₂′

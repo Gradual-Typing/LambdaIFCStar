@@ -19,7 +19,7 @@ open import CoercionExpr.Precision
 
 data InSync : ∀ {g₁ g₁′ g₂ g₂′} (c̅₁ : CExpr g₁ ⇒ g₂) (c̅₂ : CExpr g₁′ ⇒ g₂′) → Set where
   v-v : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₂ : CExpr g₁′ ⇒ g₂′}
-    → 𝒱 c̅₂
+    → CVal c̅₂
     → ⊢ c̅₁ ⊑ c̅₂
     → InSync c̅₁ c̅₂
 
@@ -28,7 +28,7 @@ data InSync : ∀ {g₁ g₁′ g₂ g₂′} (c̅₁ : CExpr g₁ ⇒ g₂) (c�
     → InSync c̅₁ (⊥ g₁′ g₂′ p)
 
 catchup-back : ∀ {ℓ ℓ′ g g′} (c̅ : CExpr l ℓ ⇒ g) (c̅₁′ : CExpr l ℓ′ ⇒ g′)
-  → 𝒱 c̅
+  → CVal c̅
   → ⊢ c̅ ⊑ c̅₁′
   → ∃[ c̅₂′ ] (c̅₁′ —↠ c̅₂′) × (InSync c̅ c̅₂′)
 catchup-back (id (l ℓ)) (id (l ℓ′)) id (⊑-id l⊑l) = ⟨ _ , _ ∎ , v-v id (⊑-id l⊑l) ⟩
