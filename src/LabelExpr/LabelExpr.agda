@@ -151,6 +151,10 @@ plug-congₑ (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ 
 ↠ₑ-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) =
   L —→⟨ L→ ⟩ ↠ₑ-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
+preserve-mult : ∀ {g} {M N} → ⊢ M ⇐ g → M —↠ₑ N → ⊢ N ⇐ g
+preserve-mult ⊢M (_ ∎) = ⊢M
+preserve-mult ⊢L (L —→⟨ L→M ⟩ M↠N) = preserve-mult (preserve ⊢L L→M) M↠N
+
 
 data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LExpr) → .(g₁ ⊑ₗ g₂) → Set where
 
