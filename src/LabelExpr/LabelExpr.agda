@@ -14,9 +14,10 @@ open import Function using (case_of_)
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
-open import CoercionExpr.CoercionExpr hiding (Progress; progress; plug-cong; ↠-trans)
+open import CoercionExpr.CoercionExpr
+  hiding (Progress; progress; plug-cong; ↠-trans)
 open import CoercionExpr.SyntacComp
-open import CoercionExpr.Precision
+open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 
 
 data LExpr : Set where
@@ -156,61 +157,66 @@ preserve-mult ⊢M (_ ∎) = ⊢M
 preserve-mult ⊢L (L —→⟨ L→M ⟩ M↠N) = preserve-mult (preserve ⊢L L→M) M↠N
 
 
-data ⊢_⊑_⇐_ : ∀ {g₁ g₂} (M M′ : LExpr) → .(g₁ ⊑ₗ g₂) → Set where
+data ⊢_⊑_⇐_⊑_ : ∀ (M M′ : LExpr) (g₁ g₂ : Label) → Set where
 
-  ⊑-l : ∀ {ℓ} → ⊢ l ℓ ⊑ l ℓ ⇐ l⊑l {ℓ}
+  ⊑-l : ∀ {ℓ} → ⊢ l ℓ ⊑ l ℓ ⇐ l ℓ ⊑ l ℓ
 
   ⊑-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′}
              {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
-             {g₁⊑g₁′ : g₁ ⊑ₗ g₁′} {g₂⊑g₂′ : g₂ ⊑ₗ g₂′}
-    → ⊢ M ⊑ M′ ⇐ g₁⊑g₁′
+    → ⊢ M ⊑ M′ ⇐ g₁ ⊑ g₁′
     → ⊢ c̅ ⊑ c̅′
       --------------------------------------
-    → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⟪ c̅′ ⟫ ⇐ g₂⊑g₂′
+    → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⟪ c̅′ ⟫ ⇐ g₂ ⊑ g₂′
 
-  ⊑-castl : ∀ {g₁ g₂ g′} {M M′}
-              {c̅ : CExpr g₁ ⇒ g₂}
-              {g₁⊑g′ : g₁ ⊑ₗ g′} {g₂⊑g′ : g₂ ⊑ₗ g′}
-    → ⊢ M ⊑ M′ ⇐ g₁⊑g′
+  ⊑-castl : ∀ {g₁ g₂ g′} {M M′} {c̅ : CExpr g₁ ⇒ g₂}
+    → ⊢ M ⊑ M′ ⇐ g₁ ⊑ g′
     → ⊢l c̅ ⊑ g′
       --------------------------------------
-    → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⇐ g₂⊑g′
+    → ⊢ M ⟪ c̅ ⟫ ⊑ M′ ⇐ g₂ ⊑ g′
 
-  ⊑-castr : ∀ {g g₁′ g₂′} {M M′}
-              {c̅′ : CExpr g₁′ ⇒ g₂′}
-              {g⊑g₁′ : g ⊑ₗ g₁′} {g⊑g₂′ : g ⊑ₗ g₂′}
-    → ⊢ M ⊑ M′ ⇐ g⊑g₁′
+  ⊑-castr : ∀ {g g₁′ g₂′} {M M′} {c̅′ : CExpr g₁′ ⇒ g₂′}
+    → ⊢ M ⊑ M′ ⇐ g ⊑ g₁′
     → ⊢r g ⊑ c̅′
       --------------------------------------
-    → ⊢ M ⊑ M′ ⟪ c̅′ ⟫ ⇐ g⊑g₂′
+    → ⊢ M ⊑ M′ ⟪ c̅′ ⟫ ⇐ g ⊑ g₂′
 
-  ⊑-blame : ∀ {g g′} {M} {g⊑g′ : g ⊑ₗ g′} {p}
+  ⊑-blame : ∀ {g g′} {M} {p}
     → ⊢ M ⇐ g
+    → g ⊑ₗ g′
       --------------------------
-    → ⊢ M ⊑ blame p ⇐ g⊑g′
+    → ⊢ M ⊑ blame p ⇐ g ⊑ g′
+
 
 {- Precision implies that both sides are well-typed -}
-prec→⊢ : ∀ {g g′} {M M′} {g⊑g′ : g ⊑ₗ g′}
-  → ⊢ M ⊑ M′ ⇐ g⊑g′
-  → (⊢ M ⇐ g) × (⊢ M′ ⇐ g′)
+prec→⊢ : ∀ {g g′} {M M′}
+  → ⊢ M ⊑ M′ ⇐ g ⊑ g′
+  → ⊢ M ⇐ g  ×  ⊢ M′ ⇐ g′
 prec→⊢ ⊑-l = ⟨ ⊢l , ⊢l ⟩
-prec→⊢ (⊑-cast {g₁⊑g₁′ = g⊑g′} M⊑M′ c̅⊑c̅′) =
-  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
+prec→⊢ (⊑-cast M⊑M′ c̅⊑c̅′) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
   ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ ⟩
-prec→⊢ (⊑-castl {g₁⊑g′ = g⊑g′} M⊑M′ _) =
-  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
+prec→⊢ (⊑-castl M⊑M′ _) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
   ⟨ ⊢cast ⊢M , ⊢M′ ⟩
-prec→⊢ (⊑-castr {g⊑g₁′ = g⊑g′} M⊑M′ _) =
-  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ {g⊑g′ = g⊑g′} M⊑M′ in
+prec→⊢ (⊑-castr M⊑M′ _) =
+  let ⟨ ⊢M , ⊢M′ ⟩ = prec→⊢ M⊑M′ in
   ⟨ ⊢M , ⊢cast ⊢M′ ⟩
-prec→⊢ (⊑-blame ⊢M) = ⟨ ⊢M , ⊢blame ⟩
+prec→⊢ (⊑-blame ⊢M _) = ⟨ ⊢M , ⊢blame ⟩
+
+
+{- Term precision implies type precision -}
+prec→⊑ : ∀ {g₁ g₂} {M N} → ⊢ M ⊑ N ⇐ g₁ ⊑ g₂ → g₁ ⊑ₗ g₂
+prec→⊑ ⊑-l = l⊑l
+prec→⊑ (⊑-cast _ c̅⊑c̅′)   = proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)
+prec→⊑ (⊑-castl _ c̅⊑g′)  = proj₂ (prec-left→⊑ _ c̅⊑g′)
+prec→⊑ (⊑-castr _ g⊑c̅′)  = proj₂ (prec-right→⊑ _ g⊑c̅′)
+prec→⊑ (⊑-blame ⊢M g⊑g′) = g⊑g′
 
 
 {- Precision of label expressions implies the precision of coercion expressions -}
-prec-inv : ∀ {ℓ ℓ′ g g′} {g⊑g′ : g ⊑ₗ g′}
-             {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g′}
-  → ⊢ l ℓ ⟪ c̅ ⟫ ⊑ l ℓ′ ⟪ c̅′ ⟫ ⇐ g⊑g′
-  → (ℓ ≡ ℓ′) × (⊢ c̅ ⊑ c̅′)
+prec-inv : ∀ {ℓ ℓ′ g g′} {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g′}
+  → ⊢ l ℓ ⟪ c̅ ⟫ ⊑ l ℓ′ ⟪ c̅′ ⟫ ⇐ g ⊑ g′
+  → ℓ ≡ ℓ′  ×  ⊢ c̅ ⊑ c̅′
 prec-inv (⊑-cast ⊑-l c̅⊑c̅′)                 = ⟨ refl , c̅⊑c̅′ ⟩
 prec-inv (⊑-castl (⊑-castr ⊑-l ℓ⊑c̅′) c̅⊑g′) = ⟨ refl , comp-pres-⊑-rl ℓ⊑c̅′ c̅⊑g′ ⟩
 prec-inv (⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′)  = ⟨ refl , comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′  ⟩
