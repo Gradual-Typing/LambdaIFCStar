@@ -43,6 +43,13 @@ data LVal : LExpr → Set where
     → Irreducible c̅
     → LVal (l ℓ ⟪ c̅ ⟫)
 
+data LResult : LExpr → Set where
+
+  success : ∀ {V} → LVal V → LResult V
+
+  fail : ∀ {p} → LResult (blame p)
+
+
 data ⊢_⇐_ : LExpr → Label → Set where
 
   ⊢l : ∀ {ℓ} → ⊢ l ℓ ⇐ l ℓ
