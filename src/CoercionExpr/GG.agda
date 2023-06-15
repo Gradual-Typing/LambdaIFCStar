@@ -21,6 +21,7 @@ open import CoercionExpr.CatchUp     using (catchup) public
 open import CoercionExpr.Simulation  using (sim) public
 open import CoercionExpr.CatchUpBack using (InSync; catchup-back) public
 open import CoercionExpr.SimBack     using (sim-back) public
+open import CoercionExpr.SimBackBlame
 
 
 sim-mult : ∀ {g₁ g₁′ g₂ g₂′} {c̅₁ : CExpr g₁ ⇒ g₂} {c̅₁′ c̅₂′ : CExpr g₁′ ⇒ g₂′}
@@ -36,14 +37,25 @@ sim-mult {c̅₁ = c̅₁} c̅₁⊑c̅₁′ 𝓋′ (_ —→⟨ c̅₁′→c
   ⟨ c̅₃ , 𝓋 , ↠-trans c̅₁↠c̅₂ c̅₂↠c̅₃ , c̅₃⊑c̅₂′ ⟩
 
 
-sim-back-mult : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CExpr l ℓ ⇒ g} {c̅₁′ : CExpr l ℓ′ ⇒ g′}
+sim-back-success : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CExpr l ℓ ⇒ g} {c̅₁′ : CExpr l ℓ′ ⇒ g′}
   → ⊢ c̅₁ ⊑ c̅₁′
   → CVal c̅₂
   → c̅₁ —↠ c̅₂
     ---------------------------------------------------
   → ∃[ c̅₂′ ] (c̅₁′ —↠ c̅₂′) × (InSync c̅₂ c̅₂′)
-sim-back-mult c̅₁⊑c̅₁′ 𝓋 (_ ∎) = catchup-back _ _ 𝓋 c̅₁⊑c̅₁′
-sim-back-mult {c̅₁ = c̅₁} c̅₁⊑c̅₁′ 𝓋 (_ —→⟨ c̅₁→c̅ ⟩ c̅↠c̅₂) =
+sim-back-success c̅₁⊑c̅₁′ 𝓋 (_ ∎) = catchup-back _ _ 𝓋 c̅₁⊑c̅₁′
+sim-back-success {c̅₁ = c̅₁} c̅₁⊑c̅₁′ 𝓋 (_ —→⟨ c̅₁→c̅ ⟩ c̅↠c̅₂) =
   let ⟨ c̅₂′ , c̅₁′↠c̅₂′ , prec ⟩ = sim-back c̅₁⊑c̅₁′ c̅₁→c̅ in
-  let ⟨ c̅₃′ , c̅₂′↠c̅₃′ , sync ⟩ = sim-back-mult prec 𝓋 c̅↠c̅₂ in
+  let ⟨ c̅₃′ , c̅₂′↠c̅₃′ , sync ⟩ = sim-back-success prec 𝓋 c̅↠c̅₂ in
+  ⟨ c̅₃′ , ↠-trans c̅₁′↠c̅₂′ c̅₂′↠c̅₃′ , sync ⟩
+
+sim-back-fail : ∀ {ℓ ℓ′ g g′} {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g′} {p}
+  → ⊢ c̅ ⊑ c̅′
+  → c̅ —↠ ⊥ (l ℓ) g p
+    ---------------------------------------------------
+  → ∃[ q ] (c̅′ —↠ ⊥ (l ℓ′) g′ q) × (⊢ ⊥ (l ℓ) g p ⊑ ⊥ (l ℓ′) g′ q)
+sim-back-fail c̅⊑c̅′ (_ ∎) = sim-back-blame c̅⊑c̅′
+sim-back-fail {c̅ = c̅₁} c̅₁⊑c̅₁′ (_ —→⟨ c̅₁→c̅ ⟩ c̅↠c̅₂) =
+  let ⟨ c̅₂′ , c̅₁′↠c̅₂′ , prec ⟩ = sim-back c̅₁⊑c̅₁′ c̅₁→c̅ in
+  let ⟨ c̅₃′ , c̅₂′↠c̅₃′ , sync ⟩ = sim-back-fail prec c̅↠c̅₂ in
   ⟨ c̅₃′ , ↠-trans c̅₁′↠c̅₂′ c̅₂′↠c̅₃′ , sync ⟩
