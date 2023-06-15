@@ -28,7 +28,37 @@ sim-back : ∀ {g g′} {M M′ N}
   → M —→ₑ N
     -----------------------------------------------------------------
   → ∃[ N′ ] (M′ —↠ₑ N′) × (⊢ N ⊑ N′ ⇐ g ⊑ g′)
-sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = {!!}
+
+sim-back-blame : ∀ {g g′} {M′} {p}
+  → ⊢ blame p ⊑ M′ ⇐ g ⊑ g′
+  → ∃[ q ] (M′ —↠ₑ blame q) × (⊢ blame p ⊑ blame q ⇐ g ⊑ g′)
+sim-back-blame (⊑-castr blame⊑M′ g⊑c̅′)
+  with sim-back-blame blame⊑M′
+... | ⟨ q , M′↠blame , prec ⟩ =
+  ⟨ q , ↠ₑ-trans (plug-congₑ M′↠blame) (blame q ⟪ _ ⟫ —→⟨ ξ-blame ⟩ blame q ∎) ,
+    ⊑-blame ⊢blame (proj₂ (prec-right→⊑ _ g⊑c̅′)) ⟩
+sim-back-blame (⊑-blame x y) = ⟨ _ , blame _ ∎ , ⊑-blame x y ⟩
+
+sim-back-cast : ∀ {g₁ g₁′ g₂ g₂′} {M M′ N} {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
+  → ⊢ M ⊑ M′ ⇐ g₁ ⊑ g₁′
+  → ⊢ c̅ ⊑ c̅′
+  → M ⟪ c̅ ⟫ —→ₑ N
+  → ∃[ N′ ] (M′ ⟪ c̅′ ⟫ —↠ₑ N′) × (⊢ N ⊑ N′ ⇐ g₂ ⊑ g₂′)
+sim-back-cast M⊑M′ c̅⊑c̅′ (ξ M→N)
+  with sim-back M⊑M′ M→N
+... | ⟨ N′ , M′↠N′ , N⊑N′ ⟩ =
+  ⟨ N′ ⟪ _ ⟫ , plug-congₑ M′↠N′ , ⊑-cast N⊑N′ c̅⊑c̅′ ⟩
+sim-back-cast M⊑M′ c̅⊑c̅′ ξ-blame
+  with sim-back-blame M⊑M′
+... | ⟨ q , M′↠⊥ , prec ⟩ =
+  ⟨ blame q , ↠ₑ-trans (plug-congₑ M′↠⊥) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
+    ⊑-blame ⊢blame (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+sim-back-cast M⊑M′ c̅⊑c̅′ β-id = {!!}
+sim-back-cast M⊑M′ c̅⊑c̅′ (cast x x₁) = {!!}
+sim-back-cast M⊑M′ c̅⊑c̅′ (blame x) = {!!}
+sim-back-cast M⊑M′ c̅⊑c̅′ (comp x) = {!!}
+
+sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
 sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = {!!}
 sim-back (⊑-castr M⊑M′ g⊑c̅′) M→N
   with sim-back M⊑M′ M→N
