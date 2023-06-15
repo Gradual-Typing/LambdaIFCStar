@@ -55,7 +55,24 @@ sim-back-cast M⊑M′ c̅⊑c̅′ ξ-blame
     ⊑-blame ⊢blame (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
 sim-back-cast M⊑M′ c̅⊑c̅′ β-id = {!!}
 sim-back-cast M⊑M′ c̅⊑c̅′ (cast x x₁) = {!!}
-sim-back-cast M⊑M′ c̅⊑c̅′ (blame x) = {!!}
+sim-back-cast M⊑M′ c̅⊑c̅′ (blame c̅↠⊥) with prec→⊑ M⊑M′
+... | l⊑l with catchup-back v-l M⊑M′
+...   | ⟨ blame p , fail , M′↠blame , ⊑-blame ⊢l l⊑l ⟩ =
+  ⟨ blame p , ↠ₑ-trans (plug-congₑ M′↠blame) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
+    ⊑-blame ⊢blame (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+...   | ⟨ l ℓ , success v-l , M′↠V′ , ⊑-l ⟩ =
+  case sim-back-fail c̅⊑c̅′ c̅↠⊥ of λ where
+  ⟨ q , c̅′↠⊥ , prec ⟩ →
+    ⟨ blame q ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (l ℓ ⟪ _ ⟫ —→⟨ blame c̅′↠⊥ ⟩ blame q ∎) ,
+      ⊑-blame ⊢blame (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+...   | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castr ⊑-l ℓ⊑c̅′₁ ⟩ =
+  case sim-back-fail (comp-pres-⊑-rb ℓ⊑c̅′₁ c̅⊑c̅′) c̅↠⊥ of λ where
+  ⟨ q , c̅′↠⊥ , prec ⟩ →
+    ⟨ blame q ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
+      ⊑-blame ⊢blame (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+
 sim-back-cast M⊑M′ c̅⊑c̅′ (comp x) = {!!}
 
 sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
