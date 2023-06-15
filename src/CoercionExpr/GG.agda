@@ -19,7 +19,7 @@ open import CoercionExpr.Precision
 
 open import CoercionExpr.CatchUp     using (catchup) public
 open import CoercionExpr.Simulation  using (sim) public
-open import CoercionExpr.CatchUpBack using (catchup-back) public
+open import CoercionExpr.CatchUpBack using (InSync; catchup-back) public
 open import CoercionExpr.SimBack     using (sim-back) public
 
 
@@ -34,3 +34,16 @@ sim-mult {c̅₁ = c̅₁} c̅₁⊑c̅₁′ 𝓋′ (_ —→⟨ c̅₁′→c
   let ⟨ c̅₂ ,     c̅₁↠c̅₂ , c̅₂⊑c̅′ ⟩  = sim c̅₁⊑c̅₁′ c̅₁′→c̅′ in
   let ⟨ c̅₃ , 𝓋 , c̅₂↠c̅₃ , c̅₃⊑c̅₂′ ⟩ = sim-mult c̅₂⊑c̅′ 𝓋′ c̅′↠c̅₂′ in
   ⟨ c̅₃ , 𝓋 , ↠-trans c̅₁↠c̅₂ c̅₂↠c̅₃ , c̅₃⊑c̅₂′ ⟩
+
+
+sim-back-mult : ∀ {ℓ ℓ′ g g′} {c̅₁ c̅₂ : CExpr l ℓ ⇒ g} {c̅₁′ : CExpr l ℓ′ ⇒ g′}
+  → ⊢ c̅₁ ⊑ c̅₁′
+  → CVal c̅₂
+  → c̅₁ —↠ c̅₂
+    ---------------------------------------------------
+  → ∃[ c̅₂′ ] (c̅₁′ —↠ c̅₂′) × (InSync c̅₂ c̅₂′)
+sim-back-mult c̅₁⊑c̅₁′ 𝓋 (_ ∎) = catchup-back _ _ 𝓋 c̅₁⊑c̅₁′
+sim-back-mult {c̅₁ = c̅₁} c̅₁⊑c̅₁′ 𝓋 (_ —→⟨ c̅₁→c̅ ⟩ c̅↠c̅₂) =
+  let ⟨ c̅₂′ , c̅₁′↠c̅₂′ , prec ⟩ = sim-back c̅₁⊑c̅₁′ c̅₁→c̅ in
+  let ⟨ c̅₃′ , c̅₂′↠c̅₃′ , sync ⟩ = sim-back-mult prec 𝓋 c̅↠c̅₂ in
+  ⟨ c̅₃′ , ↠-trans c̅₁′↠c̅₂′ c̅₂′↠c̅₃′ , sync ⟩
