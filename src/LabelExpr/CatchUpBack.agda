@@ -27,53 +27,58 @@ catchup-back : ∀ {g g′} {V M′}
   → ⊢ V ⊑ M′ ⇐ g ⊑ g′
   → ∃[ N′ ] (LResult N′) × (M′ —↠ₑ N′) × (⊢ V ⊑ N′ ⇐ g ⊑ g′)
 catchup-back v-l ⊑-l = ⟨ l _ , success v-l , _ ∎ , ⊑-l ⟩
-catchup-back (v-cast ⟨ 𝓋 , x ⟩) (⊑-cast {c̅ = c̅} {c̅′} V⊑M′ c̅⊑c̅′) = {!!}
---   with catchup-back v-l V⊑M′
--- ... | ⟨ blame p , M′↠⊥ , v-⊥ V⊑⊥ ⟩ =
---   ⟨ blame p , ↠ₑ-trans (plug-congₑ M′↠⊥) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
---     v-⊥ (⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′))) ⟩
--- ... | ⟨ l ℓ , M′↠V′ , v-v v-l ⊑-l ⟩ =
---   case precₗ→⊑ _ _ c̅⊑c̅′ of λ where
---   ⟨ l⊑l , _ ⟩ →
---     case catchup-backₗ _ _ 𝓋 c̅⊑c̅′ of λ where
---     ⟨ c̅″ , c̅′↠⊥ , v-⊥ z ⟩ →
---       ⟨ blame _ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
---         v-⊥ (⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′))) ⟩
---     ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
---       ⟨ l _ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
---         v-v v-l (⊑-castl ⊑-l (⊑-left-contract c̅⊑id)) ⟩
---     ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
---       ⟨ l _ ⟪ c̅″ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
---         v-v (v-cast ⟨ up id , (λ ()) ⟩) (⊑-cast ⊑-l c̅′⊑c̅″) ⟩
---     ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
---       ⟨ l _ ⟪ c̅″ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
---         v-v (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) (⊑-cast ⊑-l c̅′⊑c̅″) ⟩
--- ... | ⟨ l ℓ ⟪ c̅′₁ ⟫ , M′↠V′ , v-v (v-cast i) (⊑-castr ⊑-l ℓ⊑c̅′₁) ⟩
---   with preserve-mult (proj₂ (prec→⊢ V⊑M′)) M′↠V′
--- ...   | ⊢cast ⊢l =
---   let prec : ⊢ c̅ ⊑ c̅′₁ ⨟ c̅′
---       prec = comp-pres-⊑-rb ℓ⊑c̅′₁ c̅⊑c̅′ in
---   case catchup-backₗ _ _ 𝓋 prec of λ where
---   ⟨ c̅″ , c̅′↠⊥ , v-⊥ z ⟩ →
---     ⟨ blame _ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
---       v-⊥ (⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′))) ⟩
---   ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
---     ⟨ l _ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
---       v-v v-l (⊑-castl ⊑-l (⊑-left-contract c̅⊑id)) ⟩
---   ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
---     ⟨ l _ ⟪ c̅″ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
---       v-v (v-cast ⟨ up id , (λ ()) ⟩) (⊑-cast ⊑-l c̅′⊑c̅″) ⟩
---   ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
---     ⟨ l _ ⟪ c̅″ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
---       v-v (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) (⊑-cast ⊑-l c̅′⊑c̅″) ⟩
-catchup-back (v-cast i) (⊑-castl V⊑M′ c̅⊑g′) = {!!}
---   with catchup-back v-l V⊑M′ | proj₁ (prec-left→⊑ _ c̅⊑g′)
--- ... | ⟨ blame p , M′↠⊥ , v-⊥ prec ⟩ | l⊑l =
---   ⟨ blame p , M′↠⊥ , v-⊥ (⊑-castl (⊑-blame ⊢l l⊑l) c̅⊑g′) ⟩
--- ... | ⟨ V′ , M′↠V′ , v-v v′ M⊑V′ ⟩ | l⊑l
---   with prec→⊢ M⊑V′ | prec→⊑ M⊑V′
--- ... | ⟨ ⊢l , _ ⟩ | l⊑l =
---     ⟨ V′ , M′↠V′ , v-v v′ (⊑-castl M⊑V′ c̅⊑g′) ⟩
+catchup-back (v-cast ⟨ 𝓋 , x ⟩) (⊑-cast {c̅ = c̅} {c̅′} V⊑M′ c̅⊑c̅′)
+  with catchup-back v-l V⊑M′
+... | ⟨ blame p , fail , M′↠⊥ , V⊑⊥ ⟩ =
+  ⟨ blame p , fail , ↠ₑ-trans (plug-congₑ M′↠⊥) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
+    ⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+... | ⟨ l ℓ , success v-l , M′↠V′ , ⊑-l ⟩ =
+  case precₗ→⊑ _ _ c̅⊑c̅′ of λ where
+  ⟨ l⊑l , _ ⟩ →
+    case catchup-backₗ _ _ 𝓋 c̅⊑c̅′ of λ where
+    ⟨ c̅″ , c̅′↠⊥ , v-⊥ z ⟩ →
+      ⟨ blame _ , fail , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
+        ⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+    ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
+      ⟨ l _ , success v-l , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+        ⊑-castl ⊑-l (⊑-left-contract c̅⊑id) ⟩
+    ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
+      ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ up id , (λ ()) ⟩) ,
+        ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
+        ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
+    ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
+      ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
+        ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
+        ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
+... | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i) , M′↠V′ , ⊑-castr ⊑-l ℓ⊑c̅′₁ ⟩
+  with preserve-mult (proj₂ (prec→⊢ V⊑M′)) M′↠V′
+...   | ⊢cast ⊢l =
+  let prec : ⊢ c̅ ⊑ c̅′₁ ⨟ c̅′
+      prec = comp-pres-⊑-rb ℓ⊑c̅′₁ c̅⊑c̅′ in
+  case catchup-backₗ _ _ 𝓋 prec of λ where
+  ⟨ c̅″ , c̅′↠⊥ , v-⊥ z ⟩ →
+    ⟨ blame _ , fail , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
+      ⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
+    ⟨ l _ , success v-l ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+      ⊑-castl ⊑-l (⊑-left-contract c̅⊑id) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ up id , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
+      ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
+      ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
+catchup-back (v-cast i) (⊑-castl V⊑M′ c̅⊑g′)
+  with catchup-back v-l V⊑M′ | proj₁ (prec-left→⊑ _ c̅⊑g′)
+... | ⟨ blame p , fail , M′↠⊥ , prec ⟩ | l⊑l =
+  ⟨ blame p , fail , M′↠⊥ , ⊑-castl (⊑-blame ⊢l l⊑l) c̅⊑g′ ⟩
+... | ⟨ V′ , success v′ , M′↠V′ , M⊑V′ ⟩ | l⊑l
+  with prec→⊢ M⊑V′ | prec→⊑ M⊑V′
+... | ⟨ ⊢l , _ ⟩ | l⊑l =
+    ⟨ V′ , success v′ , M′↠V′ , ⊑-castl M⊑V′ c̅⊑g′ ⟩
 catchup-back v (⊑-castr V⊑M′ g⊑c̅′)
   with catchup-back v V⊑M′
 ... | ⟨ blame p , fail , M′↠⊥ , V⊑⊥ ⟩ =
@@ -143,8 +148,43 @@ catchup-back (v-cast ⟨ 𝓋 , _ ⟩) (⊑-castr {c̅′ = c̅′} V⊑M′ g�
       ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
 catchup-back {g = g} {g′} v (⊑-castr {M = V} {c̅′ = c̅′} V⊑M′ g⊑c̅′)
     | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castr ⊑-l g⊑c̅′₁ ⟩ =
-  {!!}
-catchup-back {g = g} {g′} v (⊑-castr {M = V} {c̅′ = c̅′} V⊑M′ g⊑c̅′)
-    | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castr (⊑-castl y z) g⊑c̅′₁ ⟩ =
-  {!!}
+  let id⊑c̅′₁⨟c̅′ = ⊑-right-expand (comp-pres-⊑-rr g⊑c̅′₁ g⊑c̅′) in
+  case catchup-backₗ _ _ id id⊑c̅′₁⨟c̅′ of λ where
+  ⟨ c̅″ , c̅′↠⊥ , v-⊥ _ ⟩ →
+    ⟨ blame _ , fail ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
+      ⊑-blame ⊢l (proj₂ (prec-right→⊑ _ g⊑c̅′)) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
+    ⟨ l _ , success v-l ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+      ⊑-l ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ up id , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
+      ⊑-castr ⊑-l (⊑-right-contract c̅′⊑c̅″) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
+      ⊑-castr ⊑-l (⊑-right-contract c̅′⊑c̅″) ⟩
+catchup-back {g = g} {g′} (v-cast {c̅ = c̅} ⟨ 𝓋 , _ ⟩) (⊑-castr {M = V} {c̅′ = c̅′} V⊑M′ g⊑c̅′)
+    | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′₁ ⟩ =
+  let c̅⊑c̅′₁⨟c̅′ : ⊢ c̅ ⊑ c̅′₁ ⨟ c̅′
+      c̅⊑c̅′₁⨟c̅′ = comp-pres-⊑-br (comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′₁) g⊑c̅′ in
+  case catchup-backₗ _ _ 𝓋 c̅⊑c̅′₁⨟c̅′ of λ where
+  ⟨ c̅″ , c̅′↠⊥ , v-⊥ _ ⟩ →
+    ⟨ blame _ , fail ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
+      ⊑-blame (⊢cast ⊢l) (proj₂ (prec-right→⊑ _ g⊑c̅′)) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
+    ⟨ l _ , success v-l ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+      ⊑-castl ⊑-l c̅⊑ℓ ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ up id , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
+      ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
+      ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
 catchup-back v (⊑-blame ⊢V x) = ⟨ _ , fail , _ ∎ , ⊑-blame ⊢V x ⟩
