@@ -99,7 +99,27 @@ catchup-back v (⊑-castr V⊑M′ g⊑c̅′)
     ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
       ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
       ⊑-castr prec (⊑-right-contract c̅′⊑c̅″) ⟩
-catchup-back v (⊑-castr V⊑M′ g⊑c̅′) | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i) , M′↠V′ , ⊑-cast y z ⟩ = {!!}
+catchup-back (v-cast ⟨ 𝓋 , _ ⟩) (⊑-castr {c̅′ = c̅′} V⊑M′ g⊑c̅′)
+    | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-cast {M = M} {c̅ = c̅} {c̅′₁} M⊑ℓ c̅⊑c̅′₁ ⟩ =
+  let prec : ⊢ c̅ ⊑ c̅′₁ ⨟ c̅′
+      prec = comp-pres-⊑-br c̅⊑c̅′₁ g⊑c̅′ in
+  case catchup-backₗ _ _ 𝓋 prec of λ where
+  ⟨ c̅″ , c̅′↠⊥ , v-⊥ z ⟩ →
+    ⟨ blame _ , fail ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
+      ⊑-blame (⊢cast ⊢l) (proj₂ (prec-right→⊑ _ g⊑c̅′)) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v id c̅⊑id ⟩ →
+    ⟨ l _ , success v-l ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+      ⊑-castl M⊑ℓ (⊑-left-contract c̅⊑id) ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (up id) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ up id , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (up id) ⟩ _ ∎) ,
+      ⊑-cast M⊑ℓ c̅′⊑c̅″ ⟩
+  ⟨ c̅″ , c̅′↠c̅″ , v-v (inj 𝓋′) c̅′⊑c̅″ ⟩ →
+    ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
+      ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
+      ⊑-cast M⊑ℓ c̅′⊑c̅″ ⟩
 catchup-back (v-cast ⟨ 𝓋 , _ ⟩) (⊑-castr {c̅′ = c̅′} V⊑M′ g⊑c̅′)
     | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castl {c̅ = c̅} (⊑-castr ⊑-l ℓ⊑c̅′₁) c̅⊑g′ ⟩ =
   let c̅⊑c̅′₁⨟c̅′ : ⊢ c̅ ⊑ c̅′₁ ⨟ c̅′
@@ -121,5 +141,10 @@ catchup-back (v-cast ⟨ 𝓋 , _ ⟩) (⊑-castr {c̅′ = c̅′} V⊑M′ g�
     ⟨ l _ ⟪ c̅″ ⟫ , success (v-cast ⟨ inj 𝓋′ , (λ ()) ⟩) ,
       ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ cast c̅′↠c̅″ (inj 𝓋′) ⟩ _ ∎) ,
       ⊑-cast ⊑-l c̅′⊑c̅″ ⟩
-catchup-back v (⊑-castr V⊑M′ g⊑c̅′) | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i) , M′↠V′ , ⊑-castr y z ⟩ = {!!}
+catchup-back {g = g} {g′} v (⊑-castr {M = V} {c̅′ = c̅′} V⊑M′ g⊑c̅′)
+    | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castr ⊑-l g⊑c̅′₁ ⟩ =
+  {!!}
+catchup-back {g = g} {g′} v (⊑-castr {M = V} {c̅′ = c̅′} V⊑M′ g⊑c̅′)
+    | ⟨ l ℓ ⟪ c̅′₁ ⟫ , success (v-cast i₁) , M′↠V′ , ⊑-castr (⊑-castl y z) g⊑c̅′₁ ⟩ =
+  {!!}
 catchup-back v (⊑-blame ⊢V x) = ⟨ _ , fail , _ ∎ , ⊑-blame ⊢V x ⟩
