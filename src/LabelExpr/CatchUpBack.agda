@@ -19,7 +19,7 @@ open import LabelExpr.LabelExpr
 open import CoercionExpr.CoercionExpr hiding (Progress; progress; plug-cong; ↠-trans)
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SyntacComp
-open import CoercionExpr.CatchUpBack renaming (InSync to InSyncₗ ; catchup-back to catchup-backₗ)
+open import CoercionExpr.CatchUpBack renaming (catchup-back to catchup-backₗ)
 
 
 catchup-back : ∀ {g g′} {V M′}
