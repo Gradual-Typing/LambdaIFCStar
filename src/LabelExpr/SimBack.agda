@@ -120,7 +120,20 @@ sim-back-cast M⊑M′ c̅⊑c̅′ (blame c̅↠⊥) with prec→⊑ M⊑M′
     ⟨ blame q ,
       ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i₁ ⟩ _ —→⟨ blame c̅′↠⊥ ⟩ _ ∎) ,
       ⊑-blame ⊢blame (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
-sim-back-cast M⊑M′ c̅⊑c̅′ (comp x) = {!!}
+sim-back-cast {c̅ = c̅} {c̅′} M⊑M′ c̅⊑c̅′ (comp i)
+  with catchup-back (v-cast i) M⊑M′
+... | ⟨ blame p , fail , M′↠blame , V⊑blame ⟩ =
+  ⟨ blame p , ↠ₑ-trans (plug-congₑ M′↠blame) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
+    ⊑-blame (⊢cast ⊢l) (proj₂ (precₗ→⊑ _ _ c̅⊑c̅′)) ⟩
+... | ⟨ l ℓ′ , success v-l , M′↠V′ , ⊑-castl ⊑-l c̅ᵢ⊑ℓ ⟩ =
+  ⟨ l ℓ′ ⟪ c̅′ ⟫ , plug-congₑ M′↠V′ , ⊑-cast ⊑-l (comp-pres-⊑-lb c̅ᵢ⊑ℓ c̅⊑c̅′) ⟩
+... | ⟨ l ℓ′ ⟪ c̅ᵢ′ ⟫ , success (v-cast i′) , M′↠V′ , V⊑V′ ⟩
+  with prec→⊢ V⊑V′
+... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
+  with prec-inv V⊑V′
+... | ⟨ refl , c̅ᵢ⊑c̅ᵢ′ ⟩ =
+  ⟨ l ℓ′ ⟪ c̅ᵢ′ ⨟ c̅′ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i′ ⟩ _ ∎) ,
+    ⊑-cast ⊑-l (comp-pres-prec c̅ᵢ⊑c̅ᵢ′ c̅⊑c̅′) ⟩
 
 sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
 sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = {!!}
