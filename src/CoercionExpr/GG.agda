@@ -19,7 +19,7 @@ open import CoercionExpr.Precision
 
 open import CoercionExpr.CatchUp     using (catchup) public
 open import CoercionExpr.Simulation  using (sim) public
-open import CoercionExpr.CatchUpBack using (InSync; catchup-back) public
+open import CoercionExpr.CatchUpBack using (InSync; v-v; v-⊥; catchup-back) public
 open import CoercionExpr.SimBack     using (sim-back) public
 open import CoercionExpr.SimBackBlame
 
