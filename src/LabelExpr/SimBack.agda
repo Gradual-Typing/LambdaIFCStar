@@ -135,8 +135,25 @@ sim-back-cast {c̅ = c̅} {c̅′} M⊑M′ c̅⊑c̅′ (comp i)
   ⟨ l ℓ′ ⟪ c̅ᵢ′ ⨟ c̅′ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i′ ⟩ _ ∎) ,
     ⊑-cast ⊑-l (comp-pres-prec c̅ᵢ⊑c̅ᵢ′ c̅⊑c̅′) ⟩
 
+sim-back-castl : ∀ {g₁ g₂ g′} {M M′ N} {c̅ : CExpr g₁ ⇒ g₂}
+  → ⊢ M ⊑ M′ ⇐ g₁ ⊑ g′
+  → ⊢l c̅ ⊑ g′
+  → M ⟪ c̅ ⟫ —→ₑ N
+  → ∃[ N′ ] (M′ —↠ₑ N′) × (⊢ N ⊑ N′ ⇐ g₂ ⊑ g′)
+sim-back-castl M⊑M′ c̅⊑g′ (ξ M→N)
+  with sim-back M⊑M′ M→N
+... | ⟨ N′ , M′↠N′ , N⊑N′ ⟩ = ⟨ N′ , M′↠N′ , ⊑-castl N⊑N′ c̅⊑g′ ⟩
+sim-back-castl M⊑M′ c̅⊑g′ ξ-blame
+  with sim-back-blame M⊑M′
+... | ⟨ p , M′↠blame , prec ⟩ =
+  ⟨ blame p , M′↠blame , ⊑-blame ⊢blame (proj₂ (prec-left→⊑ _ c̅⊑g′)) ⟩
+sim-back-castl M⊑M′ c̅⊑g′ β-id = {!!}
+sim-back-castl M⊑M′ c̅⊑g′ (cast x x₁) = {!!}
+sim-back-castl M⊑M′ c̅⊑g′ (blame x) = {!!}
+sim-back-castl M⊑M′ c̅⊑g′ (comp x) = {!!}
+
 sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
-sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = {!!}
+sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = sim-back-castl M⊑M′ c̅⊑g′ M⟨c⟩→N
 sim-back (⊑-castr M⊑M′ g⊑c̅′) M→N
   with sim-back M⊑M′ M→N
 ... | ⟨ N′ , M′↠N′ , N⊑N′ ⟩ =
