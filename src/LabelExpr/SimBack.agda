@@ -28,4 +28,11 @@ sim-back : ∀ {g g′} {M M′ N}
   → M —→ₑ N
     -----------------------------------------------------------------
   → ∃[ N′ ] (M′ —↠ₑ N′) × (⊢ N ⊑ N′ ⇐ g ⊑ g′)
-sim-back M⊑M′ M→N = {!!}
+sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = {!!}
+sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = {!!}
+sim-back (⊑-castr M⊑M′ g⊑c̅′) M→N
+  with sim-back M⊑M′ M→N
+... | ⟨ N′ , M′↠N′ , N⊑N′ ⟩ =
+  ⟨ N′ ⟪ _ ⟫ , plug-congₑ M′↠N′ , ⊑-castr N⊑N′ g⊑c̅′ ⟩
+sim-back (⊑-blame ⊢M g⊑g′) M→N =
+  ⟨ _ , _ ∎ , ⊑-blame (preserve ⊢M M→N) g⊑g′ ⟩
