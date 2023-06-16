@@ -150,9 +150,14 @@ sim-back-castl M⊑M′ c̅⊑g′ ξ-blame
 sim-back-castl M⊑M′ (⊑-id l⊑l) β-id
   with catchup-back v-l M⊑M′
 ... | ⟨ N′ , _ , M′↠N′ , V⊑N′ ⟩ = ⟨ N′ , M′↠N′ , V⊑N′ ⟩
-sim-back-castl M⊑M′ c̅⊑g′ (cast x x₁) = {!!}
+sim-back-castl M⊑M′ c̅⊑g′ (cast c̅↠c̅ₙ 𝓋)
+  with catchup-back v-l M⊑M′
+... | ⟨ N′ , _ , M′↠N′ , V⊑N′ ⟩ =
+  ⟨ N′ , M′↠N′ , ⊑-castl V⊑N′ (pres-prec-left-mult c̅⊑g′ c̅↠c̅ₙ) ⟩
 sim-back-castl M⊑M′ c̅⊑g′ (blame x) = {!!}
-sim-back-castl M⊑M′ c̅⊑g′ (comp x) = {!!}
+sim-back-castl M⊑M′ c̅⊑g′ (comp i)
+  with catchup-back (v-cast i) M⊑M′
+... | ⟨ N′ , r , M′↠N′ , V⊑N′ ⟩ = {!!}
 
 sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
 sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = sim-back-castl M⊑M′ c̅⊑g′ M⟨c⟩→N

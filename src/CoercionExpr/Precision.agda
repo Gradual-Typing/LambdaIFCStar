@@ -109,6 +109,15 @@ pres-prec-left (⊑-cast (⊑-cast prec l⊑l ⋆⊑) ⋆⊑ l⊑l) (?-id x) = p
 pres-prec-left (⊑-cast (⊑-cast _ l⊑l ⋆⊑) ⋆⊑ ()) (?-↑ x)
 pres-prec-left (⊑-cast (⊑-cast prec l⊑l ⋆⊑) ⋆⊑ ()) (?-⊥ x)
 
+pres-prec-left-mult : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
+  → ⊢l c̅₁ ⊑ g′
+  → c̅₁ —↠ c̅₂
+  → ⊢l c̅₂ ⊑ g′
+pres-prec-left-mult prec (_ ∎) = prec
+pres-prec-left-mult prec (_ —→⟨ r ⟩ r*) =
+  let prec′ = pres-prec-left prec r in
+  pres-prec-left-mult prec′ r*
+
 
 prec→⊑ : ∀ {g₁ g₁′ g₂ g₂′} (c̅ : CExpr g₁ ⇒ g₂) (c̅′ : CExpr g₁′ ⇒ g₂′)
   → ⊢ c̅ ⊑ c̅′
