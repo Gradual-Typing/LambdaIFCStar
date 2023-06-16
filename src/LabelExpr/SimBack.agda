@@ -147,7 +147,9 @@ sim-back-castl M⊑M′ c̅⊑g′ ξ-blame
   with sim-back-blame M⊑M′
 ... | ⟨ p , M′↠blame , prec ⟩ =
   ⟨ blame p , M′↠blame , ⊑-blame ⊢blame (proj₂ (prec-left→⊑ _ c̅⊑g′)) ⟩
-sim-back-castl M⊑M′ c̅⊑g′ β-id = {!!}
+sim-back-castl M⊑M′ (⊑-id l⊑l) β-id
+  with catchup-back v-l M⊑M′
+... | ⟨ N′ , _ , M′↠N′ , V⊑N′ ⟩ = ⟨ N′ , M′↠N′ , V⊑N′ ⟩
 sim-back-castl M⊑M′ c̅⊑g′ (cast x x₁) = {!!}
 sim-back-castl M⊑M′ c̅⊑g′ (blame x) = {!!}
 sim-back-castl M⊑M′ c̅⊑g′ (comp x) = {!!}
