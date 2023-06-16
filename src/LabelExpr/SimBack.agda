@@ -8,6 +8,7 @@ open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Function using (case_of_)
 
@@ -154,7 +155,7 @@ sim-back-castl M⊑M′ c̅⊑g′ (cast c̅↠c̅ₙ 𝓋)
   with catchup-back v-l M⊑M′
 ... | ⟨ N′ , _ , M′↠N′ , V⊑N′ ⟩ =
   ⟨ N′ , M′↠N′ , ⊑-castl V⊑N′ (pres-prec-left-mult c̅⊑g′ c̅↠c̅ₙ) ⟩
-sim-back-castl M⊑M′ c̅⊑g′ (blame x) = {!!}
+sim-back-castl M⊑M′ c̅⊑g′ (blame c̅↠⊥) = contradiction c̅↠⊥ (prec-left-safe c̅⊑g′)
 sim-back-castl M⊑M′ c̅⊑g′ (comp i)
   with catchup-back (v-cast i) M⊑M′
 ... | ⟨ blame p , fail , M′↠blame , V⊑blame ⟩ =

@@ -184,3 +184,18 @@ prec-inj-left : ∀ {g g′ ℓ}
 prec-inj-left (c̅ₙ ⨾ c) c̅ₙ′ v v′ (⊑-cast c̅ₙ⊑c̅ₙ′ g₁⊑ℓ ⋆⊑) = ⊑-castl c̅ₙ⊑c̅ₙ′ g₁⊑ℓ ⋆⊑
 prec-inj-left (c̅ₙ ⨾ id .⋆) c̅ₙ′ () v′ (⊑-castl c̅ₙ⊑c̅ₙ′⨾! ⋆⊑ ⋆⊑)
 prec-inj-left c̅ₙ c̅ₙ′ v v′ (⊑-castr c̅ₙ⊑c̅ₙ′⨾! ⋆⊑ ⋆⊑) = c̅ₙ⊑c̅ₙ′⨾!
+
+
+prec-left-safe : ∀ {ℓ g g′ p} {c̅ : CExpr l ℓ ⇒ g}
+  → ⊢l c̅ ⊑ g′
+  → ¬ (c̅ —↠ ⊥ (l ℓ) g p)
+prec-left-safe (⊑-id g⊑g′) (.(id (l _)) —→⟨ () ⟩ _)
+prec-left-safe (⊑-cast prec x y) (_ —→⟨ ξ r ⟩ r*) =
+  prec-left-safe (⊑-cast (pres-prec-left prec r) x y) r*
+prec-left-safe (⊑-cast () _ _) (_ —→⟨ ξ-⊥ ⟩ _ ∎)
+prec-left-safe (⊑-cast prec _ _) (_ —→⟨ id _ ⟩ r*) =
+  prec-left-safe prec r*
+prec-left-safe (⊑-cast (⊑-cast prec _ _) _ _) (_ —→⟨ ?-id _ ⟩ r*) =
+  prec-left-safe prec r*
+prec-left-safe (⊑-cast (⊑-cast _ l⊑l _) _ ()) (_ —→⟨ ?-↑ _ ⟩ _)
+prec-left-safe (⊑-cast (⊑-cast _ l⊑l _) _ ()) (_ —→⟨ ?-⊥ _ ⟩ _ ∎)
