@@ -161,8 +161,12 @@ sim-back-castl M⊑M′ c̅⊑g′ (comp i)
   ⟨ blame p , M′↠blame , ⊑-blame (⊢cast ⊢l) (proj₂ (prec-left→⊑ _ c̅⊑g′)) ⟩
 ... | ⟨ l ℓ′ , success v-l , M′↠V′ , ⊑-castl ⊑-l c̅ᵢ⊑ℓ ⟩ =
   ⟨ l ℓ′ , M′↠V′ , ⊑-castl ⊑-l (comp-pres-⊑-ll c̅ᵢ⊑ℓ c̅⊑g′) ⟩
-... | ⟨ l ℓ′ ⟪ c̅′ ⟫ , success (v-cast i′) , M′↠V′ , V⊑V′ ⟩ =
-  {!!}
+... | ⟨ l ℓ′ ⟪ c̅′ ⟫ , success (v-cast i′) , M′↠V′ , ⊑-cast ⊑-l c̅ᵢ⊑c̅′ ⟩ =
+  ⟨ _ , M′↠V′ , ⊑-cast ⊑-l (comp-pres-⊑-bl c̅ᵢ⊑c̅′ c̅⊑g′) ⟩
+... | ⟨ l ℓ′ ⟪ c̅′ ⟫ , success (v-cast i′) , M′↠V′ , ⊑-castl (⊑-castr ⊑-l ℓ⊑c̅′) c̅ᵢ⊑g′ ⟩ =
+  ⟨ _ , M′↠V′ , ⊑-cast ⊑-l (comp-pres-⊑-bl (comp-pres-⊑-rl ℓ⊑c̅′ c̅ᵢ⊑g′) c̅⊑g′) ⟩
+... | ⟨ l ℓ′ ⟪ c̅′ ⟫ , success (v-cast i′) , M′↠V′ , ⊑-castr (⊑-castl ⊑-l c̅ᵢ⊑ℓ) g₁⊑c̅′ ⟩ =
+  ⟨ _ , M′↠V′ , ⊑-cast ⊑-l (comp-pres-⊑-bl (comp-pres-⊑-lr c̅ᵢ⊑ℓ g₁⊑c̅′) c̅⊑g′) ⟩
 
 sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
 sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = sim-back-castl M⊑M′ c̅⊑g′ M⟨c⟩→N
