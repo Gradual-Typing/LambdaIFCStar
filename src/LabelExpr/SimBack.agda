@@ -157,7 +157,12 @@ sim-back-castl M⊑M′ c̅⊑g′ (cast c̅↠c̅ₙ 𝓋)
 sim-back-castl M⊑M′ c̅⊑g′ (blame x) = {!!}
 sim-back-castl M⊑M′ c̅⊑g′ (comp i)
   with catchup-back (v-cast i) M⊑M′
-... | ⟨ N′ , r , M′↠N′ , V⊑N′ ⟩ = {!!}
+... | ⟨ blame p , fail , M′↠blame , V⊑blame ⟩ =
+  ⟨ blame p , M′↠blame , ⊑-blame (⊢cast ⊢l) (proj₂ (prec-left→⊑ _ c̅⊑g′)) ⟩
+... | ⟨ l ℓ′ , success v-l , M′↠V′ , ⊑-castl ⊑-l c̅ᵢ⊑ℓ ⟩ =
+  ⟨ l ℓ′ , M′↠V′ , ⊑-castl ⊑-l (comp-pres-⊑-ll c̅ᵢ⊑ℓ c̅⊑g′) ⟩
+... | ⟨ l ℓ′ ⟪ c̅′ ⟫ , success (v-cast i′) , M′↠V′ , V⊑V′ ⟩ =
+  {!!}
 
 sim-back (⊑-cast M⊑M′ c̅⊑c̅′) M⟨c⟩→N = sim-back-cast M⊑M′ c̅⊑c̅′ M⟨c⟩→N
 sim-back (⊑-castl M⊑M′ c̅⊑g′) M⟨c⟩→N = sim-back-castl M⊑M′ c̅⊑g′ M⟨c⟩→N
