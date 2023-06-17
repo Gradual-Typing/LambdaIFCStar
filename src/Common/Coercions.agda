@@ -11,8 +11,8 @@ open import Function using (case_of_; case_return_of_)
 open import Common.Utils
 open import Common.Types
 open import Common.BlameLabels
-open import LabelCoercionCalculus.CoercionExp hiding (coerce) public
-open import LabelCoercionCalculus.Stamping
+open import CoercionExpr.CoercionExpr hiding (coerce) public
+open import CoercionExpr.Stamping
 
 
 infix 6 Castᵣ_⇒_
@@ -31,7 +31,7 @@ data Castᵣ_⇒_ where
     → Castᵣ Ref A ⇒ Ref B
 
   fun : ∀ {g₁ g₂} {A B C D}
-    → CoercionExp g₂ ⇒ g₁
+    → CExpr g₂ ⇒ g₁
     → (c : Cast C ⇒ A)  {- in  -}
     → (d : Cast B ⇒ D)  {- out -}
     → Castᵣ ⟦ g₁ ⟧ A ⇒ B ⇒ ⟦ g₂ ⟧ C ⇒ D
@@ -40,26 +40,26 @@ data Castᵣ_⇒_ where
 data Cast_⇒_ where
   cast : ∀ {S T g₁ g₂}
     → Castᵣ S ⇒ T
-    → CoercionExp g₁ ⇒ g₂
+    → CExpr g₁ ⇒ g₂
     → Cast S of g₁ ⇒ T of g₂
 
 
 {- Irreducible coercions form values -}
 data Irreducible : ∀ {A B} → Cast A ⇒ B → Set where
-  ir-base : ∀ {ι ℓ g} {c̅ : CoercionExp l ℓ ⇒ g}
-    → 𝒱 c̅
+  ir-base : ∀ {ι ℓ g} {c̅ : CExpr l ℓ ⇒ g}
+    → CVal c̅
     → l ℓ ≢ g  {- c̅ ≢ id -}
     → Irreducible (cast (id ι) c̅)
 
   ir-ref : ∀ {A B ℓ g}
-      {c : Cast B ⇒ A} {d : Cast A ⇒ B} {c̅ : CoercionExp l ℓ ⇒ g}
-    → 𝒱 c̅
+      {c : Cast B ⇒ A} {d : Cast A ⇒ B} {c̅ : CExpr l ℓ ⇒ g}
+    → CVal c̅
     → Irreducible (cast (ref c d) c̅)
 
   ir-fun : ∀ {A B C D ℓ g gᶜ₁ gᶜ₂}
       {c : Cast C ⇒ A} {d : Cast B ⇒ D}
-      {c̅ : CoercionExp l ℓ ⇒ g} {d̅ : CoercionExp gᶜ₁ ⇒ gᶜ₂}
-    → 𝒱 c̅
+      {c̅ : CExpr l ℓ ⇒ g} {d̅ : CExpr gᶜ₁ ⇒ gᶜ₂}
+    → CVal c̅
     → Irreducible (cast (fun d̅ c d) c̅)
 
 
@@ -91,8 +91,8 @@ stamp-ir (cast cᵣ c̅) (ir-base 𝓋 _) ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ
 stamp-ir (cast cᵣ c̅) (ir-ref  𝓋)   ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
 stamp-ir (cast cᵣ c̅) (ir-fun  𝓋)   ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
 
-stamp-not-id : ∀ {ℓ ℓ′ g} {c̅ : CoercionExp l ℓ ⇒ g}
-  → 𝒱 c̅
+stamp-not-id : ∀ {ℓ ℓ′ g} {c̅ : CExpr l ℓ ⇒ g}
+  → CVal c̅
   → l ℓ ≢ g
   → l ℓ ≢ g ⋎̃ l ℓ′
 stamp-not-id {low} {low} id neq = neq
@@ -106,6 +106,6 @@ stamp-ir-irreducible : ∀ {A B} {c : Cast A ⇒ B} {ℓ}
   → (i : Irreducible c)
   → Irreducible (stamp-ir c i ℓ)
 stamp-ir-irreducible {ℓ = ℓ′} (ir-base {ι} {ℓ} {g} 𝓋 x) =
-  ir-base (stampₗ-𝒱 _ 𝓋 _) (stamp-not-id 𝓋 x)
-stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stampₗ-𝒱 _ 𝓋 _)
-stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stampₗ-𝒱 _ 𝓋 _)
+  ir-base (stampₗ-CVal _ 𝓋 _) (stamp-not-id 𝓋 x)
+stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stampₗ-CVal _ 𝓋 _)
+stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stampₗ-CVal _ 𝓋 _)
