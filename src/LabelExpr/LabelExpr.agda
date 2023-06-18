@@ -18,6 +18,7 @@ open import CoercionExpr.CoercionExpr
   hiding (Progress; progress; plug-cong; ↠-trans)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
+open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
 
 
 data LExpr : Set where
@@ -227,3 +228,8 @@ prec-inv : ∀ {ℓ ℓ′ g g′} {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l �
 prec-inv (⊑-cast ⊑-l c̅⊑c̅′)                 = ⟨ refl , c̅⊑c̅′ ⟩
 prec-inv (⊑-castl (⊑-castr ⊑-l ℓ⊑c̅′) c̅⊑g′) = ⟨ refl , comp-pres-⊑-rl ℓ⊑c̅′ c̅⊑g′ ⟩
 prec-inv (⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′)  = ⟨ refl , comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′  ⟩
+
+
+∥_∥ : ∀ (V : LExpr) → LVal V → StaticLabel
+∥ l ℓ       ∥ v-l                = ℓ
+∥ l ℓ ⟪ c̅ ⟫ ∥ (v-cast ⟨ 𝓋 , _ ⟩) = ∥ c̅ ∥ₗ 𝓋

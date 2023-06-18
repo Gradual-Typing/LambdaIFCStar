@@ -14,7 +14,7 @@ open import Syntax
 open import Common.Utils
 open import Common.Types
 open import Common.Coercions
-open import LabelCoercionCalculus.SecurityLevel
+open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
 open import Memory.HeapContext
 open import CC2.Syntax
 
@@ -122,22 +122,23 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ assign? L M T ĝ g p ⇐ ` Unit of l low
 
 
-  ⊢prot : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {pc : CoercionExp l low ⇒ gc′} {𝓋}
+  ⊢prot : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {PC : LExpr} {v : LVal PC}
     → Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
-    → ∥ pc ∥ 𝓋 ≡ ℓv′
+    → ⊢ PC ⇐ gc′
+    → ∥ PC ∥ v ≡ ℓv′
     → ℓv ⋎ ℓ ≼ ℓv′
     → B ≡ stamp A (l ℓ)
       ------------------------------------------- Prot
-    → Γ ; Σ ; gc ; ℓv ⊢ prot pc 𝓋 ℓ M A ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ prot PC v ℓ M A ⇐ B
 
 
-  ⊢prot-cast : ∀ {Γ Σ gc gc′ gc″ ℓv A B M ℓ} {c̅ : CoercionExp gc″ ⇒ gc′}
-    → (∀ {ℓv} → Γ ; Σ ; gc′ ; ℓv ⊢ M ⇐ A)
-    → gc ⋎̃ l ℓ ≾ gc″
-    → NotProj (gc ⋎̃ l ℓ) gc″
-    → B ≡ stamp A (l ℓ)
-      ---------------------------------------------------- ProtCast
-    → Γ ; Σ ; gc ; ℓv ⊢ prot-cast c̅ ℓ M A ⇐ B
+  -- ⊢prot-cast : ∀ {Γ Σ gc gc′ gc″ ℓv A B M ℓ} {c̅ : CoercionExp gc″ ⇒ gc′}
+  --   → (∀ {ℓv} → Γ ; Σ ; gc′ ; ℓv ⊢ M ⇐ A)
+  --   → gc ⋎̃ l ℓ ≾ gc″
+  --   → NotProj (gc ⋎̃ l ℓ) gc″
+  --   → B ≡ stamp A (l ℓ)
+  --     ---------------------------------------------------- ProtCast
+  --   → Γ ; Σ ; gc ; ℓv ⊢ prot-cast c̅ ℓ M A ⇐ B
 
 
   ⊢cast : ∀ {Γ Σ gc ℓv A B M} {c : Cast A ⇒ B}
