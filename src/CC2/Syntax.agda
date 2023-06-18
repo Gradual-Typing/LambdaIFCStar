@@ -7,7 +7,10 @@ open import Data.Bool renaming (Bool to 𝔹)
 
 open import Syntax
 open import Common.BlameLabels
-open import Common.Coercions
+open import Common.Coercions public
+open import LabelExpr.LabelExpr
+  renaming (blame to bl; Irreducible to Ir;
+            Progress to Progressₑ; progress to progressₑ) public
 open import Memory.Addr
 
 
@@ -26,10 +29,11 @@ data Op : Set where
   op-assign       : (T : RawType) → (ℓ̂ ℓ : StaticLabel) → Op
   op-assign?      : (T : RawType) → (ĝ g :       Label) → BlameLabel → Op
   op-cast         : ∀ {A B} → Cast A ⇒ B → Op
-  op-prot         : ∀ {g} (A : Type) (pc : CoercionExp l low ⇒ g)
-    → 𝒱 pc → (ℓ : StaticLabel) → Op
-  op-prot-cast    : ∀ {g₁ g₂} (A : Type) (c̅ : CoercionExp g₁ ⇒ g₂)
+  op-prot         : ∀ (A : Type)
+    → (pc : LExpr) → LVal pc
     → (ℓ : StaticLabel) → Op
+  -- op-prot-cast    : ∀ {g₁ g₂} (A : Type) (c̅ : CoercionExp g₁ ⇒ g₂)
+  --   → (ℓ : StaticLabel) → Op
   op-blame        : BlameLabel → Op
   {- Terms that only appear in erasure -}
   op-opaque       : Op
@@ -49,8 +53,8 @@ sig (op-deref A g)     = ■ ∷ []
 sig (op-assign T ℓ̂ ℓ)  = ■ ∷ ■ ∷ []
 sig (op-assign? T ĝ g p) = ■ ∷ ■ ∷ []
 sig (op-cast c)        = ■ ∷ []
-sig (op-prot A pc 𝓋 ℓ)   = ■ ∷ []
-sig (op-prot-cast A c̅ ℓ) = ■ ∷ []
+sig (op-prot A pc v ℓ)   = ■ ∷ []
+-- sig (op-prot-cast A c̅ ℓ) = ■ ∷ []
 sig (op-blame p)       = []
 sig op-opaque          = []
 
@@ -73,6 +77,6 @@ pattern assign L M T ℓ̂ ℓ   = (op-assign T ℓ̂ ℓ) ⦅ cons (ast L) (con
 pattern assign? L M T ĝ g p = (op-assign? T ĝ g p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _⟨_⟩ M c           = (op-cast c) ⦅ cons (ast M) nil ⦆
 pattern prot pc 𝓋 ℓ M A    = (op-prot A pc 𝓋 ℓ) ⦅ cons (ast M) nil ⦆
-pattern prot-cast c̅ ℓ M A  = (op-prot-cast A c̅ ℓ) ⦅ cons (ast M) nil ⦆
+-- pattern prot-cast c̅ ℓ M A  = (op-prot-cast A c̅ ℓ) ⦅ cons (ast M) nil ⦆
 pattern blame p            = (op-blame p) ⦅ nil ⦆
 pattern ●                 = op-opaque ⦅ nil ⦆                     {- opaque value -}
