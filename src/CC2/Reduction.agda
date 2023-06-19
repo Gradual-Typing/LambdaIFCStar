@@ -34,16 +34,19 @@ data _∣_∣_—→_∣_ : Term → Heap → (PC : LExpr) → Term → Heap →
       ------------------------------------------------------------------------- ProtectContext
     → prot PC (success v) ℓ M A ∣ μ ∣ PC′ —→ prot PC (success v) ℓ M′ A ∣ μ′
 
-  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ}
-    → (vc : LVal PC)
+  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ} {vc : LVal PC}
     → (v  : Value V)
     → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
       -------------------------------------------------------------------- ProtectValue
     → prot PC (success vc) ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v ⊢V ℓ ∣ μ
 
-  -- prot-err : ∀ {μ pc g ℓ e p}
-  --     --------------------------------------------------- ProtectContext
-  --   → prot g ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
+  prot-err : ∀ {μ PC PC′ A ℓ p} {v : LVal PC}
+      -------------------------------------------------------------------- ProtectBlame
+    → prot PC (success v) ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
+
+  prot-err-pc : ∀ {M μ PC A ℓ p}
+      ------------------------------------------------------------------ ProtectBlamePC
+    → prot (bl p) fail ℓ M A ∣ μ ∣ PC —→ blame p ∣ μ
 
   -- app-static : ∀ {L M μ pc}
   --     ------------------------------------- AppStatic
