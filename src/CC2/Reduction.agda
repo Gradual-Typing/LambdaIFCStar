@@ -48,6 +48,23 @@ data _∣_∣_—→_∣_ : Term → Heap → (PC : LExpr) → Term → Heap →
       ------------------------------------------------------------------ ProtectBlamePC
     → prot (bl p) fail ℓ M A ∣ μ ∣ PC —→ blame p ∣ μ
 
+  cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC}
+    → RawValue Vᵣ
+    → c̅ —↠ c̅ₙ
+    → CVal c̅ₙ
+      ----------------------------------------------------------- Cast
+    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩ ∣ μ
+
+  cast-blame : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC p}
+    → RawValue Vᵣ
+    → c̅ —↠ ⊥ g₁ g₂ p
+      ----------------------------------------------------------- CastBlame
+    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ PC —→ blame p ∣ μ
+
+  cast-id : ∀ {ι g} {k : rep ι} {μ PC}
+      ---------------------------------------------------- CastId
+    → $ k ⟨ cast (id ι) (id g) ⟩ ∣ μ ∣ PC —→ $ k ∣ μ
+
   -- app-static : ∀ {L M μ pc}
   --     ------------------------------------- AppStatic
   --   → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
