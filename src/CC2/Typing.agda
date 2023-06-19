@@ -122,14 +122,21 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ assign? L M T ĝ g p ⇐ ` Unit of l low
 
 
-  ⊢prot : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {PC : LExpr} {v : LVal PC}
+  ⊢prot : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {PC} {v : LVal PC}
     → Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
     → ⊢ PC ⇐ gc′
     → ∥ PC ∥ v ≡ ℓv′
     → ℓv ⋎ ℓ ≼ ℓv′
     → B ≡ stamp A (l ℓ)
       ------------------------------------------- Prot
-    → Γ ; Σ ; gc ; ℓv ⊢ prot PC v ℓ M A ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ prot PC (success v) ℓ M A ⇐ B
+
+
+  ⊢prot-err : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {p}
+    → Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
+    → B ≡ stamp A (l ℓ)
+      ---------------------------------------------------- ProtBlame
+    → Γ ; Σ ; gc ; ℓv ⊢ prot (bl p) fail ℓ M A ⇐ B
 
 
   -- ⊢prot-cast : ∀ {Γ Σ gc gc′ gc″ ℓv A B M ℓ} {c̅ : CoercionExp gc″ ⇒ gc′}
