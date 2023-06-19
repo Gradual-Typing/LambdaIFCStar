@@ -11,174 +11,159 @@ open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import Common.Utils
-open import Common.Types
-open import CC2.CCStatics
+open import CC2.Statics
+open import CC2.Frame public
 open import Memory.Heap Term Value
-
-open import CC2.ApplyCast        public
-open import CC2.Frame            public
-
-
-nsu : StaticLabel → StaticLabel → StaticLabel → Set
-nsu ℓ₁ ℓ₂ ℓ = ℓ₁ ≼ ℓ × ℓ₂ ≼ ℓ
-
-nsu? : ∀ ℓ₁ ℓ₂ ℓ → Dec (nsu ℓ₁ ℓ₂ ℓ)
-nsu? high high high = yes ⟨ h≼h , h≼h ⟩
-nsu? high high low  = no λ { ⟨ _ , () ⟩ }
-nsu? high low high  = yes ⟨ h≼h , l≼h ⟩
-nsu? high low low   = no λ { ⟨ () , _ ⟩ }
-nsu? low high high  = yes ⟨ l≼h , h≼h ⟩
-nsu? low high low   = no λ { ⟨ _ , () ⟩ }
-nsu? low low high   = yes ⟨ l≼h , l≼h ⟩
-nsu? low low low    = yes ⟨ l≼l , l≼l ⟩
 
 
 infix 2 _∣_∣_—→_∣_
 
-data _∣_∣_—→_∣_ : Term → Heap → StaticLabel → Term → Heap → Set where
+data _∣_∣_—→_∣_ : Term → Heap → (PC : LExpr) → Term → Heap → Set where
 
-  ξ : ∀ {M M′ F μ μ′ pc}
-    → M        ∣ μ ∣ pc —→ M′        ∣ μ′
+  ξ : ∀ {M M′ F μ μ′} {PC}
+    → M        ∣ μ ∣ PC —→ M′        ∣ μ′
       ---------------------------------------------- ξ
-    → plug M F ∣ μ ∣ pc —→ plug M′ F ∣ μ′
+    → plug M F ∣ μ ∣ PC —→ plug M′ F ∣ μ′
 
-  ξ-err : ∀ {F μ pc e p}
-      ---------------------------------------------- ξ-error
-    → plug (blame e p) F ∣ μ ∣ pc —→ blame e p ∣ μ
+  ξ-err : ∀ {F μ PC p}
+      ---------------------------------------------- ξ-blame
+    → plug (blame p) F ∣ μ ∣ PC —→ blame p ∣ μ
 
-  prot-val : ∀ {V μ pc g ℓ}
-    → (v : Value V)
-      --------------------------------------------------- ProtectVal
-    → prot g ℓ V ∣ μ ∣ pc —→ stamp-val V v ℓ ∣ μ
+  prot-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {v : LVal PC}
+    →                         M ∣ μ ∣ PC  —→ M′ ∣ μ′
+      ------------------------------------------------------------------------- ProtectContext
+    → prot PC (success v) ℓ M A ∣ μ ∣ PC′ —→ prot PC (success v) ℓ M′ A ∣ μ′
 
-  prot-ctx : ∀ {M M′ μ μ′ pc g ℓ}
-    → M        ∣ μ ∣ pc ⋎ ℓ —→ M′        ∣ μ′
-      --------------------------------------------------- ProtectContext
-    → prot g ℓ M ∣ μ ∣ pc     —→ prot g ℓ M′ ∣ μ′
+  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ}
+    → (vc : LVal PC)
+    → (v  : Value V)
+    → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
+      -------------------------------------------------------------------- ProtectValue
+    → prot PC (success vc) ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v ⊢V ℓ ∣ μ
 
-  prot-err : ∀ {μ pc g ℓ e p}
-      --------------------------------------------------- ProtectContext
-    → prot g ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
+  -- prot-err : ∀ {μ pc g ℓ e p}
+  --     --------------------------------------------------- ProtectContext
+  --   → prot g ℓ (blame e p) ∣ μ ∣ pc —→ blame e p ∣ μ
 
-  app-static : ∀ {L M μ pc}
-      ------------------------------------- AppStatic
-    → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
+  -- app-static : ∀ {L M μ pc}
+  --     ------------------------------------- AppStatic
+  --   → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
 
-  β : ∀ {V N μ pc A ℓ ℓᶜ}
-    → Value V
-      ------------------------------------------------------------------- β
-    → app✓ (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ) V ∣ μ ∣ pc —→ prot (l pc) ℓ (N [ V ]) ∣ μ
+  -- β : ∀ {V N μ pc A ℓ ℓᶜ}
+  --   → Value V
+  --     ------------------------------------------------------------------- β
+  --   → app✓ (ƛ⟦ ℓᶜ ⟧ A ˙ N of ℓ) V ∣ μ ∣ pc —→ prot (l pc) ℓ (N [ V ]) ∣ μ
 
-  β-if-true : ∀ {M N μ pc A ℓ}
-      ----------------------------------------------------------------------- IfTrue
-    → if ($ true of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ M ∣ μ
+  -- β-if-true : ∀ {M N μ pc A ℓ}
+  --     ----------------------------------------------------------------------- IfTrue
+  --   → if ($ true of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ M ∣ μ
 
-  β-if-false : ∀ {M N μ pc A ℓ}
-      ----------------------------------------------------------------------- IfFalse
-    → if ($ false of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ N ∣ μ
+  -- β-if-false : ∀ {M N μ pc A ℓ}
+  --     ----------------------------------------------------------------------- IfFalse
+  --   → if ($ false of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ N ∣ μ
 
-  β-let : ∀ {V N μ pc}
-    → Value V
-      -------------------------------------- Let
-    → `let V N ∣ μ ∣ pc —→ N [ V ] ∣ μ
+  -- β-let : ∀ {V N μ pc}
+  --   → Value V
+  --     -------------------------------------- Let
+  --   → `let V N ∣ μ ∣ pc —→ N [ V ] ∣ μ
 
-  ref-static : ∀ {M μ pc ℓ}
-      ------------------------------------------------- RefStatic
-    → ref⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
+  -- ref-static : ∀ {M μ pc ℓ}
+  --     ------------------------------------------------- RefStatic
+  --   → ref⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
-  ref?-ok : ∀ {M μ pc ℓ p}
-    → pc ≼ ℓ
-      ------------------------------------------------- Ref?Success
-    → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
+  -- ref?-ok : ∀ {M μ pc ℓ p}
+  --   → pc ≼ ℓ
+  --     ------------------------------------------------- Ref?Success
+  --   → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
 
-  ref?-fail : ∀ {M μ pc ℓ p}
-    → ¬ pc ≼ ℓ
-      ------------------------------------------------- Ref?Fail
-    → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ blame nsu-error p ∣ μ
+  -- ref?-fail : ∀ {M μ pc ℓ p}
+  --   → ¬ pc ≼ ℓ
+  --     ------------------------------------------------- Ref?Fail
+  --   → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ blame nsu-error p ∣ μ
 
-  ref : ∀ {V μ pc n ℓ}
-    → (v : Value V)
-    → a⟦ ℓ ⟧ n FreshIn μ  {- address is fresh -}
-      -------------------------------------------------------------------------------- Ref
-    → ref✓⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr (a⟦ ℓ ⟧ n) of low ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
+  -- ref : ∀ {V μ pc n ℓ}
+  --   → (v : Value V)
+  --   → a⟦ ℓ ⟧ n FreshIn μ  {- address is fresh -}
+  --     -------------------------------------------------------------------------------- Ref
+  --   → ref✓⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr (a⟦ ℓ ⟧ n) of low ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
 
-  deref : ∀ {V μ pc v n ℓ ℓ̂}
-    → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
-      --------------------------------------------------------------------- Deref
-    → ! (addr (a⟦ ℓ̂ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (l pc) (ℓ̂ ⋎ ℓ) V ∣ μ
+  -- deref : ∀ {V μ pc v n ℓ ℓ̂}
+  --   → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
+  --     --------------------------------------------------------------------- Deref
+  --   → ! (addr (a⟦ ℓ̂ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (l pc) (ℓ̂ ⋎ ℓ) V ∣ μ
 
-  assign-static : ∀ {L M μ pc}
-      ------------------------------------------------------- AssignStatic
-    → assign L M ∣ μ ∣ pc —→ assign✓ L M ∣ μ
+  -- assign-static : ∀ {L M μ pc}
+  --     ------------------------------------------------------- AssignStatic
+  --   → assign L M ∣ μ ∣ pc —→ assign✓ L M ∣ μ
 
-  β-assign : ∀ {V μ pc n ℓ ℓ̂}
-    → (v : Value V)
-      ---------------------------------------------------------------------------------------------- Assign
-    → assign✓ (addr (a⟦ ℓ̂ ⟧ n) of ℓ) V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
+  -- β-assign : ∀ {V μ pc n ℓ ℓ̂}
+  --   → (v : Value V)
+  --     ---------------------------------------------------------------------------------------------- Assign
+  --   → assign✓ (addr (a⟦ ℓ̂ ⟧ n) of ℓ) V ∣ μ ∣ pc —→ $ tt of low ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
 
-  cast : ∀ {A B V M μ pc} {c : Cast A ⇒ B}
-    → Value V → Active c
-    → ApplyCast V , c ↝ M
-      ----------------------------------- Cast
-    → V ⟨ c ⟩ ∣ μ ∣ pc —→ M ∣ μ
+  -- cast : ∀ {A B V M μ pc} {c : Cast A ⇒ B}
+  --   → Value V → Active c
+  --   → ApplyCast V , c ↝ M
+  --     ----------------------------------- Cast
+  --   → V ⟨ c ⟩ ∣ μ ∣ pc —→ M ∣ μ
 
-  β-if⋆-true : ∀ {M N μ pc A g ℓ} {p} {c~ : (` Bool of g) ~ (` Bool of ⋆)}
-      --------------------------------------------------------------------------------- IfCastTrue
-    → let c = cast _ _ p c~ in
-       if⋆ ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ M) ⟨ branch/c A c ⟩ ∣ μ
+  -- β-if⋆-true : ∀ {M N μ pc A g ℓ} {p} {c~ : (` Bool of g) ~ (` Bool of ⋆)}
+  --     --------------------------------------------------------------------------------- IfCastTrue
+  --   → let c = cast _ _ p c~ in
+  --      if⋆ ($ true of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ M) ⟨ branch/c A c ⟩ ∣ μ
 
-  β-if⋆-false : ∀ {M N μ pc A g ℓ} {p} {c~ : (` Bool of g) ~ (` Bool of ⋆)}
-      --------------------------------------------------------------------------------- IfCastFalse
-    → let c = cast _ _ p c~ in
-       if⋆ ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ N) ⟨ branch/c A c ⟩ ∣ μ
+  -- β-if⋆-false : ∀ {M N μ pc A g ℓ} {p} {c~ : (` Bool of g) ~ (` Bool of ⋆)}
+  --     --------------------------------------------------------------------------------- IfCastFalse
+  --   → let c = cast _ _ p c~ in
+  --      if⋆ ($ false of ℓ ⟨ c ⟩) A M N ∣ μ ∣ pc —→ (prot ⋆ ℓ N) ⟨ branch/c A c ⟩ ∣ μ
 
-  app?-ok : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q}
-              {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
-    → Value V
-    → nsu pc ℓ ℓᶜ
-      ----------------------------------------------------------------------------- App?Success
-    → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
-       app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ (app✓ V (M ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
+  -- app?-ok : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q}
+  --             {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
+  --   → Value V
+  --   → nsu pc ℓ ℓᶜ
+  --     ----------------------------------------------------------------------------- App?Success
+  --   → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
+  --      app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ (app✓ V (M ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
 
-  app?-fail : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q}
-                {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
-    → Value V
-    → ¬ nsu pc ℓ ℓᶜ
-      ----------------------------------------------------------------------------- App?Fail
-    → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
-       app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
+  -- app?-fail : ∀ {V M μ pc A B C D ℓ ℓᶜ} {p q}
+  --               {c~ : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ ~ ⟦ ⋆ ⟧ C ⇒ D of ⋆}
+  --   → Value V
+  --   → ¬ nsu pc ℓ ℓᶜ
+  --     ----------------------------------------------------------------------------- App?Fail
+  --   → let c = cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) (⟦ ⋆ ⟧ C ⇒ D of ⋆) p c~ in
+  --      app? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
 
-  fun-cast : ∀ {V W μ pc A B C D ℓᶜ₁ ℓᶜ₂ ℓ₁ ℓ₂} {p}
-               {c~ : (⟦ l ℓᶜ₁ ⟧ A ⇒ B of l ℓ₁) ~ (⟦ l ℓᶜ₂ ⟧ C ⇒ D of l ℓ₂)}
-    → Value V → Value W
-      ----------------------------------------------------------------------------- FunCast
-    → let c = cast (⟦ l ℓᶜ₁ ⟧ A ⇒ B of l ℓ₁) (⟦ l ℓᶜ₂ ⟧ C ⇒ D of l ℓ₂) p c~ in
-       app✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ (app✓ V (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
+  -- fun-cast : ∀ {V W μ pc A B C D ℓᶜ₁ ℓᶜ₂ ℓ₁ ℓ₂} {p}
+  --              {c~ : (⟦ l ℓᶜ₁ ⟧ A ⇒ B of l ℓ₁) ~ (⟦ l ℓᶜ₂ ⟧ C ⇒ D of l ℓ₂)}
+  --   → Value V → Value W
+  --     ----------------------------------------------------------------------------- FunCast
+  --   → let c = cast (⟦ l ℓᶜ₁ ⟧ A ⇒ B of l ℓ₁) (⟦ l ℓᶜ₂ ⟧ C ⇒ D of l ℓ₂) p c~ in
+  --      app✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ (app✓ V (W ⟨ dom/c c ⟩)) ⟨ cod/c c ⟩ ∣ μ
 
-  deref-cast : ∀ {V μ pc S T ℓ ℓ̂ g ĝ} {p}
-                 {c~ : (Ref (S of l ℓ̂) of l ℓ) ~ (Ref (T of ĝ) of g)}
-    → Value V
-      --------------------------------------------------------------------- DerefCast
-    → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ĝ) of g) p c~ in
-       ! (V ⟨ c ⟩) ∣ μ ∣ pc —→ ! V ⟨ out/c c ⟩ ∣ μ
+  -- deref-cast : ∀ {V μ pc S T ℓ ℓ̂ g ĝ} {p}
+  --                {c~ : (Ref (S of l ℓ̂) of l ℓ) ~ (Ref (T of ĝ) of g)}
+  --   → Value V
+  --     --------------------------------------------------------------------- DerefCast
+  --   → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ĝ) of g) p c~ in
+  --      ! (V ⟨ c ⟩) ∣ μ ∣ pc —→ ! V ⟨ out/c c ⟩ ∣ μ
 
-  assign?-ok : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
-    → Value V
-    → nsu pc ℓ ℓ̂
-      ----------------------------------------------------------------------------- Assign?Success
-    → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
-       assign? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ assign✓ V (M ⟨ in/c c ⟩) ∣ μ
+  -- assign?-ok : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
+  --   → Value V
+  --   → nsu pc ℓ ℓ̂
+  --     ----------------------------------------------------------------------------- Assign?Success
+  --   → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
+  --      assign? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ assign✓ V (M ⟨ in/c c ⟩) ∣ μ
 
-  assign?-fail : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
-    → Value V
-    → ¬ nsu pc ℓ ℓ̂
-      ----------------------------------------------------------------------------- Assign?Fail
-    → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
-       assign? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
-       {- blame the projection assign? -}
+  -- assign?-fail : ∀ {V M μ pc S T ℓ ℓ̂} {p q} {c~ : Ref (S of l ℓ̂) of l ℓ ~ Ref (T of ⋆) of ⋆}
+  --   → Value V
+  --   → ¬ nsu pc ℓ ℓ̂
+  --     ----------------------------------------------------------------------------- Assign?Fail
+  --   → let c = cast (Ref (S of l ℓ̂) of l ℓ) (Ref (T of ⋆) of ⋆) p c~ in
+  --      assign? (V ⟨ c ⟩) M q ∣ μ ∣ pc —→ blame nsu-error q ∣ μ
+  --      {- blame the projection assign? -}
 
-  assign-cast : ∀ {V W μ pc A B g₁ g₂} {c : Cast (Ref A of g₁) ⇒ (Ref B of g₂)}
-    → Value V → Value W
-    → (i : Inert c)
-      ------------------------------------------------------------------------ AssignCast
-    → assign✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ assign✓ V (W ⟨ in/c c ⟩) ∣ μ
+  -- assign-cast : ∀ {V W μ pc A B g₁ g₂} {c : Cast (Ref A of g₁) ⇒ (Ref B of g₂)}
+  --   → Value V → Value W
+  --   → (i : Inert c)
+  --     ------------------------------------------------------------------------ AssignCast
+  --   → assign✓ (V ⟨ c ⟩) W ∣ μ ∣ pc —→ assign✓ V (W ⟨ in/c c ⟩) ∣ μ
