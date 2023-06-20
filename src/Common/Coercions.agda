@@ -11,8 +11,9 @@ open import Function using (case_of_; case_return_of_)
 open import Common.Utils
 open import Common.Types
 open import Common.BlameLabels
-open import CoercionExpr.CoercionExpr hiding (coerce) public
+open import CoercionExpr.CoercionExpr public
 open import CoercionExpr.Stamping
+open import CoercionExpr.SyntacComp renaming (_⨟_ to _⊹⊹_)
 
 
 infix 6 Castᵣ_⇒_
@@ -109,3 +110,13 @@ stamp-ir-irreducible {ℓ = ℓ′} (ir-base {ι} {ℓ} {g} 𝓋 x) =
   ir-base (stampₗ-CVal _ 𝓋 _) (stamp-not-id 𝓋 x)
 stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stampₗ-CVal _ 𝓋 _)
 stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stampₗ-CVal _ 𝓋 _)
+
+
+{- Syntactical composition -}
+_⨟ᵣ_ : ∀ {T₁ T₂ T₃} → Castᵣ T₁ ⇒ T₂ → Castᵣ T₂ ⇒ T₃ → Castᵣ T₁ ⇒ T₃
+_⨟_  : ∀ {A B C} → Cast A ⇒ B → Cast B ⇒ C → Cast A ⇒ C
+
+id .ι       ⨟ᵣ id ι        = id ι
+ref c₁ d₁   ⨟ᵣ ref c₂ d₂   = ref  (c₂ ⨟ c₁) (d₁ ⨟ d₂)
+fun c̅ c₁ d₁ ⨟ᵣ fun d̅ c₂ d₂ = fun  (d̅ ⊹⊹ c̅) (c₂ ⨟ c₁) (d₁ ⨟ d₂)
+cast cᵣ c̅   ⨟  cast dᵣ d̅   = cast (cᵣ ⨟ᵣ dᵣ) (c̅ ⊹⊹ d̅)

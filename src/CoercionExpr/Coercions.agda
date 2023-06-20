@@ -38,7 +38,7 @@ coerce-nproj (l low)  (l low)  (≾-l l≼l) _ = id (l low)
 coerce-nproj (l low)  (l high) (≾-l l≼h) _ = ↑
 coerce-nproj (l high) (l high) (≾-l h≼h) _ = id (l high)
 
-coerce : ∀ (g₁ g₂ : Label) → g₁ ≾ g₂ → BlameLabel → ⊢ g₁ ⇒ g₂
-coerce ⋆ (l ℓ)  g₁≾g₂ p = ℓ ?? p  {- requires a blame label when projecting -}
-coerce ⋆     ⋆  g₁≾g₂ p = coerce-nproj ⋆ ⋆ g₁≾g₂ (λ x → x)
-coerce (l ℓ) g₂ g₁≾g₂ p = coerce-nproj (l ℓ) g₂ g₁≾g₂ λ _ → l
+-- coerce : ∀ (g₁ g₂ : Label) → g₁ ≾ g₂ → BlameLabel → ⊢ g₁ ⇒ g₂
+-- coerce ⋆ (l ℓ)  g₁≾g₂ p = ℓ ?? p  {- requires a blame label when projecting -}
+-- coerce ⋆     ⋆  g₁≾g₂ p = coerce-nproj ⋆ ⋆ g₁≾g₂ (λ x → x)
+-- coerce (l ℓ) g₂ g₁≾g₂ p = coerce-nproj (l ℓ) g₂ g₁≾g₂ λ _ → l

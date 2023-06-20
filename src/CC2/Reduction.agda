@@ -65,6 +65,12 @@ data _∣_∣_—→_∣_ : Term → Heap → (PC : LExpr) → Term → Heap →
       ---------------------------------------------------- CastId
     → $ k ⟨ cast (id ι) (id g) ⟩ ∣ μ ∣ PC —→ $ k ∣ μ
 
+  cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C} {μ PC}
+    → RawValue Vᵣ
+    → Irreducible cᵢ
+      -----------------------------------------------------
+    → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cᵢ ⨟ d ⟩ ∣ μ
+
   -- app-static : ∀ {L M μ pc}
   --     ------------------------------------- AppStatic
   --   → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
