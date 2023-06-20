@@ -11,6 +11,7 @@ open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import Common.Utils
+open import CoercionExpr.SecurityLevel
 open import CC2.Statics
 open import CC2.Frame public
 open import Memory.Heap Term Value
@@ -84,6 +85,28 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ App!
     → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ ⟨ PC , vc ⟩ —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
+
+  app-cast : ∀ {N V A B C D gc₁ gc₂ ℓ₁ ℓ₂} {d̅ : CExpr gc₂ ⇒ gc₁} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
+               {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′} {vc}
+    → (v : Value V)
+    → (𝓋 : CVal c̅ₙ)
+    → (stampₑ PC vc ℓ₂) ⟪ d̅ ⟫ —↠ₑ PC′
+    → (r : LResult PC′)
+      ---------------------------------------------------------------------------- AppCast
+    → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ ⟨ PC , vc ⟩ —→
+         `let (V ⟨ c ⟩) A (prot PC′ r ℓ₂ (N ⟨ d ⟩) D) ∣ μ
+
+  app!-cast : ∀ {N V A B C D gc ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ g}
+                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′} {gc vc}
+    → (v : Value V)
+    → (𝓋 : CVal c̅ₙ)
+    → ⊢ PC ⇐ gc
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       (stampₑ PC vc ℓ′) ⟪ coerce-to⋆ (gc ⋎̃ l ℓ′) ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
+    → (r : LResult PC′)
+      ---------------------------------------------------------------------------- App!Cast
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ ⟨ PC , vc ⟩ —→
+         `let (V ⟨ c ⟩) A (prot PC′ r (∥ c̅ₙ ∥ₗ 𝓋) (N ⟨ d ⟩) D) ∣ μ
 
   -- β-if-true : ∀ {M N μ pc A ℓ}
   --     ----------------------------------------------------------------------- IfTrue
