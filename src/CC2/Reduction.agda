@@ -18,62 +18,64 @@ open import Memory.Heap Term Value
 
 infix 2 _∣_∣_—→_∣_
 
-data _∣_∣_—→_∣_ : Term → Heap → (PC : LExpr) → Term → Heap → Set where
+data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Heap → Set where
 
-  ξ : ∀ {M M′ F μ μ′} {PC}
-    → M        ∣ μ ∣ PC —→ M′        ∣ μ′
-      ---------------------------------------------- ξ
-    → plug M F ∣ μ ∣ PC —→ plug M′ F ∣ μ′
+  ξ : ∀ {M M′ F μ μ′ PC v}
+    →        M ∣ μ ∣ ⟨ PC , v ⟩ —→ M′        ∣ μ′
+      -------------------------------------------------- ξ
+    → plug M F ∣ μ ∣ ⟨ PC , v ⟩ —→ plug M′ F ∣ μ′
 
-  ξ-err : ∀ {F μ PC p}
-      ---------------------------------------------- ξ-blame
-    → plug (blame p) F ∣ μ ∣ PC —→ blame p ∣ μ
+  ξ-err : ∀ {F μ PC v p}
+      ------------------------------------------------------ ξ-blame
+    → plug (blame p) F ∣ μ ∣ ⟨ PC , v ⟩ —→ blame p ∣ μ
 
-  prot-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {v : LVal PC}
-    →                         M ∣ μ ∣ PC  —→ M′ ∣ μ′
-      ------------------------------------------------------------------------- ProtectContext
-    → prot PC (success v) ℓ M A ∣ μ ∣ PC′ —→ prot PC (success v) ℓ M′ A ∣ μ′
+  prot-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {v v′}
+    →                         M ∣ μ ∣ ⟨ PC  , v  ⟩ —→ M′ ∣ μ′
+      ---------------------------------------------------------------------------- ProtectContext
+    → prot PC (success v) ℓ M A ∣ μ ∣ ⟨ PC′ , v′ ⟩ —→ prot PC (success v) ℓ M′ A ∣ μ′
 
-  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ} {vc : LVal PC}
+  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ} {vc vc′}
     → (v  : Value V)
     → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
-      -------------------------------------------------------------------- ProtectValue
-    → prot PC (success vc) ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v ⊢V ℓ ∣ μ
+      ------------------------------------------------------------------------ ProtectValue
+    → prot PC (success vc) ℓ V A ∣ μ ∣ ⟨ PC′ , vc′ ⟩ —→ stamp-val V v ⊢V ℓ ∣ μ
 
-  prot-err : ∀ {μ PC PC′ A ℓ p} {v : LVal PC}
-      -------------------------------------------------------------------- ProtectBlame
-    → prot PC (success v) ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
+  prot-err : ∀ {μ PC PC′ A ℓ p} {v v′}
+      ------------------------------------------------------------------------ ProtectBlame
+    → prot PC (success v) ℓ (blame p) A ∣ μ ∣ ⟨ PC′ , v′ ⟩ —→ blame p ∣ μ
 
-  prot-err-pc : ∀ {M μ PC A ℓ p}
+  prot-err-pc : ∀ {M μ PC A ℓ p} {v}
       ------------------------------------------------------------------ ProtectBlamePC
-    → prot (bl p) fail ℓ M A ∣ μ ∣ PC —→ blame p ∣ μ
+    → prot (bl p) fail ℓ M A ∣ μ ∣ ⟨ PC , v ⟩ —→ blame p ∣ μ
 
-  cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC}
+  cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC} {v}
     → RawValue Vᵣ
     → c̅ —↠ c̅ₙ
     → CVal c̅ₙ
-      ----------------------------------------------------------- Cast
-    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩ ∣ μ
+      ---------------------------------------------------------------- Cast
+    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩ ∣ μ
 
-  cast-blame : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC p}
+  cast-blame : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC p} {v}
     → RawValue Vᵣ
     → c̅ —↠ ⊥ g₁ g₂ p
       ----------------------------------------------------------- CastBlame
-    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ PC —→ blame p ∣ μ
+    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ blame p ∣ μ
 
-  cast-id : ∀ {ι g} {k : rep ι} {μ PC}
-      ---------------------------------------------------- CastId
-    → $ k ⟨ cast (id ι) (id g) ⟩ ∣ μ ∣ PC —→ $ k ∣ μ
+  cast-id : ∀ {ι g} {k : rep ι} {μ PC} {v}
+      ----------------------------------------------------------- CastId
+    → $ k ⟨ cast (id ι) (id g) ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ $ k ∣ μ
 
-  cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C} {μ PC}
+  cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C} {μ PC} {v}
     → RawValue Vᵣ
     → Irreducible cᵢ
-      ----------------------------------------------------- CastComposition
-    → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cᵢ ⨟ d ⟩ ∣ μ
+      ---------------------------------------------------------- CastComposition
+    → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ Vᵣ ⟨ cᵢ ⨟ d ⟩ ∣ μ
 
-  -- app-static : ∀ {L M μ pc}
-  --     ------------------------------------- AppStatic
-  --   → app L M ∣ μ ∣ pc —→ app✓ L M ∣ μ
+  app-static : ∀ {N V A B ℓ μ PC} {vc}
+    → (v : Value V)
+      ------------------------------------------------ App
+    → app (ƛ N) V A B ℓ ∣ μ ∣ ⟨ PC , vc ⟩ —→
+         prot (stampₑ PC vc ℓ) (success (stampₑ-LVal vc)) ℓ (N [ V ]) B ∣ μ
 
   -- β : ∀ {V N μ pc A ℓ ℓᶜ}
   --   → Value V
