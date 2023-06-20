@@ -92,17 +92,6 @@ stamp-ir (cast cᵣ c̅) (ir-base 𝓋 _) ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ
 stamp-ir (cast cᵣ c̅) (ir-ref  𝓋)   ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
 stamp-ir (cast cᵣ c̅) (ir-fun  𝓋)   ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)
 
-stamp-not-id : ∀ {ℓ ℓ′ g} {c̅ : CExpr l ℓ ⇒ g}
-  → CVal c̅
-  → l ℓ ≢ g
-  → l ℓ ≢ g ⋎̃ l ℓ′
-stamp-not-id {low} {low} id neq = neq
-stamp-not-id {low} {high} id neq = λ ()
-stamp-not-id {high} id neq = neq
-stamp-not-id (inj id) neq = neq
-stamp-not-id (inj (up id)) neq = neq
-stamp-not-id (up id) neq = neq
-
 stamp-ir-irreducible : ∀ {A B} {c : Cast A ⇒ B} {ℓ}
   → (i : Irreducible c)
   → Irreducible (stamp-ir c i ℓ)

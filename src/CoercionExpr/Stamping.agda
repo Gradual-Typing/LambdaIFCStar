@@ -1,6 +1,6 @@
 module CoercionExpr.Stamping where
 
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst)
 
 open import Common.Utils
 open import Common.SecurityLabels
@@ -51,3 +51,15 @@ stampₗ-low (id {l high}) = refl
 stampₗ-low (inj id) = refl
 stampₗ-low (inj (up id)) = refl
 stampₗ-low (up id) = refl
+
+
+stamp-not-id : ∀ {ℓ ℓ′ g} {c̅ : CExpr l ℓ ⇒ g}
+  → CVal c̅
+  → l ℓ ≢ g
+  → l ℓ ≢ g ⋎̃ l ℓ′
+stamp-not-id {low} {low} id neq = neq
+stamp-not-id {low} {high} id neq = λ ()
+stamp-not-id {high} id neq = neq
+stamp-not-id (inj id) neq = neq
+stamp-not-id (inj (up id)) neq = neq
+stamp-not-id (up id) neq = neq

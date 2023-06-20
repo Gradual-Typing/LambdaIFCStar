@@ -68,7 +68,7 @@ data _∣_∣_—→_∣_ : Term → Heap → (PC : LExpr) → Term → Heap →
   cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C} {μ PC}
     → RawValue Vᵣ
     → Irreducible cᵢ
-      -----------------------------------------------------
+      ----------------------------------------------------- CastComposition
     → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cᵢ ⨟ d ⟩ ∣ μ
 
   -- app-static : ∀ {L M μ pc}

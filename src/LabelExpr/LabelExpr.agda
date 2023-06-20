@@ -19,6 +19,7 @@ open import CoercionExpr.CoercionExpr
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
+open import CoercionExpr.Stamping
 
 
 data LExpr : Set where
@@ -230,6 +231,33 @@ prec-inv (⊑-castl (⊑-castr ⊑-l ℓ⊑c̅′) c̅⊑g′) = ⟨ refl , comp
 prec-inv (⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′)  = ⟨ refl , comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′  ⟩
 
 
+{- Security level -}
 ∥_∥ : ∀ (V : LExpr) → LVal V → StaticLabel
 ∥ l ℓ       ∥ v-l                = ℓ
 ∥ l ℓ ⟪ c̅ ⟫ ∥ (v-cast ⟨ 𝓋 , _ ⟩) = ∥ c̅ ∥ₗ 𝓋
+
+
+{- Stamping -}
+stampₑ : ∀ V → LVal V → StaticLabel → LExpr
+stampₑ (l ℓ) v-l low     = l ℓ
+stampₑ (l low) v-l high  = l low ⟪ id (l low) ⨾ ↑ ⟫
+stampₑ (l high) v-l high = l high
+stampₑ (l ℓ ⟪ c̅ ⟫) (v-cast ⟨ 𝓋 , _ ⟩) ℓ′ = l ℓ ⟪ stampₗ c̅ 𝓋 ℓ′ ⟫
+
+stampₑ-wt : ∀ {V g ℓ}
+  → (v : LVal V)
+  → ⊢ V ⇐ g
+  → ⊢ stampₑ V v ℓ ⇐ (g ⋎̃ l ℓ)
+stampₑ-wt {g = g} {low} v-l ⊢V rewrite g⋎̃low≡g {g} = ⊢V
+stampₑ-wt {ℓ = high} (v-l {low}) ⊢l = ⊢cast ⊢l
+stampₑ-wt {ℓ = high} (v-l {high}) ⊢l = ⊢l
+stampₑ-wt (v-cast i) (⊢cast ⊢l) = ⊢cast ⊢l
+
+stampₑ-LVal : ∀ {V ℓ}
+  → (v : LVal V)
+  → LVal (stampₑ V v ℓ)
+stampₑ-LVal {V} {low} v-l = v-l
+stampₑ-LVal {V} {high} (v-l {low}) = v-cast ⟨ up id , (λ ()) ⟩
+stampₑ-LVal {V} {high} (v-l {high}) = v-l
+stampₑ-LVal {V} {ℓ} (v-cast ⟨ 𝓋 , x ⟩) =
+  v-cast ⟨ stampₗ-CVal _ 𝓋 ℓ , stamp-not-id 𝓋 x ⟩
