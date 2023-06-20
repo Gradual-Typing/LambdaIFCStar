@@ -58,7 +58,7 @@ sig (op-prot A PC r ℓ)   = ■ ∷ []
 sig (op-blame p)       = []
 sig op-opaque          = []
 
-open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug) public
+open Syntax.OpSig Op sig renaming (ABT to Term; plug to plug-abt; ⟪_⟫ to ⦅_⦆) public
 
 infix 8 _⟨_⟩
 
