@@ -19,130 +19,139 @@ open import Memory.Heap Term Value
 
 infix 2 _∣_∣_—→_∣_
 
-data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Heap → Set where
+data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set where
 
-  ξ : ∀ {M M′ F μ μ′ PC v}
-    →        M ∣ μ ∣ ⟨ PC , v ⟩ —→ M′        ∣ μ′
+  ξ : ∀ {M M′ F μ μ′ PC}
+    →        M ∣ μ ∣ PC —→ M′        ∣ μ′
       -------------------------------------------------- ξ
-    → plug M F ∣ μ ∣ ⟨ PC , v ⟩ —→ plug M′ F ∣ μ′
+    → plug M F ∣ μ ∣ PC —→ plug M′ F ∣ μ′
 
-  ξ-err : ∀ {F μ PC v p}
+  ξ-blame : ∀ {F μ PC p}
       ------------------------------------------------------ ξ-blame
-    → plug (blame p) F ∣ μ ∣ ⟨ PC , v ⟩ —→ blame p ∣ μ
+    → plug (blame p) F ∣ μ ∣ PC —→ blame p ∣ μ
 
-  prot-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {v v′}
-    →                         M ∣ μ ∣ ⟨ PC  , v  ⟩ —→ M′ ∣ μ′
+  prot-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {v}
+    →                         M ∣ μ ∣ PC  —→ M′ ∣ μ′
       ---------------------------------------------------------------------------- ProtectContext
-    → prot PC (success v) ℓ M A ∣ μ ∣ ⟨ PC′ , v′ ⟩ —→ prot PC (success v) ℓ M′ A ∣ μ′
+    → prot PC (success v) ℓ M A ∣ μ ∣ PC′ —→ prot PC (success v) ℓ M′ A ∣ μ′
 
-  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ} {vc vc′}
+  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ} {vc}
     → (v  : Value V)
     → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
       ------------------------------------------------------------------------ ProtectValue
-    → prot PC (success vc) ℓ V A ∣ μ ∣ ⟨ PC′ , vc′ ⟩ —→ stamp-val V v ⊢V ℓ ∣ μ
+    → prot PC (success vc) ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v ⊢V ℓ ∣ μ
 
-  prot-err : ∀ {μ PC PC′ A ℓ p} {v v′}
+  prot-blame : ∀ {μ PC PC′ A ℓ p} {v}
       ------------------------------------------------------------------------ ProtectBlame
-    → prot PC (success v) ℓ (blame p) A ∣ μ ∣ ⟨ PC′ , v′ ⟩ —→ blame p ∣ μ
+    → prot PC (success v) ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
 
-  prot-err-pc : ∀ {M μ PC A ℓ p} {v}
+  prot-blame-pc : ∀ {M μ PC A ℓ p}
       ------------------------------------------------------------------ ProtectBlamePC
-    → prot (bl p) fail ℓ M A ∣ μ ∣ ⟨ PC , v ⟩ —→ blame p ∣ μ
+    → prot (bl p) fail ℓ M A ∣ μ ∣ PC —→ blame p ∣ μ
 
-  cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC} {v}
+  cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC}
     → RawValue Vᵣ
     → c̅ —↠ c̅ₙ
     → CVal c̅ₙ
       ---------------------------------------------------------------- Cast
-    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩ ∣ μ
+    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩ ∣ μ
 
-  cast-blame : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC p} {v}
+  cast-blame : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {μ PC p}
     → RawValue Vᵣ
     → c̅ —↠ ⊥ g₁ g₂ p
       ----------------------------------------------------------- CastBlame
-    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ blame p ∣ μ
+    → Vᵣ ⟨ cast cᵣ c̅ ⟩ ∣ μ ∣ PC —→ blame p ∣ μ
 
-  cast-id : ∀ {ι g} {k : rep ι} {μ PC} {v}
+  cast-id : ∀ {ι g} {k : rep ι} {μ PC}
       ----------------------------------------------------------- CastId
-    → $ k ⟨ cast (id ι) (id g) ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ $ k ∣ μ
+    → $ k ⟨ cast (id ι) (id g) ⟩ ∣ μ ∣ PC —→ $ k ∣ μ
 
-  cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C} {μ PC} {v}
+  cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C} {μ PC}
     → RawValue Vᵣ
     → Irreducible cᵢ
       ---------------------------------------------------------- CastComposition
-    → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ ∣ μ ∣ ⟨ PC , v ⟩ —→ Vᵣ ⟨ cᵢ ⨟ d ⟩ ∣ μ
+    → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ ∣ μ ∣ PC —→ Vᵣ ⟨ cᵢ ⨟ d ⟩ ∣ μ
 
-  β : ∀ {N V A B ℓ μ PC} {vc}
-    → (v : Value V)
+  β : ∀ {N V A B ℓ μ PC}
+    → (v  : Value V)
+    → (vc : LVal PC)
       ------------------------------------------------------------------------------ App
-    → app (ƛ N) V A B ℓ ∣ μ ∣ ⟨ PC , vc ⟩ —→
+    → app (ƛ N) V A B ℓ ∣ μ ∣ PC —→
          prot (stampₑ PC vc ℓ) (success (stampₑ-LVal vc)) ℓ (N [ V ]) B ∣ μ
 
-  β-app! : ∀ {N V A B ℓ μ PC PC′} {gc vc}
-    → (v : Value V)
+  β-app! : ∀ {N V A B ℓ μ PC PC′} {gc}
+    → (v  : Value V)
+    → (vc : LVal PC)
     → ⊢ PC ⇐ gc
     → (stampₑ PC vc ℓ) ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ App!
-    → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ ⟨ PC , vc ⟩ —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
+    → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ PC —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
 
   app-cast : ∀ {N V A B C D gc₁ gc₂ ℓ₁ ℓ₂} {d̅ : CExpr gc₂ ⇒ gc₁} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
-               {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′} {vc}
-    → (v : Value V)
-    → (𝓋 : CVal c̅ₙ)
+               {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′}
+    → (v  : Value V)
+    → (vc : LVal PC)
+    → (𝓋  : CVal c̅ₙ)
     → (stampₑ PC vc ℓ₂) ⟪ d̅ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ---------------------------------------------------------------------------- AppCast
-    → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ ⟨ PC , vc ⟩ —→
+    → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ PC —→
          `let (V ⟨ c ⟩) A (prot PC′ r ℓ₂ (N ⟨ d ⟩) D) ∣ μ
 
   app!-cast : ∀ {N V A B C D gc ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ g}
-                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′} {gc vc}
-    → (v : Value V)
-    → (𝓋 : CVal c̅ₙ)
-    → ⊢ PC ⇐ gc
+                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′} {gc′}
+    → (v  : Value V)
+    → (vc : LVal PC)
+    → (𝓋  : CVal c̅ₙ)
+    → ⊢ PC ⇐ gc′
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        (stampₑ PC vc ℓ′) ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ---------------------------------------------------------------------------- App!Cast
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ ⟨ PC , vc ⟩ —→
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ PC —→
          `let (V ⟨ c ⟩) A (prot PC′ r ℓ′ (N ⟨ d ⟩) D) ∣ μ
 
-  β-if-true : ∀ {A ℓ M N μ PC} {v}
-      ------------------------------------------------------------- IfTrue
-    → if ($ true) A ℓ M N ∣ μ ∣ ⟨ PC , v ⟩ —→
-         prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ M A ∣ μ
+  β-if-true : ∀ {A ℓ M N μ PC}
+    → (v : LVal PC)
+      ------------------------------------------------------------------------------------- IfTrue
+    → if ($ true) A ℓ M N ∣ μ ∣ PC —→ prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ M A ∣ μ
 
-  β-if-false : ∀ {A ℓ M N μ PC} {v}
-      ------------------------------------------------------------- IfFalse
-    → if ($ false) A ℓ M N ∣ μ ∣ ⟨ PC , v ⟩ —→
-         prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ N A ∣ μ
+  β-if-false : ∀ {A ℓ M N μ PC}
+    → (v : LVal PC)
+      ------------------------------------------------------------------------------------- IfFalse
+    → if ($ false) A ℓ M N ∣ μ ∣ PC —→ prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ N A ∣ μ
 
-  β-if!-true : ∀ {A ℓ gc M N μ PC PC′} {v}
+  β-if!-true : ∀ {A ℓ gc M N μ PC PC′}
+    → (v : LVal PC)
     → ⊢ PC ⇐ gc
     → stampₑ PC v ℓ ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
-      ---------------------------------------------------------------------------- If!True
-    → if! ($ true) A (l ℓ) M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ M A ∣ μ
+      -------------------------------------------------------------------- If!True
+    → if! ($ true) A (l ℓ) M N ∣ μ ∣ PC —→ prot PC′ r ℓ M A ∣ μ
 
-  β-if!-false : ∀ {A ℓ gc M N μ PC PC′} {v}
+  β-if!-false : ∀ {A ℓ gc M N μ PC PC′}
+    → (v : LVal PC)
     → ⊢ PC ⇐ gc
     → stampₑ PC v ℓ ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
-      ---------------------------------------------------------------------------- If!False
-    → if! ($ false) A (l ℓ) M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ N A ∣ μ
+      --------------------------------------------------------------------- If!False
+    → if! ($ false) A (l ℓ) M N ∣ μ ∣ PC —→ prot PC′ r ℓ N A ∣ μ
 
-  if-true-cast : ∀ {A M N μ PC} {v}
+  if-true-cast : ∀ {A M N μ PC}
+    → (v : LVal PC)
       ------------------------------------------------------------------------ IfTrueCast
-    → if ($ true ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+    → if ($ true ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ PC —→
          prot (stampₑ PC v high) (success (stampₑ-LVal v)) high M A ∣ μ
 
-  if-false-cast : ∀ {A M N μ PC} {v}
+  if-false-cast : ∀ {A M N μ PC}
+    → (v : LVal PC)
       ------------------------------------------------------------------------ IfFalseCast
-    → if ($ false ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+    → if ($ false ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ PC —→
          prot (stampₑ PC v high) (success (stampₑ-LVal v)) high N A ∣ μ
 
-  if!-true-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′} {v}
+  if!-true-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′}
+    → (v : LVal PC)
     → (𝓋 : CVal c̅ₙ)
     → l ℓ ≢ g
     → ⊢ PC ⇐ gc
@@ -150,9 +159,10 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
        stampₑ PC v ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ If!TrueCast
-    → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ′ M A ∣ μ
+    → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ PC —→ prot PC′ r ℓ′ M A ∣ μ
 
-  if!-false-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′} {v}
+  if!-false-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′}
+    → (v : LVal PC)
     → (𝓋 : CVal c̅ₙ)
     → l ℓ ≢ g
     → ⊢ PC ⇐ gc
@@ -160,37 +170,39 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
        stampₑ PC v ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ If!FalseCast
-    → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ′ N A ∣ μ
+    → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ PC —→ prot PC′ r ℓ′ N A ∣ μ
 
-  β-let : ∀ {V A N μ PC} {v}
+  β-let : ∀ {V A N μ PC}
     → Value V
       ----------------------------------------------- Let
-    → `let V A N ∣ μ ∣ ⟨ PC , v ⟩ —→ N [ V ] ∣ μ
+    → `let V A N ∣ μ ∣ PC —→ N [ V ] ∣ μ
 
-  -- ref-static : ∀ {M μ pc ℓ}
-  --     ------------------------------------------------- RefStatic
-  --   → ref⟦ ℓ ⟧ M ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
+  ref : ∀ {ℓ V n μ PC}
+    → (v : Value V)
+    → a⟦ ℓ ⟧ n FreshIn μ
+      -------------------------------------------------------------------- Ref
+    → ref⟦ ℓ ⟧ V ∣ μ ∣ PC —→ addr n ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
 
-  -- ref?-ok : ∀ {M μ pc ℓ p}
-  --   → pc ≼ ℓ
-  --     ------------------------------------------------- Ref?Success
-  --   → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ ref✓⟦ ℓ ⟧ M ∣ μ
+  ref? : ∀ {ℓ V n p μ PC PC′}
+    → (v : Value V)
+    → a⟦ ℓ ⟧ n FreshIn μ
+    → PC ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ —↠ₑ PC′
+    → LVal PC′
+      -------------------------------------------------------------------- Ref?
+    → ref?⟦ ℓ ⟧ V p ∣ μ ∣ PC —→ addr n ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
 
-  -- ref?-fail : ∀ {M μ pc ℓ p}
-  --   → ¬ pc ≼ ℓ
-  --     ------------------------------------------------- Ref?Fail
-  --   → ref?⟦ ℓ ⟧ M p ∣ μ ∣ pc —→ blame nsu-error p ∣ μ
+  ref?-blame : ∀ {ℓ V n p μ PC}
+    → (v : Value V)
+    → a⟦ ℓ ⟧ n FreshIn μ
+    → PC ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ —↠ₑ bl p
+      -------------------------------------------------------------------- Ref?Blame
+    → ref?⟦ ℓ ⟧ V p ∣ μ ∣ PC —→ blame p ∣ μ
 
-  -- ref : ∀ {V μ pc n ℓ}
-  --   → (v : Value V)
-  --   → a⟦ ℓ ⟧ n FreshIn μ  {- address is fresh -}
-  --     -------------------------------------------------------------------------------- Ref
-  --   → ref✓⟦ ℓ ⟧ V ∣ μ ∣ pc —→ addr (a⟦ ℓ ⟧ n) of low ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
-
-  -- deref : ∀ {V μ pc v n ℓ ℓ̂}
-  --   → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
-  --     --------------------------------------------------------------------- Deref
-  --   → ! (addr (a⟦ ℓ̂ ⟧ n) of ℓ) ∣ μ ∣ pc —→ prot (l pc) (ℓ̂ ⋎ ℓ) V ∣ μ
+  deref : ∀ {n T ℓ̂ ℓ V v μ PC}
+    → (vc : LVal PC)
+    → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
+      --------------------------------------------------------------------------------- Deref
+    → ! (addr n) (T of l ℓ̂) (l ℓ) ∣ μ ∣ PC —→ prot PC (success vc) ℓ V (T of l ℓ̂) ∣ μ
 
   -- assign-static : ∀ {L M μ pc}
   --     ------------------------------------------------------- AssignStatic

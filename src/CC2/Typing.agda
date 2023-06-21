@@ -94,10 +94,10 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ ref⟦ ℓ ⟧ M ⇐ Ref (T of l ℓ) of l low
 
 
-  ⊢ref? : ∀ {Γ Σ gc ℓv M T ℓ p}
-    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of l ℓ
+  ⊢ref? : ∀ {Γ Σ ℓv M T ℓ p}
+    → Γ ; Σ ; ⋆ ; ℓv ⊢ M ⇐ T of l ℓ
       ---------------------------------------------------------------- Ref?
-    → Γ ; Σ ; gc ; ℓv ⊢ ref?⟦ ℓ ⟧ M p ⇐ Ref (T of l ℓ) of l low
+    → Γ ; Σ ; ⋆ ; ℓv ⊢ ref?⟦ ℓ ⟧ M p ⇐ Ref (T of l ℓ) of l low
 
 
   ⊢deref : ∀ {Γ Σ gc ℓv M A B g}
@@ -132,10 +132,10 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ prot PC (success v) ℓ M A ⇐ B
 
 
-  ⊢prot-err : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {p}
+  ⊢prot-blame-pc : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {p}
     → Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
     → B ≡ stamp A (l ℓ)
-      ---------------------------------------------------- ProtBlame
+      ---------------------------------------------------- ProtBlamePC
     → Γ ; Σ ; gc ; ℓv ⊢ prot (bl p) fail ℓ M A ⇐ B
 
 
@@ -154,6 +154,6 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ M ⟨ c ⟩ ⇐ B
 
 
-  ⊢err : ∀ {Γ Σ gc ℓv A p}
+  ⊢blame : ∀ {Γ Σ gc ℓv A p}
       ------------------------------------ Blame
     → Γ ; Σ ; gc ; ℓv ⊢ blame p ⇐ A
