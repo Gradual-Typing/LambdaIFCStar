@@ -8,7 +8,7 @@ open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import Common.Utils
 open import CoercionExpr.SecurityLevel
@@ -81,7 +81,7 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
   β-app! : ∀ {N V A B ℓ μ PC PC′} {gc vc}
     → (v : Value V)
     → ⊢ PC ⇐ gc
-    → (stampₑ PC vc ℓ) ⟪ coerce-to⋆ (gc ⋎̃ l ℓ) ⟫ —↠ₑ PC′
+    → (stampₑ PC vc ℓ) ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ App!
     → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ ⟨ PC , vc ⟩ —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
@@ -102,11 +102,11 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
     → (𝓋 : CVal c̅ₙ)
     → ⊢ PC ⇐ gc
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce-to⋆ (gc ⋎̃ l ℓ′) ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
+       (stampₑ PC vc ℓ′) ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ---------------------------------------------------------------------------- App!Cast
     → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ ⟨ PC , vc ⟩ —→
-         `let (V ⟨ c ⟩) A (prot PC′ r (∥ c̅ₙ ∥ₗ 𝓋) (N ⟨ d ⟩) D) ∣ μ
+         `let (V ⟨ c ⟩) A (prot PC′ r ℓ′ (N ⟨ d ⟩) D) ∣ μ
 
   β-if-true : ∀ {A ℓ M N μ PC} {v}
       ------------------------------------------------------------- IfTrue
@@ -114,22 +114,31 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
          prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ M A ∣ μ
 
   if-true-cast : ∀ {A M N μ PC} {v}
-      ------------------------------------------------------------------- IfTrueCast
+      ------------------------------------------------------------------------ IfTrueCast
     → if ($ true ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
          prot (stampₑ PC v high) (success (stampₑ-LVal v)) high M A ∣ μ
 
-  -- β-if-true : ∀ {M N μ pc A ℓ}
-  --     ----------------------------------------------------------------------- IfTrue
-  --   → if ($ true of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ M ∣ μ
+  β-if!-true : ∀ {A ℓ gc M N μ PC PC′} {v}
+    → ⊢ PC ⇐ gc
+    → stampₑ PC v ℓ ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
+    → (r : LResult PC′)
+      ---------------------------------------------------------------------------- If!True
+    → if! ($ true) A (l ℓ) M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ M A ∣ μ
 
-  -- β-if-false : ∀ {M N μ pc A ℓ}
-  --     ----------------------------------------------------------------------- IfFalse
-  --   → if ($ false of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ N ∣ μ
+  if!-true-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′} {v}
+    → (𝓋 : CVal c̅ₙ)
+    → l ℓ ≢ g
+    → ⊢ PC ⇐ gc
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       stampₑ PC v ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
+    → (r : LResult PC′)
+      ------------------------------------------------------------------------------ If!TrueCast
+    → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ′ M A ∣ μ
 
-  -- β-let : ∀ {V N μ pc}
-  --   → Value V
-  --     -------------------------------------- Let
-  --   → `let V N ∣ μ ∣ pc —→ N [ V ] ∣ μ
+  β-let : ∀ {V A N μ PC} {v}
+    → Value V
+      ----------------------------------------------- Let
+    → `let V A N ∣ μ ∣ ⟨ PC , v ⟩ —→ N [ V ] ∣ μ
 
   -- ref-static : ∀ {M μ pc ℓ}
   --     ------------------------------------------------- RefStatic
