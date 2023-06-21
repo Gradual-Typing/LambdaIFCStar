@@ -108,6 +108,16 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
     → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ ⟨ PC , vc ⟩ —→
          `let (V ⟨ c ⟩) A (prot PC′ r (∥ c̅ₙ ∥ₗ 𝓋) (N ⟨ d ⟩) D) ∣ μ
 
+  β-if-true : ∀ {A ℓ M N μ PC} {v}
+      ------------------------------------------------------------- IfTrue
+    → if ($ true) A ℓ M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+         prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ M A ∣ μ
+
+  if-true-cast : ∀ {A M N μ PC} {v}
+      ------------------------------------------------------------------- IfTrueCast
+    → if ($ true ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+         prot (stampₑ PC v high) (success (stampₑ-LVal v)) high M A ∣ μ
+
   -- β-if-true : ∀ {M N μ pc A ℓ}
   --     ----------------------------------------------------------------------- IfTrue
   --   → if ($ true of ℓ) A M N ∣ μ ∣ pc —→ prot (l pc) ℓ M ∣ μ
