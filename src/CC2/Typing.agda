@@ -122,10 +122,10 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ assign? L M T ĝ g p ⇐ ` Unit of l low
 
 
-  ⊢prot : ∀ {Γ Σ gc gc′ ℓv ℓv′ A B M ℓ} {PC} {v : LVal PC}
-    → Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
+  ⊢prot : ∀ {Γ Σ gc gc′ ℓv A B M ℓ} {PC} {v : LVal PC}
+    → let ℓv′ = ∥ PC ∥ v in
+       Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
     → ⊢ PC ⇐ gc′
-    → ∥ PC ∥ v ≡ ℓv′
     → ℓv ⋎ ℓ ≼ ℓv′
     → B ≡ stamp A (l ℓ)
       ------------------------------------------- Prot
