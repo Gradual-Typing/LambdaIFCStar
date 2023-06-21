@@ -113,8 +113,8 @@ progress (⊢cast {c̅ = c̅} ⊢M) =
     case ⟨ v , ⊢M ⟩ of λ where
     ⟨ v-l , ⊢l ⟩ →
       case result c̅ of λ where
-      (success c̅↠d̅ 𝓋) → step (cast c̅↠d̅ 𝓋)
-      (fail c̅↠⊥)      → step (blame c̅↠⊥)
+      ⟨ d̅ , c̅↠d̅ , success 𝓋 ⟩ → step (cast c̅↠d̅ 𝓋)
+      ⟨ _ , c̅↠⊥ , fail      ⟩ → step (blame c̅↠⊥)
     ⟨ v-cast {c̅ = c̅′} i , ⊢cast _ ⟩ → step (comp i)
   (error) → step ξ-blame
   (step M→N) → step (ξ M→N)

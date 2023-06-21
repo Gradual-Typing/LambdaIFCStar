@@ -173,53 +173,68 @@ progress (⊥ g₁ g₂ p) = error
 
 
 
-data Result : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
+-- data Result : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
 
-  success : ∀ {g₁ g₂} {c̅ c̅′ : CExpr g₁ ⇒ g₂}
-    → c̅ —↠ c̅′
-    → CVal c̅′
-    → Result c̅
+--   success : ∀ {g₁ g₂} {c̅ c̅′ : CExpr g₁ ⇒ g₂}
+--     → c̅ —↠ c̅′
+--     → CVal c̅′
+--     → Result c̅
 
-  fail : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} {p}
-    → c̅ —↠ ⊥ g₁ g₂ p
-    → Result c̅
+--   fail : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} {p}
+--     → c̅ —↠ ⊥ g₁ g₂ p
+--     → Result c̅
+
+data CResult : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where
+
+  success : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} → CVal c̅ → CResult c̅
+
+  fail    : ∀ {g₁ g₂ p} → CResult (⊥ g₁ g₂ p)
 
 
-result : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Result c̅
-result (id g) = success (_ ∎) id
-result (⊥ g₁ g₂ p) = fail (_ ∎)
-result (c̅ ⨾ c) with result c̅
-... | success c̅′↠c̅″ id with c
-result (_ ⨾ c) | success c̅′↠c̅″ id | id g   =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id id ⟩ _ ∎)) id
-result (_ ⨾ c) | success c̅′↠c̅″ id | ↑     =
-  success (plug-cong c̅′↠c̅″) (up id)
-result (_ ⨾ c) | success c̅′↠c̅″ id | ℓ !    =
-  success (plug-cong c̅′↠c̅″) (inj id)
-result (_ ⨾ c) | success c̅′↠c̅″ id | ℓ ?? p =
-  success (plug-cong c̅′↠c̅″) id⨾?
-result (_ ⨾ c) | success c̅′↠c̅″ id⨾? with c
-result (_ ⨾ c) | success c̅′↠c̅″ id⨾? | id _ =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id id⨾? ⟩ _ ∎)) id⨾?
-result (_ ⨾ c) | success c̅′↠c̅″ id⨾? | ↑   =
-  success (plug-cong c̅′↠c̅″) (up id⨾?)
-result (_ ⨾ c) | success c̅′↠c̅″ id⨾? | ℓ₁ ! =
-  success (plug-cong c̅′↠c̅″) (inj id⨾?)
-result (_ ⨾ c) | success c̅′↠c̅″ (inj v) with c
-result (_ ⨾ c) | success c̅′↠c̅″ (inj v) | id ⋆ =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id (inj v) ⟩ _ ∎)) (inj v)
-result (_ ⨾ c) | success c̅′↠c̅″ (inj {ℓ = low}  v) | low  ?? p =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-id v ⟩ _ ∎)) v
-result (_ ⨾ c) | success c̅′↠c̅″ (inj {ℓ = high} v) | high ?? p =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-id v ⟩ _ ∎)) v
-result (_ ⨾ c) | success c̅′↠c̅″ (inj {ℓ = low}  v) | high ?? p =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-↑ v ⟩ _ ∎)) (up v)
-result (_ ⨾ c) | success c̅′↠c̅″ (inj {ℓ = high} v) | low  ?? p =
-  fail (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-⊥ v ⟩ _ ∎))
-result (_ ⨾ c) | success c̅′↠c̅″ (up v) with c
-result (_ ⨾ c) | success c̅′↠c̅″ (up v) | id (l high) =
-  success (↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id (up v) ⟩ _ ∎)) (up v)
-result (_ ⨾ c) | success c̅′↠c̅″ (up v) | high !      =
-  success (plug-cong c̅′↠c̅″) (inj (up v))
-result (_ ⨾ c) | fail c̅′↠⊥ =
-  fail (↠-trans (plug-cong c̅′↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎))
+_⇓_ : ∀ {g₁ g₂} → (c̅ d̅ : CExpr g₁ ⇒ g₂) → Set
+c̅ ⇓ d̅ = (c̅ —↠ d̅) × CResult d̅
+
+
+result : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → ∃[ d̅ ] c̅ ⇓ d̅
+result (id g) = ⟨ _ , _ ∎ , success id ⟩
+result (⊥ g₁ g₂ p) = ⟨ _ , _ ∎ , fail ⟩
+result (c̅ ⨾ c)
+  with result c̅
+... | ⟨ _ , c̅′↠c̅″ , success id ⟩
+  with c
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id ⟩ | id g   =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id id ⟩ _ ∎) , success id ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id ⟩ | ↑     =
+  ⟨ _ , plug-cong c̅′↠c̅″ , success (up id) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id ⟩ | ℓ !    =
+  ⟨ _ , plug-cong c̅′↠c̅″ , success (inj id) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id ⟩ | ℓ ?? p =
+  ⟨ _ , plug-cong c̅′↠c̅″ , success id⨾? ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id⨾? ⟩
+  with c
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id⨾? ⟩ | id _ =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id id⨾? ⟩ _ ∎) , success id⨾? ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id⨾? ⟩ | ↑   =
+  ⟨ _ , plug-cong c̅′↠c̅″ , success (up id⨾?) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success id⨾? ⟩ | ℓ₁ ! =
+  ⟨ _ , plug-cong c̅′↠c̅″ , success (inj id⨾?) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (inj v) ⟩
+  with c
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (inj v) ⟩ | id ⋆ =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id (inj v) ⟩ _ ∎) , success (inj v) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (inj {ℓ = low}  v) ⟩ | low  ?? p =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-id v ⟩ _ ∎) , success v ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (inj {ℓ = high} v) ⟩ | high ?? p =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-id v ⟩ _ ∎) , success v ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (inj {ℓ = low}  v) ⟩ | high ?? p =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-↑ v ⟩ _ ∎) , success (up v) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (inj {ℓ = high} v) ⟩ | low  ?? p =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ ?-⊥ v ⟩ _ ∎) , fail ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (up v) ⟩
+  with c
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (up v) ⟩ | id (l high) =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠c̅″) (_ —→⟨ id (up v) ⟩ _ ∎) , success (up v) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (up v) ⟩ | high !      =
+  ⟨ _ , plug-cong c̅′↠c̅″ , success (inj (up v)) ⟩
+result (_ ⨾ c) | ⟨ _ , c̅′↠⊥ , fail ⟩ =
+  ⟨ _ , ↠-trans (plug-cong c̅′↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , fail ⟩
