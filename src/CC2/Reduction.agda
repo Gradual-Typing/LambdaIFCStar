@@ -113,10 +113,10 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
     → if ($ true) A ℓ M N ∣ μ ∣ ⟨ PC , v ⟩ —→
          prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ M A ∣ μ
 
-  if-true-cast : ∀ {A M N μ PC} {v}
-      ------------------------------------------------------------------------ IfTrueCast
-    → if ($ true ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
-         prot (stampₑ PC v high) (success (stampₑ-LVal v)) high M A ∣ μ
+  β-if-false : ∀ {A ℓ M N μ PC} {v}
+      ------------------------------------------------------------- IfFalse
+    → if ($ false) A ℓ M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+         prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ N A ∣ μ
 
   β-if!-true : ∀ {A ℓ gc M N μ PC PC′} {v}
     → ⊢ PC ⇐ gc
@@ -124,6 +124,23 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
     → (r : LResult PC′)
       ---------------------------------------------------------------------------- If!True
     → if! ($ true) A (l ℓ) M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ M A ∣ μ
+
+  β-if!-false : ∀ {A ℓ gc M N μ PC PC′} {v}
+    → ⊢ PC ⇐ gc
+    → stampₑ PC v ℓ ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
+    → (r : LResult PC′)
+      ---------------------------------------------------------------------------- If!False
+    → if! ($ false) A (l ℓ) M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ N A ∣ μ
+
+  if-true-cast : ∀ {A M N μ PC} {v}
+      ------------------------------------------------------------------------ IfTrueCast
+    → if ($ true ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+         prot (stampₑ PC v high) (success (stampₑ-LVal v)) high M A ∣ μ
+
+  if-false-cast : ∀ {A M N μ PC} {v}
+      ------------------------------------------------------------------------ IfFalseCast
+    → if ($ false ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ ⟨ PC , v ⟩ —→
+         prot (stampₑ PC v high) (success (stampₑ-LVal v)) high N A ∣ μ
 
   if!-true-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′} {v}
     → (𝓋 : CVal c̅ₙ)
@@ -134,6 +151,16 @@ data _∣_∣_—→_∣_ : Term → Heap → ∃[ PC ] LVal PC → Term → Hea
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ If!TrueCast
     → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ′ M A ∣ μ
+
+  if!-false-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′} {v}
+    → (𝓋 : CVal c̅ₙ)
+    → l ℓ ≢ g
+    → ⊢ PC ⇐ gc
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       stampₑ PC v ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
+    → (r : LResult PC′)
+      ------------------------------------------------------------------------------ If!FalseCast
+    → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ ⟨ PC , v ⟩ —→ prot PC′ r ℓ′ N A ∣ μ
 
   β-let : ∀ {V A N μ PC} {v}
     → Value V
