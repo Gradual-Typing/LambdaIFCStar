@@ -15,7 +15,7 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import CoercionExpr.CoercionExpr
-  hiding (Progress; progress; plug-cong; ↠-trans)
+  hiding (Progress; progress; plug-cong; ↠-trans; _∎; _—→⟨_⟩_)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
@@ -131,35 +131,14 @@ preserve (⊢cast ⊢M) (cast x x₁) = ⊢cast ⊢l
 preserve (⊢cast ⊢M) (blame _) = ⊢blame
 preserve (⊢cast ⊢M) (comp _) = ⊢cast ⊢l
 
+open import Common.MultiStep ⊤ (λ {tt tt → LExpr}) _—→ₑ_ public
+  renaming (_—↠_ to _—↠ₑ_; ↠-trans to ↠ₑ-trans)
 
-infix  2 _—↠ₑ_
-infixr 2 _—→⟨_⟩_
-infix  3 _∎
-
-data _—↠ₑ_ : ∀ (M N : LExpr) → Set where
-  _∎ : ∀ M → M —↠ₑ M
-
-  _—→⟨_⟩_ : ∀ L {M N : LExpr}
-    → L —→ₑ M
-    → M —↠ₑ N
-      ---------------
-    → L —↠ₑ N
-
-plug-congₑ : ∀ {g₁ g₂} {M N } {c̅ : CExpr g₁ ⇒ g₂}
+plug-congₑ : ∀ {g₁ g₂} {M N : LExpr} {c̅ : CExpr g₁ ⇒ g₂}
   → M —↠ₑ N
   → M ⟪ c̅ ⟫ —↠ₑ N ⟪ c̅ ⟫
 plug-congₑ (M ∎) = (M ⟪ _ ⟫) ∎
 plug-congₑ (M —→⟨ M→L ⟩ L↠N) = M ⟪ _ ⟫ —→⟨ ξ M→L ⟩ (plug-congₑ L↠N)
-
-↠ₑ-trans : ∀ {L M N}
-  → L —↠ₑ M
-  → M —↠ₑ N
-  → L —↠ₑ N
-↠ₑ-trans (L ∎) (._ ∎) = L ∎
-↠ₑ-trans (L ∎) (.L —→⟨ M→ ⟩ ↠N) = L —→⟨ M→ ⟩ ↠N
-↠ₑ-trans (L —→⟨ L→ ⟩ ↠M) (M ∎) = L —→⟨ L→ ⟩ ↠M
-↠ₑ-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) =
-  L —→⟨ L→ ⟩ ↠ₑ-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
 preserve-mult : ∀ {g} {M N} → ⊢ M ⇐ g → M —↠ₑ N → ⊢ N ⇐ g
 preserve-mult ⊢M (_ ∎) = ⊢M

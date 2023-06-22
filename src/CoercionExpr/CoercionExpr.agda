@@ -102,35 +102,14 @@ data _—→_ : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → CExpr g₁ ⇒ g₂ 
       -----------------------------------------------
     → c̅ ⨾ (high !) ⨾ (low ?? p)  —→ ⊥ g (l low) p
 
-infix  2 _—↠_
-infixr 2 _—→⟨_⟩_
-infix  3 _∎
 
-data _—↠_ : ∀ {g₁ g₂} (c̅₁ c̅₂ : CExpr g₁ ⇒ g₂) → Set where
-  _∎ : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂)
-      ---------------
-    → c̅ —↠ c̅
-
-  _—→⟨_⟩_ : ∀ {g₁ g₂} (c̅₁ : CExpr g₁ ⇒ g₂) {c̅₂ c̅₃}
-    → c̅₁ —→ c̅₂
-    → c̅₂ —↠ c̅₃
-      ---------------
-    → c̅₁ —↠ c̅₃
+open import Common.MultiStep Label (CExpr_⇒_) _—→_ public
 
 plug-cong : ∀ {g₁ g₂ g₃} {M N : CExpr g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
   → M —↠ N
   → M ⨾ c —↠ N ⨾ c
 plug-cong (M ∎) = (M ⨾ _) ∎
 plug-cong (M —→⟨ M→L ⟩ L↠N) = M ⨾ _ —→⟨ ξ M→L ⟩ (plug-cong L↠N)
-
-↠-trans : ∀ {g₁ g₂} {L M N : CExpr g₁ ⇒ g₂}
-  → L —↠ M
-  → M —↠ N
-  → L —↠ N
-↠-trans (L ∎) (._ ∎) = L ∎
-↠-trans (L ∎) (.L —→⟨ M→ ⟩ ↠N) = L —→⟨ M→ ⟩ ↠N
-↠-trans (L —→⟨ L→ ⟩ ↠M) (M ∎) = L —→⟨ L→ ⟩ ↠M
-↠-trans (L —→⟨ L→ ⟩ ↠M) (M —→⟨ M→ ⟩ ↠N) = L —→⟨ L→ ⟩ ↠-trans ↠M (M —→⟨ M→ ⟩ ↠N)
 
 
 data Progress : ∀ {g₁ g₂} → (c̅ : CExpr g₁ ⇒ g₂) → Set where

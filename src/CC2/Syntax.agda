@@ -10,7 +10,8 @@ open import Common.BlameLabels
 open import Common.Coercions public
 open import LabelExpr.LabelExpr
   renaming (blame to bl; Irreducible to Ir;
-            Progress to Progressₑ; progress to progressₑ) public
+            Progress to Progressₑ; progress to progressₑ)
+  hiding (_∎; _—→⟨_⟩_) public
 open import Memory.Addr
 
 

@@ -12,7 +12,7 @@ open import Common.Utils
 open import Common.Types
 open import Common.BlameLabels
 open import CoercionExpr.CoercionExpr
-  renaming (_—→_ to _—→ₗ_; _—↠_ to _—↠ₗ_) public
+  renaming (_—→_ to _—→ₗ_; _—↠_ to _—↠ₗ_; plug-cong to plug-congₗ) public
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ) public
 open import CoercionExpr.Stamping
 open import CoercionExpr.SyntacComp renaming (_⨟_ to _⊹⊹_)
