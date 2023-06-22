@@ -17,36 +17,7 @@ open import CC2.Frame public
 open import Memory.Heap Term Value
 
 
-infix 2 _—→_
-
-data _—→_ : Term → Term → Set where
-
-  cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂}
-    → RawValue Vᵣ
-    → c̅ —↠ₗ c̅ₙ
-    → CVal c̅ₙ
-      ----------------------------------------------------------- Cast
-    → Vᵣ ⟨ cast cᵣ c̅ ⟩ —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩
-
-  cast-blame : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂} {p}
-    → RawValue Vᵣ
-    → c̅ —↠ₗ ⊥ g₁ g₂ p
-      ----------------------------------------------------------- CastBlame
-    → Vᵣ ⟨ cast cᵣ c̅ ⟩ —→ blame p
-
-  cast-id : ∀ {ι g} {k : rep ι}
-      ----------------------------------------------------------- CastId
-    → $ k ⟨ cast (id ι) (id g) ⟩ —→ $ k
-
-  cast-comp : ∀ {Vᵣ A B C} {cᵢ : Cast A ⇒ B} {d : Cast B ⇒ C}
-    → RawValue Vᵣ
-    → Irreducible cᵢ
-      ----------------------------------------------------------- CastComposition
-    → Vᵣ ⟨ cᵢ ⟩ ⟨ d ⟩ —→ Vᵣ ⟨ cᵢ ⨟ d ⟩
-
-open import Common.MultiStep ⊤ (λ {tt tt → Term}) _—→_ public
-
-
+open import CC2.CastReduction public
 
 infix 2 _∣_∣_—→_∣_
 

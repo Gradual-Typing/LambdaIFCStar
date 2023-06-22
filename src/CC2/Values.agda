@@ -139,3 +139,10 @@ stamp-val-low (V-cast v (ir-fun (up id))) ⊢V = refl
 ⊢value-pc (⊢lam ⊢N) (V-raw V-ƛ) = ⊢lam ⊢N
 ⊢value-pc ⊢const (V-raw V-const) = ⊢const
 ⊢value-pc (⊢cast ⊢V) (V-cast v i) = ⊢cast (⊢value-pc ⊢V (V-raw v))
+
+
+data Result : Term → Set where
+
+  success : ∀ {V} → Value V → Result V
+
+  fail : ∀ {p} → Result (blame p)
