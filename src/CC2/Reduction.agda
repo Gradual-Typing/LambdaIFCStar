@@ -242,9 +242,48 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
          $ tt ∣ cons-μ (a⟦ ℓ̂₁ ⟧ n) W w μ
 
   assign-blame : ∀ {S T ℓ̂₁ ℓ̂₂ ℓ₁ ℓ₂ V n} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
-                  {c : Cast T of l ℓ̂₂ ⇒ S of l ℓ̂₁} {d : Cast S of l ℓ̂₁ ⇒ T of l ℓ̂₂} {μ PC} {p}
+                {c : Cast T of l ℓ̂₂ ⇒ S of l ℓ̂₁} {d : Cast S of l ℓ̂₁ ⇒ T of l ℓ̂₂} {μ PC p}
     → (v : Value V)
     → (𝓋 : CVal c̅ₙ)
     → V ⟨ c ⟩ —↠ blame p
       ---------------------------------------------------------------------------- AssignBlame
     → assign (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ℓ̂₂ ℓ₂ ∣ μ ∣ PC —→ blame p ∣ μ
+
+  assign?-cast : ∀ {S T ℓ̂ ĝ ℓ g gc V W n} {c̅ₙ : CExpr l ℓ ⇒ g}
+              {c : Cast T of ĝ ⇒ S of l ℓ̂} {d : Cast S of l ℓ̂ ⇒ T of ĝ} {μ PC PC′ p}
+    → (v  : Value V)
+    → (vc : LVal PC)
+    → (𝓋  : CVal c̅ₙ)
+    → ⊢ PC ⇐ gc
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       (stampₑ PC vc ℓ) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
+    → LVal PC′
+    → V ⟨ c ⟩ —↠ W
+    → (w : Value W)
+      ---------------------------------------------------------------------- Assign?
+    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→
+         $ tt ∣ cons-μ (a⟦ ℓ̂ ⟧ n) W w μ
+
+  assign?-blame-pc : ∀ {S T ℓ̂ ĝ ℓ g gc V n} {c̅ₙ : CExpr l ℓ ⇒ g}
+       {c : Cast T of ĝ ⇒ S of l ℓ̂} {d : Cast S of l ℓ̂ ⇒ T of ĝ} {μ PC p}
+    → (v  : Value V)
+    → (vc : LVal PC)
+    → (𝓋  : CVal c̅ₙ)
+    → ⊢ PC ⇐ gc
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       (stampₑ PC vc ℓ) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ bl p
+      --------------------------------------------------------------------------- Assign?BlamePC
+    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→ blame p ∣ μ
+
+  assign?-blame : ∀ {S T ℓ̂ ĝ ℓ g gc V n} {c̅ₙ : CExpr l ℓ ⇒ g}
+              {c : Cast T of ĝ ⇒ S of l ℓ̂} {d : Cast S of l ℓ̂ ⇒ T of ĝ} {μ PC PC′ p q}
+    → (v  : Value V)
+    → (vc : LVal PC)
+    → (𝓋  : CVal c̅ₙ)
+    → ⊢ PC ⇐ gc
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       (stampₑ PC vc ℓ) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
+    → LVal PC′
+    → V ⟨ c ⟩ —↠ blame q
+      ---------------------------------------------------------------------------- Assign?Blame
+    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→ blame q ∣ μ
