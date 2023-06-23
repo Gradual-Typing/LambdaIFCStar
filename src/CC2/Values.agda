@@ -18,6 +18,7 @@ open import CC2.Typing
 data Err : Term → Set where
   E-error : ∀ {p} → Err (blame p)
 
+
 data RawValue : Term → Set where
   V-addr  : ∀ {n} → RawValue (addr n)
   V-ƛ     : ∀ {N} → RawValue (ƛ N)
@@ -28,6 +29,12 @@ data Value : Term → Set where
   V-cast  : ∀ {A B V} {c : Cast A ⇒ B}
     → RawValue V → Irreducible c → Value (V ⟨ c ⟩)
   V-●    : Value ●
+
+
+data Result : Term → Set where
+  success : ∀ {V} → Value V → Result V
+  fail    : ∀ {p}            → Result (blame p)
+
 
 {- I don't think we need the value canonical form lemmas anymore -}
 -- data Fun : Term → HeapContext → Type → Set where
@@ -139,10 +146,3 @@ stamp-val-low (V-cast v (ir-fun (up id))) ⊢V = refl
 ⊢value-pc (⊢lam ⊢N) (V-raw V-ƛ) = ⊢lam ⊢N
 ⊢value-pc ⊢const (V-raw V-const) = ⊢const
 ⊢value-pc (⊢cast ⊢V) (V-cast v i) = ⊢cast (⊢value-pc ⊢V (V-raw v))
-
-
-data Result : Term → Set where
-
-  success : ∀ {V} → Value V → Result V
-
-  fail : ∀ {p} → Result (blame p)
