@@ -51,7 +51,7 @@ cast-sn : ∀ {Σ A B V} {c : Cast A ⇒ B}
     ----------------------------------------
   → ∃[ M ] (V ⟨ c ⟩ —↠ M) × Result M
 cast-sn {V = addr n} {c = cast (ref c d) c̅} (V-raw V-addr) (⊢addr eq)
-  with result c̅
+  with cexpr-sn c̅
 ... | ⟨ c̅ₙ , c̅↠c̅ₙ , success 𝓋 ⟩ =
   ⟨ addr n ⟨ cast (ref c d) c̅ₙ ⟩ ,
     _ —→⟨ cast V-addr c̅↠c̅ₙ 𝓋 ⟩ _ ∎ ,
@@ -59,7 +59,7 @@ cast-sn {V = addr n} {c = cast (ref c d) c̅} (V-raw V-addr) (⊢addr eq)
 ... | ⟨ ⊥ _ _ p , c̅↠⊥ , fail ⟩ =
   ⟨ blame p , _ —→⟨ cast-blame V-addr c̅↠⊥ ⟩ _ ∎ , fail ⟩
 cast-sn {V = ƛ N} {c = cast (fun d̅ c d) c̅} (V-raw V-ƛ) (⊢lam ⊢N)
-  with result c̅
+  with cexpr-sn c̅
 ... | ⟨ c̅ₙ , c̅↠c̅ₙ , success 𝓋 ⟩ =
   ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩ ,
     _ —→⟨ cast V-ƛ c̅↠c̅ₙ 𝓋 ⟩ _ ∎ ,
@@ -67,7 +67,7 @@ cast-sn {V = ƛ N} {c = cast (fun d̅ c d) c̅} (V-raw V-ƛ) (⊢lam ⊢N)
 ... | ⟨ ⊥ _ _ p , c̅↠⊥ , fail ⟩ =
   ⟨ blame p , _ —→⟨ cast-blame V-ƛ c̅↠⊥ ⟩ _ ∎ , fail ⟩
 cast-sn {V = $ k} {c = cast (id ι) c̅} (V-raw V-const) ⊢const
-  with result c̅
+  with cexpr-sn c̅
 ... | ⟨ c̅ₙ , c̅↠c̅ₙ , success id ⟩ =
   ⟨ $ k , _ —→⟨ cast V-const c̅↠c̅ₙ id ⟩ _ —→⟨ cast-id ⟩ _ ∎ ,
     success (V-raw V-const) ⟩

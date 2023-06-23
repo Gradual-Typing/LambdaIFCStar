@@ -112,7 +112,7 @@ progress (⊢cast {c̅ = c̅} ⊢M) =
   (done v) →
     case ⟨ v , ⊢M ⟩ of λ where
     ⟨ v-l , ⊢l ⟩ →
-      case result c̅ of λ where
+      case cexpr-sn c̅ of λ where
       ⟨ d̅ , c̅↠d̅ , success 𝓋 ⟩ → step (cast c̅↠d̅ 𝓋)
       ⟨ _ , c̅↠⊥ , fail      ⟩ → step (blame c̅↠⊥)
     ⟨ v-cast {c̅ = c̅′} i , ⊢cast _ ⟩ → step (comp i)

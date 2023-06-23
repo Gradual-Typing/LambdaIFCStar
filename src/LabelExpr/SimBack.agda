@@ -19,7 +19,8 @@ open import Common.BlameLabels
 open import LabelExpr.LabelExpr
 open import LabelExpr.CatchUpBack
 
-open import CoercionExpr.CoercionExpr hiding (Progress; progress; plug-cong; ↠-trans)
+open import CoercionExpr.CoercionExpr
+  hiding (_—→⟨_⟩_; _∎; Progress; progress; plug-cong; ↠-trans)
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.GG renaming (catchup-back to catchup-backₗ; sim-back to sim-backₗ)
