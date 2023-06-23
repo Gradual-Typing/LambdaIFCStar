@@ -88,14 +88,14 @@
                    ℓv ⋎ ℓ ≼ ℓv′
                    B = stamp A ℓ
 -------------------------------------------------------- Protect
-          Γ ; Σ ; gc ; ℓv ⊢ ⦃ pc ⦄ M ⟪ ℓ ⟫ ⇐ B
+          Γ ; Σ ; gc ; ℓv ⊢ prot pc ℓ M ⇐ B
 
 
             ∀ ℓv. Γ ; Σ ; gc′ ; ℓv ⊢ M ⇐ A
          ⊢ c̅ : gc″ ⇒ gc′   gc ⋎̃ ℓ ≾ gc″
                    B = stamp A ℓ
 --------------------------------------------------- ProtectCast
-        Γ ; Σ ; gc ; ℓv ⊢ { c̅ } M ⟪ ℓ ⟫ ⇐ B
+        Γ ; Σ ; gc ; ℓv ⊢ prot-cast c̅ ℓ M ⇐ B
 
 
    Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A   c : A ⇒ B
