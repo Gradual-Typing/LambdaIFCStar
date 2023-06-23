@@ -17,7 +17,7 @@ open import Common.BlameLabels
 
 open import LabelExpr.LabelExpr
 
-open import CoercionExpr.CoercionExpr
+open import CoercionExpr.CoercionExpr hiding (_—→⟨_⟩_; _∎)
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.CatchUp renaming (catchup to catchupₗ)

@@ -18,7 +18,7 @@ open import Common.BlameLabels
 open import LabelExpr.LabelExpr
 open import LabelExpr.CatchUp
 
-open import CoercionExpr.CoercionExpr
+open import CoercionExpr.CoercionExpr renaming (_—→⟨_⟩_ to _—→ₗ⟨_⟩_; _∎ to _∎ₗ)
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.GG hiding (sim) renaming (catchup to catchupₗ)
@@ -120,7 +120,7 @@ sim-castr M⊑M′ (⊑-id g⊑ℓ) β-id
 sim-castr M⊑M′ g⊑c̅′ (cast c̅′↠c̅ₙ 𝓋′) =
   let id⊑c̅′ = ⊑-right-expand g⊑c̅′ in
   case sim-mult id⊑c̅′ 𝓋′ c̅′↠c̅ₙ of λ where
-  ⟨ _ , _ , _ ∎ , id⊑c̅ₙ ⟩ →
+  ⟨ _ , _ , _ ∎ₗ , id⊑c̅ₙ ⟩ →
     ⟨ _ , _ ∎ , ⊑-castr M⊑M′ (⊑-right-contract id⊑c̅ₙ) ⟩
 sim-castr M⊑M′ g⊑c̅′ (blame _) =
   ⟨ _ , _ ∎ , ⊑-blame (proj₁ (prec→⊢ M⊑M′)) (proj₂ (prec-right→⊑ _ g⊑c̅′)) ⟩
