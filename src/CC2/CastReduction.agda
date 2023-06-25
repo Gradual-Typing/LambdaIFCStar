@@ -21,7 +21,7 @@ data _—→_ : Term → Term → Set where
 
   cast : ∀ {Vᵣ S T g₁ g₂} {cᵣ : Castᵣ S ⇒ T} {c̅ c̅ₙ : CExpr g₁ ⇒ g₂}
     → RawValue Vᵣ
-    → c̅ —↠ₗ c̅ₙ
+    → c̅ —→⁺ c̅ₙ
     → CVal c̅ₙ
       ----------------------------------------------------------- Cast
     → Vᵣ ⟨ cast cᵣ c̅ ⟩ —→ Vᵣ ⟨ cast cᵣ c̅ₙ ⟩
@@ -44,7 +44,6 @@ data _—→_ : Term → Term → Set where
 
 open import Common.MultiStep ⊤ (λ {tt tt → Term}) _—→_ public
 
-
 cast-sn : ∀ {Σ A B V} {c : Cast A ⇒ B}
   → Value V
   → [] ; Σ ; l low ; low ⊢ V ⇐ A
@@ -52,9 +51,12 @@ cast-sn : ∀ {Σ A B V} {c : Cast A ⇒ B}
   → ∃[ M ] (V ⟨ c ⟩ —↠ M) × Result M
 cast-sn {V = addr n} {c = cast (ref c d) c̅} (V-raw V-addr) (⊢addr eq)
   with cexpr-sn c̅
-... | ⟨ c̅ₙ , c̅↠c̅ₙ , success 𝓋 ⟩ =
+... | ⟨ c̅ₙ , c̅ₙ ∎ₗ , success 𝓋 ⟩ =
+  ⟨ addr n ⟨ cast (ref c d) c̅ₙ ⟩ , _ ∎ ,
+    success (V-cast V-addr (ir-ref 𝓋)) ⟩
+... | ⟨ c̅ₙ , c̅ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ , success 𝓋 ⟩ =
   ⟨ addr n ⟨ cast (ref c d) c̅ₙ ⟩ ,
-    _ —→⟨ cast V-addr c̅↠c̅ₙ 𝓋 ⟩ _ ∎ ,
+    _ —→⟨ cast V-addr (c̅ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ) 𝓋 ⟩ _ ∎ ,
     success (V-cast V-addr (ir-ref 𝓋)) ⟩
 ... | ⟨ ⊥ _ _ p , c̅↠⊥ , fail ⟩ =
   ⟨ blame p , _ —→⟨ cast-blame V-addr c̅↠⊥ ⟩ _ ∎ , fail ⟩
@@ -62,22 +64,25 @@ cast-sn {V = ƛ N} {c = cast (fun d̅ c d) c̅} (V-raw V-ƛ) (⊢lam ⊢N)
   with cexpr-sn c̅
 ... | ⟨ c̅ₙ , c̅↠c̅ₙ , success 𝓋 ⟩ =
   ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩ ,
-    _ —→⟨ cast V-ƛ c̅↠c̅ₙ 𝓋 ⟩ _ ∎ ,
+    _ —→⟨ cast V-ƛ {!!} 𝓋 ⟩ _ ∎ ,
     success (V-cast V-ƛ (ir-fun 𝓋)) ⟩
 ... | ⟨ ⊥ _ _ p , c̅↠⊥ , fail ⟩ =
   ⟨ blame p , _ —→⟨ cast-blame V-ƛ c̅↠⊥ ⟩ _ ∎ , fail ⟩
 cast-sn {V = $ k} {c = cast (id ι) c̅} (V-raw V-const) ⊢const
   with cexpr-sn c̅
-... | ⟨ c̅ₙ , c̅↠c̅ₙ , success id ⟩ =
-  ⟨ $ k , _ —→⟨ cast V-const c̅↠c̅ₙ id ⟩ _ —→⟨ cast-id ⟩ _ ∎ ,
+... | ⟨ c̅ₙ , c̅ ∎ₗ , success id ⟩ =
+  ⟨ $ k , _ —→⟨ cast-id ⟩ _ ∎ ,
+    success (V-raw V-const) ⟩
+... | ⟨ c̅ₙ , c̅ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ , success id ⟩ =
+  ⟨ $ k , _ —→⟨ cast V-const (c̅ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ) id ⟩ _ —→⟨ cast-id ⟩ _ ∎ ,
     success (V-raw V-const) ⟩
 ... | ⟨ c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ =
   ⟨ $ k ⟨ cast (id ι) c̅ₙ ⟩ ,
-    _ —→⟨ cast V-const c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎ ,
+    _ —→⟨ cast V-const {!!} (inj 𝓋) ⟩ _ ∎ ,
     success (V-cast V-const (ir-base (inj 𝓋) (λ ()))) ⟩
 ... | ⟨ c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ =
   ⟨ $ k ⟨ cast (id ι) c̅ₙ ⟩ ,
-    _ —→⟨ cast V-const c̅↠c̅ₙ (up id) ⟩ _ ∎ ,
+    _ —→⟨ cast V-const {!!} (up id) ⟩ _ ∎ ,
     success (V-cast V-const (ir-base (up id) (λ ()))) ⟩
 ... | ⟨ ⊥ _ _ p , c̅↠⊥ , fail ⟩ =
   ⟨ blame p , _ —→⟨ cast-blame V-const c̅↠⊥ ⟩ _ ∎ , fail ⟩

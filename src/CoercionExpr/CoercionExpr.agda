@@ -105,6 +105,13 @@ data _—→_ : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → CExpr g₁ ⇒ g₂ 
 
 open import Common.MultiStep Label (CExpr_⇒_) _—→_ public
 
+data _—→⁺_ : ∀ {g₁ g₂} (M N : CExpr g₁ ⇒ g₂) → Set where
+
+  _—→⟨_⟩_ : ∀ {g₁ g₂} (L : CExpr g₁ ⇒ g₂) {M N}
+    → L —→ M
+    → M —↠ N
+    → L —→⁺ N
+
 plug-cong : ∀ {g₁ g₂ g₃} {M N : CExpr g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
   → M —↠ N
   → M ⨾ c —↠ N ⨾ c
