@@ -100,32 +100,6 @@ progress {M = app! L M A B g} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
             step (app!-cast w vc 𝓋 ⊢PC ↠PC′ r V⟨c⟩↠V′ v′)
 progress v ⊢PC ⊢M ⊢μ = {!!}
--- progress pc (app? L M p) (⊢app? ⊢L ⊢M) μ ⊢μ =
---   case progress pc L ⊢L μ ⊢μ of λ where
---   (step L→L′) → step (ξ {F = app?□ M p} L→L′)
---   (done v) →
---     case canonical-fun ⊢L v of λ where
---     (Fun-ƛ _ (<:-ty () _))
---     (Fun-proxy f (I-fun (cast (⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ) _ _ _) I-label I-label)
---       (<:-ty <:-⋆ (<:-fun <:-⋆ _ _))) →
---         case nsu? pc ℓ ℓᶜ of λ where
---         (yes nsu-yes) → step (app?-ok (fun-is-value f) nsu-yes)
---         (no  nsu-no)  → step (app?-fail (fun-is-value f) nsu-no)
---   (err (E-error {e})) → step (ξ-err {F = app?□ M p} {e = e})
--- progress pc (app✓ L M) (⊢app✓ ⊢L ⊢M _ _) μ ⊢μ =
---   case progress pc L ⊢L μ ⊢μ of λ where
---   (step L→L′) → step (ξ {F = app✓□ M} L→L′)
---   (done v) →
---     case progress pc M ⊢M μ ⊢μ of λ where
---     (step M→M′) → step (ξ {F = (app✓ L □) v} M→M′)
---     (done w) →
---       case canonical-fun ⊢L v of λ where
---       (Fun-ƛ _ _) → step (β w)
---       (Fun-proxy f (I-fun (cast (⟦ l _ ⟧ _ ⇒ _ of l _) (⟦ l _ ⟧ _ ⇒ _ of l _) _ _) I-label I-label)
---         (<:-ty (<:-l _) (<:-fun (<:-l _) _ _))) →
---         step (fun-cast (fun-is-value f) w)
---     (err (E-error {e})) → step (ξ-err {F = (app✓ L □) v} {e = e})
---   (err (E-error {e})) → step (ξ-err {F = app✓□ M} {e = e})
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
 --   (step L→L′) → step (ξ {F = if□ A M N} L→L′)
