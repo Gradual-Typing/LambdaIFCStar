@@ -73,18 +73,20 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ------------------------------------------------------------------------------ App!
     → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ PC —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
 
-  app-cast : ∀ {N V A B C D gc₁ gc₂ ℓ₁ ℓ₂} {d̅ : CExpr gc₂ ⇒ gc₁} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
+  app-cast : ∀ {N V W A B C D gc₁ gc₂ ℓ₁ ℓ₂} {d̅ : CExpr gc₂ ⇒ gc₁} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′}
     → (v  : Value V)
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
     → (stampₑ PC vc ℓ₂) ⟪ d̅ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
+    → V ⟨ c ⟩ —↠ W
+    → Value W
       ---------------------------------------------------------------------------- AppCast
     → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ PC —→
-         `let (V ⟨ c ⟩) A (prot PC′ r ℓ₂ (N ⟨ d ⟩) D) ∣ μ
+         prot PC′ r ℓ₂ ((N [ W ]) ⟨ d ⟩) D ∣ μ
 
-  app!-cast : ∀ {N V A B C D gc ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ g}
+  app!-cast : ∀ {N V W A B C D gc ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ g}
                 {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′} {gc′}
     → (v  : Value V)
     → (vc : LVal PC)
@@ -93,9 +95,11 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        (stampₑ PC vc ℓ′) ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
+    → V ⟨ c ⟩ —↠ W
+    → Value W
       ---------------------------------------------------------------------------- App!Cast
     → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ PC —→
-         `let (V ⟨ c ⟩) A (prot PC′ r ℓ′ (N ⟨ d ⟩) D) ∣ μ
+         prot PC′ r ℓ′ ((N [ W ]) ⟨ d ⟩) D ∣ μ
 
   β-if-true : ∀ {A ℓ M N μ PC}
     → (v : LVal PC)
