@@ -114,6 +114,27 @@ progress {M = if L A ℓ M N} vc ⊢PC (⊢if ⊢L ⊢M ⊢N eq) ⊢μ =
       step (if-true-cast  vc)
     ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
       step (if-false-cast vc)
+progress {M = if! L A g M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N eq) ⊢μ =
+  case progress vc ⊢PC ⊢L ⊢μ of λ where
+  (step L→L′)  → step (ξ {F = if!□ A g M N} L→L′)
+  (err E-blame) → step (ξ-blame {F = if!□ A g M N})
+  (done (V-raw v)) →
+    case ⟨ v , ⊢L ⟩ of λ where
+    ⟨ V-const {k =  true} , ⊢const ⟩ →
+      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+      ⟨ PC′ , ↠PC′ , r ⟩ →
+        step (β-if!-true  vc ⊢PC ↠PC′ r)
+    ⟨ V-const {k = false} , ⊢const ⟩ →
+      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+      ⟨ PC′ , ↠PC′ , r ⟩ →
+        step (β-if!-false vc ⊢PC ↠PC′ r)
+  (done (V-cast v i)) → {!!}
+    -- case ⟨ v , ⊢L , i ⟩ of λ where
+    -- ⟨ V-const , ⊢cast ⊢const , ir-base id ℓ≢ℓ ⟩ → contradiction refl ℓ≢ℓ
+    -- ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
+    --   step (if-true-cast  vc)
+    -- ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
+    --   step (if-false-cast vc)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
