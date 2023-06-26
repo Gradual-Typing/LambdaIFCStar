@@ -63,8 +63,11 @@ progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
       (step M→M′) → step (ξ {F = app L □ (V-cast v i) A B ℓ} M→M′)
       (err E-blame) → step (ξ-blame {F = app L □ (V-cast v i) A B ℓ})
       (done w) →
-        case cexpr-sn (stampₑ _ vc ℓ ⟪ d̅ ⟫) of λ where
-        _ → step (app-cast w vc 𝓋 {!!} {!!} {!!} {!!})
+        case lexpr-sn (stampₑ _ vc ℓ ⟪ d̅ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+        ⟨ PC′ , ↠PC′ , r ⟩ →
+          case cast-sn {c = c} w ⊢M of λ where
+          ⟨ M , V⟨c⟩↠M , _ ⟩ →
+            step (app-cast w vc 𝓋 ↠PC′ r {!!} {!!})
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (app? L M p) (⊢app? ⊢L ⊢M) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where

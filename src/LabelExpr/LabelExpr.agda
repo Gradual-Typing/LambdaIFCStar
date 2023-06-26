@@ -242,13 +242,13 @@ stampₑ-LVal {V} {ℓ} (v-cast ⟨ 𝓋 , x ⟩) =
   v-cast ⟨ stampₗ-CVal _ 𝓋 ℓ , stamp-not-id 𝓋 x ⟩
 
 
-lexpr-sn : ∀ {A L}
+lexpr-sn : ∀ {A} L
   → ⊢ L ⇐ A
     ----------------------------------------
   → ∃[ M ] (L —↠ₑ M) × LResult M
-lexpr-sn {L = l ℓ} ⊢l = ⟨ l ℓ , _ ∎ , success v-l ⟩
-lexpr-sn (⊢cast {c̅ = c̅} ⊢L) =
-  case lexpr-sn ⊢L of λ where
+lexpr-sn (l ℓ) ⊢l = ⟨ l ℓ , _ ∎ , success v-l ⟩
+lexpr-sn (L ⟪ c̅ ⟫) (⊢cast ⊢L) =
+  case lexpr-sn L ⊢L of λ where
   ⟨ blame p , L↠blame , fail ⟩ →
     ⟨ blame p , ↠ₑ-trans (plug-congₑ L↠blame) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
       fail ⟩
@@ -290,4 +290,4 @@ lexpr-sn (⊢cast {c̅ = c̅} ⊢L) =
         ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
                       (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
           success (v-cast ⟨ inj 𝓋 , (λ ()) ⟩) ⟩
-lexpr-sn {L = blame p} ⊢blame = ⟨ blame p , _ ∎ , fail ⟩
+lexpr-sn (blame p) ⊢blame = ⟨ blame p , _ ∎ , fail ⟩
