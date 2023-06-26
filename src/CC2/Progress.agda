@@ -41,18 +41,30 @@ progress : ∀ {Σ gc A} {PC M μ}
   → Σ ⊢ μ
     ------------------------------------------
   → Progress M μ PC
-progress v ⊢PC (⊢var ())
-progress v ⊢PC ⊢const    ⊢μ = done (V-raw V-const)
-progress v ⊢PC (⊢addr _) ⊢μ = done (V-raw V-addr)
-progress v ⊢PC (⊢lam ⊢M) ⊢μ = done (V-raw V-ƛ)
-progress {M = app L M A B ℓ} v ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
-  case progress v ⊢PC ⊢L ⊢μ of λ where
+progress vc ⊢PC (⊢var ())
+progress _ ⊢PC ⊢const    ⊢μ = done (V-raw V-const)
+progress _ ⊢PC (⊢addr _) ⊢μ = done (V-raw V-addr)
+progress _ ⊢PC (⊢lam ⊢M) ⊢μ = done (V-raw V-ƛ)
+progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
+  case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = app□ M A B ℓ} L→L′)
-  (err E-error) → step (ξ-blame {F = app□ M A B ℓ})
+  (err E-blame) → step (ξ-blame {F = app□ M A B ℓ})
   (done (V-raw v)) →
     case ⟨ v , ⊢L ⟩ of λ where
-    ⟨ V-ƛ , ⊢lam ⊢N ⟩ → {!!}
-  (done (V-cast v i)) → {!!}
+    ⟨ V-ƛ , ⊢lam ⊢N ⟩ →
+      case progress vc ⊢PC ⊢M ⊢μ of λ where
+      (step M→M′) → step (ξ {F = app L □ (V-raw v) A B ℓ} M→M′)
+      (err E-blame) → step (ξ-blame {F = app L □ (V-raw v) A B ℓ})
+      (done w) → step (β w vc)
+  (done (V-cast v i)) →
+    case ⟨ v , ⊢L , i ⟩ of λ where
+    ⟨ V-ƛ , ⊢cast {c = cast (fun d̅ c d) c̅ₙ} (⊢lam ⊢N) , ir-fun 𝓋 ⟩ →
+      case progress vc ⊢PC ⊢M ⊢μ of λ where
+      (step M→M′) → step (ξ {F = app L □ (V-cast v i) A B ℓ} M→M′)
+      (err E-blame) → step (ξ-blame {F = app L □ (V-cast v i) A B ℓ})
+      (done w) →
+        case cexpr-sn (stampₑ _ vc ℓ ⟪ d̅ ⟫) of λ where
+        _ → step (app-cast w vc 𝓋 {!!} {!!} {!!} {!!})
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (app? L M p) (⊢app? ⊢L ⊢M) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where

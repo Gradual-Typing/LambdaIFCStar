@@ -16,7 +16,7 @@ open import CC2.Typing
 
 
 data Err : Term → Set where
-  E-error : ∀ {p} → Err (blame p)
+  E-blame : ∀ {p} → Err (blame p)
 
 
 data RawValue : Term → Set where
