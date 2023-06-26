@@ -144,6 +144,13 @@ progress {M = `let M A N} vc ⊢PC (⊢let ⊢M ⊢N) ⊢μ =
   (step M→M′)  → step (ξ {F = let□ A N} M→M′)
   (err E-blame) → step (ξ-blame {F = let□ A N})
   (done v)      → step (β-let v)
+progress {M = prot PC′ (success vc′) ℓ M A} vc ⊢PC (⊢prot ⊢M ⊢PC′ _ eq) ⊢μ =
+  case progress vc′ ⊢PC′ ⊢M ⊢μ of λ where
+  (step M→M′)  → step (prot-ctx M→M′)
+  (err E-blame) → step prot-blame
+  (done v)      → step (prot-val v ⊢M)
+progress {M = prot (bl p) fail ℓ M A} vc ⊢PC ⊢prot-blame-pc ⊢μ =
+  step prot-blame-pc
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
