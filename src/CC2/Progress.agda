@@ -99,6 +99,21 @@ progress {M = app! L M A B g} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
             step (app!-blame w 𝓋 V⟨c⟩↠blame)
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
             step (app!-cast w vc 𝓋 ⊢PC ↠PC′ r V⟨c⟩↠V′ v′)
+progress {M = if L A ℓ M N} vc ⊢PC (⊢if ⊢L ⊢M ⊢N eq) ⊢μ =
+  case progress vc ⊢PC ⊢L ⊢μ of λ where
+  (step L→L′)  → step (ξ {F = if□ A ℓ M N} L→L′)
+  (err E-blame) → step (ξ-blame {F = if□ A ℓ M N})
+  (done (V-raw v)) →
+    case ⟨ v , ⊢L ⟩ of λ where
+    ⟨ V-const {k =  true} , ⊢const ⟩ → step (β-if-true  vc)
+    ⟨ V-const {k = false} , ⊢const ⟩ → step (β-if-false vc)
+  (done (V-cast v i)) →
+    case ⟨ v , ⊢L , i ⟩ of λ where
+    ⟨ V-const , ⊢cast ⊢const , ir-base id ℓ≢ℓ ⟩ → contradiction refl ℓ≢ℓ
+    ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
+      step (if-true-cast  vc)
+    ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
+      step (if-false-cast vc)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
