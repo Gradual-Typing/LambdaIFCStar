@@ -70,6 +70,34 @@ progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
             step (app-blame w 𝓋 V⟨c⟩↠blame)
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
             step (app-cast w vc 𝓋 ↠PC′ r V⟨c⟩↠V′ v′)
+progress {M = app! L M A B g} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
+  case progress vc ⊢PC ⊢L ⊢μ of λ where
+  (step L→L′)  → step (ξ {F = app!□ M A B g} L→L′)
+  (err E-blame) → step (ξ-blame {F = app!□ M A B g})
+  (done (V-raw v)) →
+    case ⟨ v , ⊢L ⟩ of λ where
+    ⟨ V-ƛ , ⊢lam ⊢N ⟩ →
+      case progress vc ⊢PC ⊢M ⊢μ of λ where
+      (step M→M′) → step (ξ {F = app! L □ (V-raw v) A B g} M→M′)
+      (err E-blame) → step (ξ-blame {F = app! L □ (V-raw v) A B g})
+      (done w) →
+        case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+        ⟨ PC′ , ↠PC′ , r ⟩ →
+          step (β-app! w vc ⊢PC ↠PC′ r)
+  (done (V-cast v i)) → {!!}
+    -- case ⟨ v , ⊢L , i ⟩ of λ where
+    -- ⟨ V-ƛ , ⊢cast {c = cast (fun d̅ c d) c̅ₙ} (⊢lam ⊢N) , ir-fun 𝓋 ⟩ →
+    --   case progress vc ⊢PC ⊢M ⊢μ of λ where
+    --   (step M→M′) → step (ξ {F = app L □ (V-cast v i) A B ℓ} M→M′)
+    --   (err E-blame) → step (ξ-blame {F = app L □ (V-cast v i) A B ℓ})
+    --   (done w) →
+    --     case lexpr-sn (stampₑ _ vc ℓ ⟪ d̅ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+    --     ⟨ PC′ , ↠PC′ , r ⟩ →
+    --       case cast-sn {c = c} w ⊢M of λ where
+    --       ⟨ blame p , V⟨c⟩↠blame , fail ⟩ →
+    --         step (app-blame w 𝓋 V⟨c⟩↠blame)
+    --       ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
+    --         step (app-cast w vc 𝓋 ↠PC′ r V⟨c⟩↠V′ v′)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (app? L M p) (⊢app? ⊢L ⊢M) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
