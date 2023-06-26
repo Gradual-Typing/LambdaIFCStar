@@ -139,6 +139,11 @@ progress {M = if! L A g M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N eq) ⊢μ =
       case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
       ⟨ PC′ , ↠PC′ , r ⟩ →
         step (if!-false-cast vc 𝓋 x ⊢PC ↠PC′ r)
+progress {M = `let M A N} vc ⊢PC (⊢let ⊢M ⊢N) ⊢μ =
+  case progress vc ⊢PC ⊢M ⊢μ of λ where
+  (step M→M′)  → step (ξ {F = let□ A N} M→M′)
+  (err E-blame) → step (ξ-blame {F = let□ A N})
+  (done v)      → step (β-let v)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
