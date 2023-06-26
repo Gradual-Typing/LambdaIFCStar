@@ -128,13 +128,17 @@ progress {M = if! L A g M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N eq) ⊢μ =
       case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
       ⟨ PC′ , ↠PC′ , r ⟩ →
         step (β-if!-false vc ⊢PC ↠PC′ r)
-  (done (V-cast v i)) → {!!}
-    -- case ⟨ v , ⊢L , i ⟩ of λ where
-    -- ⟨ V-const , ⊢cast ⊢const , ir-base id ℓ≢ℓ ⟩ → contradiction refl ℓ≢ℓ
-    -- ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
-    --   step (if-true-cast  vc)
-    -- ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
-    --   step (if-false-cast vc)
+  (done (V-cast v i)) →
+    case ⟨ v , ⊢L , i ⟩ of λ where
+    ⟨ V-const , ⊢cast ⊢const , ir-base id ℓ≢ℓ ⟩ → contradiction refl ℓ≢ℓ
+    ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
+      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+      ⟨ PC′ , ↠PC′ , r ⟩ →
+        step (if!-true-cast vc 𝓋 x ⊢PC ↠PC′ r)
+    ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
+      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
+      ⟨ PC′ , ↠PC′ , r ⟩ →
+        step (if!-false-cast vc 𝓋 x ⊢PC ↠PC′ r)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
