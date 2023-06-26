@@ -240,3 +240,54 @@ stampₑ-LVal {V} {high} (v-l {low}) = v-cast ⟨ up id , (λ ()) ⟩
 stampₑ-LVal {V} {high} (v-l {high}) = v-l
 stampₑ-LVal {V} {ℓ} (v-cast ⟨ 𝓋 , x ⟩) =
   v-cast ⟨ stampₗ-CVal _ 𝓋 ℓ , stamp-not-id 𝓋 x ⟩
+
+
+lexpr-sn : ∀ {A L}
+  → ⊢ L ⇐ A
+    ----------------------------------------
+  → ∃[ M ] (L —↠ₑ M) × LResult M
+lexpr-sn {L = l ℓ} ⊢l = ⟨ l ℓ , _ ∎ , success v-l ⟩
+lexpr-sn (⊢cast {c̅ = c̅} ⊢L) =
+  case lexpr-sn ⊢L of λ where
+  ⟨ blame p , L↠blame , fail ⟩ →
+    ⟨ blame p , ↠ₑ-trans (plug-congₑ L↠blame) (_ —→⟨ ξ-blame ⟩ _ ∎) ,
+      fail ⟩
+  ⟨ l ℓ , L↠V , success v-l ⟩ →
+    case ⟨ preserve-mult ⊢L L↠V , cexpr-sn c̅ ⟩ of λ where
+    ⟨ ⊢l , ⊥ _ _ q , c̅↠d̅ , fail ⟩ →
+      ⟨ blame q , ↠ₑ-trans (plug-congₑ L↠V)
+                            (_ —→⟨ blame c̅↠d̅ ⟩ _ ∎) ,
+        fail ⟩
+    ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success id ⟩ →
+      ⟨ l ℓ , ↠ₑ-trans (plug-congₑ L↠V)
+                        (_ —→⟨ cast c̅↠c̅ₙ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+        success v-l ⟩
+    ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ →
+      ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
+                              (_ —→⟨ cast c̅↠c̅ₙ (up id) ⟩ _ ∎) ,
+        success (v-cast ⟨ up id , (λ ()) ⟩) ⟩
+    ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ →
+      ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
+                              (_ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
+        success (v-cast ⟨ inj 𝓋 , (λ ()) ⟩) ⟩
+  ⟨ l ℓ ⟪ c̅ᵢ ⟫ , L↠V , success (v-cast i) ⟩ →
+    case preserve-mult ⊢L L↠V of λ where
+    (⊢cast ⊢l) →
+      case cexpr-sn (c̅ᵢ ⨟ c̅) of λ where
+      ⟨ ⊥ _ _ q , c̅↠d̅ , fail ⟩ →
+        ⟨ blame q , ↠ₑ-trans (plug-congₑ L↠V)
+                    (_ —→⟨ comp i ⟩ _ —→⟨ blame c̅↠d̅ ⟩ _ ∎) ,
+          fail ⟩
+      ⟨ c̅ₙ , c̅↠c̅ₙ , success id ⟩ →
+        ⟨ l ℓ , ↠ₑ-trans (plug-congₑ L↠V)
+                (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+          success v-l ⟩
+      ⟨ c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ →
+        ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
+                      (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (up id) ⟩ _ ∎) ,
+          success (v-cast ⟨ up id , (λ ()) ⟩) ⟩
+      ⟨ c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ →
+        ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
+                      (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
+          success (v-cast ⟨ inj 𝓋 , (λ ()) ⟩) ⟩
+lexpr-sn {L = blame p} ⊢blame = ⟨ blame p , _ ∎ , fail ⟩
