@@ -158,8 +158,17 @@ progress {M = ref⟦ ℓ ⟧ M} {μ} vc ⊢PC (⊢ref ⊢M _) ⊢μ =
   (done v)      →
     let ⟨ n , fresh ⟩ = gen-fresh μ in
     step (ref v fresh)
-progress {M = ref?⟦ ℓ ⟧ M p} vc ⊢PC (⊢ref? ⊢M) ⊢μ =
-  {!!}
+progress {M = ref?⟦ ℓ ⟧ M p} {μ} vc ⊢PC (⊢ref? ⊢M) ⊢μ =
+  case progress vc ⊢PC ⊢M ⊢μ of λ where
+  (step M→M′)  → step (ξ {F = ref?⟦ ℓ ⟧□ p} M→M′)
+  (err E-blame) → step (ξ-blame {F = ref?⟦ ℓ ⟧□ p})
+  (done v)      →
+    case lexpr-sn _ (⊢cast ⊢PC) of λ where
+    ⟨ PC′ , ↠PC′ , success vc′ ⟩ →
+      let ⟨ n , fresh ⟩ = gen-fresh μ in
+      step (ref? v fresh ↠PC′ vc′)
+    ⟨ bl q , ↠PC′ , fail ⟩ →
+      step (ref?-blame v ↠PC′)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where

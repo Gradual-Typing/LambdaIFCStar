@@ -196,12 +196,11 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       -------------------------------------------------------------------- Ref?
     → ref?⟦ ℓ ⟧ V p ∣ μ ∣ PC —→ addr n ∣ cons-μ (a⟦ ℓ ⟧ n) V v μ
 
-  ref?-blame : ∀ {ℓ V n p μ PC}
+  ref?-blame : ∀ {ℓ V p q μ PC}
     → (v : Value V)
-    → a⟦ ℓ ⟧ n FreshIn μ
-    → PC ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ —↠ₑ bl p
+    → PC ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ —↠ₑ bl q
       -------------------------------------------------------------------- Ref?Blame
-    → ref?⟦ ℓ ⟧ V p ∣ μ ∣ PC —→ blame p ∣ μ
+    → ref?⟦ ℓ ⟧ V p ∣ μ ∣ PC —→ blame q ∣ μ
 
   deref : ∀ {n T ℓ̂ ℓ V v μ PC}
     → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
