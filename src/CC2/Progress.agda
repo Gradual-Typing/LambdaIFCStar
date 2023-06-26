@@ -151,6 +151,15 @@ progress {M = `let M A N} vc ⊢PC (⊢let ⊢M ⊢N) ⊢μ =
   (step M→M′)  → step (ξ {F = let□ A N} M→M′)
   (err E-blame) → step (ξ-blame {F = let□ A N})
   (done v)      → step (β-let v)
+progress {M = ref⟦ ℓ ⟧ M} {μ} vc ⊢PC (⊢ref ⊢M _) ⊢μ =
+  case progress vc ⊢PC ⊢M ⊢μ of λ where
+  (step M→M′)  → step (ξ {F = ref⟦ ℓ ⟧□} M→M′)
+  (err E-blame) → step (ξ-blame {F = ref⟦ ℓ ⟧□})
+  (done v)      →
+    let ⟨ n , fresh ⟩ = gen-fresh μ in
+    step (ref v fresh)
+progress {M = ref?⟦ ℓ ⟧ M p} vc ⊢PC (⊢ref? ⊢M) ⊢μ =
+  {!!}
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (if L A M N) (⊢if ⊢L ⊢M ⊢N) μ ⊢μ =
 --   case progress pc L ⊢L μ ⊢μ of λ where
