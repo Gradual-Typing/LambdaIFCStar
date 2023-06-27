@@ -169,6 +169,16 @@ progress {M = ref?⟦ ℓ ⟧ M p} {μ} vc ⊢PC (⊢ref? ⊢M) ⊢μ =
       step (ref? v fresh ↠PC′ vc′)
     ⟨ bl q , ↠PC′ , fail ⟩ →
       step (ref?-blame v ↠PC′)
+progress {M = ! M A g} {μ} vc ⊢PC (⊢deref ⊢M x) ⊢μ =
+  case progress vc ⊢PC ⊢M ⊢μ of λ where
+  (step M→M′)  → step (ξ {F = !□ A g} M→M′)
+  (err E-blame) → step (ξ-blame {F = !□ A g})
+  (done (V-raw (V-addr {n}))) →
+    case ⊢M of λ where
+    (⊢addr {ℓ̂ = ℓ̂} eq) →
+      let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
+      step (deref {v = v} eq)
+  (done (V-cast v i)) → {!!}
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (! M) (⊢deref ⊢M) μ ⊢μ =
 --   case progress pc M ⊢M μ ⊢μ of λ where
