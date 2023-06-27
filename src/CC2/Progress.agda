@@ -178,7 +178,11 @@ progress {M = ! M A g} {μ} vc ⊢PC (⊢deref ⊢M x) ⊢μ =
     (⊢addr {ℓ̂ = ℓ̂} eq) →
       let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
       step (deref {v = v} eq)
-  (done (V-cast v i)) → {!!}
+  (done (V-cast v i)) →
+    case ⟨ v , ⊢M , i ⟩ of λ where
+    ⟨ V-addr {n} , ⊢cast (⊢addr {ℓ̂ = ℓ̂} eq) , ir-ref 𝓋 ⟩ →
+      let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
+      step (deref-cast {v = v} 𝓋 eq)
 progress v ⊢PC ⊢M ⊢μ = {!!}
 -- progress pc (! M) (⊢deref ⊢M) μ ⊢μ =
 --   case progress pc M ⊢M μ ⊢μ of λ where
