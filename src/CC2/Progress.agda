@@ -192,6 +192,16 @@ progress {M = assign L M T ℓ̂ ℓ} {μ} vc ⊢PC (⊢assign ⊢L ⊢M _ _) �
     (step M→M′)  → step (ξ {F = assign _ □ (V-raw V-addr) T ℓ̂ ℓ} M→M′)
     (err E-blame) → step (ξ-blame {F = assign _ □ (V-raw V-addr) T ℓ̂ ℓ})
     (done v) → step (β-assign v)
-  (done (V-cast v i)) →
-    {!!}
+  (done (V-cast w i)) →
+    case ⟨ w , ⊢L , i ⟩ of λ where
+    ⟨ V-addr {n} , ⊢cast (⊢addr eq) , ir-ref {c = c} 𝓋 ⟩ →
+      case progress vc ⊢PC ⊢M ⊢μ of λ where
+      (step M→M′)  → step (ξ {F = assign _ □ (V-cast w i) T ℓ̂ ℓ} M→M′)
+      (err E-blame) → step (ξ-blame {F = assign _ □ (V-cast w i) T ℓ̂ ℓ})
+      (done v) →
+        case cast-sn {c = c} v ⊢M of λ where
+        ⟨ blame p , V⟨c⟩↠blame , fail ⟩ →
+          step (assign-blame v 𝓋 V⟨c⟩↠blame)
+        ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
+          step (assign-cast v 𝓋 V⟨c⟩↠V′ v′)
 progress v ⊢PC ⊢M ⊢μ = {!!}
