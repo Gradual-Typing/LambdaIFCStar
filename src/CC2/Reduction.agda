@@ -37,11 +37,10 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ---------------------------------------------------------------------------- ProtectContext
     → prot PC (success v) ℓ M A ∣ μ ∣ PC′ —→ prot PC (success v) ℓ M′ A ∣ μ′
 
-  prot-val : ∀ {Σ gc ℓv V μ PC PC′ A ℓ} {vc}
+  prot-val : ∀ {V μ PC PC′ A ℓ} {vc}
     → (v  : Value V)
-    → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
       ------------------------------------------------------------------------ ProtectValue
-    → prot PC (success vc) ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v ⊢V ℓ ∣ μ
+    → prot PC (success vc) ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v A ℓ ∣ μ
 
   prot-blame : ∀ {μ PC PC′ A ℓ p} {v}
       ------------------------------------------------------------------------ ProtectBlame

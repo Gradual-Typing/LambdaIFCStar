@@ -78,27 +78,48 @@ canonical⋆ (V-raw V-const) ()
 canonical⋆ (V-cast {V = W} {c} w i) (⊢cast ⊢W) = ⟨ _ , c , _ , refl , i , ⊢W ⟩
 
 
-stamp-val : ∀ {Σ gc ℓv A} V → Value V → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A → StaticLabel → Term
-stamp-val (addr n) (V-raw V-addr) ⊢V low = addr n
-stamp-val (addr n) (V-raw V-addr) (⊢addr {T = T} {low} {ℓ̂} x) high =
-  addr n ⟨ cast (coerceᵣ-id (Ref (T of l ℓ̂))) (id (l low) ⨾ ↑) ⟩
-stamp-val (addr n) (V-raw V-addr) (⊢addr {ℓ = high} x) high = addr n
-stamp-val (ƛ N) (V-raw V-ƛ) ⊢V low = ƛ N
-stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {g = g} {A} {B} {ℓ = low} ⊢N) high =
+stamp-val : ∀ V → Value V → (A : Type) → StaticLabel → Term
+stamp-val (addr n) (V-raw V-addr) A low = addr n
+stamp-val (addr n) (V-raw V-addr) (Ref A of l low) high =
+  addr n ⟨ cast (coerceᵣ-id (Ref A)) (id (l low) ⨾ ↑) ⟩
+stamp-val (addr n) (V-raw V-addr) (Ref A of l high) high = addr n
+stamp-val (ƛ N) (V-raw V-ƛ) A low = ƛ N
+stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l low) high =
   ƛ N ⟨ cast (coerceᵣ-id (⟦ g ⟧ A ⇒ B)) (id (l low) ⨾ ↑) ⟩
-stamp-val (ƛ N) (V-raw V-ƛ) (⊢lam {ℓ = high} ⊢N) high = ƛ N
-stamp-val ($ k) (V-raw V-const) ⊢V low = $ k
-stamp-val ($ k) (V-raw V-const) (⊢const {ι = ι} {ℓ = low}) high =
+stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l high) high = ƛ N
+stamp-val ($ k) (V-raw V-const) A low = $ k
+stamp-val ($ k) (V-raw V-const) (` ι of l low) high =
   $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
-stamp-val ($ k) (V-raw V-const) (⊢const {ℓ = high}) high = $ k
-stamp-val (V ⟨ c ⟩) (V-cast v i) ⊢V ℓ = V ⟨ stamp-ir c i ℓ ⟩
+stamp-val ($ k) (V-raw V-const) (` ι of l high) high = $ k
+stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
+-- other impossible cases suppose ⊢ V ⇐ A
+stamp-val V v A ℓ = ●
+
+stamp-val-wt : ∀ {Σ gc ℓv A V ℓ}
+  → (v : Value V)
+  → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
+    -------------------------------------------------------------
+  → [] ; Σ ; gc ; ℓv ⊢ stamp-val V v A ℓ ⇐ stamp A (l ℓ)
+stamp-val-wt {A = A} {ℓ = low} (V-raw V-addr) ⊢V rewrite stamp-low A = ⊢V
+stamp-val-wt {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = low} eq) =
+  ⊢cast (⊢addr eq)
+stamp-val-wt {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = high} eq) = ⊢addr eq
+stamp-val-wt {A = A} {ℓ = low} (V-raw V-ƛ) ⊢V rewrite stamp-low A = ⊢V
+stamp-val-wt {ℓ = high} (V-raw V-ƛ) (⊢lam {ℓ = low} ⊢N) =
+  ⊢cast (⊢lam ⊢N)
+stamp-val-wt {ℓ = high} (V-raw V-ƛ) (⊢lam {ℓ = high} ⊢N) = ⊢lam ⊢N
+stamp-val-wt {A = A} {ℓ = low} (V-raw V-const) ⊢V rewrite stamp-low A = ⊢V
+stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
+  ⊢cast ⊢const
+stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = ⊢const
+stamp-val-wt {A = A} {V} {ℓ} (V-cast v i) (⊢cast ⊢V) = ⊢cast ⊢V
 
 
 -- A stamped value is value
 stamp-val-value : ∀ {Σ gc ℓv A V ℓ}
   → (v : Value V)
   → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
-  → Value (stamp-val V v ⊢V ℓ)
+  → Value (stamp-val V v A ℓ)
 stamp-val-value {ℓ = low} (V-raw V-addr) ⊢V = V-raw V-addr
 stamp-val-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = low} _) =
   V-cast V-addr (ir-ref (up id))
@@ -117,7 +138,7 @@ stamp-val-value (V-cast v i) ⊢V = V-cast v (stamp-ir-irreducible i)
 stamp-val-low : ∀ {Σ gc ℓv A V}
   → (v : Value V)
   → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
-  → stamp-val V v ⊢V low ≡ V
+  → stamp-val V v A low ≡ V
 stamp-val-low (V-raw V-addr) ⊢V = refl
 stamp-val-low (V-raw V-ƛ) ⊢V = refl
 stamp-val-low (V-raw V-const) ⊢V = refl
