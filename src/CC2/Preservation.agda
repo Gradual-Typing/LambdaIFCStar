@@ -72,8 +72,10 @@ pres vc ⊢PC ⊢plug ⊢μ (ξ {F = F} M→N) =
       ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩  = pres vc ⊢PC ⊢M ⊢μ M→N in
   ⟨ Σ′ , Σ′⊇Σ , wt-plug ⊢M′ Σ′⊇Σ , ⊢μ′ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ ξ-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres vc ⊢PC (⊢prot {v = vc′} ⊢M ⊢PC′ x eq) ⊢μ (prot-ctx M→N) =
+  let ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩  = pres vc′ ⊢PC′ ⊢M ⊢μ M→N in
+  ⟨ Σ′ , Σ′⊇Σ , ⊢prot ⊢M′ ⊢PC′ x eq , ⊢μ′ ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (prot-ctx M→N) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (prot-val v ⊢V) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ prot-blame = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ prot-blame-pc = {!!}
