@@ -77,11 +77,12 @@ pres vc ⊢PC (⊢prot {v = vc′} ⊢M ⊢PC′ x eq) ⊢μ (prot-ctx M→N) =
   ⟨ Σ′ , Σ′⊇Σ , ⊢prot ⊢M′ ⊢PC′ x eq , ⊢μ′ ⟩
 pres {Σ} vc ⊢PC (⊢prot ⊢V ⊢PC′ x refl) ⊢μ (prot-val v) =
   ⟨ Σ , ⊇-refl Σ , ⊢value-pc (stamp-val-wt v ⊢V) (stamp-val-value v ⊢V) , ⊢μ ⟩
+pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame-pc = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres {Σ} vc ⊢PC ⊢M ⊢μ (cast v V⟨c⟩→M) = {!!}
+pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢M eq) ⊢μ (β v vc†) =
+  ⟨ Σ , ⊇-refl Σ , ⊢prot {!!} (stampₑ-wt vc† ⊢PC) {!!} eq , ⊢μ ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
--- pres vc ⊢PC ⊢M ⊢μ prot-blame = {!!}
--- pres vc ⊢PC ⊢M ⊢μ prot-blame-pc = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (cast x x₁) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (β v vc₁) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-app! v vc₁ x x₁ r) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (app-cast v vc₁ 𝓋 x r x₁ x₂) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (app-blame v 𝓋 x) = {!!}
