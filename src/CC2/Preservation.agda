@@ -18,6 +18,8 @@ open import CC2.Statics
 open import CC2.Reduction
 open import CC2.HeapTyping
 
+open import CC2.SubstPreserve using (substitution-pres)
+
 {- Plug inversion -}
 plug-inv : ∀ {Σ gc ℓv M A} (F : Frame)
   → [] ; Σ ; gc ; ℓv ⊢ plug M F ⇐ A
@@ -80,8 +82,8 @@ pres {Σ} vc ⊢PC (⊢prot ⊢V ⊢PC′ x refl) ⊢μ (prot-val v) =
 pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame-pc = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (cast v V⟨c⟩→M) = {!!}
-pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢M eq) ⊢μ (β v vc†) =
-  ⟨ Σ , ⊇-refl Σ , ⊢prot {!!} (stampₑ-wt vc† ⊢PC) {!!} eq , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢V eq) ⊢μ (β v vc†) =
+  ⟨ Σ , ⊇-refl Σ , ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v)) (stampₑ-wt vc† ⊢PC) {!!} eq , ⊢μ ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-app! v vc₁ x x₁ r) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (app-cast v vc₁ 𝓋 x r x₁ x₂) = {!!}
