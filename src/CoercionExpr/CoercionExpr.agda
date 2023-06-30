@@ -8,7 +8,8 @@ open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Relation.Nullary.Negation using (contradiction)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 open import Function using (case_of_)
 
 open import Common.Utils
@@ -111,6 +112,11 @@ data _—→⁺_ : ∀ {g₁ g₂} (M N : CExpr g₁ ⇒ g₂) → Set where
     → L —→ M
     → M —↠ N
     → L —→⁺ N
+
+→⁺-impl-↠ : ∀ {g₁ g₂} {M N : CExpr g₁ ⇒ g₂}
+  → M —→⁺ N
+  → M —↠  N
+→⁺-impl-↠ (_ —→⟨ r ⟩ r*) = _ —→⟨ r ⟩ r*
 
 plug-cong : ∀ {g₁ g₂ g₃} {M N : CExpr g₁ ⇒ g₂} {c : ⊢ g₂ ⇒ g₃}
   → M —↠ N
@@ -220,3 +226,40 @@ CVal⌿→ : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g} → CVal c̅ → ¬ (c̅ 
 CVal⌿→ id ()
 CVal⌿→ (inj 𝓋) (ξ r) = CVal⌿→ 𝓋 r
 CVal⌿→ (up 𝓋)  (ξ r) = CVal⌿→ 𝓋 r
+
+CResult⌿→ : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g} → CResult c̅ → ¬ (c̅ —→ d̅)
+CResult⌿→ (success 𝓋) = CVal⌿→ 𝓋
+
+det : ∀ {ℓ g} {c̅ d̅₁ d̅₂ : CExpr l ℓ ⇒ g}
+  → c̅ —→ d̅₁
+  → c̅ —→ d̅₂
+    ---------------------------------------
+  → d̅₁ ≡ d̅₂
+det (ξ r1) (ξ r2) = cong (_⨾ _) (det r1 r2)
+det (ξ r) (id 𝓋) = contradiction r (CVal⌿→ 𝓋)
+det (ξ r) (?-id 𝓋) = contradiction r (CVal⌿→ (inj 𝓋))
+det (ξ r) (?-↑ 𝓋) = contradiction r (CVal⌿→ (inj 𝓋))
+det (ξ r) (?-⊥ 𝓋) = contradiction r (CVal⌿→ (inj 𝓋))
+det ξ-⊥ ξ-⊥ = refl
+det (id 𝓋) (ξ r) = contradiction r (CVal⌿→ 𝓋)
+det (id _) (id _) = refl
+det (?-id 𝓋) (ξ r) = contradiction r (CVal⌿→ (inj 𝓋))
+det (?-id _) (?-id _) = refl
+det (?-↑ 𝓋) (ξ r) = contradiction r (CVal⌿→ (inj 𝓋))
+det (?-↑ _) (?-↑ _) = refl
+det (?-⊥ 𝓋) (ξ r) = contradiction r (CVal⌿→ (inj 𝓋))
+det (?-⊥ _) (?-⊥ _) = refl
+
+det-mult : ∀ {ℓ g} {c̅ d̅₁ d̅₂ : CExpr l ℓ ⇒ g}
+  → c̅ —↠ d̅₁
+  → c̅ —↠ d̅₂
+  → CResult d̅₁
+  → CResult d̅₂
+    ----------------------------------------------
+  → d̅₁ ≡ d̅₂
+det-mult (_ ∎) (_ ∎) r₁ r₂ = refl
+det-mult (_ ∎) (_ —→⟨ c̅→d̅ ⟩ _) r₁ r₂ = contradiction c̅→d̅ (CResult⌿→ r₁)
+det-mult (_ —→⟨ c̅→d̅ ⟩ _) (_ ∎) r₁ r₂ = contradiction c̅→d̅ (CResult⌿→ r₂)
+det-mult (_ —→⟨ c̅→d̅₃ ⟩ d̅₃↠d̅₁) (_ —→⟨ c̅→d̅₄ ⟩ d̅₄↠d̅₂) r₁ r₂
+  with det c̅→d̅₃ c̅→d̅₄
+... | refl = det-mult d̅₃↠d̅₁ d̅₄↠d̅₂ r₁ r₂
