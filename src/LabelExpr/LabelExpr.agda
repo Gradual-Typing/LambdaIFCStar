@@ -9,7 +9,7 @@ open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no; recompute)
 open import Relation.Nullary.Negation using (contradiction; ¬?)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; cong; sym)
 open import Function using (case_of_)
 
 open import Common.Utils
@@ -328,6 +328,45 @@ LVal⌿→ : ∀ {V M} → LVal V → ¬ (V —→ₑ M)
 LVal⌿→ (v-cast (ir id x)) β-id = contradiction refl (recompute (¬? (_ ==? _)) x)
 LVal⌿→ (v-cast (ir 𝓋 _)) (cast (_ —→ₗ⟨ r ⟩ _) _) = CVal⌿→ 𝓋 r
 LVal⌿→ (v-cast (ir 𝓋 _)) (blame (_ —→ₗ⟨ r ⟩ _))  = CVal⌿→ 𝓋 r
+
+
+detₑ : ∀ {L M N}
+  → L —→ₑ M
+  → L —→ₑ N
+  → M ≡ N
+detₑ (ξ L→M) (ξ L→N) = cong _⟪ _ ⟫ (detₑ L→M L→N)
+detₑ (ξ L→M) (comp i) = contradiction L→M (LVal⌿→ (v-cast i))
+detₑ ξ-blame ξ-blame = refl
+detₑ β-id β-id = refl
+detₑ β-id (cast (_ —→ₗ⟨ r ⟩ _) _) = contradiction r (CVal⌿→ id)
+detₑ β-id (blame (_ —→ₗ⟨ r ⟩ _)) = contradiction r (CVal⌿→ id)
+detₑ (cast (_ —→ₗ⟨ r ⟩ _) _) β-id = contradiction r (CVal⌿→ id)
+detₑ (cast c̅→⁺d̅₁ 𝓋₁) (cast c̅→⁺d̅₂ 𝓋₂) =
+  cong (_ ⟪_⟫) (det-mult (→⁺-impl-↠ c̅→⁺d̅₁) (→⁺-impl-↠ c̅→⁺d̅₂)
+                         (success 𝓋₁) (success 𝓋₂))
+detₑ (cast c̅→⁺c̅ₙ 𝓋) (blame c̅↠⊥)
+  with det-mult (→⁺-impl-↠ c̅→⁺c̅ₙ) c̅↠⊥ (success 𝓋) fail
+... | refl = case 𝓋 of λ ()
+detₑ (blame (_ —→ₗ⟨ r ⟩ _)) β-id = contradiction r (CVal⌿→ id)
+detₑ (blame c̅↠⊥) (cast c̅→⁺c̅ₙ 𝓋)
+  with det-mult (→⁺-impl-↠ c̅→⁺c̅ₙ) c̅↠⊥ (success 𝓋) fail
+... | refl = case 𝓋 of λ ()
+detₑ (blame c̅↠⊥₁) (blame c̅↠⊥₂)
+  with det-mult c̅↠⊥₁ c̅↠⊥₂ fail fail
+... | refl = refl
+detₑ (comp i) (ξ L→N) = contradiction L→N (LVal⌿→ (v-cast i))
+detₑ (comp _) (comp _) = refl
+
+-- det : ∀ {M V W}
+--   → M —↠ₑ V
+--   → M —↠ₑ W
+--   → LVal V → LVal W
+--     -----------------------
+--   → V ≡ W
+-- det (V ∎) (W ∎) _ _ = refl
+-- det (_ ∎) (_ —→⟨ r ⟩ ↠W) v = contradiction r (LVal⌿→ v)
+-- det (_ —→⟨ r ⟩ ↠V) (_ ∎) _ v = contradiction r (LVal⌿→ v)
+-- det (_ —→⟨ x ⟩ ↠V) (_ —→⟨ x₁ ⟩ ↠W) v w = {!!}
 
 
 stamp⇒⋆-security : ∀ {g ℓ V V′}
