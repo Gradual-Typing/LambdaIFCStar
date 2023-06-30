@@ -215,3 +215,8 @@ uniq-CVal id id = refl
 uniq-CVal id⨾? id⨾? = refl
 uniq-CVal (inj v) (inj v′) rewrite uniq-CVal v v′ = refl
 uniq-CVal (up v) (up v′) rewrite uniq-CVal v v′ = refl
+
+CVal⌿→ : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g} → CVal c̅ → ¬ (c̅ —→ d̅)
+CVal⌿→ id ()
+CVal⌿→ (inj 𝓋) (ξ r) = CVal⌿→ 𝓋 r
+CVal⌿→ (up 𝓋)  (ξ r) = CVal⌿→ 𝓋 r

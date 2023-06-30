@@ -10,6 +10,7 @@ open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Function using (case_of_)
 
@@ -131,3 +132,23 @@ comp-pres-⊑-br : ∀ {g₁ g₁′ g₂ g₂′ g₃′}
 comp-pres-⊑-br c̅⊑c̅₁′ (⊑-id g⊑g′) = ⊑-castr c̅⊑c̅₁′ g⊑g′ g⊑g′
 comp-pres-⊑-br c̅⊑c̅₁′ (⊑-cast x y z) = ⊑-castr (comp-pres-⊑-br c̅⊑c̅₁′ x) y z
 comp-pres-⊑-br c̅⊑c̅₁′ (⊑-⊥ _ x) = ⊑-⊥ (proj₁ (prec→⊑ _ _ c̅⊑c̅₁′)) x
+
+{- syntactical composition won't get a value -}
+comp-not-val : ∀ {ℓ g₁ g₂}
+  → (c̅ : CExpr l ℓ ⇒ g₁)
+  → (d̅ : CExpr g₁ ⇒ g₂)
+  → ¬ (CVal (c̅ ⨟ d̅))
+comp-not-val c (id _) = λ ()
+comp-not-val c (d ⨾ _ !) (inj v) = contradiction v (comp-not-val c d)
+comp-not-val c (d ⨾ ↑)  (up v)  = contradiction v (comp-not-val c d)
+comp-not-val c (⊥ _ _ p) = λ ()
+
+{- (as a result, ) reducing the syntactical comp of two exprs to a value
+   takes one or more steps -}
+comp-→⁺ : ∀ {ℓ g₁ g₂} {c̅₁ : CExpr l ℓ ⇒ g₁} {c̅₂ : CExpr g₁ ⇒ g₂} {d̅}
+  → (c̅₁ ⨟ c̅₂) —↠  d̅
+  → CVal d̅
+  → (c̅₁ ⨟ c̅₂) —→⁺ d̅
+comp-→⁺ {c̅₂ = c̅ ⨾ _ !} (_ ∎) (inj 𝓋) = contradiction 𝓋 (comp-not-val _ c̅)
+comp-→⁺ {c̅₂ = c̅ ⨾ ↑}  (_ ∎) (up 𝓋)  = contradiction 𝓋 (comp-not-val _ c̅)
+comp-→⁺ (_ —→⟨ x ⟩ r) _ = _ —→⟨ x ⟩ r

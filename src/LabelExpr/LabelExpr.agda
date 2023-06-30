@@ -7,7 +7,8 @@ open import Data.List hiding ([_])
 open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
-open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary using (¬_; Dec; yes; no; recompute)
+open import Relation.Nullary.Negation using (contradiction; ¬?)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Function using (case_of_)
 
@@ -15,7 +16,8 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import CoercionExpr.CoercionExpr
-  hiding (Progress; progress; plug-cong; ↠-trans; _∎; _—→⟨_⟩_)
+  renaming (_∎ to _∎ₗ ; _—→⟨_⟩_ to _—→ₗ⟨_⟩_)
+  hiding (Progress; progress; plug-cong; ↠-trans)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
@@ -84,7 +86,7 @@ data _—→ₑ_ : (M N : LExpr) → Set where
   β-id : ∀ {ℓ} → l ℓ ⟪ id (l ℓ) ⟫ —→ₑ l ℓ
 
   cast : ∀ {ℓ g} {c̅ c̅ₙ : CExpr l ℓ ⇒ g}
-    → c̅ —↠ c̅ₙ
+    → c̅ —→⁺ c̅ₙ
     → CVal c̅ₙ
       -------------------------------
     → l ℓ ⟪ c̅ ⟫ —→ₑ l ℓ ⟪ c̅ₙ ⟫
@@ -117,7 +119,10 @@ progress (⊢cast {c̅ = c̅} ⊢M) =
     case ⟨ v , ⊢M ⟩ of λ where
     ⟨ v-l , ⊢l ⟩ →
       case cexpr-sn c̅ of λ where
-      ⟨ d̅ , c̅↠d̅ , success 𝓋 ⟩ → step (cast c̅↠d̅ 𝓋)
+      ⟨ d̅ , _ ∎ₗ , success id ⟩ → step β-id
+      ⟨ d̅ , _ ∎ₗ , success (inj 𝓋) ⟩ → done (v-cast (ir (inj 𝓋) λ ()))
+      ⟨ d̅ , _ ∎ₗ , success (up id) ⟩ → done (v-cast (ir (up id) λ ()))
+      ⟨ d̅ , _ —→ₗ⟨ c̅→c̅′ ⟩ c̅′↠d̅ , success 𝓋 ⟩ → step (cast (_ —→ₗ⟨ c̅→c̅′ ⟩ c̅′↠d̅) 𝓋)
       ⟨ _ , c̅↠⊥ , fail      ⟩ → step (blame c̅↠⊥)
     ⟨ v-cast {c̅ = c̅′} i , ⊢cast _ ⟩ → step (comp i)
   (error) → step ξ-blame
@@ -262,17 +267,27 @@ lexpr-sn (L ⟪ c̅ ⟫) (⊢cast ⊢L) =
       ⟨ blame q , ↠ₑ-trans (plug-congₑ L↠V)
                             (_ —→⟨ blame c̅↠d̅ ⟩ _ ∎) ,
         fail ⟩
-    ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success id ⟩ →
+    ⟨ ⊢l , c̅ₙ , _ ∎ₗ , success id ⟩ →
       ⟨ l ℓ , ↠ₑ-trans (plug-congₑ L↠V)
-                        (_ —→⟨ cast c̅↠c̅ₙ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+                        (_ —→⟨ β-id ⟩ _ ∎) ,
         success v-l ⟩
-    ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ →
-      ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
-                              (_ —→⟨ cast c̅↠c̅ₙ (up id) ⟩ _ ∎) ,
+    ⟨ ⊢l , c̅ₙ , _ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ , success id ⟩ →
+      ⟨ l ℓ , ↠ₑ-trans (plug-congₑ L↠V)
+                        (_ —→⟨ cast (_ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ) id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+        success v-l ⟩
+    ⟨ ⊢l , c̅ₙ , _ ∎ₗ , success (up id) ⟩ →
+      ⟨ l ℓ ⟪ _ ⟫ , plug-congₑ L↠V ,
         success (v-cast (ir (up id) (λ ()))) ⟩
-    ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ →
+    ⟨ ⊢l , c̅ₙ , _ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ , success (up id) ⟩ →
       ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
-                              (_ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
+                              (_ —→⟨ cast (_ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ) (up id) ⟩ _ ∎) ,
+        success (v-cast (ir (up id) (λ ()))) ⟩
+    ⟨ ⊢l , c̅ₙ , _ ∎ₗ , success (inj 𝓋) ⟩ →
+      ⟨ l ℓ ⟪ _ ⟫ , plug-congₑ L↠V ,
+        success (v-cast (ir (inj 𝓋) (λ ()))) ⟩
+    ⟨ ⊢l , c̅ₙ , _ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ , success (inj 𝓋) ⟩ →
+      ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
+                              (_ —→⟨ cast (_ —→ₗ⟨ c̅→d̅ ⟩ d̅↠c̅ₙ) (inj 𝓋) ⟩ _ ∎) ,
         success (v-cast (ir (inj 𝓋) (λ ()))) ⟩
   ⟨ l ℓ ⟪ c̅ᵢ ⟫ , L↠V , success (v-cast i) ⟩ →
     case preserve-mult ⊢L L↠V of λ where
@@ -282,17 +297,17 @@ lexpr-sn (L ⟪ c̅ ⟫) (⊢cast ⊢L) =
         ⟨ blame q , ↠ₑ-trans (plug-congₑ L↠V)
                     (_ —→⟨ comp i ⟩ _ —→⟨ blame c̅↠d̅ ⟩ _ ∎) ,
           fail ⟩
-      ⟨ c̅ₙ , c̅↠c̅ₙ , success id ⟩ →
+      ⟨ c̅ₙ , c̅↠d̅ , success id ⟩ →
         ⟨ l ℓ , ↠ₑ-trans (plug-congₑ L↠V)
-                (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
+                (_ —→⟨ comp i ⟩ _ —→⟨ cast (comp-→⁺ c̅↠d̅ id) id ⟩ _ —→⟨ β-id ⟩ _ ∎) ,
           success v-l ⟩
       ⟨ c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ →
         ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
-                      (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (up id) ⟩ _ ∎) ,
+                      (_ —→⟨ comp i ⟩ _ —→⟨ cast (comp-→⁺ c̅↠c̅ₙ (up id)) (up id) ⟩ _ ∎) ,
           success (v-cast (ir (up id) (λ ()))) ⟩
       ⟨ c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ →
         ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
-                      (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
+                      (_ —→⟨ comp i ⟩ _ —→⟨ cast (comp-→⁺ c̅↠c̅ₙ (inj 𝓋)) (inj 𝓋) ⟩ _ ∎) ,
           success (v-cast (ir (inj 𝓋) (λ ()))) ⟩
 lexpr-sn (blame p) ⊢blame = ⟨ blame p , _ ∎ , fail ⟩
 
@@ -308,3 +323,25 @@ stampₑ-security {V = l low}  {ℓ = high} v-l = refl
 stampₑ-security {V = l high} {ℓ = high} v-l = refl
 stampₑ-security {V} {low}  (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 low
 stampₑ-security {V} {high} (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 high
+
+LVal⌿→ : ∀ {V M} → LVal V → ¬ (V —→ₑ M)
+LVal⌿→ (v-cast (ir id x)) β-id = contradiction refl (recompute (¬? (_ ==? _)) x)
+LVal⌿→ (v-cast (ir 𝓋 _)) (cast (_ —→ₗ⟨ r ⟩ _) _) = CVal⌿→ 𝓋 r
+LVal⌿→ (v-cast (ir 𝓋 _)) (blame (_ —→ₗ⟨ r ⟩ _))  = CVal⌿→ 𝓋 r
+
+
+stamp⇒⋆-security : ∀ {g ℓ V V′}
+  → (v : LVal V)
+  → ⊢ V ⇐ g
+  → stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ V′
+  → (v′ : LVal V′)
+    ---------------------------------
+  → (∥ V ∥ v) ⋎ ℓ ≡ ∥ V′ ∥ v′
+stamp⇒⋆-security {ℓ = low} (v-l {ℓ}) ⊢l ↠V′ v′
+  rewrite ℓ⋎low≡ℓ {ℓ} with ↠V′
+... | _ —→⟨ r ⟩ _ = contradiction r (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
+... | _ ∎ with v′
+... | v-cast (ir (inj id) _) = refl
+stamp⇒⋆-security {ℓ = high} (v-l {low}) ⊢l ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l ↠V′ v′ = {!!}
+stamp⇒⋆-security (v-cast (ir 𝓋 _)) ⊢V ↠V′ v′ = {!!}

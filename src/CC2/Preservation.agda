@@ -86,7 +86,9 @@ pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢V eq) ⊢μ (β v vc†) rewrite uni
   ⟨ Σ , ⊇-refl Σ ,
     ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v)) (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! (⊢lam ⊢N) ⊢V eq) ⊢μ (β-app! v vc† ⊢PC† ↠PC′ (success vc′)) =
-  ⟨ Σ , ⊇-refl Σ , ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v)) {!!} {!!} eq , ⊢μ ⟩
+  ⟨ Σ , ⊇-refl Σ ,
+    ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v))
+          (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′) {!!} eq , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ (β-app! v vc† ⊢PC† ↠PC′ fail) =
   ⟨ Σ , ⊇-refl Σ , ⊢prot-blame-pc , ⊢μ ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
