@@ -209,3 +209,9 @@ cexpr-sn (_ ⨾ c) | ⟨ _ , c̅′↠c̅″ , success (up v) ⟩ | high !      
   ⟨ _ , plug-cong c̅′↠c̅″ , success (inj (up v)) ⟩
 cexpr-sn (_ ⨾ c) | ⟨ _ , c̅′↠⊥ , fail ⟩ =
   ⟨ _ , ↠-trans (plug-cong c̅′↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎) , fail ⟩
+
+uniq-CVal : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂} → (v v′ : CVal c̅) → v ≡ v′
+uniq-CVal id id = refl
+uniq-CVal id⨾? id⨾? = refl
+uniq-CVal (inj v) (inj v′) rewrite uniq-CVal v v′ = refl
+uniq-CVal (up v) (up v′) rewrite uniq-CVal v v′ = refl

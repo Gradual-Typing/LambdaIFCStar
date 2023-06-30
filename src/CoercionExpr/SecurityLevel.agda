@@ -1,5 +1,7 @@
 module CoercionExpr.SecurityLevel where
 
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels

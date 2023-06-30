@@ -31,8 +31,12 @@ data LExpr : Set where
   blame : BlameLabel → LExpr
 
 
-Irreducible : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Set
-Irreducible {g₁} {g₂} c̅ = CVal c̅ × g₁ ≢ g₂
+data Irreducible : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → Set where
+
+  ir : ∀ {g₁ g₂} {c̅ : CExpr g₁ ⇒ g₂}
+    → CVal c̅
+    → .(g₁ ≢ g₂)
+    → Irreducible c̅
 
 
 data LVal : LExpr → Set where
@@ -213,7 +217,7 @@ prec-inv (⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′)  = ⟨ refl , comp-p
 {- Security level -}
 ∥_∥ : ∀ (V : LExpr) → LVal V → StaticLabel
 ∥ l ℓ       ∥ v-l                = ℓ
-∥ l ℓ ⟪ c̅ ⟫ ∥ (v-cast ⟨ 𝓋 , _ ⟩) = ∥ c̅ ∥ₗ 𝓋
+∥ l ℓ ⟪ c̅ ⟫ ∥ (v-cast (ir 𝓋 _)) = ∥ c̅ ∥ₗ 𝓋
 
 
 {- Stamping -}
@@ -221,7 +225,7 @@ stampₑ : ∀ V → LVal V → StaticLabel → LExpr
 stampₑ (l ℓ) v-l low     = l ℓ
 stampₑ (l low) v-l high  = l low ⟪ id (l low) ⨾ ↑ ⟫
 stampₑ (l high) v-l high = l high
-stampₑ (l ℓ ⟪ c̅ ⟫) (v-cast ⟨ 𝓋 , _ ⟩) ℓ′ = l ℓ ⟪ stampₗ c̅ 𝓋 ℓ′ ⟫
+stampₑ (l ℓ ⟪ c̅ ⟫) (v-cast (ir 𝓋 _)) ℓ′ = l ℓ ⟪ stampₗ c̅ 𝓋 ℓ′ ⟫
 
 stampₑ-wt : ∀ {V g ℓ}
   → (v : LVal V)
@@ -230,16 +234,16 @@ stampₑ-wt : ∀ {V g ℓ}
 stampₑ-wt {g = g} {low} v-l ⊢V rewrite g⋎̃low≡g {g} = ⊢V
 stampₑ-wt {ℓ = high} (v-l {low}) ⊢l = ⊢cast ⊢l
 stampₑ-wt {ℓ = high} (v-l {high}) ⊢l = ⊢l
-stampₑ-wt (v-cast i) (⊢cast ⊢l) = ⊢cast ⊢l
+stampₑ-wt (v-cast (ir 𝓋 _)) (⊢cast ⊢l) = ⊢cast ⊢l
 
 stampₑ-LVal : ∀ {V ℓ}
   → (v : LVal V)
   → LVal (stampₑ V v ℓ)
 stampₑ-LVal {V} {low} v-l = v-l
-stampₑ-LVal {V} {high} (v-l {low}) = v-cast ⟨ up id , (λ ()) ⟩
+stampₑ-LVal {V} {high} (v-l {low}) = v-cast (ir (up id) (λ ()))
 stampₑ-LVal {V} {high} (v-l {high}) = v-l
-stampₑ-LVal {V} {ℓ} (v-cast ⟨ 𝓋 , x ⟩) =
-  v-cast ⟨ stampₗ-CVal _ 𝓋 ℓ , stamp-not-id 𝓋 x ⟩
+stampₑ-LVal {V} {ℓ} (v-cast (ir 𝓋 x)) =
+  v-cast (ir (stampₗ-CVal _ 𝓋 ℓ) (stamp-not-id 𝓋 x))
 
 
 lexpr-sn : ∀ {A} L
@@ -265,11 +269,11 @@ lexpr-sn (L ⟪ c̅ ⟫) (⊢cast ⊢L) =
     ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ →
       ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
                               (_ —→⟨ cast c̅↠c̅ₙ (up id) ⟩ _ ∎) ,
-        success (v-cast ⟨ up id , (λ ()) ⟩) ⟩
+        success (v-cast (ir (up id) (λ ()))) ⟩
     ⟨ ⊢l , c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ →
       ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
                               (_ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
-        success (v-cast ⟨ inj 𝓋 , (λ ()) ⟩) ⟩
+        success (v-cast (ir (inj 𝓋) (λ ()))) ⟩
   ⟨ l ℓ ⟪ c̅ᵢ ⟫ , L↠V , success (v-cast i) ⟩ →
     case preserve-mult ⊢L L↠V of λ where
     (⊢cast ⊢l) →
@@ -285,9 +289,22 @@ lexpr-sn (L ⟪ c̅ ⟫) (⊢cast ⊢L) =
       ⟨ c̅ₙ , c̅↠c̅ₙ , success (up id) ⟩ →
         ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
                       (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (up id) ⟩ _ ∎) ,
-          success (v-cast ⟨ up id , (λ ()) ⟩) ⟩
+          success (v-cast (ir (up id) (λ ()))) ⟩
       ⟨ c̅ₙ , c̅↠c̅ₙ , success (inj 𝓋) ⟩ →
         ⟨ l ℓ ⟪ _ ⟫ , ↠ₑ-trans (plug-congₑ L↠V)
                       (_ —→⟨ comp i ⟩ _ —→⟨ cast c̅↠c̅ₙ (inj 𝓋) ⟩ _ ∎) ,
-          success (v-cast ⟨ inj 𝓋 , (λ ()) ⟩) ⟩
+          success (v-cast (ir (inj 𝓋) (λ ()))) ⟩
 lexpr-sn (blame p) ⊢blame = ⟨ blame p , _ ∎ , fail ⟩
+
+
+uniq-LVal : ∀ {V} → (v w : LVal V) → v ≡ w
+uniq-LVal v-l v-l = refl
+uniq-LVal (v-cast (ir 𝓋 x)) (v-cast (ir 𝓋′ y)) rewrite uniq-CVal 𝓋 𝓋′ = refl
+
+
+stampₑ-security : ∀ {V ℓ} (v : LVal V) → (∥ V ∥ v) ⋎ ℓ ≡ ∥ stampₑ V v ℓ ∥ (stampₑ-LVal v)
+stampₑ-security {V = l ℓ}    {ℓ = low}  v-l rewrite ℓ⋎low≡ℓ {ℓ} = refl
+stampₑ-security {V = l low}  {ℓ = high} v-l = refl
+stampₑ-security {V = l high} {ℓ = high} v-l = refl
+stampₑ-security {V} {low}  (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 low
+stampₑ-security {V} {high} (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 high

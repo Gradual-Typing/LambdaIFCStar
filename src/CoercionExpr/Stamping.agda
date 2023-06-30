@@ -32,16 +32,21 @@ stampₗ-CVal (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = inj (up id)
 stampₗ-CVal (id (l low) ⨾ ↑) (up id) high = up id
 
 {- coercion stampₗing is correct with respect to security level -}
-stampₗ-level : ∀ {ℓ g} (c̅ : CExpr l ℓ ⇒ g) → (v : CVal c̅) → (ℓ′ : StaticLabel)
-  → ∥ stampₗ c̅ v ℓ′ ∥ (stampₗ-CVal c̅ v ℓ′) ≡ (∥ c̅ ∥ v) ⋎ ℓ′
-stampₗ-level {g = g} c̅ v low
+stampₗ-security : ∀ {ℓ g}
+  → (c̅ : CExpr l ℓ ⇒ g)
+  → (v : CVal c̅)
+  → (ℓ′ : StaticLabel)
+    ---------------------------------------------------------
+  → (∥ c̅ ∥ v) ⋎ ℓ′ ≡ ∥ stampₗ c̅ v ℓ′ ∥ (stampₗ-CVal c̅ v ℓ′)
+stampₗ-security {g = g} c̅ v low
   rewrite g⋎̃low≡g {g} | ℓ⋎low≡ℓ {∥ c̅ ∥ v} = refl
-stampₗ-level (id (l low)) id high = refl
-stampₗ-level (id (l high)) id high = refl
-stampₗ-level (id (l low) ⨾ low !) (inj id) high = refl
-stampₗ-level (id (l high) ⨾ high !) (inj id) high = refl
-stampₗ-level (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = refl
-stampₗ-level (id (l low) ⨾ ↑) (up id) high = refl
+stampₗ-security (id (l low)) id high = refl
+stampₗ-security (id (l high)) id high = refl
+stampₗ-security (id (l low) ⨾ low !) (inj id) high = refl
+stampₗ-security (id (l high) ⨾ high !) (inj id) high = refl
+stampₗ-security (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = refl
+stampₗ-security (id (l low) ⨾ ↑) (up id) high = refl
+
 
 stampₗ-low : ∀ {ℓ g} {c̅ : CExpr l ℓ ⇒ g}
   → (𝓋 : CVal c̅)
