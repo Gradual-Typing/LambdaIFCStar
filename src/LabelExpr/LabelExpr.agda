@@ -329,6 +329,9 @@ LVal⌿→ (v-cast (ir id x)) β-id = contradiction refl (recompute (¬? (_ ==? 
 LVal⌿→ (v-cast (ir 𝓋 _)) (cast (_ —→ₗ⟨ r ⟩ _) _) = CVal⌿→ 𝓋 r
 LVal⌿→ (v-cast (ir 𝓋 _)) (blame (_ —→ₗ⟨ r ⟩ _))  = CVal⌿→ 𝓋 r
 
+LResult⌿→ : ∀ {M N} → LResult M → ¬ (M —→ₑ N)
+LResult⌿→ (success v) = LVal⌿→ v
+
 
 detₑ : ∀ {L M N}
   → L —→ₑ M
@@ -362,12 +365,12 @@ detₑ (comp _) (comp _) = refl
 det-multₑ : ∀ {M V W}
   → M —↠ₑ V
   → M —↠ₑ W
-  → LVal V → LVal W
+  → LResult V → LResult W
     -----------------------
   → V ≡ W
 det-multₑ (V ∎) (W ∎) _ _ = refl
-det-multₑ (_ ∎) (_ —→⟨ r ⟩ ↠W) v = contradiction r (LVal⌿→ v)
-det-multₑ (_ —→⟨ r ⟩ ↠V) (_ ∎) _ v = contradiction r (LVal⌿→ v)
+det-multₑ (_ ∎) (_ —→⟨ r ⟩ ↠W) v = contradiction r (LResult⌿→ v)
+det-multₑ (_ —→⟨ r ⟩ ↠V) (_ ∎) _ v = contradiction r (LResult⌿→ v)
 det-multₑ (L —→⟨ L→M ⟩ M↠V) (L —→⟨ L→N ⟩ N↠W) v w
   with detₑ L→M L→N
 ... | refl = det-multₑ M↠V N↠W v w
