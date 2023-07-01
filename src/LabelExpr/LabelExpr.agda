@@ -333,6 +333,7 @@ LVal⌿→ (v-cast (ir 𝓋 _)) (blame (_ —→ₗ⟨ r ⟩ _))  = CVal⌿→ �
 detₑ : ∀ {L M N}
   → L —→ₑ M
   → L —→ₑ N
+    ----------------------------
   → M ≡ N
 detₑ (ξ L→M) (ξ L→N) = cong _⟪ _ ⟫ (detₑ L→M L→N)
 detₑ (ξ L→M) (comp i) = contradiction L→M (LVal⌿→ (v-cast i))
@@ -357,16 +358,19 @@ detₑ (blame c̅↠⊥₁) (blame c̅↠⊥₂)
 detₑ (comp i) (ξ L→N) = contradiction L→N (LVal⌿→ (v-cast i))
 detₑ (comp _) (comp _) = refl
 
--- det : ∀ {M V W}
---   → M —↠ₑ V
---   → M —↠ₑ W
---   → LVal V → LVal W
---     -----------------------
---   → V ≡ W
--- det (V ∎) (W ∎) _ _ = refl
--- det (_ ∎) (_ —→⟨ r ⟩ ↠W) v = contradiction r (LVal⌿→ v)
--- det (_ —→⟨ r ⟩ ↠V) (_ ∎) _ v = contradiction r (LVal⌿→ v)
--- det (_ —→⟨ x ⟩ ↠V) (_ —→⟨ x₁ ⟩ ↠W) v w = {!!}
+
+det-multₑ : ∀ {M V W}
+  → M —↠ₑ V
+  → M —↠ₑ W
+  → LVal V → LVal W
+    -----------------------
+  → V ≡ W
+det-multₑ (V ∎) (W ∎) _ _ = refl
+det-multₑ (_ ∎) (_ —→⟨ r ⟩ ↠W) v = contradiction r (LVal⌿→ v)
+det-multₑ (_ —→⟨ r ⟩ ↠V) (_ ∎) _ v = contradiction r (LVal⌿→ v)
+det-multₑ (L —→⟨ L→M ⟩ M↠V) (L —→⟨ L→N ⟩ N↠W) v w
+  with detₑ L→M L→N
+... | refl = det-multₑ M↠V N↠W v w
 
 
 stamp⇒⋆-security : ∀ {g ℓ V V′}
