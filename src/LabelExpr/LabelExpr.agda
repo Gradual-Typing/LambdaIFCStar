@@ -376,6 +376,15 @@ det-multₑ (L —→⟨ L→M ⟩ M↠V) (L —→⟨ L→N ⟩ N↠W) v w
 ... | refl = det-multₑ M↠V N↠W v w
 
 
+security-eq : ∀ {V₁ V₂}
+  → (v₁ : LVal V₁)
+  → (v₂ : LVal V₂)
+  → V₁ ≡ V₂
+    --------------------------
+  → ∥ V₁ ∥ v₁ ≡ ∥ V₂ ∥ v₂
+security-eq v₁ v₂ eq rewrite eq rewrite uniq-LVal v₁ v₂ = refl
+
+
 stamp⇒⋆-security : ∀ {g ℓ V V′}
   → (v : LVal V)
   → ⊢ V ⇐ g
@@ -388,6 +397,18 @@ stamp⇒⋆-security {ℓ = low} (v-l {ℓ}) ⊢l ↠V′ v′
 ... | _ —→⟨ r ⟩ _ = contradiction r (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
 ... | _ ∎ with v′
 ... | v-cast (ir (inj id) _) = refl
-stamp⇒⋆-security {ℓ = high} (v-l {low}) ⊢l ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} {V} {V′} (v-l {low}) ⊢l ↠V′ v′ = ∣V†∣≡∣V′∣
+  where
+  ♣ : (id (l low) ⨾ ↑ ⨾ id (l high) ⨾ high !) —→⁺ (id (l low) ⨾ ↑ ⨾ high !)
+  ♣ = _ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ
+  ♥ : l low ⟪ id (l low) ⨾ ↑ ⟫ ⟪ id (l high) ⨾ (high !) ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  ♥ = _ —→⟨ comp (ir (up id) (λ ())) ⟩ _ —→⟨ cast ♣ (inj (up id)) ⟩ _ ∎
+  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj (up id)) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
 stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l ↠V′ v′ = {!!}
 stamp⇒⋆-security (v-cast (ir 𝓋 _)) ⊢V ↠V′ v′ = {!!}
