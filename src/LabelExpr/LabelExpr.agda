@@ -410,5 +410,7 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-l {low}) ⊢l ↠V′ v′ = ∣
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
   ∣V†∣≡∣V′∣ = security-eq v† v′ eq
-stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ ∎) (v-cast (ir (inj id) _)) = refl
+stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ —→⟨ V→M ⟩ _) v′ =
+  contradiction V→M (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
 stamp⇒⋆-security (v-cast (ir 𝓋 _)) ⊢V ↠V′ v′ = {!!}
