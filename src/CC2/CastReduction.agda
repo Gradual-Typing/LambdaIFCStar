@@ -98,3 +98,15 @@ cast-sn {V = $ k} {c = cast (id ι) c̅} (V-raw V-const) ⊢const
 cast-sn {c = c} (V-cast {c = cᵢ} v i) (⊢cast ⊢Vᵣ)
   with cast-sn {c = cᵢ ⨟ c} (V-raw v) ⊢Vᵣ
 ... | ⟨ M , Vᵣ⟨cᵢ⨟c⟩↠M , r ⟩ = ⟨ M , _ —→⟨ cast-comp v i ⟩ Vᵣ⟨cᵢ⨟c⟩↠M , r ⟩
+
+{- Casting value preserves types -}
+cast-pres : ∀ {Σ gc ℓv A B V M} {c : Cast A ⇒ B}
+  → Value V
+  → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A
+  → V ⟨ c ⟩ —→ M
+    ---------------------------------------------------
+  → [] ; Σ ; gc ; ℓv ⊢ M ⇐ B
+cast-pres v ⊢V (cast r _ 𝓋)            = ⊢cast ⊢V
+cast-pres v ⊢V (cast-blame _ _)        = ⊢blame
+cast-pres v ⊢V cast-id                 = ⊢V
+cast-pres v (⊢cast ⊢V) (cast-comp r i) = ⊢cast ⊢V
