@@ -19,6 +19,8 @@ open import CC2.Reduction
 open import CC2.HeapTyping
 
 open import CC2.SubstPreserve using (substitution-pres)
+open import LabelExpr.Security  {- reasoning about security levels of LExpr -}
+
 
 {- Plug inversion -}
 plug-inv : ∀ {Σ gc ℓv M A} (F : Frame)
