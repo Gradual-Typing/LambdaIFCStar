@@ -100,13 +100,20 @@ cast-sn {c = c} (V-cast {c = cᵢ} v i) (⊢cast ⊢Vᵣ)
 ... | ⟨ M , Vᵣ⟨cᵢ⨟c⟩↠M , r ⟩ = ⟨ M , _ —→⟨ cast-comp v i ⟩ Vᵣ⟨cᵢ⨟c⟩↠M , r ⟩
 
 {- Casting value preserves types -}
-cast-pres : ∀ {Σ gc ℓv A B V M} {c : Cast A ⇒ B}
-  → Value V
-  → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A
-  → V ⟨ c ⟩ —→ M
+cast-pres : ∀ {Σ gc ℓv A M N}
+  → [] ; Σ ; gc ; ℓv ⊢ M ⇐ A
+  → M —→ N
     ---------------------------------------------------
-  → [] ; Σ ; gc ; ℓv ⊢ M ⇐ B
-cast-pres v ⊢V (cast r _ 𝓋)            = ⊢cast ⊢V
-cast-pres v ⊢V (cast-blame _ _)        = ⊢blame
-cast-pres v ⊢V cast-id                 = ⊢V
-cast-pres v (⊢cast ⊢V) (cast-comp r i) = ⊢cast ⊢V
+  → [] ; Σ ; gc ; ℓv ⊢ N ⇐ A
+cast-pres (⊢cast ⊢V) (cast r _ 𝓋)            = ⊢cast ⊢V
+cast-pres ⊢M (cast-blame _ _)                = ⊢blame
+cast-pres (⊢cast ⊢V) cast-id                 = ⊢V
+cast-pres (⊢cast (⊢cast ⊢V)) (cast-comp r i) = ⊢cast ⊢V
+
+cast-pres-mult : ∀ {Σ gc ℓv A M N}
+  → [] ; Σ ; gc ; ℓv ⊢ M ⇐ A
+  → M —↠ N
+    ---------------------------------------------------
+  → [] ; Σ ; gc ; ℓv ⊢ N ⇐ A
+cast-pres-mult ⊢M (_ ∎)                 = ⊢M
+cast-pres-mult ⊢M (_ —→⟨ M→L ⟩ L↠N) = cast-pres-mult (cast-pres ⊢M M→L) L↠N
