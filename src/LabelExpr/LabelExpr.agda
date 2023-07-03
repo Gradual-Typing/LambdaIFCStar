@@ -467,7 +467,48 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id (l high)} (ir id 
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
   ∣V†∣≡∣V′∣ = security-eq v† v′ eq
-stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = _ ⨾ _ !} (ir (inj 𝓋) _)) ⊢V ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ low !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′ =
+  ∣V†∣≡∣V′∣
+  where
+  ♥ : l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  ♥ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj (up id)) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ high !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′ =
+  ∣V†∣≡∣V′∣
+  where
+  ♥ : l high ⟪ id (l high) ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l high ⟪ id (l high) ⨾ high ! ⟫
+  ♥ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
+      _ ∎
+  V† = l high ⟪ id (l high) ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj id) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ _ !} (ir (inj (up id)) _)) (⊢cast ⊢l) ↠V′ v′ =
+  ∣V†∣≡∣V′∣
+  where
+  ♥ : l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  ♥ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj (up id)) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
 stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ ↑} (ir (up id) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
