@@ -82,13 +82,18 @@ pres {Σ} vc ⊢PC (⊢prot ⊢V ⊢PC′ x refl) ⊢μ (prot-val v) =
 pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame-pc = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (cast v V⟨c⟩→M) = {!!}
-pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢V eq) ⊢μ (β v vc†) rewrite uniq-LVal vc vc† =
-  ⟨ Σ , ⊇-refl Σ ,
-    ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v)) (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢lam ⊢N) ⊢V eq) ⊢μ (β-app! v vc† ⊢PC† ↠PC′ (success vc′)) =
+pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢V eq) ⊢μ (β v vc†)
+  rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v))
-          (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′) {!!} eq , ⊢μ ⟩
+          (stampₑ-wt vc† ⊢PC)
+          (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢app! (⊢lam ⊢N) ⊢V eq) ⊢μ (β-app! v vc† ⊢PC† ↠PC′ (success vc′))
+  rewrite uniq-LVal vc vc† =
+  ⟨ Σ , ⊇-refl Σ ,
+    ⊢prot (substitution-pres ⊢N (⊢value-pc ⊢V v))
+          (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′)
+          (≡→≼ (stamp⇒⋆-security vc† ⊢PC† ↠PC′ vc′)) eq , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ (β-app! v vc† ⊢PC† ↠PC′ fail) =
   ⟨ Σ , ⊇-refl Σ , ⊢prot-blame-pc , ⊢μ ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
