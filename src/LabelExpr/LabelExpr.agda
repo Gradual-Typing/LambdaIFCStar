@@ -451,6 +451,19 @@ stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {l high} {id (l low) �
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
   ∣V†∣≡∣V′∣ = security-eq v† v′ eq
-stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = id (l ℓ)} (ir id _)) ⊢V ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = id (l low)} (ir id x)) (⊢cast ⊢l) ↠V′ v′ =
+  contradiction refl (recompute (¬? (_ ==? _)) x)
+stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id (l high)} (ir id _)) (⊢cast ⊢l) ↠V′ v′ =
+  ∣V†∣≡∣V′∣
+  where
+  ♥ : l high ⟪ id (l high) ⟫ ⟪ id (l high) ⨾ high ! ⟫ —↠ₑ l high ⟪ id (l high) ⨾ high ! ⟫
+  ♥ = _ —→⟨ ξ β-id ⟩ _ ∎
+  V† = l high ⟪ id (l high) ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj id) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
 stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = _ ⨾ _ !} (ir (inj 𝓋) _)) ⊢V ↠V′ v′ = {!!}
 stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = _ ⨾ ↑} (ir (up id) _)) ⊢V ↠V′ v′ = {!!}
