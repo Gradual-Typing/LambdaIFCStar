@@ -413,4 +413,44 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-l {low}) ⊢l ↠V′ v′ = ∣
 stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ ∎) (v-cast (ir (inj id) _)) = refl
 stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ —→⟨ V→M ⟩ _) v′ =
   contradiction V→M (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
-stamp⇒⋆-security (v-cast (ir 𝓋 _)) ⊢V ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = low} (v-cast {ℓ} {l ℓ} {id (l ℓ)} (ir id x)) ⊢V ↠V′ v′ =
+  contradiction refl (recompute (¬? (_ ==? _)) x)
+stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {ℓ} {⋆} {_ ⨾ _ !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′
+  rewrite ℓ⋎low≡ℓ {ℓ} = ∣V†∣≡∣V′∣
+  where
+  ♥ : l ℓ ⟪ id (l ℓ) ⨾ ℓ ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l ℓ ⟪ id (l ℓ) ⨾ ℓ ! ⟫
+  ♥ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩ _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩ _ ∎
+  V† = l ℓ ⟪ id (l ℓ) ⨾ ℓ ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj id) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {⋆} {id (l low) ⨾ ↑ ⨾ high !} (ir (inj (up id)) _)) (⊢cast ⊢l) ↠V′ v′ =
+  ∣V†∣≡∣V′∣
+  where
+  ♥ : l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  ♥ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩ _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩ _ ∎
+  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj (up id)) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {l high} {id (l low) ⨾ ↑} (ir (up id) _)) (⊢cast ⊢l) ↠V′ v′ =
+  ∣V†∣≡∣V′∣
+  where
+  ♥ : l low ⟪ id (l low) ⨾ ↑ ⟫ ⟪ id (l high) ⨾ high ! ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  ♥ = _ —→⟨ comp (ir (up id) (λ ())) ⟩ _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩ _ ∎
+  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
+  v† : LVal V†
+  v† = v-cast (ir (inj (up id)) (λ ()))
+  eq : V† ≡ V′
+  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
+  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
+  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = id (l ℓ)} (ir id _)) ⊢V ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = _ ⨾ _ !} (ir (inj 𝓋) _)) ⊢V ↠V′ v′ = {!!}
+stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = _ ⨾ ↑} (ir (up id) _)) ⊢V ↠V′ v′ = {!!}
