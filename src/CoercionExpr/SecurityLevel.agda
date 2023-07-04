@@ -72,33 +72,56 @@ comp-security : ∀ {ℓ g₁ g₂} {c̅ₙ : CExpr l ℓ ⇒ g₁} {c̅ : CExpr
 comp-security {c̅ = id _} v r* v′ = {!!}
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ id g} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
-... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎)) in
+  let eq = det-mult r* ♣ (success v′) fail in
+  case (subst CVal eq v′) of λ where ()
 ... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ ↑} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
-... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎)) in
+  let eq = det-mult r* ♣ (success v′) fail in
+  case (subst CVal eq v′) of λ where ()
 ... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ ℓ !} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
-... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎)) in
+  let eq = det-mult r* ♣ (success v′) fail in
+  case (subst CVal eq v′) of λ where ()
 ... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ low ?? p} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
-... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎)) in
+  let eq = det-mult r* ♣ (success v′) fail in
+  case (subst CVal eq v′) of λ where ()
 ... | ⟨ d̅ , ↠d̅ , success (inj (id {l low})) ⟩ =
   let ih = comp-security v ↠d̅ (inj id) in
   ℓ≼low→ℓ≼ℓ′ ih
 ... | ⟨ d̅ , ↠d̅ , success (inj (id {l high})) ⟩ =
-  let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-⊥ id ⟩ _ ∎)) in
-  let eq = det-mult ♣ r* fail (success v′) in
   case v′ of λ where ()
-... | ⟨ d̅ , ↠d̅ , success (inj (up id)) ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success (inj (up id)) ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-⊥ (up id) ⟩ _ ∎)) in
+  let eq = det-mult r* ♣ (success v′) fail in
+  case (subst CVal eq v′) of λ where ()
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ high ?? p} {d̅ₙ} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
-... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
-... | ⟨ d̅ , ↠d̅ , success (inj id) ⟩ = {!!}
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎)) in
+  let eq = det-mult r* ♣ (success v′) fail in
+  case (subst CVal eq v′) of λ where ()
+... | ⟨ d̅ , ↠d̅ , success (inj (id {l low})) ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-↑ id ⟩ _ ∎)) in
+  let eq = det-mult ♣ r* (success (up id)) (success v′) in
+  subst (_ ≼_) (security-eq (up id) v′ eq) (_ ≼high)
+... | ⟨ d̅ , ↠d̅ , success (inj (id {l high})) ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-id id ⟩ _ ∎)) in
+  let eq = det-mult ♣ r* (success id) (success v′) in
+  subst (_ ≼_) (security-eq id v′ eq) (_ ≼high)
 ... | ⟨ d̅ , ↠d̅ , success (inj (up id)) ⟩ =
   let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-id (up id) ⟩ _ ∎)) in
   let eq = det-mult ♣ r* (success (up id)) (success v′) in
   subst (_ ≼_) (security-eq (up id) v′ eq) (_ ≼high)
-comp-security {c̅ = ⊥ _ _ p} v r* v′ = {!!}
+comp-security {c̅ = ⊥ _ _ p} v (_ ∎) ()
