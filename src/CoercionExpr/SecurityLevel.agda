@@ -69,7 +69,11 @@ comp-security : ∀ {ℓ g₁ g₂} {c̅ₙ : CExpr l ℓ ⇒ g₁} {c̅ : CExpr
   → (v′ : CVal d̅ₙ)
     -----------------------------
   → ∥ c̅ₙ ∥ v ≼ ∥ d̅ₙ ∥ v′
-comp-security {c̅ = id _} v r* v′ = {!!}
+comp-security {c̅ₙ = c̅ₙ} {id g} {d̅ₙ} v r* v′ =
+  ≡→≼ (security-eq v v′ (det-mult ♣ r* (success v) (success v′)))
+  where
+  ♣ : c̅ₙ ⨾ id g —↠ c̅ₙ
+  ♣ = _ —→⟨ id v ⟩ _ ∎
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ id g} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
 ... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
