@@ -1,12 +1,23 @@
 module CoercionExpr.SecurityLevel where
 
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Data.Nat
+open import Data.Unit using (⊤; tt)
+open import Data.Bool using (true; false) renaming (Bool to 𝔹)
+open import Data.List hiding ([_])
+open import Data.Product renaming (_,_ to ⟨_,_⟩)
+open import Data.Sum using (_⊎_)
+open import Data.Maybe
+open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst; sym)
+open import Function using (case_of_)
 
 open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import CoercionExpr.CoercionExpr
 open import CoercionExpr.Precision
+open import CoercionExpr.SyntacComp
 
 
 ∥_∥ : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → CVal c̅ → StaticLabel
@@ -42,3 +53,52 @@ level-prec (_ ⨾ ↑) .(id (l _) ⨾ (_ !)) (up id) (inj id) (⊑-castl c̅⊑c
 level-prec (_ ⨾ ↑) .(id (l _) ⨾ (_ !)) (up id) (inj id) (⊑-castr c̅⊑c̅′ _ ())
 level-prec (_ ⨾ ↑) .(id (l low) ⨾ ↑ ⨾ (high !)) (up id) (inj (up id)) c̅⊑c̅′ = h≼h
 level-prec (_ ⨾ ↑) .(id (l low) ⨾ ↑) (up id) (up id) c̅⊑c̅′ = h≼h
+
+
+security-eq : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g}
+  → (v₁ : CVal c̅)
+  → (v₂ : CVal d̅)
+  → c̅ ≡ d̅
+    --------------------------
+  → ∥ c̅ ∥ v₁ ≡ ∥ d̅ ∥ v₂
+security-eq v₁ v₂ eq rewrite eq | uniq-CVal v₁ v₂ = refl
+
+comp-security : ∀ {ℓ g₁ g₂} {c̅ₙ : CExpr l ℓ ⇒ g₁} {c̅ : CExpr g₁ ⇒ g₂} {d̅ₙ}
+  → (v : CVal c̅ₙ)
+  → c̅ₙ ⨟ c̅ —↠ d̅ₙ
+  → (v′ : CVal d̅ₙ)
+    -----------------------------
+  → ∥ c̅ₙ ∥ v ≼ ∥ d̅ₙ ∥ v′
+comp-security {c̅ = id _} v r* v′ = {!!}
+comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ id g} v r* v′
+  with cexpr-sn (c̅ₙ ⨟ c̅)
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
+comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ ↑} v r* v′
+  with cexpr-sn (c̅ₙ ⨟ c̅)
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
+comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ ℓ !} v r* v′
+  with cexpr-sn (c̅ₙ ⨟ c̅)
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
+comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ low ?? p} v r* v′
+  with cexpr-sn (c̅ₙ ⨟ c̅)
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success (inj (id {l low})) ⟩ =
+  let ih = comp-security v ↠d̅ (inj id) in
+  ℓ≼low→ℓ≼ℓ′ ih
+... | ⟨ d̅ , ↠d̅ , success (inj (id {l high})) ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-⊥ id ⟩ _ ∎)) in
+  let eq = det-mult ♣ r* fail (success v′) in
+  case v′ of λ where ()
+... | ⟨ d̅ , ↠d̅ , success (inj (up id)) ⟩ = {!!}
+comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ high ?? p} {d̅ₙ} v r* v′
+  with cexpr-sn (c̅ₙ ⨟ c̅)
+... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success (inj id) ⟩ = {!!}
+... | ⟨ d̅ , ↠d̅ , success (inj (up id)) ⟩ =
+  let ♣ = (↠-trans (plug-cong ↠d̅) (_ —→⟨ ?-id (up id) ⟩ _ ∎)) in
+  let eq = det-mult ♣ r* (success (up id)) (success v′) in
+  subst (_ ≼_) (security-eq (up id) v′ eq) (_ ≼high)
+comp-security {c̅ = ⊥ _ _ p} v r* v′ = {!!}

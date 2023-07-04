@@ -96,6 +96,9 @@ low  ≼? high = yes l≼h
 high ≼? high = yes h≼h
 high ≼? low  = no λ ()
 
+ℓ≼low→ℓ≼ℓ′ : ∀ {ℓ ℓ′} → ℓ ≼ low → ℓ ≼ ℓ′
+ℓ≼low→ℓ≼ℓ′ {.low} {ℓ′} l≼l = low≼ ℓ′
+
 
 {- **** Label subtyping **** -}
 infix 5 _<:ₗ_
