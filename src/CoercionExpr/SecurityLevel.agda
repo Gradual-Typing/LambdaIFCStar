@@ -90,7 +90,18 @@ comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ ℓ !} v r* v′
   let ♣ = (↠-trans (plug-cong ↠⊥) (_ —→⟨ ξ-⊥ ⟩ _ ∎)) in
   let eq = det-mult r* ♣ (success v′) fail in
   case (subst CVal eq v′) of λ where ()
-... | ⟨ d̅ , ↠d̅ , success v-d ⟩ = {!!}
+... | ⟨ id (l ℓ) , ↠d̅ , success id ⟩ =
+  let ih = comp-security v ↠d̅ id in
+  let ♣ : (c̅ₙ ⨟ c̅) ⨾ ℓ ! —↠ id (l ℓ) ⨾ ℓ !
+      ♣ = plug-cong ↠d̅ in
+  let eq = det-mult ♣ r* (success (inj id)) (success v′) in
+  subst (_ ≼_) (security-eq (inj id) v′ eq) ih
+... | ⟨ id (l low) ⨾ ↑ , ↠d̅ , success (up id) ⟩ =
+  let ih = comp-security v ↠d̅ (up id) in
+  let ♣ : (c̅ₙ ⨟ c̅) ⨾ high ! —↠ id (l low) ⨾ ↑ ⨾ high !
+      ♣ = plug-cong ↠d̅ in
+  let eq = det-mult ♣ r* (success (inj (up id))) (success v′) in
+  subst (_ ≼_) (security-eq (inj (up id)) v′ eq) (_ ≼high)
 comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ low ?? p} v r* v′
   with cexpr-sn (c̅ₙ ⨟ c̅)
 ... | ⟨ ⊥ _ _ p , ↠⊥ , fail ⟩ =
