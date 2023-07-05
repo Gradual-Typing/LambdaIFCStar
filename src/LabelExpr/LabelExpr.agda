@@ -16,8 +16,8 @@ open import Common.Utils
 open import Common.SecurityLabels
 open import Common.BlameLabels
 open import CoercionExpr.CoercionExpr
-  renaming (_∎ to _∎ₗ ; _—→⟨_⟩_ to _—→ₗ⟨_⟩_)
-  hiding (Progress; progress; plug-cong; ↠-trans)
+  renaming (_∎ to _∎ₗ ; _—→⟨_⟩_ to _—→ₗ⟨_⟩_; ↠-trans to ↠-transₗ)
+  hiding (Progress; progress; plug-cong)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
@@ -370,10 +370,23 @@ det-multₑ (L —→⟨ L→M ⟩ M↠V) (L —→⟨ L→N ⟩ N↠W) v w
 
 cast-red-label-eq : ∀ {ℓ ℓ′ g} {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g}
   → l ℓ ⟪ c̅ ⟫ —↠ₑ l ℓ′ ⟪ c̅′ ⟫
+    ------------------------------------
   → ℓ ≡ ℓ′
 cast-red-label-eq (l ℓ ⟪ c̅ ⟫ ∎) = refl
 cast-red-label-eq (_ —→⟨ β-id ⟩ (_ —→⟨ r ⟩ _)) =
   contradiction r (LVal⌿→ v-l)
 cast-red-label-eq (_ —→⟨ cast _ _ ⟩ r*) = cast-red-label-eq r*
 cast-red-label-eq (_ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
+  contradiction r (LResult⌿→ fail)
+
+cast-red-inv : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g}
+  → l ℓ ⟪ c̅ ⟫ —↠ₑ l ℓ ⟪ d̅ ⟫
+    --------------------------------------------
+  → c̅ —↠ d̅
+cast-red-inv (_ ∎) = _ ∎ₗ
+cast-red-inv (_ —→⟨ β-id ⟩ _ —→⟨ r ⟩ _) =
+  contradiction r (LVal⌿→ v-l)
+cast-red-inv (_ —→⟨ cast c̅→⁺c̅ₙ v ⟩ r*) =
+  ↠-transₗ (→⁺-impl-↠ c̅→⁺c̅ₙ) (cast-red-inv r*)
+cast-red-inv (_ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
   contradiction r (LResult⌿→ fail)
