@@ -63,14 +63,14 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → app (ƛ N) V A B ℓ ∣ μ ∣ PC —→
          prot (stampₑ PC vc ℓ) (success (stampₑ-LVal vc)) ℓ (N [ V ]) B ∣ μ
 
-  β-app! : ∀ {N V A B ℓ μ PC PC′} {gc}
-    → (v  : Value V)
-    → (vc : LVal PC)
-    → ⊢ PC ⇐ gc
-    → (stampₑ PC vc ℓ) ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
-    → (r : LResult PC′)
-      ------------------------------------------------------------------------------ App!
-    → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ PC —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
+  -- β-app! : ∀ {N V A B ℓ μ PC PC′} {gc}
+  --   → (v  : Value V)
+  --   → (vc : LVal PC)
+  --   → ⊢ PC ⇐ gc
+  --   → (stampₑ PC vc ℓ) ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
+  --   → (r : LResult PC′)
+  --     ------------------------------------------------------------------------------ App!
+  --   → app! (ƛ N) V A B (l ℓ) ∣ μ ∣ PC —→ prot PC′ r ℓ (N [ V ]) B ∣ μ
 
   app-cast : ∀ {N V W A B C D gc₁ gc₂ ℓ₁ ℓ₂} {d̅ : CExpr gc₂ ⇒ gc₁} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′}
@@ -93,8 +93,8 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ---------------------------------------------------------------------------- AppBlame
     → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ PC —→ blame p ∣ μ
 
-  app!-cast : ∀ {N V W A B C D gc gc′ ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ g}
-                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′}
+  app!-cast : ∀ {N V W A B C T gc gc′ ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                {c : Cast C ⇒ A} {d : Cast B ⇒ T of g} {μ PC PC′}
     → (v  : Value V)
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
@@ -104,17 +104,17 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (r : LResult PC′)
     → V ⟨ c ⟩ —↠ W
     → Value W
-      ---------------------------------------------------------------------------- App!Cast
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ PC —→
-         prot PC′ r ℓ′ ((N [ W ]) ⟨ d ⟩) D ∣ μ
+      ------------------------------------------------------------------------------------------ App!Cast
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C (T of g) ∣ μ ∣ PC —→
+         (prot PC′ r ℓ′ ((N [ W ]) ⟨ d ⟩) (T of g)) ⟨ cast (coerceᵣ-id T) (coerce (g ⋎̃ l ℓ′) ⇒⋆) ⟩ ∣ μ
 
-  app!-blame : ∀ {N V A B C D gc ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ g}
+  app!-blame : ∀ {N V A B C D gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
                  {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC p}
     → (v  : Value V)
     → (𝓋  : CVal c̅ₙ)
     → V ⟨ c ⟩ —↠ blame p
       ---------------------------------------------------------------------------- App!Blame
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D g ∣ μ ∣ PC —→ blame p ∣ μ
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→ blame p ∣ μ
 
   β-if-true : ∀ {A ℓ M N μ PC}
     → (v : LVal PC)

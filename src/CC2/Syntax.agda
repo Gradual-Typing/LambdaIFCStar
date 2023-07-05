@@ -19,7 +19,7 @@ data Op : Set where
   op-addr         : (n : RawAddr) → Op
   op-lam          : Op
   op-app          : (A B : Type) → (ℓ : StaticLabel) → Op
-  op-app!         : (A B : Type) → (g :       Label) → Op
+  op-app!         : (A B : Type) → Op
   op-const        : ∀ {ι} (k : rep ι) → Op
   op-if           : (A : Type) → (ℓ : StaticLabel) → Op
   op-if!          : (A : Type) → (g :       Label) → Op
@@ -43,7 +43,7 @@ sig : Op → List Sig
 sig (op-addr n)        = []
 sig op-lam             = (ν ■) ∷ []
 sig (op-app  A B ℓ)    = ■ ∷ ■ ∷ []
-sig (op-app! A B g)    = ■ ∷ ■ ∷ []
+sig (op-app! A B)      = ■ ∷ ■ ∷ []
 sig (op-const k)       = []
 sig (op-if  A ℓ)       = ■ ∷ ■ ∷ ■ ∷ []
 sig (op-if! A g)       = ■ ∷ ■ ∷ ■ ∷ []
@@ -66,7 +66,7 @@ infix 8 _⟨_⟩
 pattern addr n             = (op-addr n) ⦅ nil ⦆
 pattern ƛ N                = (op-lam) ⦅ cons (bind (ast N)) nil ⦆
 pattern app L M A B ℓ      = (op-app A B ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern app! L M A B g     = (op-app! A B g) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern app! L M A B       = (op-app! A B) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern $_ k               = (op-const k) ⦅ nil ⦆
 pattern if L A ℓ M N       = (op-if A ℓ) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
 pattern if! L A g M N      = (op-if! A g) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆

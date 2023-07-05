@@ -54,12 +54,12 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ app L M A B ℓ ⇐ C
 
 
-  ⊢app! : ∀ {Γ Σ gc ℓv A B C L M g}
-    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ B of g
+  ⊢app! : ∀ {Γ Σ gc ℓv A B C L M}
+    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ B of ⋆
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
-    → C ≡ stamp B g
+    → C ≡ stamp B ⋆
       ------------------------------------------------------ App!
-    → Γ ; Σ ; gc ; ℓv ⊢ app! L M A B g ⇐ C
+    → Γ ; Σ ; gc ; ℓv ⊢ app! L M A B ⇐ C
 
 
   ⊢if : ∀ {Γ Σ ℓc ℓv A B L M N ℓ}

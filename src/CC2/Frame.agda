@@ -13,9 +13,9 @@ data Frame : Set where
   -- app  L M A B ℓ
   app□   : (M : Term) → (A B : Type) → StaticLabel → Frame
   app_□  : (V : Term) → Value V → (A B : Type) → StaticLabel → Frame
-  -- app! L M A B g
-  app!□  : (M : Term) → (A B : Type) → Label → Frame
-  app!_□ : (V : Term) → Value V → (A B : Type) → Label → Frame
+  -- app! L M A B
+  app!□  : (M : Term) → (A B : Type) → Frame
+  app!_□ : (V : Term) → Value V → (A B : Type) → Frame
 
   -- ref⟦ ℓ ⟧ M
   ref⟦_⟧□ : StaticLabel → Frame
@@ -47,8 +47,8 @@ data Frame : Set where
 plug : Term → Frame → Term
 plug L (app□ M A B ℓ)          = app  L M A B ℓ
 plug M (app V □ v A B ℓ)       = app  V M A B ℓ
-plug L (app!□ M A B g)         = app! L M A B g
-plug M (app! V □ v A B g)      = app! V M A B g
+plug L (app!□ M A B)           = app! L M A B
+plug M (app! V □ v A B)        = app! V M A B
 plug M (ref⟦ ℓ ⟧□)             = ref⟦ ℓ ⟧ M
 plug M (ref?⟦ ℓ ⟧□ p)          = ref?⟦ ℓ ⟧ M p
 plug M (!□ A g)                = ! M A g
