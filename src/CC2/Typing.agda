@@ -137,15 +137,6 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ prot (bl p) fail ℓ M A ⇐ B
 
 
-  -- ⊢prot-cast : ∀ {Γ Σ gc gc′ gc″ ℓv A B M ℓ} {c̅ : CoercionExp gc″ ⇒ gc′}
-  --   → (∀ {ℓv} → Γ ; Σ ; gc′ ; ℓv ⊢ M ⇐ A)
-  --   → gc ⋎̃ l ℓ ≾ gc″
-  --   → NotProj (gc ⋎̃ l ℓ) gc″
-  --   → B ≡ stamp A (l ℓ)
-  --     ---------------------------------------------------- ProtCast
-  --   → Γ ; Σ ; gc ; ℓv ⊢ prot-cast c̅ ℓ M A ⇐ B
-
-
   ⊢cast : ∀ {Γ Σ gc ℓv A B M} {c : Cast A ⇒ B}
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
       ----------------------------------------- Cast
