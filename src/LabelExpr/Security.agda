@@ -32,13 +32,13 @@ stampₑ-security {V = l high} {ℓ = high} v-l = refl
 stampₑ-security {V} {low}  (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 low
 stampₑ-security {V} {high} (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 high
 
-security-eq : ∀ {V₁ V₂}
+security-eqₑ : ∀ {V₁ V₂}
   → (v₁ : LVal V₁)
   → (v₂ : LVal V₂)
   → V₁ ≡ V₂
     --------------------------
   → ∥ V₁ ∥ v₁ ≡ ∥ V₂ ∥ v₂
-security-eq v₁ v₂ eq rewrite eq rewrite uniq-LVal v₁ v₂ = refl
+security-eqₑ v₁ v₂ eq rewrite eq rewrite uniq-LVal v₁ v₂ = refl
 
 
 cast-security : ∀ {ℓ g V V′} {c̅ : CExpr l ℓ ⇒ g}
@@ -67,8 +67,10 @@ cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l) (_ —→⟨ comp i† ⟩ 
 cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l) (_ —→⟨ comp i† ⟩ _ —→⟨ blame _ ⟩ _) v-l = {!!}
 cast-security (v-cast i) ⊢V (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ ξ ℓ⟨c⟩→N ⟩ ↠V′) (v-cast x₁) =
   contradiction ℓ⟨c⟩→N (LVal⌿→ (v-cast i))
-cast-security (v-cast (ir 𝓋 _)) ⊢V (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ comp i ⟩ ↠V′) (v-cast (ir 𝓋′ _)) =
-  {!!}
+cast-security (v-cast (ir 𝓋 _)) ⊢V (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ comp i ⟩ ↠V′) (v-cast (ir 𝓋′ _))
+  with preserve-mult (⊢cast ⊢l) ↠V′
+... | ⊢cast ⊢l with cast-red-label-eq ↠V′
+...   | refl = comp-security 𝓋 (cast-red-inv ↠V′) 𝓋′
 
 
 stamp⇒⋆-security : ∀ {g ℓ V V′}
@@ -95,7 +97,7 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-l {low}) ⊢l ↠V′ v′ = ∣
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ ∎) (v-cast (ir (inj id) _)) = refl
 stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ —→⟨ V→M ⟩ _) v′ =
   contradiction V→M (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
@@ -112,7 +114,7 @@ stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {ℓ} {⋆} {_ ⨾ _ !} (ir 
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {⋆} {id (l low) ⨾ ↑ ⨾ high !} (ir (inj (up id)) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
@@ -124,7 +126,7 @@ stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {⋆} {id (l low) ⨾ 
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {l high} {id (l low) ⨾ ↑} (ir (up id) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
@@ -138,7 +140,7 @@ stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {l high} {id (l low) �
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = id (l low)} (ir id x)) (⊢cast ⊢l) ↠V′ v′ =
   contradiction refl (recompute (¬? (_ ==? _)) x)
 stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id (l high)} (ir id _)) (⊢cast ⊢l) ↠V′ v′ =
@@ -152,7 +154,7 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id (l high)} (ir id 
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ low !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
@@ -166,7 +168,7 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ low !} (ir 
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ high !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
@@ -180,7 +182,7 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ high !} (ir
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ _ !} (ir (inj (up id)) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
@@ -194,7 +196,7 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ _ !} (ir (inj 
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ ↑} (ir (up id) _)) (⊢cast ⊢l) ↠V′ v′ =
   ∣V†∣≡∣V′∣
   where
@@ -208,4 +210,4 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ ↑} (ir (up i
   eq : V† ≡ V′
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eq v† v′ eq
+  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
