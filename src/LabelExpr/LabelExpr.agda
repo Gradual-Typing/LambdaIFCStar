@@ -367,3 +367,13 @@ det-multₑ (_ —→⟨ r ⟩ ↠V) (_ ∎) _ v = contradiction r (LResult⌿�
 det-multₑ (L —→⟨ L→M ⟩ M↠V) (L —→⟨ L→N ⟩ N↠W) v w
   with detₑ L→M L→N
 ... | refl = det-multₑ M↠V N↠W v w
+
+cast-red-label-eq : ∀ {ℓ ℓ′ g} {c̅ : CExpr l ℓ ⇒ g} {c̅′ : CExpr l ℓ′ ⇒ g}
+  → l ℓ ⟪ c̅ ⟫ —↠ₑ l ℓ′ ⟪ c̅′ ⟫
+  → ℓ ≡ ℓ′
+cast-red-label-eq (l ℓ ⟪ c̅ ⟫ ∎) = refl
+cast-red-label-eq (_ —→⟨ β-id ⟩ (_ —→⟨ r ⟩ _)) =
+  contradiction r (LVal⌿→ v-l)
+cast-red-label-eq (_ —→⟨ cast _ _ ⟩ r*) = cast-red-label-eq r*
+cast-red-label-eq (_ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
+  contradiction r (LResult⌿→ fail)
