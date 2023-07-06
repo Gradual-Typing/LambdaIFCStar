@@ -84,8 +84,8 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ---------------------------------------------------------------------------- AppBlame
     → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ PC —→ blame p ∣ μ
 
-  app!-cast : ∀ {N V W A B C T gc gc′ ℓ g} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
-                {c : Cast C ⇒ A} {d : Cast B ⇒ T of g} {μ PC PC′}
+  app!-cast : ∀ {N V W A B C D gc gc′ ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′}
     → (v  : Value V)
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
@@ -96,8 +96,8 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → V ⟨ c ⟩ —↠ W
     → Value W
       ------------------------------------------------------------------------------------------ App!Cast
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C (T of g) ∣ μ ∣ PC —→
-         (prot PC′ r ℓ′ ((N [ W ]) ⟨ d ⟩) (T of g)) ⟨ cast (coerceᵣ-id T) (coerce (g ⋎̃ l ℓ′) ⇒⋆) ⟩ ∣ μ
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→
+         (prot PC′ r ℓ′ ((N [ W ]) ⟨ d ⟩) D) ⟨ stamp D , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
 
   app!-blame : ∀ {N V A B C D gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
                  {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC p}

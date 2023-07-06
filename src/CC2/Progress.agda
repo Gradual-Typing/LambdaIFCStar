@@ -49,7 +49,7 @@ progress {M = prot PC′ (success vc′) ℓ M A} vc ⊢PC (⊢prot ⊢M ⊢PC�
   case progress vc′ ⊢PC′ ⊢M ⊢μ of λ where
   (step M→M′)  → step (prot-ctx M→M′)
   (err E-blame) → step prot-blame
-  (done v)      → step (prot-val v ⊢M)
+  (done v)      → step (prot-val v)
 progress {M = prot (bl p) fail ℓ M A} vc ⊢PC ⊢prot-blame-pc ⊢μ =
   step prot-blame-pc
 progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
@@ -77,26 +77,18 @@ progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
             step (app-blame w 𝓋 V⟨c⟩↠blame)
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
             step (app-cast w vc 𝓋 ↠PC′ r V⟨c⟩↠V′ v′)
-progress {M = app! L M A B g} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
+progress {M = app! L M A B} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
-  (step L→L′)  → step (ξ {F = app!□ M A B g} L→L′)
-  (err E-blame) → step (ξ-blame {F = app!□ M A B g})
+  (step L→L′)  → step (ξ {F = app!□ M A B} L→L′)
+  (err E-blame) → step (ξ-blame {F = app!□ M A B})
   (done (V-raw v)) →
-    case ⟨ v , ⊢L ⟩ of λ where
-    ⟨ V-ƛ , ⊢lam ⊢N ⟩ →
-      case progress vc ⊢PC ⊢M ⊢μ of λ where
-      (step M→M′) → step (ξ {F = app! L □ (V-raw v) A B g} M→M′)
-      (err E-blame) → step (ξ-blame {F = app! L □ (V-raw v) A B g})
-      (done w) →
-        case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
-        ⟨ PC′ , ↠PC′ , r ⟩ →
-          step (β-app! w vc ⊢PC ↠PC′ r)
+    case ⟨ v , ⊢L ⟩ of λ where ⟨ V-ƛ , () ⟩
   (done (V-cast v i)) →
     case ⟨ v , ⊢L , i ⟩ of λ where
     ⟨ V-ƛ , ⊢cast {c = cast (fun d̅ c d) c̅ₙ} (⊢lam ⊢N) , ir-fun 𝓋 ⟩ →
       case progress vc ⊢PC ⊢M ⊢μ of λ where
-      (step M→M′) → step (ξ {F = app! L □ (V-cast v i) A B g} M→M′)
-      (err E-blame) → step (ξ-blame {F = app! L □ (V-cast v i) A B g})
+      (step M→M′) → step (ξ {F = app! L □ (V-cast v i) A B} M→M′)
+      (err E-blame) → step (ξ-blame {F = app! L □ (V-cast v i) A B})
       (done w) →
         case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫ ⟪ d̅ ⟫)
                       (⊢cast (⊢cast (stampₑ-wt vc ⊢PC))) of λ where
