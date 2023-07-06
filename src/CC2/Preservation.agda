@@ -116,6 +116,12 @@ pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v 
 pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame v 𝓋 ↠blame) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- If -}
+pres {Σ} vc ⊢PC (⊢if (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ (if-true-cast vc†)
+  rewrite uniq-LVal vc vc† =
+  ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢M (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢if (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ (if-false-cast vc†)
+  rewrite uniq-LVal vc vc† =
+  ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢N (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
                 (if!-true-cast vc† 𝓋 ⊢PC† ↠PC′ (success vc′))
   rewrite eq | uniq-LVal vc vc† =
@@ -137,10 +143,6 @@ pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
   rewrite eq =
   ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (β-if-true v) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (β-if-false v) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (if-true-cast v) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (if-false-cast v) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-let x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (ref v x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (ref? v x x₁ x₂) = {!!}
