@@ -62,26 +62,13 @@ cast-security v-l ⊢V ↠V′ (v-cast (ir (inj (up id)) x₁)) = _ ≼high
 cast-security v-l ⊢l ↠V′ (v-cast (ir (up id) x)) = _ ≼high
 cast-security (v-cast i) ⊢V (_ —→⟨ ξ ℓ⟨c̅⟩→N ⟩ _) v-l =
   contradiction ℓ⟨c̅⟩→N (LVal⌿→ (v-cast i))
-cast-security (v-cast (ir id x)) (⊢cast ⊢l) (_ —→⟨ comp i† ⟩ r*) v-l =
-  contradiction refl (recompute (¬? (_ ==? _)) x)
-cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l)
-              (_ —→⟨ comp i† ⟩ _ —→⟨ cast r _ ⟩ _ —→⟨ β-id ⟩ _ ∎) v-l =
-  comp-security (up id) (→⁺-impl-↠ r) id
-cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l)
-              (_ —→⟨ comp i† ⟩ _ —→⟨ cast _ 𝓋 ⟩ _ —→⟨ cast (_ —→ₗ⟨ r ⟩ _) _ ⟩ _) v-l =
-  contradiction r (CVal⌿→ 𝓋)
-cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l)
-              (_ —→⟨ comp i† ⟩ _ —→⟨ cast x y ⟩ _ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) v-l =
-  contradiction r (LResult⌿→ fail)
-cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l)
-              (_ —→⟨ comp i† ⟩ _ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) v-l =
-  contradiction r (LResult⌿→ fail)
-cast-security (v-cast (ir (inj v) _)) (⊢cast ⊢l) (_ —→⟨ comp i† ⟩ r) v-l
+cast-security (v-cast (ir v _)) (⊢cast ⊢l) (_ —→⟨ comp i† ⟩ r) v-l
   with cast-to-label-inv r | preserve-mult (⊢cast ⊢l) r
 ... | ⟨ refl , r* ⟩ | ⊢l =
   let comp-red = cast-red-inv r* in
-  comp-security (inj v) comp-red id
-cast-security (v-cast i) ⊢V (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ ξ ℓ⟨c⟩→N ⟩ ↠V′) (v-cast x₁) =
+  comp-security v comp-red id
+cast-security (v-cast i) ⊢V
+              (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ ξ ℓ⟨c⟩→N ⟩ ↠V′) (v-cast _) =
   contradiction ℓ⟨c⟩→N (LVal⌿→ (v-cast i))
 cast-security (v-cast (ir 𝓋 _)) ⊢V
               (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ comp i ⟩ ↠V′) (v-cast (ir 𝓋′ _))
