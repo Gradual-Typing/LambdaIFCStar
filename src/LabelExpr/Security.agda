@@ -9,7 +9,7 @@ open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no; recompute)
 open import Relation.Nullary.Negation using (contradiction; ¬?)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; cong; sym)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; cong; sym; subst)
 open import Function using (case_of_)
 
 open import Common.Utils
@@ -231,6 +231,14 @@ stamp⇒⋆-cast-security {g} {g′} {ℓ} {V} {V′} {c̅} v ⊢V ↠V′ v′ 
     case lexpr-sn (W ⟪ c̅ ⟫) (⊢cast ⊢W) of λ where
     ⟨ W′ , ↠W′ , success w′ ⟩ →
       let leq = cast-security w ⊢W ↠W′ w′ in
-      {!!}
-    ⟨ blame q , ↠blameq , fail ⟩ → {!!}
-  ⟨ blame p , ↠blamep , fail ⟩ → {!!}
+      let r*  = ↠ₑ-trans (plug-congₑ ↠W) ↠W′ in
+      ≼-trans (≡→≼ eq) (subst (_ ≼_)
+        (security-eqₑ w′ v′ (det-multₑ r* ↠V′ (success w′) (success v′))) leq)
+    ⟨ blame q , ↠blameq , fail ⟩ →
+      let r* = ↠ₑ-trans (plug-congₑ ↠W) ↠blameq in
+      let eq = det-multₑ ↠V′ r* (success v′) fail in
+      case (subst LVal eq v′) of λ ()
+  ⟨ blame p , ↠blamep , fail ⟩ →
+    let r* = ↠ₑ-trans (plug-congₑ ↠blamep) (_ —→⟨ ξ-blame ⟩ _ ∎) in
+    let eq = det-multₑ ↠V′ r* (success v′) fail in
+    case (subst LVal eq v′) of λ ()
