@@ -216,6 +216,19 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ ↑} (ir (up i
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
   ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
 
+
+stamp-cast-security : ∀ {g g′ ℓ V V′} {c̅ : CExpr (g ⋎̃ l ℓ) ⇒ g′}
+  → (v : LVal V)
+  → ⊢ V ⇐ g
+  → stampₑ V v ℓ ⟪ c̅ ⟫ —↠ₑ V′
+  → (v′ : LVal V′)
+    ---------------------------------
+  → (∥ V ∥ v) ⋎ ℓ ≼ ∥ V′ ∥ v′
+stamp-cast-security {ℓ = ℓ} v ⊢V ↠V′ v′ =
+  let eq  = stampₑ-security {ℓ = ℓ} v in
+  let leq = cast-security (stampₑ-LVal v) (stampₑ-wt v ⊢V) ↠V′ v′ in
+  ≼-trans (≡→≼ eq) leq
+
 stamp⇒⋆-cast-security : ∀ {g g′ ℓ V V′} {c̅ : CExpr ⋆ ⇒ g′}
   → (v : LVal V)
   → ⊢ V ⇐ g
