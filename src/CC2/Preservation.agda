@@ -150,6 +150,14 @@ pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
   ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢let ⊢V ⊢N) ⊢μ (β-let v) =
   ⟨ Σ , ⊇-refl Σ , substitution-pres ⊢N (⊢value-pc ⊢V v) , ⊢μ ⟩
+{- Reference creation -}
+pres {Σ} vc ⊢PC (⊢ref {T = T} ⊢V _) ⊢μ (ref {ℓ} {V} {n} v fresh) =
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , ⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ fresh ,
+    ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ fresh ⟩
+pres {Σ} vc ⊢PC (⊢ref? {T = T} ⊢V) ⊢μ (ref? {ℓ} {V} {n} v fresh ↠PC′ vc′) =
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , ⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ fresh ,
+    ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ fresh ⟩
+pres {Σ} vc ⊢PC ⊢M ⊢μ (ref?-blame _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- Assignment -}
 pres {Σ} vc ⊢PC (⊢assign (⊢addr hit) ⊢V _ _) ⊢μ (β-assign v) =
   ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢V v) v ⊢μ hit ⟩
@@ -167,8 +175,5 @@ pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-blame            _ _ _ _) = ⟨ Σ , ⊇-
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame-pc  _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame _ _ _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {-------------------------------------------}
-pres vc ⊢PC ⊢M ⊢μ (ref v x) = {!!}
-pres vc ⊢PC ⊢M ⊢μ (ref? v x x₁ x₂) = {!!}
-pres vc ⊢PC ⊢M ⊢μ (ref?-blame v x) = {!!}
 pres vc ⊢PC ⊢M ⊢μ (deref x) = {!!}
 pres vc ⊢PC ⊢M ⊢μ (deref-cast 𝓋 x) = {!!}
