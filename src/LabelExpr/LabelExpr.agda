@@ -390,3 +390,14 @@ cast-red-inv (_ —→⟨ cast c̅→⁺c̅ₙ v ⟩ r*) =
   ↠-transₗ (→⁺-impl-↠ c̅→⁺c̅ₙ) (cast-red-inv r*)
 cast-red-inv (_ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
   contradiction r (LResult⌿→ fail)
+
+cast-to-label-inv : ∀ {ℓ ℓ′ g} {c̅ : CExpr l ℓ ⇒ g}
+  → l ℓ ⟪ c̅ ⟫ —↠ₑ l ℓ′
+    ------------------------------------
+  → (ℓ ≡ ℓ′) × (l ℓ ⟪ c̅ ⟫ —↠ₑ l ℓ ⟪ id (l ℓ) ⟫)
+cast-to-label-inv (l ℓ ⟪ id (l _) ⟫ —→⟨ β-id ⟩ _ ∎) = ⟨ refl , _ ∎ ⟩
+cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ cast r 𝓋 ⟩ r*) =
+  let ⟨ eq , ih ⟩ = cast-to-label-inv r* in
+  ⟨ eq , _ —→⟨ cast r 𝓋 ⟩ ih ⟩
+cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
+  contradiction r (LResult⌿→ fail)

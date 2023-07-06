@@ -41,9 +41,9 @@ security-eqₑ : ∀ {V₁ V₂}
 security-eqₑ v₁ v₂ eq rewrite eq rewrite uniq-LVal v₁ v₂ = refl
 
 
-cast-security : ∀ {ℓ g V V′} {c̅ : CExpr l ℓ ⇒ g}
+cast-security : ∀ {g g′ V V′} {c̅ : CExpr g ⇒ g′}
   → (v : LVal V)
-  → ⊢ V ⇐ l ℓ
+  → ⊢ V ⇐ g
   → V ⟪ c̅ ⟫ —↠ₑ V′
   → (v′ : LVal V′)
     -------------------------
@@ -76,6 +76,11 @@ cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l)
 cast-security (v-cast (ir (up id) _)) (⊢cast ⊢l)
               (_ —→⟨ comp i† ⟩ _ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) v-l =
   contradiction r (LResult⌿→ fail)
+cast-security (v-cast (ir (inj v) _)) (⊢cast ⊢l) (_ —→⟨ comp i† ⟩ r) v-l
+  with cast-to-label-inv r | preserve-mult (⊢cast ⊢l) r
+... | ⟨ refl , r* ⟩ | ⊢l =
+  let comp-red = cast-red-inv r* in
+  comp-security (inj v) comp-red id
 cast-security (v-cast i) ⊢V (l _ ⟪ _ ⟫ ⟪ _ ⟫ —→⟨ ξ ℓ⟨c⟩→N ⟩ ↠V′) (v-cast x₁) =
   contradiction ℓ⟨c⟩→N (LVal⌿→ (v-cast i))
 cast-security (v-cast (ir 𝓋 _)) ⊢V
@@ -223,3 +228,22 @@ stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ ↑} (ir (up i
   eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
   ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
   ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
+
+stamp⇒⋆-cast-security : ∀ {g g′ ℓ V V′} {c̅ : CExpr ⋆ ⇒ g′}
+  → (v : LVal V)
+  → ⊢ V ⇐ g
+  → stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ ⟪ c̅ ⟫ —↠ₑ V′
+  → (v′ : LVal V′)
+    ---------------------------------
+  → (∥ V ∥ v) ⋎ ℓ ≼ ∥ V′ ∥ v′
+stamp⇒⋆-cast-security {g} {g′} {ℓ} {V} {V′} {c̅} v ⊢V ↠V′ v′ =
+  case lexpr-sn (stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫) (⊢cast (stampₑ-wt v ⊢V)) of λ where
+  ⟨ W , ↠W , success w ⟩ →
+    let eq = stamp⇒⋆-security v ⊢V ↠W w in
+    let ⊢W = preserve-mult (⊢cast (stampₑ-wt v ⊢V)) ↠W in
+    case lexpr-sn (W ⟪ c̅ ⟫) (⊢cast ⊢W) of λ where
+    ⟨ W′ , ↠W′ , success w′ ⟩ →
+      let leq = cast-security w ⊢W ↠W′ w′ in
+      {!!}
+    ⟨ blame q , ↠blameq , fail ⟩ → {!!}
+  ⟨ blame p , ↠blamep , fail ⟩ → {!!}

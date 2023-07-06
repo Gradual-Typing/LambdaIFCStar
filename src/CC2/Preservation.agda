@@ -113,9 +113,11 @@ pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-blame v �
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v vc† 𝓋 ⊢PC† ↠PC′ (success vc′) ↠W w)
   rewrite eq =
+  let sec-leq = cast-security (stampₑ-LVal vc†) (stampₑ-wt vc† ⊢PC) ↠PC′ vc′ in
   ⟨ Σ , ⊇-refl Σ ,
     ⊢cast (⊢prot (⊢cast (substitution-pres ⊢N (⊢value-pc (cast-pres-mult (⊢cast ⊢V) ↠W) w)))
-                 (preserve-mult (⊢cast (⊢cast (stampₑ-wt vc† ⊢PC†))) ↠PC′) {!!} refl) , ⊢μ ⟩
+                 (preserve-mult (⊢cast (⊢cast (stampₑ-wt vc† ⊢PC†))) ↠PC′)
+                 (≼-trans {!!} {!!}) refl) , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v vc† 𝓋 ⊢PC† ↠PC′ fail ↠W w)
   rewrite eq =
   ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
