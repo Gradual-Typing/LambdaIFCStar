@@ -117,22 +117,6 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ------------------------------------------------------------------------------------- IfFalse
     → if ($ false) A ℓ M N ∣ μ ∣ PC —→ prot (stampₑ PC v ℓ) (success (stampₑ-LVal v)) ℓ N A ∣ μ
 
-  β-if!-true : ∀ {A ℓ gc M N μ PC PC′}
-    → (v : LVal PC)
-    → ⊢ PC ⇐ gc
-    → stampₑ PC v ℓ ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
-    → (r : LResult PC′)
-      -------------------------------------------------------------------- If!True
-    → if! ($ true) A (l ℓ) M N ∣ μ ∣ PC —→ prot PC′ r ℓ M A ∣ μ
-
-  β-if!-false : ∀ {A ℓ gc M N μ PC PC′}
-    → (v : LVal PC)
-    → ⊢ PC ⇐ gc
-    → stampₑ PC v ℓ ⟪ coerce (gc ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ PC′
-    → (r : LResult PC′)
-      --------------------------------------------------------------------- If!False
-    → if! ($ false) A (l ℓ) M N ∣ μ ∣ PC —→ prot PC′ r ℓ N A ∣ μ
-
   if-true-cast : ∀ {A M N μ PC}
     → (v : LVal PC)
       ------------------------------------------------------------------------ IfTrueCast
@@ -145,27 +129,27 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → if ($ false ⟨ cast (id Bool) (id (l low) ⨾ ↑) ⟩) A high M N ∣ μ ∣ PC —→
          prot (stampₑ PC v high) (success (stampₑ-LVal v)) high N A ∣ μ
 
-  if!-true-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′}
+  if!-true-cast : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC PC′}
     → (v : LVal PC)
     → (𝓋 : CVal c̅ₙ)
-    → l ℓ ≢ g
     → ⊢ PC ⇐ gc
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        stampₑ PC v ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ If!TrueCast
-    → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ PC —→ prot PC′ r ℓ′ M A ∣ μ
+    → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
+         (prot PC′ r ℓ′ M A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
 
-  if!-false-cast : ∀ {A ℓ g gc M N} {c̅ₙ : CExpr l ℓ ⇒ g} {μ PC PC′}
+  if!-false-cast : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC PC′}
     → (v : LVal PC)
     → (𝓋 : CVal c̅ₙ)
-    → l ℓ ≢ g
     → ⊢ PC ⇐ gc
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        stampₑ PC v ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
     → (r : LResult PC′)
       ------------------------------------------------------------------------------ If!FalseCast
-    → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A g M N ∣ μ ∣ PC —→ prot PC′ r ℓ′ N A ∣ μ
+    → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
+         (prot PC′ r ℓ′ N A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
 
   β-let : ∀ {V A N μ PC}
     → Value V

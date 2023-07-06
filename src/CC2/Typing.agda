@@ -71,13 +71,13 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ if L A ℓ M N ⇐ B
 
 
-  ⊢if! : ∀ {Γ Σ gc ℓv A B L M N g}
-    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ` Bool of g
+  ⊢if! : ∀ {Γ Σ gc ℓv A B L M N}
+    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ` Bool of ⋆
     → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ M ⇐ A)
     → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ N ⇐ A)
-    → B ≡ stamp A g
+    → B ≡ stamp A ⋆
       --------------------------------------------------------- If!
-    → Γ ; Σ ; gc ; ℓv ⊢ if! L A g M N ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ if! L A M N ⇐ B
 
 
   ⊢let : ∀ {Γ Σ gc ℓv M N A B}

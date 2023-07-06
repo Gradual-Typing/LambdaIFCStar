@@ -56,7 +56,7 @@ plug-inv (let□ _ _) (⊢let ⊢M ⊢N) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢let ⊢M′ (relax-Σ ⊢N Σ′⊇Σ)) ⟩
 plug-inv (if□ _ _ M N) (⊢if ⊢L ⊢M ⊢N eq) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢if ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq) ⟩
-plug-inv (if!□ _ _ M N) (⊢if! ⊢L ⊢M ⊢N eq) =
+plug-inv (if!□ _ M N) (⊢if! ⊢L ⊢M ⊢N eq) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢if! ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq) ⟩
 plug-inv □⟨ c ⟩ (⊢cast ⊢M) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢cast ⊢M′) ⟩
@@ -115,19 +115,19 @@ pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v 
   ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame v 𝓋 ↠blame) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+{- If -}
+pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
+                (if!-true-cast v 𝓋 ⊢PC† ↠PC′ (success vc′)) rewrite eq =
+  ⟨ Σ , ⊇-refl Σ ,
+    ⊢cast (⊢prot ⊢M {!!} {!!} refl), ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
+                (if!-true-cast v 𝓋 ⊢PC† ↠PC′ fail) =
+  {!!}
 pres vc ⊢PC ⊢M _ _ = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (app-cast v vc₁ 𝓋 x r x₁ x₂) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (app-blame v 𝓋 x) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (app!-cast v vc₁ 𝓋 x x₁ r x₂ x₃) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (app!-blame v 𝓋 x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-if-true v) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-if-false v) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (β-if!-true v x x₁ r) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (β-if!-false v x x₁ r) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (if-true-cast v) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (if-false-cast v) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (if!-true-cast v 𝓋 x x₁ x₂ r) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (if!-false-cast v 𝓋 x x₁ x₂ r) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-let x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (ref v x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (ref? v x x₁ x₂) = {!!}

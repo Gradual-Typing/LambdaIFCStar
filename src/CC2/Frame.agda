@@ -37,8 +37,8 @@ data Frame : Set where
 
   -- if  L A ℓ M N
   if□  : Type → StaticLabel → (M N : Term) → Frame
-  -- if! L A g M N
-  if!□ : Type → Label → (M N : Term) → Frame
+  -- if! L A M N
+  if!□ : Type → (M N : Term) → Frame
 
   -- M ⟨ c ⟩
   □⟨_⟩ : ∀ {A B} → (c : Cast A ⇒ B) → Frame
@@ -58,5 +58,5 @@ plug L (assign?□ M T ĝ g p)    = assign? L M T ĝ g p
 plug M (assign? V □ v T ĝ g p) = assign? V M T ĝ g p
 plug M (let□ A N)              = `let M A N
 plug L (if□  A ℓ M N)          = if  L A ℓ M N
-plug L (if!□ A g M N)          = if! L A g M N
+plug L (if!□ A M N)            = if! L A M N
 plug M □⟨ c ⟩                  = M ⟨ c ⟩

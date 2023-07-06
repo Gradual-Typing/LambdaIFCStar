@@ -22,7 +22,7 @@ data Op : Set where
   op-app!         : (A B : Type) → Op
   op-const        : ∀ {ι} (k : rep ι) → Op
   op-if           : (A : Type) → (ℓ : StaticLabel) → Op
-  op-if!          : (A : Type) → (g :       Label) → Op
+  op-if!          : (A : Type) → Op
   op-let          : (A : Type) → Op
   op-ref          : (ℓ : StaticLabel) → Op
   op-ref?         : (ℓ : StaticLabel) → (p : BlameLabel) → Op
@@ -44,7 +44,7 @@ sig (op-app  A B ℓ)    = ■ ∷ ■ ∷ []
 sig (op-app! A B)      = ■ ∷ ■ ∷ []
 sig (op-const k)       = []
 sig (op-if  A ℓ)       = ■ ∷ ■ ∷ ■ ∷ []
-sig (op-if! A g)       = ■ ∷ ■ ∷ ■ ∷ []
+sig (op-if! A)         = ■ ∷ ■ ∷ ■ ∷ []
 sig (op-let A)         = ■ ∷ (ν ■) ∷ []
 sig (op-ref ℓ)         = ■ ∷ []
 sig (op-ref? ℓ p)      = ■ ∷ []
@@ -66,7 +66,7 @@ pattern app L M A B ℓ      = (op-app A B ℓ) ⦅ cons (ast L) (cons (ast M) n
 pattern app! L M A B       = (op-app! A B) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern $_ k               = (op-const k) ⦅ nil ⦆
 pattern if L A ℓ M N       = (op-if A ℓ) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
-pattern if! L A g M N      = (op-if! A g) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
+pattern if! L A M N        = (op-if! A) ⦅ cons (ast L) (cons (ast M) (cons (ast N) nil)) ⦆
 pattern `let M A N         = (op-let A) ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
 pattern ref⟦_⟧ ℓ M         = (op-ref ℓ) ⦅ cons (ast M) nil ⦆
 pattern ref?⟦_⟧ ℓ M p      = (op-ref? ℓ p) ⦅ cons (ast M) nil ⦆
