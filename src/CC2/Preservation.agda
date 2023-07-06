@@ -150,6 +150,10 @@ pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
   ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢let ⊢V ⊢N) ⊢μ (β-let v) =
   ⟨ Σ , ⊇-refl Σ , substitution-pres ⊢N (⊢value-pc ⊢V v) , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢assign? (⊢cast (⊢addr hit)) ⊢V) ⊢μ
+                (assign?-cast v vc† 𝓋 ⊢PC† ↠PC′ vc′ ↠W w) =
+  let ⊢W = cast-pres-mult (⊢cast ⊢V) ↠W in
+  ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢W w) w ⊢μ hit ⟩
 pres vc ⊢PC ⊢M _ _ = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (ref v x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (ref? v x x₁ x₂) = {!!}
@@ -161,6 +165,5 @@ pres vc ⊢PC ⊢M _ _ = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (assign-blame v 𝓋 x) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (β-assign? v vc₁ x x₁ x₂) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (assign?-blame v vc₁ x x₁) = {!!}
--- pres vc ⊢PC ⊢M ⊢μ (assign?-cast v vc₁ 𝓋 x x₁ x₂ x₃ w) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (assign?-cast-blame-pc v vc₁ 𝓋 x x₁) = {!!}
 -- pres vc ⊢PC ⊢M ⊢μ (assign?-cast-blame v vc₁ 𝓋 x x₁ x₂ x₃) = {!!}
