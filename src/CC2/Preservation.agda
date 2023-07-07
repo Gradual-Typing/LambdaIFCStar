@@ -160,6 +160,20 @@ pres {Σ} vc ⊢PC (⊢ref? {T = T} ⊢V) ⊢μ (ref? {ℓ} {V} {n} v fresh ↠P
   ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , ⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ fresh ,
     ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ fresh ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (ref?-blame _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+{- Dereference -}
+pres {Σ} vc ⊢PC (⊢deref (⊢addr hit) eq) ⊢μ (deref {n} {T} {ℓ̂} μa≡V) =
+  let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
+  case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
+  refl → ⟨ Σ , ⊇-refl Σ , ⊢prot (⊢value-pc ⊢V† v†) ⊢l (_ ≼high) eq , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢deref (⊢cast (⊢addr hit)) eq) ⊢μ (deref-cast {ℓ̂ = ℓ̂} {n = n} 𝓋 μa≡V) =
+  let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
+  case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
+  refl → ⟨ Σ , ⊇-refl Σ , ⊢prot (⊢cast (⊢value-pc ⊢V† v†)) ⊢l (_ ≼high) eq , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢deref! (⊢cast (⊢addr hit)) eq) ⊢μ (deref!-cast {ℓ̂ = ℓ̂} {n = n} 𝓋 μa≡V)
+  rewrite eq =
+  let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
+  case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
+  refl → ⟨ Σ , ⊇-refl Σ , ⊢cast (⊢prot (⊢cast (⊢value-pc ⊢V† v†)) ⊢l (_ ≼high) refl) , ⊢μ ⟩
 {- Assignment -}
 pres {Σ} vc ⊢PC (⊢assign (⊢addr hit) ⊢V _ _) ⊢μ (β-assign v) =
   ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢V v) v ⊢μ hit ⟩
@@ -176,10 +190,3 @@ pres {Σ} vc ⊢PC ⊢M ⊢μ (assign-blame               _ _ _) = ⟨ Σ , ⊇-
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-blame            _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame-pc  _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame _ _ _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-{-------------------------------------------}
-pres {Σ} vc ⊢PC (⊢deref (⊢addr hit) eq) ⊢μ (deref {n} {T} {ℓ̂} μa≡V) =
-  let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
-  case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
-  refl → ⟨ Σ , ⊇-refl Σ , ⊢prot (⊢value-pc ⊢V† v†) ⊢l (_ ≼high) eq , ⊢μ ⟩
-pres vc ⊢PC ⊢M ⊢μ (deref-cast 𝓋 x) = {!!}
-pres vc ⊢PC ⊢M ⊢μ (deref!-cast 𝓋 x) = {!!}
