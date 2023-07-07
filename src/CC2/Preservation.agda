@@ -44,6 +44,8 @@ plug-inv (ref?⟦ ℓ ⟧□ p) (⊢ref? ⊢M) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢ref? ⊢M′) ⟩
 plug-inv (!□ A g) (⊢deref ⊢M eq) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢deref ⊢M′ eq) ⟩
+plug-inv (!!□ A) (⊢deref! ⊢M eq) =
+  ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢deref! ⊢M′ eq) ⟩
 plug-inv (assign□ M _ ℓ̂ ℓ) (⊢assign ⊢L ⊢M x y) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢assign ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) x y) ⟩
 plug-inv (assign V □ _ _ ℓ̂ ℓ) (⊢assign ⊢L ⊢M x y) =
@@ -175,5 +177,9 @@ pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-blame            _ _ _ _) = ⟨ Σ , ⊇-
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame-pc  _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame _ _ _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {-------------------------------------------}
-pres vc ⊢PC ⊢M ⊢μ (deref x) = {!!}
+pres {Σ} vc ⊢PC (⊢deref (⊢addr hit) eq) ⊢μ (deref {n} {T} {ℓ̂} μa≡V) =
+  let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
+  case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
+  refl → ⟨ Σ , ⊇-refl Σ , ⊢prot (⊢value-pc ⊢V† v†) ⊢l (_ ≼high) eq , ⊢μ ⟩
 pres vc ⊢PC ⊢M ⊢μ (deref-cast 𝓋 x) = {!!}
+pres vc ⊢PC ⊢M ⊢μ (deref!-cast 𝓋 x) = {!!}

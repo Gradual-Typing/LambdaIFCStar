@@ -166,7 +166,17 @@ progress {M = ! M A g} {μ} vc ⊢PC (⊢deref ⊢M x) ⊢μ =
     ⟨ V-addr {n} , ⊢cast (⊢addr {ℓ̂ = ℓ̂} eq) , ir-ref 𝓋 ⟩ →
       let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
       step (deref-cast {v = v} 𝓋 eq)
-progress {M = !! M A} {μ} vc ⊢PC (⊢deref! ⊢M x) ⊢μ = {!!}
+progress {M = !! M A} {μ} vc ⊢PC (⊢deref! ⊢M x) ⊢μ =
+  case progress vc ⊢PC ⊢M ⊢μ of λ where
+  (step M→M′)  → step (ξ {F = !!□ A} M→M′)
+  (err E-blame) → step (ξ-blame {F = !!□ A})
+  (done (V-raw (V-addr {n}))) →
+    case ⊢M of λ where ()  {- impossible -}
+  (done (V-cast v i)) →
+    case ⟨ v , ⊢M , i ⟩ of λ where
+    ⟨ V-addr {n} , ⊢cast (⊢addr {ℓ̂ = ℓ̂} eq) , ir-ref 𝓋 ⟩ →
+      let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
+      step (deref!-cast {v = v} 𝓋 eq)
 progress {M = assign L M T ℓ̂ ℓ} {μ} vc ⊢PC (⊢assign ⊢L ⊢M _ _) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = assign□ M T ℓ̂ ℓ} L→L′)
