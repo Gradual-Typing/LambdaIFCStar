@@ -179,16 +179,25 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
   deref : ∀ {n T ℓ̂ ℓ V v μ PC}
     → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
       -------------------------------------------------------------- Deref
-    → ! (addr n) (T of l ℓ̂) (l ℓ) ∣ μ ∣ PC —→
+    → ! (addr n) (T of l ℓ̂) ℓ ∣ μ ∣ PC —→
          prot (l high) (success v-l) ℓ V (T of l ℓ̂) ∣ μ
 
-  deref-cast : ∀ {A T ℓ̂ ℓ g V v n} {c̅ₙ : CExpr l ℓ ⇒ g}
+  deref-cast : ∀ {A T ℓ̂ ℓ₁ ℓ₂ V v n} {c̅ₙ : CExpr l ℓ₁ ⇒ l ℓ₂}
                  {c : Cast A ⇒ T of l ℓ̂} {d : Cast T of l ℓ̂ ⇒ A} {μ PC}
     → (𝓋 : CVal c̅ₙ)
     → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
       -------------------------------------------------------------- DerefCast
-    → ! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) A g ∣ μ ∣ PC —→
-         prot (l high) (success v-l) (∥ c̅ₙ ∥ₗ 𝓋) (V ⟨ d ⟩) A ∣ μ
+    → ! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) A ℓ₂ ∣ μ ∣ PC —→
+         prot (l high) (success v-l) ℓ₂ (V ⟨ d ⟩) A ∣ μ
+
+  deref!-cast : ∀ {A T ℓ̂ ℓ V v n} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                 {c : Cast A ⇒ T of l ℓ̂} {d : Cast T of l ℓ̂ ⇒ A} {μ PC}
+    → (𝓋 : CVal c̅ₙ)
+    → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
+      -------------------------------------------------------------- Deref!Cast
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       !! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) A ∣ μ ∣ PC —→
+           (prot (l high) (success v-l) ℓ′ (V ⟨ d ⟩) A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
 
   β-assign : ∀ {T ℓ̂ ℓ V n} {μ PC}
     → (v : Value V)

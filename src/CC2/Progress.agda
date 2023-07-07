@@ -113,31 +113,22 @@ progress {M = if L A ℓ M N} vc ⊢PC (⊢if ⊢L ⊢M ⊢N eq) ⊢μ =
       step (if-true-cast  vc)
     ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
       step (if-false-cast vc)
-progress {M = if! L A g M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N eq) ⊢μ =
+progress {M = if! L A M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
-  (step L→L′)  → step (ξ {F = if!□ A g M N} L→L′)
-  (err E-blame) → step (ξ-blame {F = if!□ A g M N})
+  (step L→L′)  → step (ξ {F = if!□ A M N} L→L′)
+  (err E-blame) → step (ξ-blame {F = if!□ A M N})
   (done (V-raw v)) →
-    case ⟨ v , ⊢L ⟩ of λ where
-    ⟨ V-const {k =  true} , ⊢const ⟩ →
-      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
-      ⟨ PC′ , ↠PC′ , r ⟩ →
-        step (β-if!-true  vc ⊢PC ↠PC′ r)
-    ⟨ V-const {k = false} , ⊢const ⟩ →
-      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
-      ⟨ PC′ , ↠PC′ , r ⟩ →
-        step (β-if!-false vc ⊢PC ↠PC′ r)
+    case ⟨ v , ⊢L ⟩ of λ where ⟨ V-const , () ⟩  {- impossible -}
   (done (V-cast v i)) →
     case ⟨ v , ⊢L , i ⟩ of λ where
-    ⟨ V-const , ⊢cast ⊢const , ir-base id ℓ≢ℓ ⟩ → contradiction refl ℓ≢ℓ
     ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
       case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
       ⟨ PC′ , ↠PC′ , r ⟩ →
-        step (if!-true-cast vc 𝓋 x ⊢PC ↠PC′ r)
+        step (if!-true-cast vc 𝓋 ⊢PC ↠PC′ r)
     ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
       case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
       ⟨ PC′ , ↠PC′ , r ⟩ →
-        step (if!-false-cast vc 𝓋 x ⊢PC ↠PC′ r)
+        step (if!-false-cast vc 𝓋 ⊢PC ↠PC′ r)
 progress {M = `let M A N} vc ⊢PC (⊢let ⊢M ⊢N) ⊢μ =
   case progress vc ⊢PC ⊢M ⊢μ of λ where
   (step M→M′)  → step (ξ {F = let□ A N} M→M′)
@@ -175,6 +166,7 @@ progress {M = ! M A g} {μ} vc ⊢PC (⊢deref ⊢M x) ⊢μ =
     ⟨ V-addr {n} , ⊢cast (⊢addr {ℓ̂ = ℓ̂} eq) , ir-ref 𝓋 ⟩ →
       let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
       step (deref-cast {v = v} 𝓋 eq)
+progress {M = !! M A} {μ} vc ⊢PC (⊢deref! ⊢M x) ⊢μ = {!!}
 progress {M = assign L M T ℓ̂ ℓ} {μ} vc ⊢PC (⊢assign ⊢L ⊢M _ _) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = assign□ M T ℓ̂ ℓ} L→L′)

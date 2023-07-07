@@ -100,11 +100,18 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; ⋆ ; ℓv ⊢ ref?⟦ ℓ ⟧ M p ⇐ Ref (T of l ℓ) of l low
 
 
-  ⊢deref : ∀ {Γ Σ gc ℓv M A B g}
-    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of g
-    → B ≡ stamp A g
+  ⊢deref : ∀ {Γ Σ gc ℓv M A B ℓ}
+    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of l ℓ
+    → B ≡ stamp A (l ℓ)
       ------------------------------------- Deref
-    → Γ ; Σ ; gc ; ℓv ⊢ ! M A g ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ ! M A ℓ ⇐ B
+
+
+  ⊢deref! : ∀ {Γ Σ gc ℓv M A B}
+    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of ⋆
+    → B ≡ stamp A ⋆
+      ------------------------------------- Deref!
+    → Γ ; Σ ; gc ; ℓv ⊢ !! M A ⇐ B
 
 
   ⊢assign : ∀ {Γ Σ ℓc ℓv L M T ℓ ℓ̂}
@@ -128,7 +135,7 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → ⊢ PC ⇐ gc′
     → ℓv ⋎ ℓ ≼ ℓv′
     → B ≡ stamp A (l ℓ)
-      ------------------------------------------- Prot
+      ---------------------------------------------------- Prot
     → Γ ; Σ ; gc ; ℓv ⊢ prot PC (success v) ℓ M A ⇐ B
 
 

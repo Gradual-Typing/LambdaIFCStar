@@ -22,8 +22,10 @@ data Frame : Set where
   -- ref?⟦ ℓ ⟧ M p
   ref?⟦_⟧□ : StaticLabel → BlameLabel → Frame
 
-  -- ! M A g
-  !□ : Type → Label → Frame
+  -- ! M A ℓ
+  !□ : Type → StaticLabel → Frame
+  -- !! M A
+  !!□ : Type → Frame
 
   -- assign L M T ℓ̂ ℓ
   assign□   : (M : Term) → RawType → (ℓ̂ ℓ : StaticLabel) → Frame
@@ -51,7 +53,8 @@ plug L (app!□ M A B)           = app! L M A B
 plug M (app! V □ v A B)        = app! V M A B
 plug M (ref⟦ ℓ ⟧□)             = ref⟦ ℓ ⟧ M
 plug M (ref?⟦ ℓ ⟧□ p)          = ref?⟦ ℓ ⟧ M p
-plug M (!□ A g)                = ! M A g
+plug M (!□ A ℓ)                = ! M A ℓ
+plug M (!!□ A)                 = !! M A
 plug L (assign□ M T ℓ̂ ℓ)       = assign L M T ℓ̂ ℓ
 plug M (assign V □ v T ℓ̂ ℓ)    = assign V M T ℓ̂ ℓ
 plug L (assign?□ M T ĝ g p)    = assign? L M T ĝ g p
