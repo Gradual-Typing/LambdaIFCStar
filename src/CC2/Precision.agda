@@ -142,8 +142,23 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-lam g⊑g′ A⊑A′ N⊑N′) =
   ⟨ ⊢lam (proj₁        (cc-prec-inv {ℓv′ = low} prec* Σ⊑Σ′ N⊑N′))  ,
     ⊢lam (proj₁ (proj₂ (cc-prec-inv {ℓv  = low} prec* Σ⊑Σ′ N⊑N′))) ,
     ⊑-ty l⊑l (⊑-fun g⊑g′ A⊑A′ (proj₂ (proj₂ (cc-prec-inv {ℓv = low} {low} prec* Σ⊑Σ′ N⊑N′)))) ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app   L⊑L′ M⊑M′ eq eq′) = {!!}
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app!  L⊑L′ M⊑M′ eq eq′) = {!!}
+{- Application -}
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app {C = C} {C′} L⊑L′ M⊑M′ eq eq′) =
+  let ⟨ ⊢L , ⊢L′ , A→B⊑A′→B′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ⟨ ⊢M , ⊢M′ , _           ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  case A→B⊑A′→B′ of λ where
+  (⊑-ty l⊑l (⊑-fun l⊑l A⊑A′ B⊑B′)) →
+    let C⊑C′ : C ⊑ C′
+        C⊑C′ = subst₂ _⊑_ (sym eq) (sym eq′) (stamp-⊑ B⊑B′ l⊑l) in
+    ⟨ ⊢app ⊢L ⊢M eq , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app! {C = C} {C′} L⊑L′ M⊑M′ eq eq′) =
+  let ⟨ ⊢L , ⊢L′ , A→B⊑A′→B′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ⟨ ⊢M , ⊢M′ , _           ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  case A→B⊑A′→B′ of λ where
+  (⊑-ty ⋆⊑ (⊑-fun ⋆⊑ A⊑A′ B⊑B′)) →
+    let C⊑C′ : C ⊑ C′
+        C⊑C′ = subst₂ _⊑_ (sym eq) (sym eq′) (stamp-⊑ B⊑B′ ⋆⊑) in
+    ⟨ ⊢app! ⊢L ⊢M eq , ⊢app! ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app!l {C = C} {C′} L⊑L′ M⊑M′ eq eq′) =
   let ⟨ ⊢L , ⊢L′ , A→B⊑A′→B′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
   let ⟨ ⊢M , ⊢M′ , _           ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
