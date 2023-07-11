@@ -79,13 +79,12 @@ pres vc ⊢PC ⊢plug ⊢μ (ξ {F = F} M→N) =
   ⟨ Σ′ , Σ′⊇Σ , wt-plug ⊢M′ Σ′⊇Σ , ⊢μ′ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ ξ-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- Protection -}
-pres vc ⊢PC (⊢prot {v = vc′} ⊢M ⊢PC′ x eq) ⊢μ (prot-ctx M→N) =
+pres vc ⊢PC (⊢prot {vc = vc′} ⊢M ⊢PC′ x eq) ⊢μ (prot-ctx M→N) =
   let ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩  = pres vc′ ⊢PC′ ⊢M ⊢μ M→N in
   ⟨ Σ′ , Σ′⊇Σ , ⊢prot ⊢M′ ⊢PC′ x eq , ⊢μ′ ⟩
 pres {Σ} vc ⊢PC (⊢prot ⊢V ⊢PC′ x refl) ⊢μ (prot-val v) =
   ⟨ Σ , ⊇-refl Σ , ⊢value-pc (stamp-val-wt v ⊢V) (stamp-val-value v ⊢V) , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-pres {Σ} vc ⊢PC ⊢M ⊢μ prot-blame-pc = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢V⟨c⟩ ⊢μ (cast v V⟨c⟩→M) =
   ⟨ Σ , ⊇-refl Σ , cast-pres ⊢V⟨c⟩ V⟨c⟩→M , ⊢μ ⟩
 {- Application -}
@@ -96,26 +95,25 @@ pres {Σ} vc ⊢PC (⊢app (⊢lam ⊢N) ⊢V eq) ⊢μ (β v vc†)
           (stampₑ-wt vc† ⊢PC)
           (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
 pres {Σ} {gc} {A} {PC} vc ⊢PC (⊢app {ℓ = ℓ} (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ
-                              (app-cast v vc† 𝓋 ↠PC′ (success vc′) ↠W w)
+                              (app-cast v vc† 𝓋 ↠PC′ vc′ ↠W w)
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢prot (⊢cast (substitution-pres ⊢N (⊢value-pc (cast-pres-mult (⊢cast ⊢V) ↠W) w)))
           (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC)) ↠PC′)
           (stamp-cast-security vc† ⊢PC ↠PC′ vc′) eq , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-cast v vc† 𝓋 ↠PC′ fail ↠W w) =
-  ⟨ Σ , ⊇-refl Σ , ⊢prot-blame-pc , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-blame v 𝓋 ↠blame) =
+pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-blame-pc v vc† 𝓋 ↠PC′) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v vc† 𝓋 ⊢PC† ↠PC′ (success vc′) ↠W w)
+pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-blame v vc† 𝓋 ↠PC′ vc′ ↠blame) =
+  ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v vc† 𝓋 ⊢PC† ↠PC′ vc′ ↠W w)
   rewrite eq | uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢cast (⊢prot (⊢cast (substitution-pres ⊢N (⊢value-pc (cast-pres-mult (⊢cast ⊢V) ↠W) w)))
                  (preserve-mult (⊢cast (⊢cast (stampₑ-wt vc† ⊢PC†))) ↠PC′)
                  (stamp⇒⋆-cast-security vc† ⊢PC† ↠PC′ vc′) refl) , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v vc† 𝓋 ⊢PC† ↠PC′ fail ↠W w)
-  rewrite eq =
-  ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame v 𝓋 ↠blame) =
+pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame-pc v vc† 𝓋 ⊢PC† ↠PC′) =
+  ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame v vc† 𝓋 ⊢PC† ↠PC′ vc′ ↠blame) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- If -}
 pres {Σ} vc ⊢PC (⊢if ⊢const ⊢M ⊢N eq) ⊢μ (β-if-true vc†)
@@ -131,25 +129,17 @@ pres {Σ} vc ⊢PC (⊢if (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ (if-false-cast 
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢N (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
-                (if!-true-cast vc† 𝓋 ⊢PC† ↠PC′ (success vc′))
+                (if!-true-cast vc† 𝓋 ⊢PC† ↠PC′ vc′)
   rewrite eq | uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢cast (⊢prot ⊢M (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′)
                  (≡→≼ (stamp⇒⋆-security vc† ⊢PC† ↠PC′ vc′)) refl), ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
-                (if!-true-cast vc† 𝓋 ⊢PC† ↠PC′ fail)
-  rewrite eq =
-  ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
-                (if!-false-cast vc† 𝓋 ⊢PC† ↠PC′ (success vc′))
+                (if!-false-cast vc† 𝓋 ⊢PC† ↠PC′ vc′)
   rewrite eq | uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢cast (⊢prot ⊢N (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′)
                  (≡→≼ (stamp⇒⋆-security vc† ⊢PC† ↠PC′ vc′)) refl), ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
-                (if!-false-cast vc† 𝓋 ⊢PC† ↠PC′ fail)
-  rewrite eq =
-  ⟨ Σ , ⊇-refl Σ , ⊢cast ⊢prot-blame-pc , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢let ⊢V ⊢N) ⊢μ (β-let v) =
   ⟨ Σ , ⊇-refl Σ , substitution-pres ⊢N (⊢value-pc ⊢V v) , ⊢μ ⟩
 {- Reference creation -}
@@ -159,7 +149,7 @@ pres {Σ} vc ⊢PC (⊢ref {T = T} ⊢V _) ⊢μ (ref {ℓ} {V} {n} v fresh) =
 pres {Σ} vc ⊢PC (⊢ref? {T = T} ⊢V) ⊢μ (ref? {ℓ} {V} {n} v fresh ↠PC′ vc′) =
   ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , ⊇-fresh (a⟦ ℓ ⟧ n) T ⊢μ fresh ,
     ⊢addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) , ⊢μ-new (⊢value-pc ⊢V v) v ⊢μ fresh ⟩
-pres {Σ} vc ⊢PC ⊢M ⊢μ (ref?-blame _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres {Σ} vc ⊢PC ⊢M ⊢μ (ref?-blame-pc _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- Dereference -}
 pres {Σ} vc ⊢PC (⊢deref (⊢addr hit) eq) ⊢μ (deref {n} {T} {ℓ̂} μa≡V) =
   let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
@@ -187,6 +177,6 @@ pres {Σ} vc ⊢PC (⊢assign? (⊢cast (⊢addr hit)) ⊢V) ⊢μ
   let ⊢W = cast-pres-mult (⊢cast ⊢V) ↠W in
   ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢W w) w ⊢μ hit ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign-blame               _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-blame            _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
+pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-blame-pc         _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame-pc  _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame _ _ _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
