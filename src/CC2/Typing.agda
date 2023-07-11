@@ -129,19 +129,14 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ assign? L M T ĝ g p ⇐ ` Unit of l low
 
 
-  ⊢prot : ∀ {Γ Σ gc gc′ ℓv A B M ℓ} {PC} {v : LVal PC}
-    → let ℓv′ = ∥ PC ∥ v in
+  ⊢prot : ∀ {Γ Σ gc gc′ ℓv A B M ℓ} {PC} {vc : LVal PC}
+    → let ℓv′ = ∥ PC ∥ vc in
        Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
     → ⊢ PC ⇐ gc′
     → ℓv ⋎ ℓ ≼ ℓv′
     → B ≡ stamp A (l ℓ)
       ---------------------------------------------------- Prot
-    → Γ ; Σ ; gc ; ℓv ⊢ prot PC (success v) ℓ M A ⇐ B
-
-
-  ⊢prot-blame-pc : ∀ {Γ Σ gc ℓv A B M ℓ} {p}
-      ---------------------------------------------------- ProtBlamePC
-    → Γ ; Σ ; gc ; ℓv ⊢ prot (bl p) fail ℓ M A ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ prot PC vc ℓ M A ⇐ B
 
 
   ⊢cast : ∀ {Γ Σ gc ℓv A B M} {c : Cast A ⇒ B}

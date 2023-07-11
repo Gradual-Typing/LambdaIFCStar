@@ -31,9 +31,8 @@ data Op : Set where
   op-assign       : (T : RawType) → (ℓ̂ ℓ : StaticLabel) → Op
   op-assign?      : (T : RawType) → (ĝ g :       Label) → BlameLabel → Op
   op-cast         : ∀ {A B} → Cast A ⇒ B → Op
-  op-prot         : ∀ (A : Type)
-    → (PC : LExpr) → LResult PC
-    → (ℓ : StaticLabel) → Op
+  op-prot         : ∀ (A : Type) → (PC : LExpr) → LVal PC
+                                 → (ℓ : StaticLabel) → Op
   op-blame        : BlameLabel → Op
   {- Terms that only appear in erasure -}
   op-opaque       : Op
@@ -54,7 +53,7 @@ sig (op-deref! A)      = ■ ∷ []
 sig (op-assign T ℓ̂ ℓ)  = ■ ∷ ■ ∷ []
 sig (op-assign? T ĝ g p) = ■ ∷ ■ ∷ []
 sig (op-cast c)        = ■ ∷ []
-sig (op-prot A PC r ℓ)   = ■ ∷ []
+sig (op-prot A PC v ℓ)   = ■ ∷ []
 sig (op-blame p)       = []
 sig op-opaque          = []
 
@@ -77,6 +76,6 @@ pattern !! M A             = (op-deref! A) ⦅ cons (ast M) nil ⦆
 pattern assign L M T ℓ̂ ℓ   = (op-assign T ℓ̂ ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern assign? L M T ĝ g p = (op-assign? T ĝ g p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _⟨_⟩ M c           = (op-cast c) ⦅ cons (ast M) nil ⦆
-pattern prot PC r ℓ M A    = (op-prot A PC r ℓ) ⦅ cons (ast M) nil ⦆
+pattern prot PC v ℓ M A    = (op-prot A PC v ℓ) ⦅ cons (ast M) nil ⦆
 pattern blame p            = (op-blame p) ⦅ nil ⦆
 pattern ●                 = op-opaque ⦅ nil ⦆                     {- opaque value -}
