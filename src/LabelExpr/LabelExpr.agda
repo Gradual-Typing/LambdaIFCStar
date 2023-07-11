@@ -401,3 +401,64 @@ cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ cast r 𝓋 ⟩ r*) =
   ⟨ eq , _ —→⟨ cast r 𝓋 ⟩ ih ⟩
 cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
   contradiction r (LResult⌿→ fail)
+
+
+stamp⇒⋆↠LVal : ∀ {g ℓ V}
+  → (v : LVal V)
+  → ⊢ V ⇐ g
+    ----------------------------------------------------------------------
+  → ∃[ V′ ] (stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ V′) × LVal V′
+stamp⇒⋆↠LVal {ℓ = low} (v-l {ℓ}) ⊢l rewrite ℓ⋎low≡ℓ {ℓ} =
+  ⟨ _ ⟪ _ ⟫ , _ ∎ , v-cast (ir (inj id) (λ ())) ⟩
+stamp⇒⋆↠LVal {ℓ = high} (v-l {low}) ⊢l =
+  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = high} (v-l {high}) ⊢l =
+  ⟨ _ , _ ∎ , v-cast (ir (inj id) (λ ())) ⟩
+stamp⇒⋆↠LVal (v-cast (ir id x)) ⊢V =
+  contradiction refl (recompute (¬? (_ ==? _)) x)
+stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (inj id) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj id) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (id {l low})) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (id {l high})) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj id) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (inj (up id)) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (up id)) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
+stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
+  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
+  where
+  ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
+      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
+      _ ∎
