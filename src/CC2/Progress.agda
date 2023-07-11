@@ -45,13 +45,11 @@ progress vc ⊢PC (⊢var ())
 progress _ ⊢PC ⊢const    ⊢μ = done (V-raw V-const)
 progress _ ⊢PC (⊢addr _) ⊢μ = done (V-raw V-addr)
 progress _ ⊢PC (⊢lam ⊢M) ⊢μ = done (V-raw V-ƛ)
-progress {M = prot PC′ (success vc′) ℓ M A} vc ⊢PC (⊢prot ⊢M ⊢PC′ _ eq) ⊢μ =
+progress {M = prot PC′ vc′ ℓ M A} vc ⊢PC (⊢prot ⊢M ⊢PC′ _ eq) ⊢μ =
   case progress vc′ ⊢PC′ ⊢M ⊢μ of λ where
   (step M→M′)  → step (prot-ctx M→M′)
   (err E-blame) → step prot-blame
   (done v)      → step (prot-val v)
-progress {M = prot (bl p) fail ℓ M A} vc ⊢PC ⊢prot-blame-pc ⊢μ =
-  step prot-blame-pc
 progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = app□ M A B ℓ} L→L′)
@@ -71,12 +69,14 @@ progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
       (err E-blame) → step (ξ-blame {F = app L □ (V-cast v i) A B ℓ})
       (done w) →
         case lexpr-sn (stampₑ _ vc ℓ ⟪ d̅ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
-        ⟨ PC′ , ↠PC′ , r ⟩ →
+        ⟨ PC′ , ↠PC′ , success vc′ ⟩ →
           case cast-sn {c = c} w ⊢M of λ where
           ⟨ blame p , V⟨c⟩↠blame , fail ⟩ →
-            step (app-blame w 𝓋 V⟨c⟩↠blame)
+            step (app-blame w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠blame)
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
-            step (app-cast w vc 𝓋 ↠PC′ r V⟨c⟩↠V′ v′)
+            step (app-cast w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠V′ v′)
+        ⟨ bl p , ↠blame , fail ⟩ →
+          step (app-blame-pc w vc 𝓋 ↠blame)
 progress {M = app! L M A B} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = app!□ M A B} L→L′)
@@ -92,12 +92,14 @@ progress {M = app! L M A B} vc ⊢PC (⊢app! ⊢L ⊢M eq) ⊢μ =
       (done w) →
         case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫ ⟪ d̅ ⟫)
                       (⊢cast (⊢cast (stampₑ-wt vc ⊢PC))) of λ where
-        ⟨ PC′ , ↠PC′ , r ⟩ →
+        ⟨ PC′ , ↠PC′ , success vc′ ⟩ →
           case cast-sn {c = c} w ⊢M of λ where
           ⟨ blame p , V⟨c⟩↠blame , fail ⟩ →
-            step (app!-blame w 𝓋 V⟨c⟩↠blame)
+            step (app!-blame w vc 𝓋 ⊢PC ↠PC′ vc′ V⟨c⟩↠blame)
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
-            step (app!-cast w vc 𝓋 ⊢PC ↠PC′ r V⟨c⟩↠V′ v′)
+            step (app!-cast w vc 𝓋 ⊢PC ↠PC′ vc′ V⟨c⟩↠V′ v′)
+        ⟨ bl p , ↠blame , fail ⟩ →
+          step (app!-blame-pc w vc 𝓋 ⊢PC ↠blame)
 progress {M = if L A ℓ M N} vc ⊢PC (⊢if ⊢L ⊢M ⊢N eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = if□ A ℓ M N} L→L′)
@@ -122,13 +124,13 @@ progress {M = if! L A M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N eq) ⊢μ =
   (done (V-cast v i)) →
     case ⟨ v , ⊢L , i ⟩ of λ where
     ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
-      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
-      ⟨ PC′ , ↠PC′ , r ⟩ →
-        step (if!-true-cast vc 𝓋 ⊢PC ↠PC′ r)
+      case stamp⇒⋆↠LVal vc ⊢PC of λ where
+      ⟨ PC′ , ↠PC′ , vc′ ⟩ →
+        step (if!-true-cast vc 𝓋 ⊢PC ↠PC′ vc′)
     ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
-      case lexpr-sn (stampₑ _ vc _ ⟪ _ ⟫) (⊢cast (stampₑ-wt vc ⊢PC)) of λ where
-      ⟨ PC′ , ↠PC′ , r ⟩ →
-        step (if!-false-cast vc 𝓋 ⊢PC ↠PC′ r)
+      case stamp⇒⋆↠LVal vc ⊢PC of λ where
+      ⟨ PC′ , ↠PC′ , vc′ ⟩ →
+        step (if!-false-cast vc 𝓋 ⊢PC ↠PC′ vc′)
 progress {M = `let M A N} vc ⊢PC (⊢let ⊢M ⊢N) ⊢μ =
   case progress vc ⊢PC ⊢M ⊢μ of λ where
   (step M→M′)  → step (ξ {F = let□ A N} M→M′)
@@ -151,7 +153,7 @@ progress {M = ref?⟦ ℓ ⟧ M p} {μ} vc ⊢PC (⊢ref? ⊢M) ⊢μ =
       let ⟨ n , fresh ⟩ = gen-fresh μ in
       step (ref? v fresh ↠PC′ vc′)
     ⟨ bl q , ↠PC′ , fail ⟩ →
-      step (ref?-blame v ↠PC′)
+      step (ref?-blame-pc v ↠PC′)
 progress {M = ! M A g} {μ} vc ⊢PC (⊢deref ⊢M x) ⊢μ =
   case progress vc ⊢PC ⊢M ⊢μ of λ where
   (step M→M′)  → step (ξ {F = !□ A g} M→M′)
@@ -212,7 +214,7 @@ progress {M = assign? L M T ĝ g p} {μ} vc ⊢PC (⊢assign? ⊢L ⊢M) ⊢μ 
         case lexpr-sn (stampₑ _ vc ℓ ⟪ _ ⟫ ⟪ _ ⟫) (⊢cast (⊢cast (stampₑ-wt vc ⊢PC))) of λ where
         ⟨ PC′ , ↠PC′ , success vc′ ⟩ →
           step (β-assign? v vc ⊢PC ↠PC′ vc′)
-        ⟨ bl q , ↠PC′ , fail ⟩ → step (assign?-blame v vc ⊢PC ↠PC′)
+        ⟨ bl q , ↠blame , fail ⟩ → step (assign?-blame-pc v vc ⊢PC ↠blame)
   (done (V-cast w i)) →
     case ⟨ w , ⊢L , i ⟩ of λ where
     ⟨ V-addr {n} , ⊢cast (⊢addr eq) , ir-ref {c = c} {d} {c̅ₙ} 𝓋 ⟩ →

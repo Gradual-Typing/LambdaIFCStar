@@ -164,15 +164,6 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
          (prot PC′ vc′ ℓ′ M A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
 
-  -- if!-true-blame-pc : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC p}
-  --   → (vc : LVal PC)
-  --   → (𝓋  : CVal c̅ₙ)
-  --   → ⊢ PC ⇐ gc
-  --   → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-  --      stampₑ PC vc ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ bl p
-  --     ------------------------------------------------------------------------------ If!TrueBlamePC
-  --   → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→ blame p ∣ μ
-
   if!-false-cast : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC PC′}
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
@@ -183,15 +174,6 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ------------------------------------------------------------------ If!FalseCast
     → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
          (prot PC′ vc′ ℓ′ N A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
-
-  -- if!-false-blame-pc : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC p}
-  --   → (vc : LVal PC)
-  --   → (𝓋  : CVal c̅ₙ)
-  --   → ⊢ PC ⇐ gc
-  --   → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-  --      stampₑ PC vc ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ bl p
-  --     ------------------------------------------------------------------------------ If!FalseBlamePC
-  --   → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→ blame p ∣ μ
 
   β-let : ∀ {V A N μ PC}
     → Value V
