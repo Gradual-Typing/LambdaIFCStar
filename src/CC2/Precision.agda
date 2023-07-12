@@ -122,6 +122,31 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
       -------------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app! L M A B ⊑ app L′ M′ A′ B′ ℓ ⇐ C ⊑ C′
 
+  ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ} {vc vc′}
+    → let ℓv₂  = ∥ PC  ∥ vc  in
+       let ℓv₂′ = ∥ PC′ ∥ vc′ in
+       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
+    → PC ⊑ PC′ ⇐ g ⊑ g′
+    → ℓv₁  ⋎ ℓ  ≼ ℓv₂
+    → ℓv₁′ ⋎ ℓ ≼ ℓv₂′
+    → B  ≡ stamp A  (l ℓ)
+    → B′ ≡ stamp A′ (l ℓ)
+      ----------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M A ⊑ prot PC′ vc′ ℓ M′ A′ ⇐ B ⊑ B′
+
+  ⊑-prot! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ ℓ′} {vc vc′}
+    → let ℓv₂  = ∥ PC  ∥ vc  in
+       let ℓv₂′ = ∥ PC′ ∥ vc′ in
+       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
+    → PC ⊑ PC′ ⇐ g ⊑ g′
+    → ℓv₁  ⋎ ℓ  ≼ ℓv₂
+    → ℓv₁′ ⋎ ℓ′ ≼ ℓv₂′
+    → B  ≡ stamp A  ⋆
+    → B′ ≡ stamp A′ ⋆
+    → ℓ ≼ ℓ′
+      ----------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot! PC vc ℓ M A ⊑ prot! PC′ vc′ ℓ′ M′ A′ ⇐ B ⊑ B′
+
 
 {- The term precision relation implies that both terms are well-typed.
    Furthermore, their types are related by type precision. -}
@@ -167,3 +192,13 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app!l {C = C} {C′} L⊑L′ M⊑M′ eq
     let C⊑C′ : C ⊑ C′
         C⊑C′ = subst₂ _⊑_ (sym eq) (sym eq′) (stamp-⊑ B⊑B′ ⋆⊑) in
     ⟨ ⊢app! ⊢L ⊢M eq , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot M⊑M′ PC⊑PC′ x x′ eq eq′) rewrite eq | eq′ =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let prec = prec→⊑ PC⊑PC′ in
+  let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
+  ⟨ ⊢prot ⊢M ⊢PC x refl , ⊢prot ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ l⊑l ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot! M⊑M′ PC⊑PC′ x x′ eq eq′ ℓ≼ℓ′) rewrite eq | eq′ =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let prec = prec→⊑ PC⊑PC′ in
+  let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
+  ⟨ ⊢prot! ⊢M ⊢PC x refl , ⊢prot! ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
