@@ -20,7 +20,7 @@ open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
 open import CC2.Statics
-open import CoercionExpr.Precision hiding (prec→⊑) renaming (⊢_⊑_ to ⊢_⊑ₗ_)
+open import CoercionExpr.Precision renaming (prec→⊑ to cexpr-prec→⊑; ⊢_⊑_ to ⊢_⊑ₗ_)
 
 
 data _⊑*_ : (Γ Γ′ : Context) → Set where
@@ -92,6 +92,24 @@ data ⊢_⊑_ : ∀ {A A′ B B′} → Cast A ⇒ B → Cast A′ ⇒ B′ → 
     → ⊢ c̅ ⊑ₗ c̅′
       --------------------------------------------------------
     → ⊢ cast (fun d̅ c d) c̅ ⊑ cast (fun d̅′ c′ d′) c̅′
+
+
+coercion-prec→⊑ : ∀ {A A′ B B′} {c : Cast A ⇒ B} {d : Cast A′ ⇒ B′}
+  → ⊢ c ⊑ d
+  → A ⊑ A′ × B ⊑ B′
+coercion-prec→⊑ (⊑-base c̅⊑c̅′) =
+  let ⟨ g₁⊑g₁′ , g₂⊑g₂′ ⟩ = cexpr-prec→⊑ _ _ c̅⊑c̅′ in
+  ⟨ ⊑-ty g₁⊑g₁′ ⊑-ι , ⊑-ty g₂⊑g₂′ ⊑-ι ⟩
+coercion-prec→⊑ (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) =
+  let ⟨ g₁⊑g₁′ , g₂⊑g₂′ ⟩ = cexpr-prec→⊑ _ _ c̅⊑c̅′ in
+  let ⟨ B⊑B′ , A⊑A′ ⟩ = coercion-prec→⊑ c⊑c′ in
+  ⟨ ⊑-ty g₁⊑g₁′ (⊑-ref A⊑A′) , ⊑-ty g₂⊑g₂′ (⊑-ref B⊑B′) ⟩
+coercion-prec→⊑ (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) =
+  let ⟨ g₁⊑g₁′   , g₂⊑g₂′   ⟩ = cexpr-prec→⊑ _ _ c̅⊑c̅′ in
+  let ⟨ gc₂⊑gc₂′ , gc₁⊑gc₁′ ⟩ = cexpr-prec→⊑ _ _ d̅⊑d̅′ in
+  let ⟨ C⊑C′ , A⊑A′ ⟩ = coercion-prec→⊑ c⊑c′ in
+  let ⟨ B⊑B′ , D⊑D′ ⟩ = coercion-prec→⊑ d⊑d′ in
+  ⟨ ⊑-ty g₁⊑g₁′ (⊑-fun gc₁⊑gc₁′ A⊑A′ B⊑B′) , ⊑-ty g₂⊑g₂′ (⊑-fun gc₂⊑gc₂′ C⊑C′ D⊑D′) ⟩
 
 
 infix 4 _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_
@@ -276,6 +294,6 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot!l M⊑M′ PC⊑PC′ x x′ eq eq�
   ⟨ ⊢prot! ⊢M ⊢PC x refl , ⊢prot ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-cast M⊑M′ c⊑c′) =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
-  ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ , ? ⟩
+  ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ , proj₂ (coercion-prec→⊑ c⊑c′) ⟩
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-blame ⊢M A⊑A′) =
   ⟨ ⊢M , ⊢blame , A⊑A′ ⟩
