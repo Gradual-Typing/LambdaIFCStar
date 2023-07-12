@@ -139,6 +139,16 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ prot PC vc ℓ M A ⇐ B
 
 
+  ⊢prot! : ∀ {Γ Σ gc gc′ ℓv A B M ℓ} {PC} {vc : LVal PC}
+    → let ℓv′ = ∥ PC ∥ vc in
+       Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
+    → ⊢ PC ⇐ gc′
+    → ℓv ⋎ ℓ ≼ ℓv′
+    → B ≡ stamp A ⋆
+      ---------------------------------------------------- Prot!
+    → Γ ; Σ ; gc ; ℓv ⊢ prot! PC vc ℓ M A ⇐ B
+
+
   ⊢cast : ∀ {Γ Σ gc ℓv A B M} {c : Cast A ⇒ B}
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
       ----------------------------------------- Cast

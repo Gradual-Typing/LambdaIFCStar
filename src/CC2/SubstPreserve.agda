@@ -46,6 +46,7 @@ rename-pres (⊢deref! ⊢M eq) ⊢ρ = ⊢deref! (rename-pres ⊢M ⊢ρ) eq
 rename-pres (⊢assign ⊢L ⊢M x y) ⊢ρ = ⊢assign (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) x y
 rename-pres (⊢assign? ⊢L ⊢M) ⊢ρ = ⊢assign? (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢prot ⊢M ⊢PC x eq) ⊢ρ = ⊢prot (rename-pres ⊢M ⊢ρ) ⊢PC x eq
+rename-pres (⊢prot! ⊢M ⊢PC x eq) ⊢ρ = ⊢prot! (rename-pres ⊢M ⊢ρ) ⊢PC x eq
 rename-pres (⊢cast ⊢M) ⊢ρ = ⊢cast (rename-pres ⊢M ⊢ρ)
 rename-pres ⊢blame ⊢ρ = ⊢blame
 
@@ -89,6 +90,7 @@ subst-pres (⊢deref! ⊢M eq) ⊢σ = ⊢deref! (subst-pres ⊢M ⊢σ) eq
 subst-pres (⊢assign ⊢L ⊢M x y) ⊢σ = ⊢assign (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) x y
 subst-pres (⊢assign? ⊢L ⊢M) ⊢σ = ⊢assign? (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ)
 subst-pres (⊢prot ⊢M ⊢PC x eq) ⊢σ = ⊢prot (subst-pres ⊢M ⊢σ) ⊢PC x eq
+subst-pres (⊢prot! ⊢M ⊢PC x eq) ⊢σ = ⊢prot! (subst-pres ⊢M ⊢σ) ⊢PC x eq
 subst-pres (⊢cast ⊢M) ⊢σ = ⊢cast (subst-pres ⊢M ⊢σ)
 subst-pres ⊢blame ⊢σ = ⊢blame
 

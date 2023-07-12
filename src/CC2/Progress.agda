@@ -50,6 +50,11 @@ progress {M = prot PC′ vc′ ℓ M A} vc ⊢PC (⊢prot ⊢M ⊢PC′ _ eq) �
   (step M→M′)  → step (prot-ctx M→M′)
   (err E-blame) → step prot-blame
   (done v)      → step (prot-val v)
+progress {M = prot PC′ vc′ ℓ M A} vc ⊢PC (⊢prot ⊢M ⊢PC′ _ eq) ⊢μ =
+  case progress vc′ ⊢PC′ ⊢M ⊢μ of λ where
+  (step M→M′)  → step (prot-ctx M→M′)
+  (err E-blame) → step prot-blame
+  (done v)      → step (prot-val v)
 progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = app□ M A B ℓ} L→L′)

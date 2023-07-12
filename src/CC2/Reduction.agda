@@ -36,7 +36,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
 
 
   prot-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {vc}
-    →                         M ∣ μ ∣ PC  —→ M′ ∣ μ′
+    →                M ∣ μ ∣ PC  —→ M′ ∣ μ′
       ------------------------------------------------------------- ProtectContext
     → prot PC vc ℓ M A ∣ μ ∣ PC′ —→ prot PC vc ℓ M′ A ∣ μ′
 
@@ -50,6 +50,23 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
   prot-blame : ∀ {μ PC PC′ A ℓ p} {vc}
       ------------------------------------------------------------- ProtectBlame
     → prot PC vc ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
+
+
+  prot!-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {vc}
+    →                 M ∣ μ ∣ PC  —→ M′ ∣ μ′
+      ------------------------------------------------------------- Protect!Context
+    → prot! PC vc ℓ M A ∣ μ ∣ PC′ —→ prot! PC vc ℓ M′ A ∣ μ′
+
+
+  prot!-val : ∀ {V μ PC PC′ A ℓ} {vc}
+    → (v  : Value V)
+      --------------------------------------------------------------------------------- Protect!Value
+    → prot! PC vc ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v A ℓ ⟨ stamp A , ℓ ⇒stamp⋆ ⟩ ∣ μ
+
+
+  prot!-blame : ∀ {μ PC PC′ A ℓ p} {vc}
+      ------------------------------------------------------------- Protect!Blame
+    → prot! PC vc ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
 
 
   cast : ∀ {A B V M} {c : Cast A ⇒ B} {μ PC}
@@ -116,7 +133,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → Value W
       -------------------------------------------------------------------------- App!Cast
     → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→
-         (prot PC′ vc′ ℓ′ ((N [ W ]) ⟨ d ⟩) D) ⟨ stamp D , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
+         prot! PC′ vc′ ℓ′ ((N [ W ]) ⟨ d ⟩) D ∣ μ
 
 
   app!-blame-pc : ∀ {N V A B C D gc gc′ ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
@@ -180,7 +197,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (vc′ : LVal PC′)
       ------------------------------------------------------------------ If!TrueCast
     → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
-         (prot PC′ vc′ ℓ′ M A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
+         prot! PC′ vc′ ℓ′ M A ∣ μ
 
 
   if!-false-cast : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC PC′}
@@ -192,7 +209,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (vc′ : LVal PC′)
       ------------------------------------------------------------------ If!FalseCast
     → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
-         (prot PC′ vc′ ℓ′ N A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
+         prot! PC′ vc′ ℓ′ N A ∣ μ
 
 
   β-let : ∀ {V A N μ PC}
@@ -247,7 +264,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       ---------------------------------------------------------------------- Deref!Cast
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        !! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) A ∣ μ ∣ PC —→
-           (prot (l high) v-l ℓ′ (V ⟨ d ⟩) A) ⟨ stamp A , ℓ′ ⇒stamp⋆ ⟩ ∣ μ
+           prot! (l high) v-l ℓ′ (V ⟨ d ⟩) A ∣ μ
 
 
   β-assign : ∀ {T ℓ̂ ℓ V n} {μ PC}
