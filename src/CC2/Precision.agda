@@ -75,10 +75,12 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
       ---------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ ` x ⊑ ` x ⇐ A ⊑ A′
 
+
   ⊑-const : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ ι ℓ} {k : rep ι}
       ---------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ $ k ⊑ $ k
          ⇐ ` ι of l ℓ ⊑ ` ι of l ℓ
+
 
   ⊑-addr : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {n ℓ ℓ̂ T T′}
     → lookup-Σ Σ  (a⟦ ℓ̂ ⟧ n) ≡ just T
@@ -87,6 +89,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ addr n ⊑ addr n
          ⇐ Ref (T of l ℓ̂) of l ℓ ⊑ Ref (T′ of l ℓ̂) of l ℓ
 
+
   ⊑-lam : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {N N′} {g g′ A A′ B B′ ℓ}
     → g ⊑ₗ g′
     → A ⊑  A′
@@ -94,6 +97,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
       --------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ ƛ N ⊑ ƛ N′
          ⇐ ⟦ g ⟧ A ⇒ B of l ℓ ⊑ ⟦ g′ ⟧ A′ ⇒ B′ of l ℓ
+
 
   ⊑-app : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {L L′ M M′} {A A′ B B′ C C′ ℓ}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
@@ -104,6 +108,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
       -------------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app L M A B ℓ ⊑ app L′ M′ A′ B′ ℓ ⇐ C ⊑ C′
 
+
   ⊑-app! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′} {A A′ B B′ C C′}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ ⟦ ⋆ ⟧ A ⇒ B of ⋆ ⊑ ⟦ ⋆ ⟧ A′ ⇒ B′ of ⋆
@@ -113,6 +118,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
       -------------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ app! L M A B ⊑ app! L′ M′ A′ B′ ⇐ C ⊑ C′
 
+
   ⊑-app!l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′} {A A′ B B′ C C′ ℓ}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ ⟦ ⋆ ⟧ A ⇒ B of ⋆ ⊑ ⟦ l (ℓc ⋎ ℓ) ⟧ A′ ⇒ B′ of l ℓ
@@ -121,6 +127,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → C′ ≡ stamp B′ (l ℓ)
       -------------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app! L M A B ⊑ app L′ M′ A′ B′ ℓ ⇐ C ⊑ C′
+
 
   ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
@@ -134,6 +141,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
       ----------------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M A ⊑ prot PC′ vc′ ℓ M′ A′ ⇐ B ⊑ B′
 
+
   ⊑-prot! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ ℓ′} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
        let ℓv₂′ = ∥ PC′ ∥ vc′ in
@@ -146,6 +154,20 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → ℓ ≼ ℓ′
       ----------------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot! PC vc ℓ M A ⊑ prot! PC′ vc′ ℓ′ M′ A′ ⇐ B ⊑ B′
+
+
+  ⊑-prot!l : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ ℓ′} {vc vc′}
+    → let ℓv₂  = ∥ PC  ∥ vc  in
+       let ℓv₂′ = ∥ PC′ ∥ vc′ in
+       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
+    → PC ⊑ PC′ ⇐ g ⊑ g′
+    → ℓv₁  ⋎ ℓ  ≼ ℓv₂
+    → ℓv₁′ ⋎ ℓ′ ≼ ℓv₂′
+    → B  ≡ stamp A  ⋆
+    → B′ ≡ stamp A′ (l ℓ′)
+    → ℓ ≼ ℓ′
+      ----------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot! PC vc ℓ M A ⊑ prot PC′ vc′ ℓ′ M′ A′ ⇐ B ⊑ B′
 
 
 {- The term precision relation implies that both terms are well-typed.
@@ -202,3 +224,8 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot! M⊑M′ PC⊑PC′ x x′ eq eq′
   let prec = prec→⊑ PC⊑PC′ in
   let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
   ⟨ ⊢prot! ⊢M ⊢PC x refl , ⊢prot! ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot!l M⊑M′ PC⊑PC′ x x′ eq eq′ ℓ≼ℓ′) rewrite eq | eq′ =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let prec = prec→⊑ PC⊑PC′ in
+  let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
+  ⟨ ⊢prot! ⊢M ⊢PC x refl , ⊢prot ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
