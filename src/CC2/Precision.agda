@@ -20,7 +20,9 @@ open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
 open import CC2.Statics
-open import CoercionExpr.Precision renaming (prec→⊑ to cexpr-prec→⊑; ⊢_⊑_ to ⊢_⊑ₗ_)
+open import CoercionExpr.Precision
+  renaming (prec→⊑ to cexpr-prec→⊑;
+            ⊢l_⊑_ to ⊢ₗ_⊑_; ⊢r_⊑_ to ⊢ᵣ_⊑_)
 
 
 data _⊑*_ : (Γ Γ′ : Context) → Set where
@@ -65,37 +67,64 @@ _⊑ₘ_ : (Σ Σ′ : HeapContext) → Set
 ⊑ₘ→⊑ {ℓ̂ = high} ⟨ _ , Σᴴ⊑ ⟩ Σa≡T Σ′a≡T′ = ⊑ₕ→⊑ Σᴴ⊑ Σa≡T Σ′a≡T′
 
 
-data ⊢_⊑_ : ∀ {A A′ B B′} → Cast A ⇒ B → Cast A′ ⇒ B′ → Set where
+data ⟨_⟩⊑⟨_⟩ : ∀ {A A′ B B′} → Cast A ⇒ B → Cast A′ ⇒ B′ → Set where
 
   ⊑-base : ∀ {ι g₁ g₁′ g₂ g₂′} {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
-    → ⊢ c̅ ⊑ₗ c̅′
+    → ⊢ c̅ ⊑ c̅′
       --------------------------------------------------------
-    → ⊢ cast (Castᵣ_⇒_.id ι) c̅ ⊑ cast (Castᵣ_⇒_.id ι) c̅′
+    → ⟨ cast (Castᵣ_⇒_.id ι) c̅ ⟩⊑⟨ cast (Castᵣ_⇒_.id ι) c̅′ ⟩
 
   ⊑-ref : ∀ {A A′ B B′ g₁ g₁′ g₂ g₂′} {c : Cast B ⇒ A} {c′ : Cast B′ ⇒ A′}
             {d : Cast A ⇒ B} {d′ : Cast A′ ⇒ B′}
             {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
-    → ⊢ c ⊑  c′
-    → ⊢ d ⊑  d′
-    → ⊢ c̅ ⊑ₗ c̅′
+    → ⟨ c ⟩⊑⟨ c′ ⟩
+    → ⟨ d ⟩⊑⟨ d′ ⟩
+    → ⊢ c̅ ⊑ c̅′
       --------------------------------------------------------
-    → ⊢ cast (ref c d) c̅ ⊑ cast (ref c′ d′) c̅′
+    → ⟨ cast (ref c d) c̅ ⟩⊑⟨ cast (ref c′ d′) c̅′ ⟩
 
   ⊑-fun : ∀ {A A′ B B′ C C′ D D′ gc₁ gc₁′ gc₂ gc₂′ g₁ g₁′ g₂ g₂′}
             {c : Cast C ⇒ A} {c′ : Cast C′ ⇒ A′}
             {d : Cast B ⇒ D} {d′ : Cast B′ ⇒ D′}
             {d̅ : CExpr gc₂ ⇒ gc₁} {d̅′ : CExpr gc₂′ ⇒ gc₁′}
             {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
-    → ⊢ d̅ ⊑ₗ d̅′
-    → ⊢ c ⊑  c′
-    → ⊢ d ⊑  d′
-    → ⊢ c̅ ⊑ₗ c̅′
+    → ⊢ d̅ ⊑ d̅′
+    → ⟨ c ⟩⊑⟨ c′ ⟩
+    → ⟨ d ⟩⊑⟨ d′ ⟩
+    → ⊢ c̅ ⊑ c̅′
       --------------------------------------------------------
-    → ⊢ cast (fun d̅ c d) c̅ ⊑ cast (fun d̅′ c′ d′) c̅′
+    → ⟨ cast (fun d̅ c d) c̅ ⟩⊑⟨ cast (fun d̅′ c′ d′) c̅′ ⟩
 
+data ⟨_⟩⊑_ : ∀ {A B} → Cast A ⇒ B → (A′ : Type) → Set where
+
+  ⊑l-base : ∀ {ι g₁ g₂ g′} {c̅ : CExpr g₁ ⇒ g₂}
+    → ⊢ₗ c̅ ⊑ g′
+      --------------------------------------------------------
+    → ⟨ cast (Castᵣ_⇒_.id ι) c̅ ⟩⊑ (` ι of g′)
+
+  -- ⊑-ref : ∀ {A A′ B B′ g₁ g₁′ g₂ g₂′} {c : Cast B ⇒ A} {c′ : Cast B′ ⇒ A′}
+  --           {d : Cast A ⇒ B} {d′ : Cast A′ ⇒ B′}
+  --           {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
+  --   → ⊢ c ⊑  c′
+  --   → ⊢ d ⊑  d′
+  --   → ⊢ c̅ ⊑ₗ c̅′
+  --     --------------------------------------------------------
+  --   → ⊢ cast (ref c d) c̅ ⊑ cast (ref c′ d′) c̅′
+
+  -- ⊑-fun : ∀ {A A′ B B′ C C′ D D′ gc₁ gc₁′ gc₂ gc₂′ g₁ g₁′ g₂ g₂′}
+  --           {c : Cast C ⇒ A} {c′ : Cast C′ ⇒ A′}
+  --           {d : Cast B ⇒ D} {d′ : Cast B′ ⇒ D′}
+  --           {d̅ : CExpr gc₂ ⇒ gc₁} {d̅′ : CExpr gc₂′ ⇒ gc₁′}
+  --           {c̅ : CExpr g₁ ⇒ g₂} {c̅′ : CExpr g₁′ ⇒ g₂′}
+  --   → ⊢ d̅ ⊑ₗ d̅′
+  --   → ⊢ c ⊑  c′
+  --   → ⊢ d ⊑  d′
+  --   → ⊢ c̅ ⊑ₗ c̅′
+  --     --------------------------------------------------------
+  --   → ⊢ cast (fun d̅ c d) c̅ ⊑ cast (fun d̅′ c′ d′) c̅′
 
 coercion-prec→⊑ : ∀ {A A′ B B′} {c : Cast A ⇒ B} {d : Cast A′ ⇒ B′}
-  → ⊢ c ⊑ d
+  → ⟨ c ⟩⊑⟨ d ⟩
   → A ⊑ A′ × B ⊑ B′
 coercion-prec→⊑ (⊑-base c̅⊑c̅′) =
   let ⟨ g₁⊑g₁′ , g₂⊑g₂′ ⟩ = cexpr-prec→⊑ _ _ c̅⊑c̅′ in
@@ -221,7 +250,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
   ⊑-cast : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B B′}
              {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
-    → ⊢ c ⊑ c′
+    → ⟨ c ⟩⊑⟨ c′ ⟩
       -------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⟨ c ⟩ ⊑ M′ ⟨ c′ ⟩ ⇐ B ⊑ B′
 
