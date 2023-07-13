@@ -284,6 +284,20 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⟨ c ⟩ ⊑ M′ ⟨ c′ ⟩ ⇐ B ⊑ B′
 
 
+  ⊑-castl : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B} {c : Cast A ⇒ B}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
+    → ⟨ c ⟩⊑ A′
+      -------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⟨ c ⟩ ⊑ M′ ⇐ B ⊑ A′
+
+
+  ⊑-castr : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B′} {c′ : Cast A′ ⇒ B′}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
+    → A ⊑⟨ c′ ⟩
+      -------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⟨ c′ ⟩ ⇐ A ⊑ B′
+
+
   ⊑-blame : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M A A′ p}
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
     → A ⊑ A′
@@ -335,6 +349,7 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app!l {C = C} {C′} L⊑L′ M⊑M′ eq
     let C⊑C′ : C ⊑ C′
         C⊑C′ = subst₂ _⊑_ (sym eq) (sym eq′) (stamp-⊑ B⊑B′ ⋆⊑) in
     ⟨ ⊢app! ⊢L ⊢M eq , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
+{- Protection -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot M⊑M′ PC⊑PC′ x x′ eq eq′) rewrite eq | eq′ =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   let prec = prec→⊑ PC⊑PC′ in
@@ -350,8 +365,16 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot!l M⊑M′ PC⊑PC′ x x′ eq eq�
   let prec = prec→⊑ PC⊑PC′ in
   let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
   ⟨ ⊢prot! ⊢M ⊢PC x refl , ⊢prot ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
+{- Cast -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-cast M⊑M′ c⊑c′) =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ , proj₂ (coercion-prec→⊑ c⊑c′) ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-castl M⊑M′ c⊑A′) =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢cast ⊢M , ⊢M′ , {!!} ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-castr M⊑M′ A⊑c′) =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢M , ⊢cast ⊢M′ , {!!} ⟩
+{- Blame -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-blame ⊢M A⊑A′) =
   ⟨ ⊢M , ⊢blame , A⊑A′ ⟩
