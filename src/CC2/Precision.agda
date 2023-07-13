@@ -68,6 +68,8 @@ _⊑ₘ_ : (Σ Σ′ : HeapContext) → Set
 
 
 infix 4 ⟨_⟩⊑⟨_⟩
+infix 4 ⟨_⟩⊑_
+infix 4 _⊑⟨_⟩
 
 data ⟨_⟩⊑⟨_⟩ : ∀ {A A′ B B′} → Cast A ⇒ B → Cast A′ ⇒ B′ → Set where
 
@@ -98,8 +100,6 @@ data ⟨_⟩⊑⟨_⟩ : ∀ {A A′ B B′} → Cast A ⇒ B → Cast A′ ⇒ 
     → ⟨ cast (fun d̅ c d) c̅ ⟩⊑⟨ cast (fun d̅′ c′ d′) c̅′ ⟩
 
 
-infix 4 ⟨_⟩⊑_
-
 data ⟨_⟩⊑_ : ∀ {A B} → Cast A ⇒ B → (A′ : Type) → Set where
 
   ⊑l-base : ∀ {ι g₁ g₂ g′} {c̅ : CExpr g₁ ⇒ g₂}
@@ -107,8 +107,7 @@ data ⟨_⟩⊑_ : ∀ {A B} → Cast A ⇒ B → (A′ : Type) → Set where
       --------------------------------------------------------
     → ⟨ cast (Castᵣ_⇒_.id ι) c̅ ⟩⊑ ` ι of g′
 
-  ⊑-ref : ∀ {A A′ B g₁ g₂ g′} {c : Cast B ⇒ A}
-            {d : Cast A ⇒ B}
+  ⊑-ref : ∀ {A A′ B g₁ g₂ g′} {c : Cast B ⇒ A} {d : Cast A ⇒ B}
             {c̅ : CExpr g₁ ⇒ g₂}
     → ⟨ c ⟩⊑ A′
     → ⟨ d ⟩⊑  A′
@@ -117,16 +116,41 @@ data ⟨_⟩⊑_ : ∀ {A B} → Cast A ⇒ B → (A′ : Type) → Set where
     → ⟨ cast (ref c d) c̅ ⟩⊑ Ref A′ of g′
 
   ⊑-fun : ∀ {A A′ B B′ C D gc₁ gc₂ gc′ g₁ g₂ g′}
-            {c : Cast C ⇒ A}
-            {d : Cast B ⇒ D}
-            {d̅ : CExpr gc₂ ⇒ gc₁}
-            {c̅ : CExpr g₁ ⇒ g₂}
+            {c : Cast C ⇒ A} {d : Cast B ⇒ D}
+            {d̅ : CExpr gc₂ ⇒ gc₁} {c̅ : CExpr g₁ ⇒ g₂}
     → ⊢ₗ d̅ ⊑ gc′
     → ⟨ c ⟩⊑ A′
     → ⟨ d ⟩⊑ B′
     → ⊢ₗ c̅ ⊑ g′
       --------------------------------------------------------
     → ⟨ cast (fun d̅ c d) c̅ ⟩⊑ ⟦ gc′ ⟧ A′ ⇒ B′ of g′
+
+
+data _⊑⟨_⟩ : ∀ {A′ B′} → (A : Type) → Cast A′ ⇒ B′ → Set where
+
+  ⊑-base : ∀ {ι g g₁′ g₂′} {c̅′ : CExpr g₁′ ⇒ g₂′}
+    → ⊢ᵣ g ⊑ c̅′
+      --------------------------------------------------------
+    → ` ι of g ⊑⟨ cast (Castᵣ_⇒_.id ι) c̅′ ⟩
+
+  ⊑-ref : ∀ {A A′ B′ g g₁′ g₂′} {c′ : Cast B′ ⇒ A′} {d′ : Cast A′ ⇒ B′}
+            {c̅′ : CExpr g₁′ ⇒ g₂′}
+    → A ⊑⟨ c′ ⟩
+    → A ⊑⟨ d′ ⟩
+    → ⊢ᵣ g ⊑ c̅′
+      --------------------------------------------------------
+    → Ref A of g ⊑⟨ cast (ref c′ d′) c̅′ ⟩
+
+  ⊑-fun : ∀ {A A′ B B′ C′ D′ gc gc₁′ gc₂′ g g₁′ g₂′}
+            {c′ : Cast C′ ⇒ A′} {d′ : Cast B′ ⇒ D′}
+            {d̅′ : CExpr gc₂′ ⇒ gc₁′} {c̅′ : CExpr g₁′ ⇒ g₂′}
+    → ⊢ᵣ gc ⊑ d̅′
+    → A ⊑⟨ c′ ⟩
+    → B ⊑⟨ d′ ⟩
+    → ⊢ᵣ g ⊑ c̅′
+      --------------------------------------------------------
+    → ⟦ gc ⟧ A ⇒ B of g ⊑⟨ cast (fun d̅′ c′ d′) c̅′ ⟩
+
 
 coercion-prec→⊑ : ∀ {A A′ B B′} {c : Cast A ⇒ B} {d : Cast A′ ⇒ B′}
   → ⟨ c ⟩⊑⟨ d ⟩
