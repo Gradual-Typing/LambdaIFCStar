@@ -270,6 +270,54 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app! L M A B ⊑ app L′ M′ A′ B′ ℓ ⇐ C ⊑ C′
 
 
+  ⊑-if : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {L L′ M M′ N N′} {A A′ B B′ ℓ}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
+         ⇐ ` Bool of l ℓ ⊑ ` Bool of l ℓ
+    → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l (ℓc ⋎ ℓ) ; l (ℓc ⋎ ℓ) ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ A ⊑ A′)
+    → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l (ℓc ⋎ ℓ) ; l (ℓc ⋎ ℓ) ∣ ℓv ; ℓv′ ⊢ N ⊑ N′
+         ⇐ A ⊑ A′)
+    → B  ≡ stamp A  (l ℓ)
+    → B′ ≡ stamp A′ (l ℓ)
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ if L A ℓ M N ⊑ if L′ A′ ℓ M′ N′ ⇐ B ⊑ B′
+
+
+  ⊑-if! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′ N N′} {A A′ B B′}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
+         ⇐ ` Bool of ⋆ ⊑ ` Bool of ⋆
+    → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; ⋆ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ A ⊑ A′)
+    → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; ⋆ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′
+         ⇐ A ⊑ A′)
+    → B  ≡ stamp A  ⋆
+    → B′ ≡ stamp A′ ⋆
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ if! L A M N ⊑ if! L′ A′ M′ N′ ⇐ B ⊑ B′
+
+
+  ⊑-if!l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′ N N′} {A A′ B B′ ℓ}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
+         ⇐ ` Bool of ⋆ ⊑ ` Bool of l ℓ
+    → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; l (ℓc ⋎ ℓ) ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ A ⊑ A′)
+    → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; l (ℓc ⋎ ℓ) ∣ ℓv ; ℓv′ ⊢ N ⊑ N′
+         ⇐ A ⊑ A′)
+    → B  ≡ stamp A  ⋆
+    → B′ ≡ stamp A′ (l ℓ)
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ if! L A M N ⊑ if L′ A′ ℓ M′ N′ ⇐ B ⊑ B′
+
+
+  ⊑-let : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′ N N′} {A A′ B B′}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ A ⊑ A′
+    → (∀ {ℓv ℓv′} → A ∷ Γ ; A′ ∷ Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′
+         ⇐ B ⊑ B′)
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ `let M A N ⊑ `let M′ A′ N′ ⇐ B ⊑ B′
+
+
   ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
        let ℓv₂′ = ∥ PC′ ∥ vc′ in
@@ -384,6 +432,35 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app!l {C = C} {C′} L⊑L′ M⊑M′ eq
     let C⊑C′ : C ⊑ C′
         C⊑C′ = subst₂ _⊑_ (sym eq) (sym eq′) (stamp-⊑ B⊑B′ ⋆⊑) in
     ⟨ ⊢app! ⊢L ⊢M eq , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
+{- If -}
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if L⊑L′ M⊑M′ N⊑N′ eq eq′) rewrite eq | eq′ =
+  let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ihm = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let ihn = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ N⊑N′ in
+  ⟨ ⊢if ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) refl ,
+    ⊢if ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) refl ,
+    stamp-⊑ (proj₂ (proj₂ (ihm low low))) l⊑l ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if! L⊑L′ M⊑M′ N⊑N′ eq eq′) rewrite eq | eq′ =
+  let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ihm = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let ihn = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ N⊑N′ in
+  ⟨ ⊢if! ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) refl ,
+    ⊢if! ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) refl ,
+    stamp-⊑ (proj₂ (proj₂ (ihm low low))) ⋆⊑ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ eq eq′) rewrite eq | eq′ =
+  let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ihm = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let ihn = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ N⊑N′ in
+  ⟨ ⊢if! ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) refl ,
+    ⊢if  ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) refl ,
+    stamp-⊑ (proj₂ (proj₂ (ihm low low))) ⋆⊑ ⟩
+{- Let -}
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-let M⊑M′ N⊑N′) =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  let ih = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} (⊑*-∷ A⊑A′ Γ⊑Γ′) Σ⊑Σ′ N⊑N′ in
+  ⟨ ⊢let ⊢M (proj₁ (ih _ low)) ,
+    ⊢let ⊢M′ (proj₁ (proj₂ (ih low _))) ,
+    proj₂ (proj₂ (ih low low)) ⟩
 {- Protection -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot M⊑M′ PC⊑PC′ x x′ eq eq′) rewrite eq | eq′ =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
