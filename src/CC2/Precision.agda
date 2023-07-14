@@ -102,7 +102,7 @@ data ⟨_⟩⊑⟨_⟩ : ∀ {A A′ B B′} → Cast A ⇒ B → Cast A′ ⇒ 
 
 data ⟨_⟩⊑_ : ∀ {A B} → Cast A ⇒ B → (A′ : Type) → Set where
 
-  ⊑l-base : ∀ {ι g₁ g₂ g′} {c̅ : CExpr g₁ ⇒ g₂}
+  ⊑-base : ∀ {ι g₁ g₂ g′} {c̅ : CExpr g₁ ⇒ g₂}
     → ⊢ₗ c̅ ⊑ g′
       --------------------------------------------------------
     → ⟨ cast (Castᵣ_⇒_.id ι) c̅ ⟩⊑ ` ι of g′
@@ -168,6 +168,41 @@ coercion-prec→⊑ (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) =
   let ⟨ C⊑C′ , A⊑A′ ⟩ = coercion-prec→⊑ c⊑c′ in
   let ⟨ B⊑B′ , D⊑D′ ⟩ = coercion-prec→⊑ d⊑d′ in
   ⟨ ⊑-ty g₁⊑g₁′ (⊑-fun gc₁⊑gc₁′ A⊑A′ B⊑B′) , ⊑-ty g₂⊑g₂′ (⊑-fun gc₂⊑gc₂′ C⊑C′ D⊑D′) ⟩
+
+coercion-prec-left→⊑ : ∀ {A A′ B} {c : Cast A ⇒ B}
+  → ⟨ c ⟩⊑ A′
+  → A ⊑ A′ × B ⊑ A′
+coercion-prec-left→⊑ (⊑-base c̅⊑g′) =
+  let ⟨ g₁⊑g′ , g₂⊑g′ ⟩ = prec-left→⊑ _ c̅⊑g′ in
+  ⟨ ⊑-ty g₁⊑g′ ⊑-ι , ⊑-ty g₂⊑g′ ⊑-ι ⟩
+coercion-prec-left→⊑ (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  let ⟨ g₁⊑g′ , g₂⊑g′ ⟩ = prec-left→⊑ _ c̅⊑g′ in
+  let ⟨ B⊑A′ , A⊑A′ ⟩ = coercion-prec-left→⊑ c⊑A′ in
+  ⟨ ⊑-ty g₁⊑g′ (⊑-ref A⊑A′) , ⊑-ty g₂⊑g′ (⊑-ref B⊑A′) ⟩
+coercion-prec-left→⊑ (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  let ⟨ g₁⊑g′   , g₂⊑g′   ⟩ = prec-left→⊑ _ c̅⊑g′ in
+  let ⟨ gc₂⊑gc′ , gc₁⊑gc′ ⟩ = prec-left→⊑ _ d̅⊑gc′ in
+  let ⟨ C⊑A′ , A⊑A′ ⟩ = coercion-prec-left→⊑ c⊑A′ in
+  let ⟨ B⊑B′ , D⊑B′ ⟩ = coercion-prec-left→⊑ d⊑B′ in
+  ⟨ ⊑-ty g₁⊑g′ (⊑-fun gc₁⊑gc′ A⊑A′ B⊑B′) , ⊑-ty g₂⊑g′ (⊑-fun gc₂⊑gc′ C⊑A′ D⊑B′) ⟩
+
+coercion-prec-right→⊑ : ∀ {A A′ B′} {c : Cast A′ ⇒ B′}
+  → A ⊑⟨ c ⟩
+  → A ⊑ A′ × A ⊑ B′
+coercion-prec-right→⊑ (⊑-base g⊑c̅′) =
+  let ⟨ g⊑g₁′ , g⊑g₂′ ⟩ = prec-right→⊑ _ g⊑c̅′ in
+  ⟨ ⊑-ty g⊑g₁′ ⊑-ι , ⊑-ty g⊑g₂′ ⊑-ι ⟩
+coercion-prec-right→⊑ (⊑-ref A⊑c′ A⊑d′ g⊑c̅′) =
+  let ⟨ g⊑g₁′ , g⊑g₂′ ⟩ = prec-right→⊑ _ g⊑c̅′ in
+  let ⟨ A⊑B′ , A⊑A′ ⟩ = coercion-prec-right→⊑ A⊑c′ in
+  ⟨ ⊑-ty g⊑g₁′ (⊑-ref A⊑A′) , ⊑-ty g⊑g₂′ (⊑-ref A⊑B′) ⟩
+coercion-prec-right→⊑ (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′) =
+  let ⟨ g⊑g₁′   , g⊑g₂′   ⟩ = prec-right→⊑ _ g⊑c̅′ in
+  let ⟨ gc⊑gc₂′ , gc⊑gc₁′ ⟩ = prec-right→⊑ _ gc⊑d̅′ in
+  let ⟨ A⊑C′ , A⊑A′ ⟩ = coercion-prec-right→⊑ A⊑c′ in
+  let ⟨ B⊑B′ , B⊑D′ ⟩ = coercion-prec-right→⊑ B⊑d′ in
+  ⟨ ⊑-ty g⊑g₁′ (⊑-fun gc⊑gc₁′ A⊑A′ B⊑B′) , ⊑-ty g⊑g₂′ (⊑-fun gc⊑gc₂′ A⊑C′ B⊑D′) ⟩
+
 
 
 infix 4 _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_
@@ -371,10 +406,10 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-cast M⊑M′ c⊑c′) =
   ⟨ ⊢cast ⊢M , ⊢cast ⊢M′ , proj₂ (coercion-prec→⊑ c⊑c′) ⟩
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-castl M⊑M′ c⊑A′) =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
-  ⟨ ⊢cast ⊢M , ⊢M′ , {!!} ⟩
+  ⟨ ⊢cast ⊢M , ⊢M′ , proj₂ (coercion-prec-left→⊑ c⊑A′) ⟩
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-castr M⊑M′ A⊑c′) =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
-  ⟨ ⊢M , ⊢cast ⊢M′ , {!!} ⟩
+  ⟨ ⊢M , ⊢cast ⊢M′ , proj₂ (coercion-prec-right→⊑ A⊑c′) ⟩
 {- Blame -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-blame ⊢M A⊑A′) =
   ⟨ ⊢M , ⊢blame , A⊑A′ ⟩
