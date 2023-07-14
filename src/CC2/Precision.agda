@@ -341,6 +341,30 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
          ⇐ Ref (T of l ℓ) of l low ⊑ Ref (T′ of l ℓ) of l low
 
 
+  ⊑-deref : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B B′ ℓ}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ Ref A of l ℓ ⊑ Ref A′ of l ℓ
+    → B  ≡ stamp A  (l ℓ)
+    → B′ ≡ stamp A′ (l ℓ)
+      ----------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ ! M A ℓ ⊑ ! M′ A′ ℓ ⇐ B ⊑ B′
+
+
+  ⊑-deref! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B B′}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ Ref A of ⋆ ⊑ Ref A′ of ⋆
+    → B  ≡ stamp A  ⋆
+    → B′ ≡ stamp A′ ⋆
+      ----------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ !! M A ⊑ !! M′ A′ ⇐ B ⊑ B′
+
+
+  ⊑-deref!l : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B B′ ℓ}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ Ref A of ⋆ ⊑ Ref A′ of l ℓ
+    → B  ≡ stamp A  ⋆
+    → B′ ≡ stamp A′ (l ℓ)
+      ----------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ !! M A ⊑ ! M′ A′ ℓ ⇐ B ⊑ B′
+
+
   ⊑-assign : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {L L′ M M′} {T T′ ℓ̂ ℓ}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ Ref (T of l ℓ̂) of l ℓ ⊑ Ref (T′ of l ℓ̂) of l ℓ
@@ -526,6 +550,19 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref? M⊑M′) =
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref?l M⊑M′ ℓc≼ℓ) =
   let ⟨ ⊢M , ⊢M′ , Tℓ⊑T′ℓ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   ⟨ ⊢ref? ⊢M , ⊢ref ⊢M′ ℓc≼ℓ , ⊑-ty l⊑l (⊑-ref Tℓ⊑T′ℓ) ⟩
+{- Dereference -}
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref M⊑M′ eq eq′) rewrite eq | eq′ =
+  case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
+  ⟨ ⊢M , ⊢M′ , ⊑-ty _ (⊑-ref A⊑A′) ⟩ →
+    ⟨ ⊢deref ⊢M refl , ⊢deref ⊢M′ refl , stamp-⊑ A⊑A′ l⊑l ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref! M⊑M′ eq eq′) rewrite eq | eq′ =
+  case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
+  ⟨ ⊢M , ⊢M′ , ⊑-ty _ (⊑-ref A⊑A′) ⟩ →
+    ⟨ ⊢deref! ⊢M refl , ⊢deref! ⊢M′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref!l M⊑M′ eq eq′) rewrite eq | eq′ =
+  case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
+  ⟨ ⊢M , ⊢M′ , ⊑-ty _ (⊑-ref A⊑A′) ⟩ →
+    ⟨ ⊢deref! ⊢M refl , ⊢deref ⊢M′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
 {- Assignment -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-assign L⊑L′ M⊑M′ ℓc≼ℓ̂ ℓ≼ℓ̂) =
   let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
