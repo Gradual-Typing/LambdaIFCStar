@@ -341,6 +341,38 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
          ⇐ Ref (T of l ℓ) of l low ⊑ Ref (T′ of l ℓ) of l low
 
 
+  ⊑-assign : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {L L′ M M′} {T T′ ℓ̂ ℓ}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
+         ⇐ Ref (T of l ℓ̂) of l ℓ ⊑ Ref (T′ of l ℓ̂) of l ℓ
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ T of l ℓ̂ ⊑ T′ of l ℓ̂
+    → ℓc ≼ ℓ̂ → ℓ ≼ ℓ̂
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ assign L M T ℓ̂ ℓ ⊑ assign L′ M′ T′ ℓ̂ ℓ
+         ⇐ ` Unit of l low ⊑ ` Unit of l low
+
+
+  ⊑-assign? : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′} {T T′ ĝ ĝ′ g g′} {p q}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
+         ⇐ Ref (T of ĝ) of g ⊑ Ref (T′ of ĝ′) of g′
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ T of ĝ ⊑ T′ of ĝ′
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ assign? L M T ĝ g p ⊑ assign? L′ M′ T′ ĝ′ g′ q
+         ⇐ ` Unit of l low ⊑ ` Unit of l low
+
+
+  ⊑-assign?l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′} {T T′ ĝ ℓ̂ g ℓ} {p}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
+         ⇐ Ref (T of ĝ) of g ⊑ Ref (T′ of l ℓ̂) of l ℓ
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
+         ⇐ T of ĝ ⊑ T′ of l ℓ̂
+    → ℓc ≼ ℓ̂ → ℓ ≼ ℓ̂
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ assign? L M T ĝ g p ⊑ assign L′ M′ T′ ℓ̂ ℓ
+         ⇐ ` Unit of l low ⊑ ` Unit of l low
+
+
   ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
        let ℓv₂′ = ∥ PC′ ∥ vc′ in
@@ -494,6 +526,19 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref? M⊑M′) =
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref?l M⊑M′ ℓc≼ℓ) =
   let ⟨ ⊢M , ⊢M′ , Tℓ⊑T′ℓ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   ⟨ ⊢ref? ⊢M , ⊢ref ⊢M′ ℓc≼ℓ , ⊑-ty l⊑l (⊑-ref Tℓ⊑T′ℓ) ⟩
+{- Assignment -}
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-assign L⊑L′ M⊑M′ ℓc≼ℓ̂ ℓ≼ℓ̂) =
+  let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ⟨ ⊢M , ⊢M′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢assign ⊢L ⊢M ℓc≼ℓ̂ ℓ≼ℓ̂ , ⊢assign ⊢L′ ⊢M′ ℓc≼ℓ̂ ℓ≼ℓ̂ , ⊑-ty l⊑l ⊑-ι ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-assign? L⊑L′ M⊑M′) =
+  let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ⟨ ⊢M , ⊢M′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢assign? ⊢L ⊢M , ⊢assign? ⊢L′ ⊢M′ , ⊑-ty l⊑l ⊑-ι ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-assign?l L⊑L′ M⊑M′  ℓc≼ℓ̂ ℓ≼ℓ̂) =
+  let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
+  let ⟨ ⊢M , ⊢M′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢assign? ⊢L ⊢M , ⊢assign ⊢L′ ⊢M′ ℓc≼ℓ̂ ℓ≼ℓ̂ , ⊑-ty l⊑l ⊑-ι ⟩
 {- Protection -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot M⊑M′ PC⊑PC′ x x′ eq eq′) rewrite eq | eq′ =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
