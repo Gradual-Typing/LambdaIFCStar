@@ -18,8 +18,9 @@ open import Function using (case_of_)
 
 open import Syntax
 open import Common.Utils
-open import Memory.HeapContext
 open import CC2.Statics
+open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
+open import Memory.HeapContext
 open import CoercionExpr.Precision
   renaming (prec→⊑ to cexpr-prec→⊑;
             ⊢l_⊑_ to ⊢ₗ_⊑_; ⊢r_⊑_ to ⊢ᵣ_⊑_)
@@ -605,3 +606,18 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-castr M⊑M′ A⊑c′) =
 {- Blame -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-blame ⊢M A⊑A′) =
   ⟨ ⊢M , ⊢blame , A⊑A′ ⟩
+
+
+
+data _;_;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) → ∀ ℓ → (μ μ′ : HalfHeap) → Set where
+
+  ⊑-∅ : ∀ {Σ Σ′ ℓ} → Σ ; Σ′ ; ℓ ⊢ [] ⊑ []
+
+  ⊑-∷ : ∀ {Σ Σ′ ℓ} {μ μ′ n} {V V′ v v′} {T T′}
+    → Σ ; Σ′ ; ℓ ⊢ μ ⊑ μ′
+    → [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ V′ ⇐ T of l ℓ ⊑ T′ of l ℓ
+      --------------------------------------------------------------------------------
+    → Σ ; Σ′ ; ℓ ⊢ (⟨ n , V & v ⟩ ∷ μ) ⊑ (⟨ n , V′ & v′ ⟩ ∷ μ′)
+
+_;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) (μ μ′ : Heap) → Set
+Σ ; Σ′ ⊢ ⟨ μᴸ , μᴴ ⟩ ⊑ ⟨ μᴸ′ , μᴴ′ ⟩ = (Σ ; Σ′ ; low ⊢ μᴸ ⊑ μᴸ′) × (Σ ; Σ′ ; high ⊢ μᴴ ⊑ μᴴ′)
