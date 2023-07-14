@@ -318,6 +318,29 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ `let M A N ⊑ `let M′ A′ N′ ⇐ B ⊑ B′
 
 
+  ⊑-ref : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {M M′} {T T′ ℓ}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ T of l ℓ ⊑ T′ of l ℓ
+    → ℓc ≼ ℓ
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ ref⟦ ℓ ⟧ M ⊑ ref⟦ ℓ ⟧ M′
+         ⇐ Ref (T of l ℓ) of l low ⊑ Ref (T′ of l ℓ) of l low
+
+
+  ⊑-ref? : ∀ {Γ Γ′ Σ Σ′ ℓv ℓv′} {M M′} {T T′ ℓ} {p q}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; ⋆ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ T of l ℓ ⊑ T′ of l ℓ
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; ⋆ ∣ ℓv ; ℓv′ ⊢ ref?⟦ ℓ ⟧ M p ⊑ ref?⟦ ℓ ⟧ M′ q
+         ⇐ Ref (T of l ℓ) of l low ⊑ Ref (T′ of l ℓ) of l low
+
+
+  ⊑-ref?l : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {M M′} {T T′ ℓ} {p}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; l ℓc ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ T of l ℓ ⊑ T′ of l ℓ
+    → ℓc ≼ ℓ
+      -------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; l ℓc ∣ ℓv ; ℓv′ ⊢ ref?⟦ ℓ ⟧ M p ⊑ ref⟦ ℓ ⟧ M′
+         ⇐ Ref (T of l ℓ) of l low ⊑ Ref (T′ of l ℓ) of l low
+
+
   ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
        let ℓv₂′ = ∥ PC′ ∥ vc′ in
@@ -461,6 +484,16 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-let M⊑M′ N⊑N′) =
   ⟨ ⊢let ⊢M (proj₁ (ih _ low)) ,
     ⊢let ⊢M′ (proj₁ (proj₂ (ih low _))) ,
     proj₂ (proj₂ (ih low low)) ⟩
+{- Reference creation -}
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref M⊑M′ ℓc≼ℓ) =
+  let ⟨ ⊢M , ⊢M′ , Tℓ⊑T′ℓ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢ref ⊢M ℓc≼ℓ , ⊢ref ⊢M′ ℓc≼ℓ , ⊑-ty l⊑l (⊑-ref Tℓ⊑T′ℓ) ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref? M⊑M′) =
+  let ⟨ ⊢M , ⊢M′ , Tℓ⊑T′ℓ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢ref? ⊢M , ⊢ref? ⊢M′ , ⊑-ty l⊑l (⊑-ref Tℓ⊑T′ℓ) ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-ref?l M⊑M′ ℓc≼ℓ) =
+  let ⟨ ⊢M , ⊢M′ , Tℓ⊑T′ℓ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
+  ⟨ ⊢ref? ⊢M , ⊢ref ⊢M′ ℓc≼ℓ , ⊑-ty l⊑l (⊑-ref Tℓ⊑T′ℓ) ⟩
 {- Protection -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot M⊑M′ PC⊑PC′ x x′ eq eq′) rewrite eq | eq′ =
   let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
