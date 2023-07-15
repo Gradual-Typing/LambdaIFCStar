@@ -14,12 +14,12 @@ open import Function using (case_of_)
 
 open import Common.Utils
 open import Common.Types
+open import LabelExpr.Security  {- reasoning about security levels of LExpr -}
 open import CC2.Statics
 open import CC2.Reduction
-open import CC2.HeapTyping
+open import CC2.HeapTyping                              public
+open import CC2.SubstPreserve using (substitution-pres) public
 
-open import CC2.SubstPreserve using (substitution-pres)
-open import LabelExpr.Security  {- reasoning about security levels of LExpr -}
 
 
 {- Plug inversion -}
