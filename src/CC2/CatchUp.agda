@@ -66,16 +66,19 @@ catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑�
                   _ ∣ _ ∣ _ ∎) ,
       ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)) ⟩
   ⟨ _ , c̅↠d̅ , success (inj (up id)) ⟩ →
-    case c⊑A′ of λ where
+    case c⊑A′ of λ where         {- impossible -}
     (⊑-base c̅⊑low) →
       case pres-prec-left-mult c̅⊑low c̅↠d̅ of λ where
       (⊑-cast _ () _)
   ⟨ _ , c̅↠↑ , success (up id) ⟩ →
-    case c⊑A′ of λ where
+    case c⊑A′ of λ where         {- impossible -}
     (⊑-base c̅⊑low) →
       case pres-prec-left-mult c̅⊑low c̅↠↑ of λ where
       (⊑-cast _ _ ())
-  ⟨ ⊥ _ _ p , c̅↠⊥ , result ⟩ → {!!}
+  ⟨ ⊥ _ _ p , c̅↠⊥ , fail ⟩ →
+    case c⊑A′ of λ where         {- impossible -}
+    (⊑-base c̅⊑g′) →
+      case pres-prec-left-mult c̅⊑g′ c̅↠⊥ of λ where ()
 ... | ⟨ V , V-raw V-addr , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
 ... | ⟨ V , V-raw V-ƛ , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
 ... | ⟨ V , V-cast v i , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
