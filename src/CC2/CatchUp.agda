@@ -70,7 +70,11 @@ catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑�
     (⊑-base c̅⊑low) →
       case pres-prec-left-mult c̅⊑low c̅↠d̅ of λ where
       (⊑-cast _ () _)
-  ⟨ _ , c̅↠up , success (up _) ⟩ → {!!}
+  ⟨ _ , c̅↠↑ , success (up id) ⟩ →
+    case c⊑A′ of λ where
+    (⊑-base c̅⊑low) →
+      case pres-prec-left-mult c̅⊑low c̅↠↑ of λ where
+      (⊑-cast _ _ ())
   ⟨ ⊥ _ _ p , c̅↠⊥ , result ⟩ → {!!}
 ... | ⟨ V , V-raw V-addr , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
 ... | ⟨ V , V-raw V-ƛ , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
