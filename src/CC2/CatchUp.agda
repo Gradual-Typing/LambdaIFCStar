@@ -39,7 +39,19 @@ catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑�
   with catchup {μ = μ} {PC} (V-raw v′) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ | v′ | c
 ... | ⟨ V , V-raw V-const , M↠V , ⊑-const ⟩ | V-const | cast (id ι) c̅ =
   case cexpr-sn c̅ of λ where
-  ⟨ id _ , c̅↠id , success id ⟩ → {!!}
+  ⟨ _ , _ ∎ₗ , success id ⟩ →
+    ⟨ V , V-raw V-const ,
+      trans-mult (plug-cong (□⟨ _ ⟩) M↠V)
+                 (_ ∣ _ ∣ _ —→⟨ cast (V-raw V-const) cast-id ⟩
+                  _ ∣ _ ∣ _ ∎) ,
+      ⊑-const ⟩
+  ⟨ _ , _ —→ₗ⟨ r ⟩ r* , success id ⟩ →
+    ⟨ V , V-raw V-const ,
+      trans-mult (plug-cong (□⟨ _ ⟩) M↠V)
+                 (_ ∣ _ ∣ _ —→⟨ cast (V-raw V-const) (cast V-const (_ —→ₗ⟨ r ⟩ r*) CVal.id) ⟩
+                  _ ∣ _ ∣ _ —→⟨ cast (V-raw V-const) cast-id ⟩
+                  _ ∣ _ ∣ _ ∎) ,
+      ⊑-const ⟩
   ⟨ _ , _ ∎ₗ , success (inj id) ⟩ →
     ⟨ V ⟨ cast (Castᵣ_⇒_.id ι) (_ ⨾ CC2.Statics._! _) ⟩ ,
       V-cast V-const (ir-base (inj CVal.id) (λ ())) ,
