@@ -36,18 +36,27 @@ data _∣_∣_—↠_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
       → L ∣ μ  ∣ PC —↠ N ∣ μ″
 
 
-multi-trans : ∀ {M₁ M₂ M₃ μ₁ μ₂ μ₃ pc}
+trans-mult : ∀ {M₁ M₂ M₃ μ₁ μ₂ μ₃ pc}
   → M₁ ∣ μ₁ ∣ pc —↠ M₂ ∣ μ₂
   → M₂ ∣ μ₂ ∣ pc —↠ M₃ ∣ μ₃
   → M₁ ∣ μ₁ ∣ pc —↠ M₃ ∣ μ₃
-multi-trans (M ∣ μ ∣ pc ∎) (M ∣ μ ∣ pc ∎) = M ∣ μ ∣ pc ∎
-multi-trans (M₁ ∣ μ₁ ∣ pc ∎) (M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃) =
+trans-mult (M ∣ μ ∣ pc ∎) (M ∣ μ ∣ pc ∎) = M ∣ μ ∣ pc ∎
+trans-mult (M₁ ∣ μ₁ ∣ pc ∎) (M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃) =
   M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃
-multi-trans (M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃) (M₃ ∣ μ₃ ∣ pc ∎) =
+trans-mult (M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃) (M₃ ∣ μ₃ ∣ pc ∎) =
   M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃
-multi-trans (M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃)
+trans-mult (M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ M₂↠M₃)
             (M₃ ∣ μ₃ ∣ pc —→⟨ M₃→M₄ ⟩ M₄↠M₅) =
-  M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ (multi-trans M₂↠M₃ (M₃ ∣ μ₃ ∣ pc —→⟨ M₃→M₄ ⟩ M₄↠M₅))
+  M₁ ∣ μ₁ ∣ pc —→⟨ M₁→M₂ ⟩ (trans-mult M₂↠M₃ (M₃ ∣ μ₃ ∣ pc —→⟨ M₃→M₄ ⟩ M₄↠M₅))
+
+
+plug-cong : ∀ {M N μ μ′ PC}
+  → (F : Frame)
+  → M ∣ μ ∣ PC —↠ N ∣ μ′
+  → plug M F ∣ μ ∣ PC —↠ plug N F ∣ μ′
+plug-cong F (_ ∣ _ ∣ _ ∎) = _ ∣ _ ∣ _ ∎
+plug-cong F (L ∣ μ ∣ PC —→⟨ L→M ⟩ M↠N) =
+  plug L F ∣ μ ∣ PC —→⟨ ξ L→M ⟩ plug-cong F M↠N
 
 
 -- pres-mult : ∀ {Σ gc pc M M′ A μ μ′}
