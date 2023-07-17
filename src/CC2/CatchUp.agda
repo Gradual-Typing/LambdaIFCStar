@@ -20,6 +20,7 @@ open import CC2.Reduction
 open import CC2.MultiStep
 open import CC2.Precision
 open import CoercionExpr.Precision
+open import CoercionExpr.CatchUp renaming (catchup to catchupₗ)
 
 catchup : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M V′ μ PC} {A A′}
   → Value V′
@@ -64,9 +65,11 @@ catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑�
                  (_ ∣ _ ∣ _ —→⟨ cast (V-raw V-const) (cast V-const (_ —→ₗ⟨ r ⟩ r*) (inj CVal.id)) ⟩
                   _ ∣ _ ∣ _ ∎) ,
       ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)) ⟩
-  ⟨ _ , c̅↠inj , success (inj (up id)) ⟩ →
-    ⟨ V ⟨ cast (Castᵣ_⇒_.id ι) (_ ⨾ CC2.Statics._! _) ⟩ ,
-      V-cast V-const (ir-base (inj (up CVal.id)) (λ ())) , {!!} , ⊑-castl ⊑-const (⊑-base {!!}) ⟩
+  ⟨ _ , c̅↠d̅ , success (inj (up id)) ⟩ →
+    case c⊑A′ of λ where
+    (⊑-base c̅⊑low) →
+      case pres-prec-left-mult c̅⊑low c̅↠d̅ of λ where
+      (⊑-cast _ () _)
   ⟨ _ , c̅↠up , success (up _) ⟩ → {!!}
   ⟨ ⊥ _ _ p , c̅↠⊥ , result ⟩ → {!!}
 ... | ⟨ V , V-raw V-addr , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
