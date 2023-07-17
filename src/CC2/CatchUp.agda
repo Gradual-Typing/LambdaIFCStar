@@ -12,7 +12,6 @@ open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; subst; subst₂; sym)
 open import Function using (case_of_)
 
-open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
 open import CC2.Statics
@@ -35,8 +34,6 @@ catchup (V-raw x) ⊑-const Γ⊑Γ′ Σ⊑Σ′ = {!!}
 catchup (V-raw x) (⊑-addr x₁ x₂) Γ⊑Γ′ Σ⊑Σ′ = {!!}
 catchup (V-raw x) (⊑-lam x₁ x₂ x₃) Γ⊑Γ′ Σ⊑Σ′ = {!!}
 catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑Γ′ Σ⊑Σ′
---   with cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑V′
--- ... | ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩
   with catchup {μ = μ} {PC} (V-raw v′) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ | v′ | c
 ... | ⟨ V , V-raw V-const , M↠V , ⊑-const ⟩ | V-const | cast (id ι) c̅ =
   case cexpr-sn c̅ of λ where
@@ -79,9 +76,13 @@ catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑�
     case c⊑A′ of λ where         {- impossible -}
     (⊑-base c̅⊑g′) →
       case pres-prec-left-mult c̅⊑g′ c̅↠⊥ of λ where ()
-... | ⟨ V , V-raw V-addr , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
-... | ⟨ V , V-raw V-ƛ , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
-... | ⟨ V , V-cast v i , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
+... | ⟨ V , V-raw V-ƛ , M↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ = {!!}
+... | ⟨ V , V-raw V-addr , M↠V , ⊑-addr _ _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
+... | ⟨ V ⟨ c₁ ⟩ , V-cast {c = c₁} v i , M↠V , ⊑-castl ⊑-const c₁⊑A′ ⟩ | V-const | c =
+  let x = catchup {M = V ⟨ c₁ ⨟ c ⟩} (V-raw v′) (⊑-castl ⊑-const {!!}) Γ⊑Γ′ Σ⊑Σ′ in
+  {!!}
+... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) _ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ = {!!}
+... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-addr _ _) _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
 ... | ⟨ V , V-● , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
 catchup (V-cast x x₁) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ = {!!}
 catchup V-● M⊑V′ Γ⊑Γ′ Σ⊑Σ′ = {!!}
