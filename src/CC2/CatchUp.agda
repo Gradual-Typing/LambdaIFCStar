@@ -61,8 +61,34 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-cast
                     _ ∣ _ ∣ _ ∎) ,
         ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-left-contract c̅ₙ⊑id) l⊑l ⋆⊑)) ⟩
     ⟨ _ , up id , c̅↠↑ , ⊑-castl _ _ () ⟩  {- impossible -}
-... | ⟨ V , V-raw V-ƛ , M↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ = {!!}
-... | ⟨ V , V-raw V-addr , M↠V , ⊑-addr _ _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
+... | ⟨ V , V-raw V-ƛ , M↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ =
+  case c⊑A′ of λ where
+  (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) →
+    case catchupₗ _ _ CVal.id (⊑-left-expand c̅⊑g′) of λ where
+    ⟨ c̅ₙ , 𝓋 , _ ∎ₗ , c̅ₙ⊑id ⟩ →
+      ⟨ _ , V-cast V-ƛ (ir-fun 𝓋) ,
+        plug-cong (□⟨ _ ⟩) M↠V ,
+        ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
+    ⟨ c̅ₙ , 𝓋 , _ —→ₗ⟨ r ⟩ r* , c̅ₙ⊑id ⟩ →
+      ⟨ _ , V-cast V-ƛ (ir-fun 𝓋) ,
+        trans-mult (plug-cong (□⟨ _ ⟩) M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-raw V-ƛ) (cast V-ƛ (_ —→ₗ⟨ r ⟩ r*) 𝓋) ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
+... | ⟨ V , V-raw V-addr , M↠V , ⊑-addr x y ⟩ | V-addr | cast (ref c d) c̅ =
+  case c⊑A′ of λ where
+  (⊑-ref c⊑A′ d⊑B′ c̅⊑g′) →
+    case catchupₗ _ _ CVal.id (⊑-left-expand c̅⊑g′) of λ where
+    ⟨ c̅ₙ , 𝓋 , _ ∎ₗ , c̅ₙ⊑id ⟩ →
+      ⟨ _ , V-cast V-addr (ir-ref 𝓋) ,
+        plug-cong (□⟨ _ ⟩) M↠V ,
+        ⊑-castl (⊑-addr x y) (⊑-ref c⊑A′ d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
+    ⟨ c̅ₙ , 𝓋 , _ —→ₗ⟨ r ⟩ r* , c̅ₙ⊑id ⟩ →
+      ⟨ _ , V-cast V-addr (ir-ref 𝓋) ,
+        trans-mult (plug-cong (□⟨ _ ⟩) M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-raw V-addr) (cast V-addr (_ —→ₗ⟨ r ⟩ r*) 𝓋) ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castl (⊑-addr x y) (⊑-ref c⊑A′ d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
 ... | ⟨ V ⟨ cast _ d̅ ⟩ , V-cast v i , M↠V , ⊑-castl ⊑-const d⊑A′ ⟩ | V-const | cast (id ι) c̅ =
   case ⟨ d⊑A′ , c⊑A′ ⟩ of λ where
   ⟨ ⊑-base d̅⊑g′ , ⊑-base c̅⊑g′ ⟩ →
