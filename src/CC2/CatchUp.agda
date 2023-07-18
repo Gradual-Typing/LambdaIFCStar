@@ -20,6 +20,7 @@ open import CC2.MultiStep
 open import CC2.Precision
 open import CoercionExpr.Precision
 open import CoercionExpr.CatchUp renaming (catchup to catchupₗ)
+open import CoercionExpr.SyntacComp
 
 catchup : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M V′ μ PC} {A A′}
   → Value V′
@@ -33,9 +34,10 @@ catchup : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M V′ μ PC} {A A′}
 catchup (V-raw x) ⊑-const Γ⊑Γ′ Σ⊑Σ′ = {!!}
 catchup (V-raw x) (⊑-addr x₁ x₂) Γ⊑Γ′ Σ⊑Σ′ = {!!}
 catchup (V-raw x) (⊑-lam x₁ x₂ x₃) Γ⊑Γ′ Σ⊑Σ′ = {!!}
-catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑Γ′ Σ⊑Σ′
+catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑Γ′ Σ⊑Σ′
   with catchup {μ = μ} {PC} (V-raw v′) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ | v′ | c
 ... | ⟨ V , V-raw V-const , M↠V , ⊑-const ⟩ | V-const | cast (id ι) c̅ =
+  {- proof could be simplified if we use `catchupₗ` here instead of `cexpr-sn` -}
   case cexpr-sn c̅ of λ where
   ⟨ _ , _ ∎ₗ , success id ⟩ →
     ⟨ V , V-raw V-const ,
@@ -78,9 +80,20 @@ catchup {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑�
       case pres-prec-left-mult c̅⊑g′ c̅↠⊥ of λ where ()
 ... | ⟨ V , V-raw V-ƛ , M↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ = {!!}
 ... | ⟨ V , V-raw V-addr , M↠V , ⊑-addr _ _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
-... | ⟨ V ⟨ c₁ ⟩ , V-cast {c = c₁} v i , M↠V , ⊑-castl ⊑-const c₁⊑A′ ⟩ | V-const | c =
-  let x = catchup {M = V ⟨ c₁ ⨟ c ⟩} (V-raw v′) (⊑-castl ⊑-const {!!}) Γ⊑Γ′ Σ⊑Σ′ in
-  {!!}
+... | ⟨ V ⟨ cast _ d̅ ⟩ , V-cast v i , M↠V , ⊑-castl ⊑-const d⊑A′ ⟩ | V-const | cast (id ι) c̅ =
+  case ⟨ d⊑A′ , c⊑A′ ⟩ of λ where
+  ⟨ ⊑-base d̅⊑g′ , ⊑-base c̅⊑g′ ⟩ →
+    case catchupₗ _ _ CVal.id (⊑-left-expand (comp-pres-⊑-ll d̅⊑g′ c̅⊑g′)) of λ where
+    ⟨ _ , id , d̅⨟c̅↠id , id⊑id ⟩ → {!!}
+    ⟨ _ , inj 𝓋 , d̅⨟c̅↠! , !⊑id ⟩ →
+      ⟨ _ ,
+        V-cast v (ir-base {ι = ι} (inj 𝓋) (λ ())) ,
+        trans-mult (plug-cong □⟨ cast (id ι) c̅ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-cast v i) (cast-comp v i) ⟩
+                    _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ d̅⨟c̅↠! (inj 𝓋)) (inj 𝓋)) ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castl ⊑-const (⊑-base (⊑-left-contract !⊑id)) ⟩
+    ⟨ _ , up 𝓋 , d̅⨟c̅↠↑ , ↑⊑id ⟩ → {!!}
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) _ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ = {!!}
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-addr _ _) _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
 ... | ⟨ V , V-● , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
