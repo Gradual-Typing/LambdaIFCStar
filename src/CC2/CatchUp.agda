@@ -106,8 +106,21 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-cast
                     _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ d̅⨟c̅↠↑ (up id)) (up id)) ⟩
                     _ ∣ _ ∣ _ ∎) ,
         ⊑-castl ⊑-const (⊑-base (⊑-left-contract ↑⊑id)) ⟩
-... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) _ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ = {!!}
+... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) d⊑A′ ⟩ | V-ƛ | cast (fun d̅ c d) c̅ =
+  case ⟨ d⊑A′ , c⊑A′ ⟩ of λ where
+  ⟨ ⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′ , ⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′ ⟩ →
+    case catchupₗ _ _ CVal.id (⊑-left-expand (comp-pres-⊑-ll c̅₁⊑g′ c̅⊑g′)) of λ where
+    ⟨ c̅ₙ , 𝓋 , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
+      let d̅⨟d̅₁⊑gc′ = comp-pres-⊑-ll d̅⊑gc′ d̅₁⊑gc′ in
+      let c⨟c̅₁⊑A′ = comp-pres-prec-ll c⊑A′ c₁⊑A′ in
+      ⟨ _ , V-cast v (ir-fun 𝓋) ,
+        trans-mult (plug-cong □⟨ cast (fun d̅ c d) c̅ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-cast v i) (cast-comp v i) ⟩
+                    _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ c̅₁⨟c̅↠c̅ₙ 𝓋) 𝓋) ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′)
+                (⊑-fun d̅⨟d̅₁⊑gc′ {!!} {!!} (⊑-left-contract c̅ₙ⊑id)) ⟩
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-addr _ _) _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
-... | ⟨ V , V-● , M↠V , V⊑V′ ⟩ | v′ | c = {!!}
+... | ⟨ ● , V-● , M↠● , ●⊑V′ ⟩ | v′ | c = contradiction ●⊑V′ (●⋤ _)
 catchup (V-cast x x₁) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ = {!!}
-catchup V-● M⊑V′ Γ⊑Γ′ Σ⊑Σ′ = {!!}
+catchup V-● M⊑● Γ⊑Γ′ Σ⊑Σ′ = contradiction M⊑● (_ ⋤●)
