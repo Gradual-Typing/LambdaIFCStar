@@ -16,7 +16,7 @@ open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; subst; subst₂; sym)
 open import Function using (case_of_)
 
-open import Syntax
+open import Syntax hiding (_⨟_)
 open import Common.Utils
 open import CC2.Statics
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
@@ -24,6 +24,7 @@ open import Memory.HeapContext
 open import CoercionExpr.Precision
   renaming (prec→⊑ to cexpr-prec→⊑;
             ⊢l_⊑_ to ⊢ₗ_⊑_; ⊢r_⊑_ to ⊢ᵣ_⊑_)
+open import CoercionExpr.SyntacComp renaming (_⨟_ to _⊹⊹_)
 
 
 data _⊑*_ : (Γ Γ′ : Context) → Set where
@@ -204,6 +205,19 @@ coercion-prec-right→⊑ (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′) =
   let ⟨ B⊑B′ , B⊑D′ ⟩ = coercion-prec-right→⊑ B⊑d′ in
   ⟨ ⊑-ty g⊑g₁′ (⊑-fun gc⊑gc₁′ A⊑A′ B⊑B′) , ⊑-ty g⊑g₂′ (⊑-fun gc⊑gc₂′ A⊑C′ B⊑D′) ⟩
 
+
+comp-pres-prec-ll : ∀ {A A′ B C} {c : Cast A ⇒ B} {d : Cast B ⇒ C}
+  → ⟨     c ⟩⊑ A′
+  → ⟨     d ⟩⊑ A′
+    -----------------------
+  → ⟨ c ⨟ d ⟩⊑ A′
+comp-pres-prec-ll (⊑-base c̅⊑g′) (⊑-base d̅⊑g′) = ⊑-base (comp-pres-⊑-ll c̅⊑g′ d̅⊑g′)
+comp-pres-prec-ll (⊑-ref c₁⊑A′ d₁⊑A′ c̅⊑g′) (⊑-ref c₂⊑A′ d₂⊑A′ d̅⊑g′) =
+  ⊑-ref (comp-pres-prec-ll c₂⊑A′ c₁⊑A′) (comp-pres-prec-ll d₁⊑A′ d₂⊑A′)
+        (comp-pres-⊑-ll c̅⊑g′ d̅⊑g′)
+comp-pres-prec-ll (⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′) (⊑-fun d̅₂⊑gc′ c₂⊑A′ d₂⊑B′ c̅₂⊑g′) =
+  ⊑-fun (comp-pres-⊑-ll d̅₂⊑gc′ d̅₁⊑gc′) (comp-pres-prec-ll c₂⊑A′ c₁⊑A′)
+        (comp-pres-prec-ll d₁⊑B′ d₂⊑B′) (comp-pres-⊑-ll c̅₁⊑g′ c̅₂⊑g′)
 
 
 infix 4 _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_
