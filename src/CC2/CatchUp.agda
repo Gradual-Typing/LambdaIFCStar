@@ -145,5 +145,9 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-cast
         ⊑-castl (⊑-addr x y)
                 (⊑-ref c⨟c₁⊑A′ d₁⨟d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
 ... | ⟨ ● , V-● , M↠● , ●⊑V′ ⟩ | v′ | c = contradiction ●⊑V′ (●⋤ _)
-catchup (V-cast x x₁) M⊑V′  = {!!}
+catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (⊑-cast M⊑M′ c⊑c′) = {!!}
+catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (⊑-castl M⊑M′ c⊑A′) = {!!}
+catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (⊑-castr M⊑V′ A⊑c′)
+  with catchup {μ = μ} {PC} (V-raw v′) M⊑V′
+... | ⟨ V , v , M↠V , V⊑V′ ⟩ = ⟨ V , v , M↠V , ⊑-castr V⊑V′ A⊑c′ ⟩
 catchup V-● M⊑●  = contradiction M⊑● (_ ⋤●)
