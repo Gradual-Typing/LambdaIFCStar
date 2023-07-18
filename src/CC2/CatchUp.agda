@@ -25,17 +25,15 @@ open import CoercionExpr.SyntacComp
 catchup : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M V′ μ PC} {A A′}
   → Value V′
   → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ V′ ⇐ A ⊑ A′
-  → Γ ⊑* Γ′
-  → Σ ⊑ₘ Σ′
     -------------------------------------------------------------------
   → ∃[ V ] (Value V) ×
        (M ∣ μ ∣ PC —↠ V ∣ μ) ×
        (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ V′ ⇐ A ⊑ A′)
-catchup (V-raw x) ⊑-const Γ⊑Γ′ Σ⊑Σ′ = {!!}
-catchup (V-raw x) (⊑-addr x₁ x₂) Γ⊑Γ′ Σ⊑Σ′ = {!!}
-catchup (V-raw x) (⊑-lam x₁ x₂ x₃) Γ⊑Γ′ Σ⊑Σ′ = {!!}
-catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′) Γ⊑Γ′ Σ⊑Σ′
-  with catchup {μ = μ} {PC} (V-raw v′) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ | v′ | c
+catchup (V-raw V-const) ⊑-const  = ⟨ _ , V-raw V-const , _ ∣ _ ∣ _ ∎ , ⊑-const ⟩
+catchup (V-raw V-addr) (⊑-addr x y) = ⟨ _ , V-raw V-addr , _ ∣ _ ∣ _ ∎ , ⊑-addr x y ⟩
+catchup (V-raw V-ƛ) (⊑-lam g⊑g′ A⊑A′ N⊑N′) = ⟨ _ , V-raw V-ƛ , _ ∣ _ ∣ _ ∎ , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩
+catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-castl {c = c} M⊑V′ c⊑A′)
+  with catchup {μ = μ} {PC} (V-raw v′) M⊑V′  | v′ | c
 ... | ⟨ V , V-raw V-const , M↠V , ⊑-const ⟩ | V-const | cast (id ι) c̅ =
   case c⊑A′ of λ where
   (⊑-base c̅⊑g′) →
@@ -121,5 +119,5 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-cast
         ⊑-castl (⊑-addr x y)
                 (⊑-ref c⨟c₁⊑A′ d₁⨟d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
 ... | ⟨ ● , V-● , M↠● , ●⊑V′ ⟩ | v′ | c = contradiction ●⊑V′ (●⋤ _)
-catchup (V-cast x x₁) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ = {!!}
-catchup V-● M⊑● Γ⊑Γ′ Σ⊑Σ′ = contradiction M⊑● (_ ⋤●)
+catchup (V-cast x x₁) M⊑V′  = {!!}
+catchup V-● M⊑●  = contradiction M⊑● (_ ⋤●)
