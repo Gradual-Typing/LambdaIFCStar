@@ -112,14 +112,15 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-raw v′) (⊑-cast
     case catchupₗ _ _ CVal.id (⊑-left-expand (comp-pres-⊑-ll c̅₁⊑g′ c̅⊑g′)) of λ where
     ⟨ c̅ₙ , 𝓋 , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
       let d̅⨟d̅₁⊑gc′ = comp-pres-⊑-ll d̅⊑gc′ d̅₁⊑gc′ in
-      let c⨟c̅₁⊑A′ = comp-pres-prec-ll c⊑A′ c₁⊑A′ in
+      let c⨟c₁⊑A′ = comp-pres-prec-ll c⊑A′ c₁⊑A′ in
+      let d₁⨟d⊑B′ = comp-pres-prec-ll d₁⊑B′ d⊑B′ in
       ⟨ _ , V-cast v (ir-fun 𝓋) ,
         trans-mult (plug-cong □⟨ cast (fun d̅ c d) c̅ ⟩ M↠V)
                    (_ ∣ _ ∣ _ —→⟨ cast (V-cast v i) (cast-comp v i) ⟩
                     _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ c̅₁⨟c̅↠c̅ₙ 𝓋) 𝓋) ⟩
                     _ ∣ _ ∣ _ ∎) ,
         ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′)
-                (⊑-fun d̅⨟d̅₁⊑gc′ {!!} {!!} (⊑-left-contract c̅ₙ⊑id)) ⟩
+                (⊑-fun d̅⨟d̅₁⊑gc′ c⨟c₁⊑A′ d₁⨟d⊑B′ (⊑-left-contract c̅ₙ⊑id)) ⟩
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-addr _ _) _ ⟩ | V-addr | cast (ref c d) c̅ = {!!}
 ... | ⟨ ● , V-● , M↠● , ●⊑V′ ⟩ | v′ | c = contradiction ●⊑V′ (●⋤ _)
 catchup (V-cast x x₁) M⊑V′ Γ⊑Γ′ Σ⊑Σ′ = {!!}
