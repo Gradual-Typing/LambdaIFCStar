@@ -220,6 +220,37 @@ comp-pres-prec-ll (⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′)
         (comp-pres-prec-ll d₁⊑B′ d₂⊑B′) (comp-pres-⊑-ll c̅₁⊑g′ c̅₂⊑g′)
 
 
+comp-pres-prec-bl : ∀ {A A′ B B′ C} {c : Cast A ⇒ B} {d : Cast B ⇒ C}
+                      {c′ : Cast A′ ⇒ B′}
+  → ⟨     c ⟩⊑⟨ c′ ⟩
+  → ⟨     d ⟩⊑ B′
+    -----------------------
+  → ⟨ c ⨟ d ⟩⊑⟨ c′ ⟩
+
+comp-pres-prec-lb : ∀ {A A′ B B′ C} {c : Cast A ⇒ B} {d : Cast B ⇒ C}
+                      {c′ : Cast A′ ⇒ B′}
+  → ⟨     c ⟩⊑ A′
+  → ⟨     d ⟩⊑⟨ c′ ⟩
+    -----------------------
+  → ⟨ c ⨟ d ⟩⊑⟨ c′ ⟩
+
+comp-pres-prec-bl (⊑-base c̅⊑c̅′) (⊑-base d̅⊑g′) = ⊑-base (comp-pres-⊑-bl c̅⊑c̅′ d̅⊑g′)
+comp-pres-prec-bl (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  ⊑-ref (comp-pres-prec-lb c⊑A′ c⊑c′) (comp-pres-prec-bl d⊑d′ d⊑A′)
+        (comp-pres-⊑-bl c̅⊑c̅′ c̅⊑g′)
+comp-pres-prec-bl (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  ⊑-fun (comp-pres-⊑-lb d̅⊑gc′ d̅⊑d̅′) (comp-pres-prec-lb c⊑A′ c⊑c′)
+        (comp-pres-prec-bl d⊑d′ d⊑B′) (comp-pres-⊑-bl c̅⊑c̅′ c̅⊑g′)
+
+comp-pres-prec-lb (⊑-base d̅⊑g′) (⊑-base c̅⊑c̅′) = ⊑-base (comp-pres-⊑-lb d̅⊑g′ c̅⊑c̅′)
+comp-pres-prec-lb (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) =
+  ⊑-ref (comp-pres-prec-bl c⊑c′ c⊑A′) (comp-pres-prec-lb d⊑A′ d⊑d′)
+        (comp-pres-⊑-lb c̅⊑g′ c̅⊑c̅′)
+comp-pres-prec-lb (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) =
+  ⊑-fun (comp-pres-⊑-bl d̅⊑d̅′ d̅⊑gc′) (comp-pres-prec-bl c⊑c′ c⊑A′)
+        (comp-pres-prec-lb d⊑B′ d⊑d′) (comp-pres-⊑-lb c̅⊑g′ c̅⊑c̅′)
+
+
 infix 4 _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_
 
 data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ : HeapContext)
