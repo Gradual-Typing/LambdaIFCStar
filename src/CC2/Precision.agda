@@ -250,6 +250,36 @@ comp-pres-prec-lb (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) (⊑-fun d�
   ⊑-fun (comp-pres-⊑-bl d̅⊑d̅′ d̅⊑gc′) (comp-pres-prec-bl c⊑c′ c⊑A′)
         (comp-pres-prec-lb d⊑B′ d⊑d′) (comp-pres-⊑-lb c̅⊑g′ c̅⊑c̅′)
 
+comp-pres-prec-rl : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′}
+  → A ⊑⟨ c′ ⟩
+  → ⟨ c ⟩⊑ B′
+    -----------------------
+  → ⟨ c ⟩⊑⟨ c′ ⟩
+
+comp-pres-prec-lr : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′}
+  → ⟨ c ⟩⊑ A′
+  → B ⊑⟨ c′ ⟩
+    -----------------------
+  → ⟨ c ⟩⊑⟨ c′ ⟩
+
+comp-pres-prec-rl (⊑-base g⊑c̅′) (⊑-base c̅⊑g′) = ⊑-base (comp-pres-⊑-rl g⊑c̅′ c̅⊑g′)
+comp-pres-prec-rl (⊑-ref A⊑c′ A⊑d′ g⊑c̅′) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  ⊑-ref (comp-pres-prec-lr c⊑A′ A⊑c′) (comp-pres-prec-rl A⊑d′ d⊑A′)
+        (comp-pres-⊑-rl g⊑c̅′ c̅⊑g′)
+comp-pres-prec-rl (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  ⊑-fun (comp-pres-⊑-lr d̅⊑gc′ gc⊑d̅′) (comp-pres-prec-lr c⊑A′ A⊑c′)
+        (comp-pres-prec-rl B⊑d′ d⊑B′) (comp-pres-⊑-rl g⊑c̅′ c̅⊑g′)
+
+comp-pres-prec-lr (⊑-base c̅⊑g′) (⊑-base g⊑c̅′) = ⊑-base (comp-pres-⊑-lr c̅⊑g′ g⊑c̅′)
+comp-pres-prec-lr (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′) =
+  ⊑-ref (comp-pres-prec-rl A⊑c′ c⊑A′) (comp-pres-prec-lr d⊑A′ A⊑d′)
+        (comp-pres-⊑-lr c̅⊑g′ g⊑c̅′)
+comp-pres-prec-lr (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′) =
+  ⊑-fun (comp-pres-⊑-rl gc⊑d̅′ d̅⊑gc′) (comp-pres-prec-rl A⊑c′ c⊑A′)
+        (comp-pres-prec-lr d⊑B′ B⊑d′) (comp-pres-⊑-lr c̅⊑g′ g⊑c̅′)
+
+
+
 
 infix 4 _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_
 
