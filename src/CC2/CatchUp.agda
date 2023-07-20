@@ -307,13 +307,13 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (�
       let d̅⨟d̅₁⊑gc′ = comp-pres-⊑-ll d̅⊑gc′ d̅₁⊑gc′ in
       let d̅⨟d̅₁⊑d̅′ = comp-pres-⊑-lr d̅⨟d̅₁⊑gc′ gc⊑d̅′ in
       let c⨟c₁⊑c′ = comp-pres-prec-lr (comp-pres-prec-ll c⊑A′ c₁⊑A′) A⊑c′ in
-      -- let d₁⨟d⊑d′ = comp-pres-prec-bl d₁⊑d′ d⊑B′ in
+      let d₁⨟d⊑d′ = comp-pres-prec-rl B⊑d′ (comp-pres-prec-ll d₁⊑B′ d⊑B′) in
       ⟨ _ , V-cast v (ir-fun 𝓋) ,
         trans-mult (plug-cong □⟨ _ ⟩ M↠V)
                    (_ ∣ _ ∣ _ —→⟨ cast (V-cast v i) (cast-comp v i) ⟩
                     _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ c̅₁⨟c̅↠c̅ₙ 𝓋) 𝓋) ⟩
                     _ ∣ _ ∣ _ ∎) ,
-        ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⨟d̅₁⊑d̅′ {!!} {!!} (comp-pres-⊑-rl g⊑c̅′ (⊑-left-contract c̅ₙ⊑id))) ⟩
+        ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⨟d̅₁⊑d̅′ c⨟c₁⊑c′ d₁⨟d⊑d′ (comp-pres-⊑-rl g⊑c̅′ (⊑-left-contract c̅ₙ⊑id))) ⟩
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castr (⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) _) _ ⟩ = {!!}
 ... | ⟨ V , V-cast v i , M↠V , ⊑-cast (⊑-addr x y) _ ⟩ = {!!}
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-castr (⊑-addr x y) _) _ ⟩ = {!!}
