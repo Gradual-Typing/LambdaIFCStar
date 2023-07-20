@@ -299,7 +299,21 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (�
                     _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ c̅₁⨟c̅↠c̅ₙ 𝓋) 𝓋) ⟩
                     _ ∣ _ ∣ _ ∎) ,
         ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⨟d̅₁⊑d̅′ c⨟c₁⊑c′ d₁⨟d⊑d′ c̅ₙ⊑c̅′) ⟩
-... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-castr (⊑-lam g⊑g′ A⊑A′ N⊑N′) _) _ ⟩ = {!!}
+... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-castr (⊑-lam g⊑g′ A⊑A′ N⊑N′) A⊑c′) c₁⊑A′ ⟩ =
+  case ⟨ c₁⊑A′ , A⊑c′ , c⊑A′ , i′ ⟩ of λ where
+  ⟨ ⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′ , ⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′ , ⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′ , ir-fun 𝓋′ ⟩ →
+    case catchupₗ _ _ CVal.id (⊑-left-expand (comp-pres-⊑-ll c̅₁⊑g′ c̅⊑g′)) of λ where
+    ⟨ c̅ₙ , 𝓋 , c̅₁⨟c̅↠c̅ₙ , c̅ₙ⊑id ⟩ →
+      let d̅⨟d̅₁⊑gc′ = comp-pres-⊑-ll d̅⊑gc′ d̅₁⊑gc′ in
+      let d̅⨟d̅₁⊑d̅′ = comp-pres-⊑-lr d̅⨟d̅₁⊑gc′ gc⊑d̅′ in
+      let c⨟c₁⊑c′ = comp-pres-prec-lr (comp-pres-prec-ll c⊑A′ c₁⊑A′) A⊑c′ in
+      -- let d₁⨟d⊑d′ = comp-pres-prec-bl d₁⊑d′ d⊑B′ in
+      ⟨ _ , V-cast v (ir-fun 𝓋) ,
+        trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-cast v i) (cast-comp v i) ⟩
+                    _ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (comp-→⁺ c̅₁⨟c̅↠c̅ₙ 𝓋) 𝓋) ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⨟d̅₁⊑d̅′ {!!} {!!} (comp-pres-⊑-rl g⊑c̅′ (⊑-left-contract c̅ₙ⊑id))) ⟩
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castr (⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) _) _ ⟩ = {!!}
 ... | ⟨ V , V-cast v i , M↠V , ⊑-cast (⊑-addr x y) _ ⟩ = {!!}
 ... | ⟨ V , V-cast v i , M↠V , ⊑-castl (⊑-castr (⊑-addr x y) _) _ ⟩ = {!!}
