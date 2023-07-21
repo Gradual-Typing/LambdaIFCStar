@@ -205,7 +205,37 @@ catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (�
 ... | ⟨ ● , V-● , M↠● , ●⊑V′ ⟩ = contradiction ●⊑V′ (●⋤ _)
 catchup {gc = gc} {gc′} {ℓv} {ℓv′} {μ = μ} {PC} (V-cast v′ i′) (⊑-castl {c = c} M⊑V′ c⊑A′)
   with catchup {μ = μ} {PC} (V-cast v′ i′) M⊑V′
-... | ⟨ V , V-raw v , M↠V , V⊑V′ ⟩ =
+... | ⟨ V , V-raw v , M↠V , ⊑-castr ⊑-const A⊑c′ ⟩ =
+  case c⊑A′ of λ where
+  (⊑-base c̅⊑g′) →
+    case catchupₗ _ _ CVal.id (⊑-left-expand c̅⊑g′) of λ where
+    ⟨ _ , id , _ ∎ₗ , id⊑id ⟩ →
+      ⟨ _ , V-raw v ,
+        trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-raw v) cast-id ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castr ⊑-const A⊑c′ ⟩
+    ⟨ _ , id , _ —→ₗ⟨ r ⟩ r* , id⊑id ⟩ →
+      ⟨ _ , V-raw v ,
+        trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (_ —→ₗ⟨ r ⟩ r*) id) ⟩
+                    _ ∣ _ ∣ _ —→⟨ cast (V-raw v) cast-id ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castr ⊑-const A⊑c′ ⟩
+    ⟨ _ , inj 𝓋 , _ ∎ₗ , !⊑id ⟩ →
+      ⟨ _ , V-cast v (ir-base (inj 𝓋) (λ ())) ,
+        plug-cong □⟨ _ ⟩ M↠V ,
+        ⊑-castl (⊑-castr ⊑-const A⊑c′) (⊑-base (⊑-left-contract !⊑id)) ⟩
+    ⟨ _ , inj 𝓋 , _ —→ₗ⟨ r ⟩ r* , !⊑id ⟩ →
+      ⟨ _ , V-cast v (ir-base (inj 𝓋) (λ ())) ,
+        trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-raw v) (cast v (_ —→ₗ⟨ r ⟩ r*) (inj 𝓋)) ⟩
+                    _ ∣ _ ∣ _ ∎) ,
+        ⊑-castl (⊑-castr ⊑-const A⊑c′) (⊑-base (⊑-left-contract !⊑id)) ⟩
+    ⟨ _ , up id , d̅⨟c̅↠↑ , ⊑-castl _ l⊑l () ⟩
+... | ⟨ V , V-raw V-ƛ , M↠V , ⊑-castr (⊑-lam x y z) A⊑c′ ⟩ =
+  {!!}
+... | ⟨ V , V-raw V-addr , M↠V , ⊑-castr (⊑-addr x y) A⊑c′ ⟩ =
   {!!}
 ... | ⟨ V ⟨ c₁ ⟩ , V-cast v i , M↠V , ⊑-cast ⊑-const c₁⊑c′ ⟩ =
   case ⟨ c₁⊑c′ , c⊑A′ , i′ ⟩ of λ where
