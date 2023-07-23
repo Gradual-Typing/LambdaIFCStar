@@ -55,6 +55,17 @@ security-prec (_ ⨾ ↑) .(id (l low) ⨾ ↑ ⨾ (high !)) (up id) (inj (up id
 security-prec (_ ⨾ ↑) .(id (l low) ⨾ ↑) (up id) (up id) c̅⊑c̅′ = h≼h
 
 
+security-prec-left : ∀ {ℓ ℓ′ g} (c̅ : CExpr l ℓ ⇒ g)
+  → (v : CVal c̅)
+  → ⊢l c̅ ⊑ l ℓ′
+    --------------------------------
+  → ∥ c̅ ∥ v ≡ ℓ′
+security-prec-left .(id (l _)) id (⊑-id l⊑l) = refl
+security-prec-left .(id (l _) ⨾ (_ !)) (inj id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) = refl
+security-prec-left .(_ ⨾ ↑ ⨾ (high !)) (inj (up id)) (⊑-cast _ l⊑l _) = refl
+security-prec-left .(_ ⨾ ↑) (up id) (⊑-cast _ l⊑l ())
+
+
 security-eq : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g}
   → (v₁ : CVal c̅)
   → (v₂ : CVal d̅)
