@@ -575,6 +575,11 @@ data _⊑_ where
       --------------------
     → S of g₁ ⊑ T of g₂
 
+⊑-refl : ∀ {A} → A ⊑ A
+⊑-refl {` ι of g} = ⊑-ty ⊑ₗ-refl ⊑-ι
+⊑-refl {Ref A of g} = ⊑-ty ⊑ₗ-refl (⊑-ref ⊑-refl)
+⊑-refl {⟦ gc ⟧ A ⇒ B of g} = ⊑-ty ⊑ₗ-refl (⊑-fun ⊑ₗ-refl ⊑-refl ⊑-refl)
+
 infix 4 _⊑?_
 
 _⊑?_ : (A B : Type) → Dec (A ⊑ B)

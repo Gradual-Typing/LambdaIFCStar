@@ -97,6 +97,12 @@ data ⊢r_⊑_ : ∀ {g₁′ g₂′} (g : Label) (c̅′ : CExpr g₁′ ⇒ g
     → ⊢r g ⊑ ⊥ g₁′ g₂′ p
 
 
+prec-refl : ∀ {g₁ g₂} (c̅ : CExpr g₁ ⇒ g₂) → ⊢ c̅ ⊑ c̅
+prec-refl (id _) = ⊑-id ⊑ₗ-refl
+prec-refl (c̅ ⨾ c) = ⊑-cast (prec-refl c̅) ⊑ₗ-refl ⊑ₗ-refl
+prec-refl (⊥ _ _ p) = ⊑-⊥ ⊑ₗ-refl ⊑ₗ-refl
+
+
 pres-prec-left : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
   → ⊢l c̅₁ ⊑ g′
   → c̅₁ —→ c̅₂
