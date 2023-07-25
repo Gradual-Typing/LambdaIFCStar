@@ -462,3 +462,20 @@ stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
   ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
       _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
       _ ∎
+
+
+stampₑ-pres-prec : ∀ {ℓ} {M M′ g g′}
+  → (v  : LVal M)
+  → (v′ : LVal M′)
+  → ⊢ M ⊑ M′ ⇐ g ⊑ g′
+    ------------------------------------------------------------
+  → ⊢ stampₑ M v ℓ ⊑ stampₑ M′ v′ ℓ ⇐ (g ⋎̃ l ℓ) ⊑ (g′ ⋎̃ l ℓ)
+stampₑ-pres-prec v-l v-l M⊑M′ = {!!}
+stampₑ-pres-prec v-l (v-cast x) M⊑M′ = {!!}
+stampₑ-pres-prec (v-cast x) v-l M⊑M′ = {!!}
+stampₑ-pres-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
+  with prec→⊢ M⊑M′
+... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
+  with prec-inv M⊑M′
+... | ⟨ refl , c̅⊑c̅′ ⟩ =
+  ⊑-cast ⊑-l (stampₗ-pres-prec 𝓋 𝓋′ c̅⊑c̅′)

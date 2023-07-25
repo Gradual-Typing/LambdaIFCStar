@@ -46,15 +46,18 @@ sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc prot!-blame = {!!}
 sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (cast x x₁) = {!!}
 sim (⊑-app L⊑L′ M⊑M′ eq eq′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (β vM′ vc′) =
   {!!}
-sim {Γ} {Γ′} {Σ} {Σ′} {μ₁ = μ} {PC = PC} (⊑-app!l {L = L} {L′} {M} {M′} L⊑L′ M⊑M′ eq eq′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (β vM′ vc′)
+sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} (⊑-app!l {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
+    Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (β vM′ vc′)
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
-... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) , L↠V , ⊑-castl (⊑-lam x y z) c⊑A′ ⟩
+... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) , L↠V , ⊑-castl (⊑-lam x y z) (⊑-fun {gc₁ = gc₁} {.⋆} d̅⊑gc′ _ _ c̅⊑g′) ⟩
   with catchup {μ = μ} {PC} vM′ M⊑M′
 ...   | ⟨ W , w , M↠W , W⊑M′ ⟩ =
-  ⟨ Σ , Σ′ , _ , μ , ♣ , {!!} , μ⊑μ′ ⟩
+  ⟨ Σ , Σ′ , _ , μ , ♣ , ⊑-prot!l {!!} {!!} {!!} {!!} {!!} {!!} {!!} , μ⊑μ′ ⟩
   where
   ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
+  prec : (stampₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ coerce gc ⋎̃ l (∥ c̅ ∥ₗ 𝓋) ⇒⋆ ⟫ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
+  prec rewrite security-prec-left _ 𝓋 c̅⊑g′ = ⊑-castl (⊑-castl {!!} {!!}) d̅⊑gc′
   ♣ =  trans-mult (plug-cong (app!□ M _ _) L↠V)
       (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
       (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC {!!} {!!} {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎))
