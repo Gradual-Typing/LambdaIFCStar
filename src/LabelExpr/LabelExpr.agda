@@ -470,9 +470,25 @@ stampₑ-pres-prec : ∀ {ℓ} {M M′ g g′}
   → ⊢ M ⊑ M′ ⇐ g ⊑ g′
     ------------------------------------------------------------
   → ⊢ stampₑ M v ℓ ⊑ stampₑ M′ v′ ℓ ⇐ (g ⋎̃ l ℓ) ⊑ (g′ ⋎̃ l ℓ)
-stampₑ-pres-prec v-l v-l M⊑M′ = {!!}
-stampₑ-pres-prec v-l (v-cast x) M⊑M′ = {!!}
-stampₑ-pres-prec (v-cast x) v-l M⊑M′ = {!!}
+stampₑ-pres-prec {low} (v-l {ℓ}) v-l ⊑-l rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-l
+stampₑ-pres-prec {high} (v-l {low}) v-l ⊑-l = ⊑-cast ⊑-l (prec-refl _)
+stampₑ-pres-prec {high} (v-l {high}) v-l ⊑-l = ⊑-l
+-- ⊢ ℓ ⊑ ℓ′ ⟨ c ⟩ cases are all impossible
+stampₑ-pres-prec v-l (v-cast (ir id x)) (⊑-castr ⊑-l (⊑-id l⊑l)) =
+  contradiction refl (recompute (¬? (_ ==? _)) x)
+stampₑ-pres-prec v-l (v-cast (ir (inj id) x)) (⊑-castr ⊑-l (⊑-cast _ l⊑l ()))
+stampₑ-pres-prec v-l (v-cast (ir (inj (up id)) x)) (⊑-castr ⊑-l (⊑-cast _ () _))
+stampₑ-pres-prec v-l (v-cast (ir (up id) x)) (⊑-castr ⊑-l (⊑-cast _ l⊑l ()))
+stampₑ-pres-prec {ℓ} (v-cast (ir id x)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+  contradiction refl (recompute (¬? (_ ==? _)) x)
+stampₑ-pres-prec {low} (v-cast (ir (inj (id {l ℓ})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′)
+  rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stampₑ-pres-prec {high} (v-cast (ir (inj (id {l low})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+  ⊑-cast ⊑-l (⊑-castl (prec-refl _) l⊑l ⋆⊑)
+stampₑ-pres-prec {high} (v-cast (ir (inj (id {l high})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+  ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stampₑ-pres-prec {ℓ} (v-cast (ir (inj (up id)) _)) v-l (⊑-castl ⊑-l (⊑-cast _ () ⋆⊑))
+stampₑ-pres-prec {ℓ} (v-cast (ir (up id) _)) v-l (⊑-castl ⊑-l (⊑-cast _ l⊑l ()))
 stampₑ-pres-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
   with prec→⊢ M⊑M′
 ... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
