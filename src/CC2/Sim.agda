@@ -63,23 +63,27 @@ sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
   with catchup {μ = μ} {PC} vM′ M⊑M′
 ...   | ⟨ W , w , M↠W , W⊑M′ ⟩ =
   let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
-  let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
-          (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-          (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
-  ⟨ Σ , Σ′ , _ , μ , ♣ ,
-    ⊑-prot!l {!!} PC₁⊑stampPC′ (stamp⇒⋆-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) , μ⊑μ′ ⟩
+    case cast-sn {c = c} w ⊢W of λ where
+    ⟨ blame _ , ↠blameq , fail ⟩ → {!!}
+    ⟨ W′ , ↠W′ , success w′ ⟩ →
+      let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
+              (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
+              (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ ↠W′ w′ ⟩ _ ∣ _ ∣ _ ∎)) in
+      ⟨ Σ , Σ′ , _ , μ , ♣ ,
+        ⊑-prot!l {!!} PC₁⊑stampPC′ (stamp⇒⋆-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) , μ⊑μ′ ⟩
   where
   ∥PC∥⋎∥c̅∥≡∥stamp∥ = stampₑ-security {ℓ = ∥ c̅ ∥ₗ 𝓋} vc
   ∥c̅∥≡ℓ = security-prec-left _ 𝓋 c̅⊑g′
   ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
+  ⊢W = proj₁ (cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ W⊑M′)
   gc⊑ℓc : gc ⊑ₗ l ℓc
   gc⊑ℓc = prec→⊑ PC⊑PC′
   gc⋎ℓ⊑ℓc⋎ℓ : (gc ⋎̃ l ℓ) ⊑ₗ (l (ℓc ⋎ ℓ))
   gc⋎ℓ⊑ℓc⋎ℓ = consis-join-⊑ₗ gc⊑ℓc l⊑l
   prec : (stampₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ coerce gc ⋎̃ l (∥ c̅ ∥ₗ 𝓋) ⇒⋆ ⟫ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
-           ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
+                   ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
   prec rewrite ∥c̅∥≡ℓ =
-    ⊑-castl (⊑-castl (stampₑ-pres-prec vc vc′ PC⊑PC′) (coerce⇒⋆-prec gc⋎ℓ⊑ℓc⋎ℓ)) d̅⊑gc′
+      ⊑-castl (⊑-castl (stampₑ-pres-prec vc vc′ PC⊑PC′) (coerce⇒⋆-prec gc⋎ℓ⊑ℓc⋎ℓ)) d̅⊑gc′
 
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (app-cast v vc′† 𝓋 x vc″ x₁ x₂) = {!!}
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (app-blame-pc v vc′† 𝓋 x) = {!!}

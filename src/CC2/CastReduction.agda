@@ -44,9 +44,9 @@ data _—→_ : Term → Term → Set where
 
 open import Common.MultiStep ⊤ (λ {tt tt → Term}) _—→_ public
 
-cast-sn : ∀ {Σ gc ℓv A B V} {c : Cast A ⇒ B}
+cast-sn : ∀ {Γ Σ gc ℓv A B V} {c : Cast A ⇒ B}
   → Value V
-  → [] ; Σ ; gc ; ℓv ⊢ V ⇐ A
+  → Γ ; Σ ; gc ; ℓv ⊢ V ⇐ A
     ----------------------------------------
   → ∃[ M ] (V ⟨ c ⟩ —↠ M) × Result M
 cast-sn {V = addr n} {c = cast (ref c d) c̅} (V-raw V-addr) (⊢addr eq)
