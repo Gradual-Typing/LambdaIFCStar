@@ -103,6 +103,11 @@ prec-refl (c̅ ⨾ c) = ⊑-cast (prec-refl c̅) ⊑ₗ-refl ⊑ₗ-refl
 prec-refl (⊥ _ _ p) = ⊑-⊥ ⊑ₗ-refl ⊑ₗ-refl
 
 
+coerce⇒⋆-prec : ∀ {g₁ g₂} → g₁ ⊑ₗ g₂ → ⊢l coerce g₁ ⇒⋆ ⊑ g₂
+coerce⇒⋆-prec ⋆⊑ = ⊑-id ⋆⊑
+coerce⇒⋆-prec l⊑l = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
+
+
 pres-prec-left : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
   → ⊢l c̅₁ ⊑ g′
   → c̅₁ —→ c̅₂
