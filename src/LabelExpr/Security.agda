@@ -255,3 +255,21 @@ stamp⇒⋆-cast-security {g} {g′} {ℓ} {V} {V′} {c̅} v ⊢V ↠V′ v′ 
     let r* = ↠ₑ-trans (plug-congₑ ↠blamep) (_ —→⟨ ξ-blame ⟩ _ ∎) in
     let eq = det-multₑ ↠V′ r* (success v′) fail in
     case (subst LVal eq v′) of λ ()
+
+security-prec-mono : ∀ {g g′} {V W}
+  → (v : LVal V)
+  → (w : LVal W)
+  → ⊢ V ⊑ W ⇐ g ⊑ g′
+    -----------------------------------
+  → ∥ V ∥ v ≼ ∥ W ∥ w
+security-prec-mono v-l v-l ⊑-l = ≼-refl
+security-prec-mono v-l (v-cast (ir 𝓋′ _)) (⊑-castr ⊑-l ℓ⊑c̅′) =
+  ≡→≼ (security-prec-right _ 𝓋′ ℓ⊑c̅′)
+security-prec-mono (v-cast (ir 𝓋 _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+  ≡→≼ (security-prec-left _ 𝓋 c̅⊑ℓ′)
+security-prec-mono (v-cast (ir 𝓋 _)) (v-cast (ir 𝓋′ _)) V⊑W
+  with prec→⊢ V⊑W
+... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
+  with prec-inv V⊑W
+... | ⟨ refl , c̅⊑c̅′ ⟩ =
+  security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′

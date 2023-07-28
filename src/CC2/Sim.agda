@@ -17,6 +17,7 @@ open import Common.Utils
 open import Memory.HeapContext
 open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
+open import LabelExpr.Security
 open import CC2.Statics
 open import CC2.Reduction
 open import CC2.MultiStep
@@ -65,8 +66,11 @@ sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
   let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
           (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
           (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
-  ⟨ Σ , Σ′ , _ , μ , ♣ , ⊑-prot!l {!!} PC₁⊑stampPC′ {!!} {!!} {!!} {!!} {!!} , μ⊑μ′ ⟩
+  ⟨ Σ , Σ′ , _ , μ , ♣ ,
+    ⊑-prot!l {!!} PC₁⊑stampPC′ (stamp⇒⋆-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) , μ⊑μ′ ⟩
   where
+  ∥PC∥⋎∥c̅∥≡∥stamp∥ = stampₑ-security {ℓ = ∥ c̅ ∥ₗ 𝓋} vc
+  ∥c̅∥≡ℓ = security-prec-left _ 𝓋 c̅⊑g′
   ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
   gc⊑ℓc : gc ⊑ₗ l ℓc
   gc⊑ℓc = prec→⊑ PC⊑PC′
@@ -74,7 +78,7 @@ sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
   gc⋎ℓ⊑ℓc⋎ℓ = consis-join-⊑ₗ gc⊑ℓc l⊑l
   prec : (stampₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ coerce gc ⋎̃ l (∥ c̅ ∥ₗ 𝓋) ⇒⋆ ⟫ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
            ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
-  prec rewrite security-prec-left _ 𝓋 c̅⊑g′ =
+  prec rewrite ∥c̅∥≡ℓ =
     ⊑-castl (⊑-castl (stampₑ-pres-prec vc vc′ PC⊑PC′) (coerce⇒⋆-prec gc⋎ℓ⊑ℓc⋎ℓ)) d̅⊑gc′
 
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (app-cast v vc′† 𝓋 x vc″ x₁ x₂) = {!!}
