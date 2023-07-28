@@ -15,6 +15,8 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
+open import CoercionExpr.Precision using (coerce⇒⋆-prec)
+open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import CC2.Statics
 open import CC2.Reduction
 open import CC2.MultiStep
@@ -46,21 +48,31 @@ sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc prot!-blame = {!!}
 sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (cast x x₁) = {!!}
 sim (⊑-app L⊑L′ M⊑M′ eq eq′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (β vM′ vc′) =
   {!!}
-sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} (⊑-app!l {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
+sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′}
+    (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
     Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (β vM′ vc′)
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
-... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) , L↠V , ⊑-castl (⊑-lam x y z) (⊑-fun {gc₁ = gc₁} {.⋆} d̅⊑gc′ _ _ c̅⊑g′) ⟩
+... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,
+        L↠V , ⊑-castl (⊑-lam x y z) (⊑-fun {gc₁ = gc₁} {.⋆} d̅⊑gc′ _ _ c̅⊑g′) ⟩
   with catchup {μ = μ} {PC} vM′ M⊑M′
 ...   | ⟨ W , w , M↠W , W⊑M′ ⟩ =
+  let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
+  let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
+          (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
+          (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
   ⟨ Σ , Σ′ , _ , μ , ♣ , ⊑-prot!l {!!} {!!} {!!} {!!} {!!} {!!} {!!} , μ⊑μ′ ⟩
   where
   ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
-  prec : (stampₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ coerce gc ⋎̃ l (∥ c̅ ∥ₗ 𝓋) ⇒⋆ ⟫ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
-  prec rewrite security-prec-left _ 𝓋 c̅⊑g′ = ⊑-castl (⊑-castl {!!} {!!}) d̅⊑gc′
-  ♣ =  trans-mult (plug-cong (app!□ M _ _) L↠V)
-      (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-      (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC {!!} {!!} {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎))
+  gc⊑ℓc : gc ⊑ₗ l ℓc
+  gc⊑ℓc = prec→⊑ PC⊑PC′
+  gc⋎ℓ⊑ℓc⋎ℓ : (gc ⋎̃ l ℓ) ⊑ₗ (l (ℓc ⋎ ℓ))
+  gc⋎ℓ⊑ℓc⋎ℓ = consis-join-⊑ₗ gc⊑ℓc l⊑l
+  prec : (stampₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ coerce gc ⋎̃ l (∥ c̅ ∥ₗ 𝓋) ⇒⋆ ⟫ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
+           ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
+  prec rewrite security-prec-left _ 𝓋 c̅⊑g′ =
+    ⊑-castl (⊑-castl (stampₑ-pres-prec vc vc′ PC⊑PC′) (coerce⇒⋆-prec gc⋎ℓ⊑ℓc⋎ℓ)) d̅⊑gc′
+
 sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (app-cast v vc′ 𝓋 x vc″ x₁ x₂) = {!!}
 sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (app-blame-pc v vc′ 𝓋 x) = {!!}
 sim M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ vc (app-blame v vc′ 𝓋 x vc″ x₁) = {!!}
