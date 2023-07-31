@@ -2,12 +2,14 @@ module CC2.Reduction where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
+open import Data.Empty renaming (⊥ to Bot)
 open import Data.Bool using (true; false) renaming (Bool to 𝔹)
 open import Data.List hiding ([_])
 open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import Common.Utils
@@ -352,3 +354,31 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → V ⟨ c ⟩ —↠ blame q
       ----------------------------------------------------------------------------------- Assign?CastBlame
     → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→ blame q ∣ μ
+
+
+Value⌿→ : ∀ {V M μ μ′ PC}
+  → Value V
+  → ¬ (V ∣ μ ∣ PC —→ M ∣ μ′)
+Value⌿→ (V-raw v) (ξ {F = F} r) = plug-not-raw F v
+Value⌿→ (V-raw v) (ξ-blame {F = F}) = plug-not-raw F v
+Value⌿→ V-● r = ●⌿→ r refl
+  where
+  ●⌿→ : ∀ {M N μ μ′ PC} → (M ∣ μ ∣ PC —→ N ∣ μ′) → M ≡ ● → Bot
+  ●⌿→ (ξ       {F = F} r) eq = contradiction eq (plug-not-● F)
+  ●⌿→ (ξ-blame {F = F})   eq = contradiction eq (plug-not-● F)
+Value⌿→ (V-cast v i) r = ir⌿→ r refl v i
+  where
+  ir⌿→ : ∀ {A B} {M N V μ μ′ PC} {c : Cast A ⇒ B}
+    → (M ∣ μ ∣ PC —→ N ∣ μ′)
+    → M ≡ V ⟨ c ⟩
+    → RawValue V → Irreducible c → Bot
+  ir⌿→ (ξ {F = □⟨ c ⟩} r) refl v i = Value⌿→ (V-raw v) r
+  ir⌿→ (ξ-blame {F = □⟨ c ⟩}) refl () i
+  ir⌿→ (cast v† (cast x (_ —→ₗ⟨ r ⟩ _) x₂)) refl v (ir-base 𝓋 _) = CVal⌿→ 𝓋 r
+  ir⌿→ (cast v† (cast x (_ —→ₗ⟨ r ⟩ _) x₂)) refl v (ir-ref 𝓋) = CVal⌿→ 𝓋 r
+  ir⌿→ (cast v† (cast x (_ —→ₗ⟨ r ⟩ _) x₂)) refl v (ir-fun 𝓋) = CVal⌿→ 𝓋 r
+  ir⌿→ (cast v† (cast-blame x (_ —→ₗ⟨ r ⟩ _))) refl v (ir-base 𝓋 _) = CVal⌿→ 𝓋 r
+  ir⌿→ (cast v† (cast-blame x (_ —→ₗ⟨ r ⟩ _))) refl v (ir-ref 𝓋) = CVal⌿→ 𝓋 r
+  ir⌿→ (cast v† (cast-blame x (_ —→ₗ⟨ r ⟩ _))) refl v (ir-fun 𝓋) = CVal⌿→ 𝓋 r
+  ir⌿→ (cast v† cast-id) refl v (ir-base _ ℓ≢ℓ) = contradiction refl ℓ≢ℓ
+  ir⌿→ (cast v† (cast-comp x x₁)) refl ()

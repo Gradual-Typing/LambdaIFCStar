@@ -2,6 +2,7 @@
 
 module CC2.Frame where
 
+open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; sym)
 open import Function using (case_of_)
 
@@ -63,3 +64,41 @@ plug M (let□ A N)              = `let M A N
 plug L (if□  A ℓ M N)          = if  L A ℓ M N
 plug L (if!□ A M N)            = if! L A M N
 plug M □⟨ c ⟩                  = M ⟨ c ⟩
+
+
+plug-not-● : ∀ {M} → (F : Frame) → ¬ (plug M F ≡ ●)
+plug-not-● (app□ M A B x) ()
+plug-not-● (app V □ x A B x₁) ()
+plug-not-● (app!□ M A B) ()
+plug-not-● (app! V □ x A B) ()
+plug-not-● ref⟦ ℓ ⟧□ ()
+plug-not-● (ref?⟦ ℓ ⟧□ x₁) ()
+plug-not-● (!□ x x₁) ()
+plug-not-● (!!□ x) ()
+plug-not-● (assign□ M x ℓ̂ ℓ) ()
+plug-not-● (assign V □ x x₁ ℓ̂ ℓ) ()
+plug-not-● (assign?□ M x ĝ g x₁) ()
+plug-not-● (assign? V □ x x₁ ĝ g x₂) ()
+plug-not-● (let□ x x₁) ()
+plug-not-● (if□ x x₁ M N) ()
+plug-not-● (if!□ x M N) ()
+plug-not-● □⟨ c ⟩ ()
+
+
+plug-not-raw : ∀ {M} → (F : Frame) → ¬ RawValue (plug M F)
+plug-not-raw (app□ M A B x) ()
+plug-not-raw (app V □ x A B x₁) ()
+plug-not-raw (app!□ M A B) ()
+plug-not-raw (app! V □ x A B) ()
+plug-not-raw ref⟦ ℓ ⟧□ ()
+plug-not-raw (ref?⟦ ℓ ⟧□ x₁) ()
+plug-not-raw (!□ x x₁) ()
+plug-not-raw (!!□ x) ()
+plug-not-raw (assign□ M x ℓ̂ ℓ) ()
+plug-not-raw (assign V □ x x₁ ℓ̂ ℓ) ()
+plug-not-raw (assign?□ M x ĝ g x₁) ()
+plug-not-raw (assign? V □ x x₁ ĝ g x₂) ()
+plug-not-raw (let□ x x₁) ()
+plug-not-raw (if□ x x₁ M N) ()
+plug-not-raw (if!□ x M N) ()
+plug-not-raw □⟨ c ⟩ ()
