@@ -84,9 +84,15 @@ cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ ξ {F = □⟨ c ⟩} r ⟩ r*) re
   contradiction r (Value⌿→ v)
 cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ ξ-blame {F = □⟨ c ⟩} ⟩ r*) refl =
   case v of λ where (V-raw ())
-cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast x x₁ x₂) ⟩ r*) eq = {!!}
-cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast-blame x x₁) ⟩ r*) eq = {!!}
-cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† cast-id ⟩ r*) refl = {!!}
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast vᵣ r+ 𝓋) ⟩ r*) refl =
+  _ —→⟨ cast vᵣ r+ 𝓋 ⟩ (cast-reduction-inv (V-raw vᵣ) r* refl)
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast-blame vᵣ c̅↠⊥) ⟩ _ ∣ _ ∣ _ ∎) refl =
+  _ —→⟨ cast-blame vᵣ c̅↠⊥ ⟩ _ ∎
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast-blame vᵣ c̅↠⊥) ⟩ _ ∣ _ ∣ _ —→⟨ r ⟩ r*) refl =
+  contradiction r (Result⌿→ fail)
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† cast-id ⟩ $ _ ∣ _ ∣ _ ∎) refl =
+  _ —→⟨ cast-id ⟩ _ ∎
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† cast-id ⟩ $ _ ∣ _ ∣ _ —→⟨ r ⟩ r*) refl =
+  contradiction r (Value⌿→ v)
 cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast-comp vᵣ i) ⟩ r*) refl =
-  CC2.Reduction.↠-trans (_ —→⟨ cast-comp vᵣ i ⟩ _ ∎)
-                         (cast-reduction-inv (V-raw vᵣ) r* refl)
+  _ —→⟨ cast-comp vᵣ i ⟩ (cast-reduction-inv (V-raw vᵣ) r* refl)
