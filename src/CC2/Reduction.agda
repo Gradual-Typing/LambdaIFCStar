@@ -382,3 +382,14 @@ Value⌿→ (V-cast v i) r = ir⌿→ r refl v i
   ir⌿→ (cast v† (cast-blame x (_ —→ₗ⟨ r ⟩ _))) refl v (ir-fun 𝓋) = CVal⌿→ 𝓋 r
   ir⌿→ (cast v† cast-id) refl v (ir-base _ ℓ≢ℓ) = contradiction refl ℓ≢ℓ
   ir⌿→ (cast v† (cast-comp x x₁)) refl ()
+
+
+Result⌿→ : ∀ {M N μ μ′ PC}
+  → Result M
+  → ¬ (M ∣ μ ∣ PC —→ N ∣ μ′)
+Result⌿→ (success v) V→N = contradiction V→N (Value⌿→ v)
+Result⌿→ fail M→N = bl⌿→ M→N refl
+  where
+  bl⌿→ : ∀ {M N μ μ′ PC p} → (M ∣ μ ∣ PC —→ N ∣ μ′) → M ≡ blame p → Bot
+  bl⌿→ (ξ       {F = F} r) eq = plug-not-bl F eq
+  bl⌿→ (ξ-blame {F = F})   eq = plug-not-bl F eq

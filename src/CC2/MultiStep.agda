@@ -71,3 +71,22 @@ plug-cong F (L ∣ μ ∣ PC —→⟨ L→M ⟩ M↠N) =
 --   let ⟨ Σ′ , Σ′⊇Σ , ⊢N , ⊢μ′ ⟩ = preserve ⊢M ⊢μ pc≲gc M→N in
 --   let ⟨ Σ″ , Σ″⊇Σ′ , ⊢M′ , ⊢μ″ ⟩ = pres-mult ⊢N ⊢μ′ pc≲gc N↠M′ in
 --   ⟨ Σ″ , ⊇-trans Σ″⊇Σ′ Σ′⊇Σ , ⊢M′ , ⊢μ″ ⟩
+
+
+cast-reduction-inv : ∀ {A B M V W μ PC} {c : Cast A ⇒ B}
+  → Value V
+  → M ∣ μ ∣ PC —↠ W ∣ μ
+  → M ≡ V ⟨ c ⟩
+    --------------------------------
+  → V ⟨ c ⟩ —↠ W
+cast-reduction-inv v (_ ∣ _ ∣ _ ∎) refl = _ ∎
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ ξ {F = □⟨ c ⟩} r ⟩ r*) refl =
+  contradiction r (Value⌿→ v)
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ ξ-blame {F = □⟨ c ⟩} ⟩ r*) refl =
+  case v of λ where (V-raw ())
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast x x₁ x₂) ⟩ r*) eq = {!!}
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast-blame x x₁) ⟩ r*) eq = {!!}
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† cast-id ⟩ r*) refl = {!!}
+cast-reduction-inv v (_ ∣ _ ∣ _ —→⟨ cast v† (cast-comp vᵣ i) ⟩ r*) refl =
+  CC2.Reduction.↠-trans (_ —→⟨ cast-comp vᵣ i ⟩ _ ∎)
+                         (cast-reduction-inv (V-raw vᵣ) r* refl)
