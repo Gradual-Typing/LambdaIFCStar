@@ -25,11 +25,12 @@ open import CC2.SubstPreserve -- using (_⦂_⇒_; _⊢_⦂_⇒_)
 
 _;_⊢_⊑ˢ_⦂_⇒_,_⇒_ : ∀ (Σ Σ′ : HeapContext) → (σ σ′ : Subst) → (Γ Δ Γ′ Δ′ : Context) → Set
 Σ ; Σ′ ⊢ σ ⊑ˢ σ′ ⦂ Γ ⇒ Δ , Γ′ ⇒ Δ′ =
-  (Σ ⊢ σ ⦂ Γ ⇒ Δ) → (Σ′ ⊢ σ′ ⦂ Γ′ ⇒ Δ′) →
-  ∀ {x A A′}
-  → Γ  ∋ x ⦂ A
-  → Γ′ ∋ x ⦂ A′
-  → (∀ {gc gc′ ℓv ℓv′} → Δ ; Δ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ σ x ⊑ σ′ x ⇐ A ⊑ A′)
+  (Σ  ⊢ σ  ⦂ Γ  ⇒ Δ ) ×
+  (Σ′ ⊢ σ′ ⦂ Γ′ ⇒ Δ′) ×
+  (∀ x {A A′}
+    → Γ  ∋ x ⦂ A
+    → Γ′ ∋ x ⦂ A′
+    → (∀ {gc gc′ ℓv ℓv′} → Δ ; Δ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ σ x ⊑ σ′ x ⇐ A ⊑ A′))
 
 
 rename-pres-⊑ : ∀ {Γ Γ′ Δ Δ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′} {M M′} {ρ : Rename}
@@ -88,3 +89,16 @@ rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-cast M⊑M′ c⊑c′) = ⊑-cast (rename-p
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-castl M⊑M′ c⊑A′) = ⊑-castl (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) c⊑A′
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-castr M⊑M′ A⊑c′) = ⊑-castr (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) A⊑c′
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-blame ⊢M A⊑A′) = ⊑-blame (rename-pres ⊢M ⊢ρ) A⊑A′
+
+
+ext-pres-⊑ˢ : ∀ {Σ Σ′ Γ Γ′ Δ Δ′} {A A′} {σ σ′ : Subst}
+  → Σ ; Σ′ ⊢ σ ⊑ˢ σ′ ⦂ Γ ⇒ Δ , Γ′ ⇒ Δ′
+    --------------------------------------------------------------------------
+  → Σ ; Σ′ ⊢ ext σ ⊑ˢ ext σ′ ⦂ (A ∷ Γ) ⇒ (A ∷ Δ) , (A′ ∷ Γ′) ⇒ (A′ ∷ Δ′)
+ext-pres-⊑ˢ {Σ} {Σ′} {Γ} {Γ′} ⟨ ⊢σ , ⊢σ′ , σ⊑σ′ ⟩ =
+  ⟨ (λ {x} ∋x → exts-pres {Σ} {Γ} ⊢σ {x} ∋x) ,
+    (λ {x} ∋x → exts-pres {Σ′} {Γ′} ⊢σ′ {x} ∋x) , ♣ ⟩
+  where
+  ♣ : _
+  ♣ 0 refl refl = ⊑-var refl refl
+  ♣ (suc x) Γ∋x⦂A Γ′∋x⦂A′ = rename-pres-⊑ (λ x → x) (λ x → x) (σ⊑σ′ x Γ∋x⦂A Γ′∋x⦂A′)
