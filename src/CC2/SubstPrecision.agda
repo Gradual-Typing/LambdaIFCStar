@@ -102,3 +102,59 @@ ext-pres-⊑ˢ {Σ} {Σ′} {Γ} {Γ′} ⟨ ⊢σ , ⊢σ′ , σ⊑σ′ ⟩ =
   ♣ : _
   ♣ 0 refl refl = ⊑-var refl refl
   ♣ (suc x) Γ∋x⦂A Γ′∋x⦂A′ = rename-pres-⊑ (λ x → x) (λ x → x) (σ⊑σ′ x Γ∋x⦂A Γ′∋x⦂A′)
+
+
+subst-pres-⊑ : ∀ {Σ Σ′ Γ Γ′ Δ Δ′ gc gc′ ℓv ℓv′} {A A′} {M M′} {σ σ′}
+  → Σ ; Σ′ ⊢ σ ⊑ˢ σ′  ⦂ Γ ⇒ Δ , Γ′ ⇒ Δ′
+  → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑  M′ ⇐ A ⊑ A′
+    --------------------------------------------------------------------
+  → Δ ; Δ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ ⦅ σ ⦆ M ⊑ ⦅ σ′ ⦆ M′ ⇐ A ⊑ A′
+subst-pres-⊑ ⟨ ⊢σ , ⊢σ′ , σ⊑σ′ ⟩ (⊑-var Γ∋x⦂A Γ′∋x⦂A′) =
+  σ⊑σ′ _ Γ∋x⦂A Γ′∋x⦂A′
+subst-pres-⊑ σ⊑σ′ ⊑-const = ⊑-const
+subst-pres-⊑ {σ = σ} σ⊑σ′ (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) =
+  ⊑-lam gc⊑gc′ A⊑A′ (subst-pres-⊑ (ext-pres-⊑ˢ σ⊑σ′) N⊑N′)
+subst-pres-⊑ σ⊑σ′ (⊑-addr x y) = ⊑-addr x y
+subst-pres-⊑ σ⊑σ′ (⊑-app L⊑L′ M⊑M′ eq₁ eq₂) =
+  ⊑-app (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-app! L⊑L′ M⊑M′ eq₁ eq₂) =
+  ⊑-app! (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-app!l L⊑L′ M⊑M′ eq₁ eq₂) =
+  ⊑-app!l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-if L⊑L′ M⊑M′ N⊑N′ eq₁ eq₂) =
+  ⊑-if (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-if! L⊑L′ M⊑M′ N⊑N′ eq₁ eq₂) =
+  ⊑-if! (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ eq₁ eq₂) =
+  ⊑-if!l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-let M⊑M′ N⊑N′) =
+  ⊑-let (subst-pres-⊑ σ⊑σ′ M⊑M′)
+        (subst-pres-⊑ (ext-pres-⊑ˢ σ⊑σ′) N⊑N′)
+subst-pres-⊑ σ⊑σ′ (⊑-ref M⊑M′ x) =
+  ⊑-ref (subst-pres-⊑ σ⊑σ′ M⊑M′) x
+subst-pres-⊑ σ⊑σ′ (⊑-ref? M⊑M′) =
+  ⊑-ref? (subst-pres-⊑ σ⊑σ′ M⊑M′)
+subst-pres-⊑ σ⊑σ′ (⊑-ref?l M⊑M′ x) =
+  ⊑-ref?l (subst-pres-⊑ σ⊑σ′ M⊑M′) x
+subst-pres-⊑ σ⊑σ′ (⊑-deref M⊑M′ eq₁ eq₂) =
+  ⊑-deref (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-deref! M⊑M′ eq₁ eq₂) =
+  ⊑-deref! (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-deref!l M⊑M′ eq₁ eq₂) =
+  ⊑-deref!l (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-assign L⊑L′ M⊑M′ x y) =
+  ⊑-assign (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) x y
+subst-pres-⊑ σ⊑σ′ (⊑-assign? L⊑L′ M⊑M′) =
+  ⊑-assign? (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′)
+subst-pres-⊑ σ⊑σ′ (⊑-assign?l L⊑L′ M⊑M′ x y) =
+  ⊑-assign?l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) x y
+subst-pres-⊑ σ⊑σ′ (⊑-prot M⊑M′ PC⊑PC′ x y eq₁ eq₂) =
+  ⊑-prot (subst-pres-⊑ σ⊑σ′ M⊑M′) PC⊑PC′ x y eq₁ eq₂
+subst-pres-⊑ σ⊑σ′ (⊑-prot! M⊑M′ PC⊑PC′ x y eq₁ eq₂ z) =
+  ⊑-prot! (subst-pres-⊑ σ⊑σ′ M⊑M′) PC⊑PC′ x y eq₁ eq₂ z
+subst-pres-⊑ σ⊑σ′ (⊑-prot!l M⊑M′ PC⊑PC′ x y eq₁ eq₂ z) =
+  ⊑-prot!l (subst-pres-⊑ σ⊑σ′ M⊑M′) PC⊑PC′ x y eq₁ eq₂ z
+subst-pres-⊑ σ⊑σ′ (⊑-cast M⊑M′ c⊑c′) = ⊑-cast (subst-pres-⊑ σ⊑σ′ M⊑M′) c⊑c′
+subst-pres-⊑ σ⊑σ′ (⊑-castl M⊑M′ c⊑A′) = ⊑-castl (subst-pres-⊑ σ⊑σ′ M⊑M′) c⊑A′
+subst-pres-⊑ σ⊑σ′ (⊑-castr M⊑M′ A⊑c′) = ⊑-castr (subst-pres-⊑ σ⊑σ′ M⊑M′) A⊑c′
+subst-pres-⊑ ⟨ ⊢σ , ⊢σ′ , σ⊑σ′ ⟩ (⊑-blame ⊢M A⊑A′) = ⊑-blame (subst-pres ⊢M ⊢σ) A⊑A′
