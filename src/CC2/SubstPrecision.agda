@@ -3,7 +3,7 @@ module CC2.SubstPrecision where
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (true; false) renaming (Bool to 𝔹)
-open import Data.List
+open import Data.List hiding ([_])
 open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Maybe
@@ -158,3 +158,22 @@ subst-pres-⊑ σ⊑σ′ (⊑-cast M⊑M′ c⊑c′) = ⊑-cast (subst-pres-�
 subst-pres-⊑ σ⊑σ′ (⊑-castl M⊑M′ c⊑A′) = ⊑-castl (subst-pres-⊑ σ⊑σ′ M⊑M′) c⊑A′
 subst-pres-⊑ σ⊑σ′ (⊑-castr M⊑M′ A⊑c′) = ⊑-castr (subst-pres-⊑ σ⊑σ′ M⊑M′) A⊑c′
 subst-pres-⊑ ⟨ ⊢σ , ⊢σ′ , σ⊑σ′ ⟩ (⊑-blame ⊢M A⊑A′) = ⊑-blame (subst-pres ⊢M ⊢σ) A⊑A′
+
+
+substitution-pres-⊑ : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B B′} {N N′ V V′}
+  → Γ ⊑* Γ′
+  → Σ ⊑ₘ Σ′
+  → A ∷ Γ ; A′ ∷ Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′ ⇐ B ⊑ B′
+  → (∀ {gc gc′ ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ V′ ⇐ A ⊑ A′)
+    ---------------------------------------------------------------------------------
+  →     Γ ;      Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ (N [ V ]) ⊑ (N′ [ V′ ]) ⇐ B ⊑ B′
+substitution-pres-⊑ Γ⊑Γ′ Σ⊑Σ′ N⊑N′ V⊑V′ =
+  subst-pres-⊑ ⟨ (λ { {0} refl → proj₁ (cc-prec-inv {gc′ = l low} {ℓv′ = low} Γ⊑Γ′ Σ⊑Σ′ V⊑V′) ;
+                      {suc x} Γ∋x⦂A → ⊢var Γ∋x⦂A }) ,
+                 (λ { {0} refl → proj₁ (proj₂ (cc-prec-inv {gc = l low} {ℓv = low} Γ⊑Γ′ Σ⊑Σ′ V⊑V′)) ;
+                      {suc x} Γ∋x⦂A → ⊢var Γ∋x⦂A }) ,
+                  ♣ ⟩ N⊑N′
+  where
+  ♣ : _
+  ♣ 0       refl  refl    = V⊑V′
+  ♣ (suc x) Γ∋x⦂A Γ′∋x⦂A′ = ⊑-var Γ∋x⦂A Γ′∋x⦂A′
