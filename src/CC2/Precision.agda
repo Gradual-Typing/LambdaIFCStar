@@ -705,3 +705,26 @@ data _;_;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) → ∀ ℓ → (μ μ′ : 
 
 _;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) (μ μ′ : Heap) → Set
 Σ ; Σ′ ⊢ ⟨ μᴸ , μᴴ ⟩ ⊑ ⟨ μᴸ′ , μᴴ′ ⟩ = (Σ ; Σ′ ; low ⊢ μᴸ ⊑ μᴸ′) × (Σ ; Σ′ ; high ⊢ μᴴ ⊑ μᴴ′)
+
+
+value-⊑-pc : ∀ {Γ Γ′ Σ Σ′ gc₁ gc₁′ gc₂ gc₂′ ℓv₁ ℓv₁′ ℓv₂ ℓv₂′} {A B} {V W}
+  → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc₁ ; gc₁′ ∣ ℓv₁ ; ℓv₁′ ⊢ V ⊑ W ⇐ A ⊑ B
+  → Value V
+  → Value W
+    -------------------------------------------------------------
+  → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc₂ ; gc₂′ ∣ ℓv₂ ; ℓv₂′ ⊢ V ⊑ W ⇐ A ⊑ B
+value-⊑-pc ⊑-const (V-raw V-const) (V-raw V-const) = ⊑-const
+value-⊑-pc (⊑-addr x y) (V-raw V-addr) (V-raw V-addr) = ⊑-addr x y
+value-⊑-pc (⊑-lam x y z) (V-raw V-ƛ) (V-raw V-ƛ) = ⊑-lam x y z
+value-⊑-pc (⊑-castr V⊑W A⊑c′) (V-raw v) (V-cast v′ _) =
+  ⊑-castr (value-⊑-pc V⊑W (V-raw v) (V-raw v′)) A⊑c′
+value-⊑-pc (⊑-castl V⊑W c⊑B) (V-cast v _) (V-raw w) =
+  ⊑-castl (value-⊑-pc V⊑W (V-raw v) (V-raw w)) c⊑B
+value-⊑-pc (⊑-cast V⊑W c⊑c′) (V-cast v _) (V-cast w _) =
+  ⊑-cast (value-⊑-pc V⊑W (V-raw v) (V-raw w)) c⊑c′
+value-⊑-pc (⊑-castl V⊑W c⊑B) (V-cast v _) (V-cast w i) =
+  ⊑-castl (value-⊑-pc V⊑W (V-raw v) (V-cast w i)) c⊑B
+value-⊑-pc (⊑-castr V⊑W A⊑c′) (V-cast v i) (V-cast w _) =
+  ⊑-castr (value-⊑-pc V⊑W (V-cast v i) (V-raw w)) A⊑c′
+value-⊑-pc V⊑W v V-● = contradiction V⊑W (_ ⋤●)
+value-⊑-pc V⊑W V-● w = contradiction V⊑W (●⋤ _)
