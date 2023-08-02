@@ -56,7 +56,14 @@ sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
     (⊑-app {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (β vM′ vc′†)
   rewrite uniq-LVal vc′† vc′
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
-... | ⟨ V , V-raw V-ƛ , L↠V , prec ⟩ = {!!}
+... | ⟨ V , V-raw V-ƛ , L↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ =
+  case catchup {μ = μ} {PC} vM′ M⊑M′ of λ where
+  ⟨ W , w , M↠W , W⊑M′ ⟩ →
+    let ♣ = trans-mult (plug-cong (app□ M _ _ _) L↠V)
+              (trans-mult (plug-cong (app _ □ (V-raw V-ƛ) _ _ _) M↠W)
+              (_ ∣ _ ∣ _ —→⟨ β w vc ⟩ _ ∣ _ ∣ _ ∎)) in
+    ⟨ Σ , Σ′ , _ , μ , ♣ ,
+      ⊑-prot (substitution-pres-⊑ Γ⊑Γ′ Σ⊑Σ′ N⊑N′ (value-⊑-pc W⊑M′ w vM′)) (stampₑ-pres-prec vc vc′ PC⊑PC′) (≡→≼ (stampₑ-security vc)) (≡→≼ (stampₑ-security vc′)) eq eq′ , μ⊑μ′ ⟩
 ... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,
         L↠V , ⊑-castl (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun {gc₁ = gc₁} d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) ⟩
   with catchup {μ = μ} {PC} vM′ M⊑M′
