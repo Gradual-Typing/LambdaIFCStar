@@ -23,6 +23,7 @@ open import CC2.Reduction
 open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.CatchUp
+open import CC2.SubstPrecision using (substitution-pres-⊑)
 
 
 sim : ∀ {Γ Γ′ Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
@@ -50,8 +51,31 @@ sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (prot!-ctx M�
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (prot!-val v) = {!!}
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ prot!-blame = {!!}
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (cast x x₁) = {!!}
-sim vc vc′ (⊑-app L⊑L′ M⊑M′ eq eq′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (β vM′ vc′†) =
-  {!!}
+{- β -}
+sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+    (⊑-app {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (β vM′ vc′†)
+  rewrite uniq-LVal vc′† vc′
+  with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
+... | ⟨ V , V-raw V-ƛ , L↠V , prec ⟩ = {!!}
+... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,
+        L↠V , ⊑-castl (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun {gc₁ = gc₁} d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) ⟩
+  with catchup {μ = μ} {PC} vM′ M⊑M′
+...   | ⟨ W , w , M↠W , W⊑M′ ⟩
+  with catchup {μ = μ} {PC} vM′ (⊑-castl W⊑M′ c⊑A′)
+...   | ⟨ W₁ , w₁ , W⟨c⟩↠W₁ , W₁⊑M′ ⟩ =
+  let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
+  let ♣ = trans-mult (plug-cong (app□ M _ _ _) L↠V)
+              (trans-mult (plug-cong (app _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _ _) M↠W)
+              (_ ∣ _ ∣ _ —→⟨ app-cast w vc 𝓋 ↠PC₁ vc₁ (cast-reduction-inv w W⟨c⟩↠W₁ refl) w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+  ⟨ Σ , Σ′ , _ , μ , ♣ ,
+    ⊑-prot (⊑-castl (substitution-pres-⊑ Γ⊑Γ′ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑M′ w₁ vM′)) d⊑B′) PC₁⊑stampPC′ (stamp-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ , μ⊑μ′ ⟩
+  where
+  ⊢W = proj₁ (cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ W⊑M′)
+  ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
+  prec : (stampₑ PC vc ℓ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
+                   ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
+  prec = ⊑-castl (stampₑ-pres-prec vc vc′ PC⊑PC′) d̅⊑gc′
+
 sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
     Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (β vM′ vc′†)
@@ -59,18 +83,19 @@ sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
 ... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,
-        L↠V , ⊑-castl (⊑-lam x y z) (⊑-fun {gc₁ = gc₁} {.⋆} d̅⊑gc′ _ _ c̅⊑g′) ⟩
+        L↠V , ⊑-castl (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun {gc₁ = gc₁} {.⋆} d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) ⟩
   with catchup {μ = μ} {PC} vM′ M⊑M′
-...   | ⟨ W , w , M↠W , W⊑M′ ⟩ =
+...   | ⟨ W , w , M↠W , W⊑M′ ⟩
+  with catchup {μ = μ} {PC} vM′ (⊑-castl W⊑M′ c⊑A′)
+...   | ⟨ W₁ , w₁ , W⟨c⟩↠W₁ , W₁⊑M′ ⟩ =
   let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
-    case cast-sn {c = c} w ⊢W of λ where
-    ⟨ blame _ , ↠blameq , fail ⟩ → {!!}
-    ⟨ W′ , ↠W′ , success w′ ⟩ →
-      let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
+  let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
               (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-              (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ ↠W′ w′ ⟩ _ ∣ _ ∣ _ ∎)) in
-      ⟨ Σ , Σ′ , _ , μ , ♣ ,
-        ⊑-prot!l {!!} PC₁⊑stampPC′ (stamp⇒⋆-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) , μ⊑μ′ ⟩
+              (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ (cast-reduction-inv w W⟨c⟩↠W₁ refl) w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+  ⟨ Σ , Σ′ , _ , μ , ♣ ,
+    ⊑-prot!l (⊑-castl (substitution-pres-⊑ Γ⊑Γ′ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑M′ w₁ vM′)) d⊑B′)
+             PC₁⊑stampPC′
+             (stamp⇒⋆-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) , μ⊑μ′ ⟩
   where
   ∥PC∥⋎∥c̅∥≡∥stamp∥ = stampₑ-security {ℓ = ∥ c̅ ∥ₗ 𝓋} vc
   ∥c̅∥≡ℓ = security-prec-left _ 𝓋 c̅⊑g′
