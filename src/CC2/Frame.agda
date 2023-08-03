@@ -28,12 +28,12 @@ data Frame : Set where
   -- !! M A
   !!□ : Type → Frame
 
-  -- assign L M T ℓ̂ ℓ
+  -- assign  L M T ℓ̂ ℓ
   assign□   : (M : Term) → RawType → (ℓ̂ ℓ : StaticLabel) → Frame
   assign_□  : (V : Term) → Value V → RawType → (ℓ̂ ℓ : StaticLabel) → Frame
-  -- assign? L M T ĝ g p
-  assign?□  : (M : Term) → RawType → (ĝ g : Label) → BlameLabel → Frame
-  assign?_□ : (V : Term) → Value V → RawType → (ĝ g : Label) → BlameLabel → Frame
+  -- assign? L M T ĝ p
+  assign?□  : (M : Term) → RawType → (ĝ : Label) → BlameLabel → Frame
+  assign?_□ : (V : Term) → Value V → RawType → (ĝ : Label) → BlameLabel → Frame
 
   -- let M A N
   let□ : Type → Term → Frame
@@ -58,8 +58,8 @@ plug M (!□ A ℓ)                = ! M A ℓ
 plug M (!!□ A)                 = !! M A
 plug L (assign□ M T ℓ̂ ℓ)       = assign L M T ℓ̂ ℓ
 plug M (assign V □ v T ℓ̂ ℓ)    = assign V M T ℓ̂ ℓ
-plug L (assign?□ M T ĝ g p)    = assign? L M T ĝ g p
-plug M (assign? V □ v T ĝ g p) = assign? V M T ĝ g p
+plug L (assign?□ M    T ĝ p)   = assign? L M T ĝ p
+plug M (assign? V □ v T ĝ p)   = assign? V M T ĝ p
 plug M (let□ A N)              = `let M A N
 plug L (if□  A ℓ M N)          = if  L A ℓ M N
 plug L (if!□ A M N)            = if! L A M N
@@ -77,8 +77,8 @@ plug-not-● (!□ x x₁) ()
 plug-not-● (!!□ x) ()
 plug-not-● (assign□ M x ℓ̂ ℓ) ()
 plug-not-● (assign V □ x x₁ ℓ̂ ℓ) ()
-plug-not-● (assign?□ M x ĝ g x₁) ()
-plug-not-● (assign? V □ x x₁ ĝ g x₂) ()
+plug-not-● (assign?□ M x ĝ x₁) ()
+plug-not-● (assign? V □ x x₁ ĝ x₂) ()
 plug-not-● (let□ x x₁) ()
 plug-not-● (if□ x x₁ M N) ()
 plug-not-● (if!□ x M N) ()
@@ -95,8 +95,8 @@ plug-not-bl (!□ x x₁) ()
 plug-not-bl (!!□ x) ()
 plug-not-bl (assign□ M x ℓ̂ ℓ) ()
 plug-not-bl (assign V □ x x₁ ℓ̂ ℓ) ()
-plug-not-bl (assign?□ M x ĝ g x₁) ()
-plug-not-bl (assign? V □ x x₁ ĝ g x₂) ()
+plug-not-bl (assign?□ M x ĝ x₁) ()
+plug-not-bl (assign? V □ x x₁ ĝ x₂) ()
 plug-not-bl (let□ x x₁) ()
 plug-not-bl (if□ x x₁ M N) ()
 plug-not-bl (if!□ x M N) ()
@@ -113,8 +113,8 @@ plug-not-raw (!□ x x₁) ()
 plug-not-raw (!!□ x) ()
 plug-not-raw (assign□ M x ℓ̂ ℓ) ()
 plug-not-raw (assign V □ x x₁ ℓ̂ ℓ) ()
-plug-not-raw (assign?□ M x ĝ g x₁) ()
-plug-not-raw (assign? V □ x x₁ ĝ g x₂) ()
+plug-not-raw (assign?□ M x ĝ x₁) ()
+plug-not-raw (assign? V □ x x₁ ĝ x₂) ()
 plug-not-raw (let□ x x₁) ()
 plug-not-raw (if□ x x₁ M N) ()
 plug-not-raw (if!□ x M N) ()

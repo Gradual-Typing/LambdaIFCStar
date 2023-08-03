@@ -122,11 +122,12 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ assign L M T ℓ̂ ℓ ⇐ ` Unit of l low
 
 
-  ⊢assign? : ∀ {Γ Σ gc ℓv L M T g ĝ p}
-    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ Ref (T of ĝ) of g
+  ⊢assign? : ∀ {Γ Σ gc ℓv L M T ĝ p}
+    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ Ref (T of ĝ) of ⋆
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ T of ĝ
       ------------------------------------------------------------- Assign?
-    → Γ ; Σ ; gc ; ℓv ⊢ assign? L M T ĝ g p ⇐ ` Unit of l low
+    → Γ ; Σ ; gc ; ℓv ⊢ assign? L M T ĝ p ⇐ ` Unit of l low
+  {- Note: L has ⋆ so that we can get its security using ∥_∥ at runtime -}
 
 
   ⊢prot : ∀ {Γ Σ gc gc′ ℓv A B M ℓ} {PC} {vc : LVal PC}

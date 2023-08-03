@@ -295,26 +295,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → assign (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ℓ̂₂ ℓ₂ ∣ μ ∣ PC —→ blame p ∣ μ
 
 
-  β-assign? : ∀ {T ℓ̂ ℓ gc V n} {μ PC PC′ p}
-    → (v  : Value V)
-    → (vc : LVal PC)
-    → ⊢ PC ⇐ gc
-    → (stampₑ PC vc ℓ) ⟪ coerce gc ⋎̃ l ℓ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
-    → LVal PC′
-      ----------------------------------------------------------------------------------- Assign?
-    → assign? (addr n) V T (l ℓ̂) (l ℓ) p ∣ μ ∣ PC —→ $ tt ∣ cons-μ (a⟦ ℓ̂ ⟧ n) V v μ
-
-
-  assign?-blame-pc : ∀ {T ℓ̂ ℓ gc V n} {μ PC p q}
-    → (v  : Value V)
-    → (vc : LVal PC)
-    → ⊢ PC ⇐ gc
-    → (stampₑ PC vc ℓ) ⟪ coerce gc ⋎̃ l ℓ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ bl q
-      ----------------------------------------------------------------------------------- Assign?BlamePC
-    → assign? (addr n) V T (l ℓ̂) (l ℓ) p ∣ μ ∣ PC —→ blame q ∣ μ
-
-
-  assign?-cast : ∀ {S T ℓ̂ ĝ ℓ g gc V W n} {c̅ₙ : CExpr l ℓ ⇒ g}
+  assign?-cast : ∀ {S T ℓ̂ ĝ ℓ gc V W n} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
               {c : Cast T of ĝ ⇒ S of l ℓ̂} {d : Cast S of l ℓ̂ ⇒ T of ĝ} {μ PC PC′ p}
     → (v  : Value V)
     → (vc : LVal PC)
@@ -326,11 +307,11 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → V ⟨ c ⟩ —↠ W
     → (w : Value W)
       ---------------------------------------------------------------------- Assign?Cast
-    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→
+    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ p ∣ μ ∣ PC —→
          $ tt ∣ cons-μ (a⟦ ℓ̂ ⟧ n) W w μ
 
 
-  assign?-cast-blame-pc : ∀ {S T ℓ̂ ĝ ℓ g gc V n} {c̅ₙ : CExpr l ℓ ⇒ g}
+  assign?-cast-blame-pc : ∀ {S T ℓ̂ ĝ ℓ gc V n} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
        {c : Cast T of ĝ ⇒ S of l ℓ̂} {d : Cast S of l ℓ̂ ⇒ T of ĝ} {μ PC p q}
     → (v  : Value V)
     → (vc : LVal PC)
@@ -339,10 +320,10 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        (stampₑ PC vc ℓ′) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ bl q
       ------------------------------------------------------------------------------------ Assign?CastBlamePC
-    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→ blame q ∣ μ
+    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ p ∣ μ ∣ PC —→ blame q ∣ μ
 
 
-  assign?-cast-blame : ∀ {S T ℓ̂ ĝ ℓ g gc V n} {c̅ₙ : CExpr l ℓ ⇒ g}
+  assign?-cast-blame : ∀ {S T ℓ̂ ĝ ℓ gc V n} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
               {c : Cast T of ĝ ⇒ S of l ℓ̂} {d : Cast S of l ℓ̂ ⇒ T of ĝ} {μ PC PC′ p q}
     → (v  : Value V)
     → (vc : LVal PC)
@@ -353,7 +334,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → LVal PC′
     → V ⟨ c ⟩ —↠ blame q
       ----------------------------------------------------------------------------------- Assign?CastBlame
-    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ g p ∣ μ ∣ PC —→ blame q ∣ μ
+    → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ p ∣ μ ∣ PC —→ blame q ∣ μ
 
 
 Value⌿→ : ∀ {V M μ μ′ PC}

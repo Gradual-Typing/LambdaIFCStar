@@ -29,7 +29,7 @@ data Op : Set where
   op-deref        : (A : Type) → (ℓ : StaticLabel) → Op
   op-deref!       : (A : Type) → Op
   op-assign       : (T : RawType) → (ℓ̂ ℓ : StaticLabel) → Op
-  op-assign?      : (T : RawType) → (ĝ g :       Label) → BlameLabel → Op
+  op-assign?      : (T : RawType) → (ĝ : Label) → BlameLabel → Op
   op-cast         : ∀ {A B} → Cast A ⇒ B → Op
   op-prot         : ∀ (A : Type) → (PC : LExpr) → LVal PC
                                  → (ℓ : StaticLabel) → Op
@@ -52,8 +52,8 @@ sig (op-ref ℓ)         = ■ ∷ []
 sig (op-ref? ℓ p)      = ■ ∷ []
 sig (op-deref A ℓ)     = ■ ∷ []
 sig (op-deref! A)      = ■ ∷ []
-sig (op-assign T ℓ̂ ℓ)  = ■ ∷ ■ ∷ []
-sig (op-assign? T ĝ g p) = ■ ∷ ■ ∷ []
+sig (op-assign  T ℓ̂ ℓ) = ■ ∷ ■ ∷ []
+sig (op-assign? T ĝ p) = ■ ∷ ■ ∷ []
 sig (op-cast c)        = ■ ∷ []
 sig (op-prot A PC v ℓ)   = ■ ∷ []
 sig (op-prot! A PC v ℓ)  = ■ ∷ []
@@ -76,8 +76,8 @@ pattern ref⟦_⟧ ℓ M         = (op-ref ℓ) ⦅ cons (ast M) nil ⦆
 pattern ref?⟦_⟧ ℓ M p      = (op-ref? ℓ p) ⦅ cons (ast M) nil ⦆
 pattern ! M A g            = (op-deref A g) ⦅ cons (ast M) nil ⦆
 pattern !! M A             = (op-deref! A) ⦅ cons (ast M) nil ⦆
-pattern assign L M T ℓ̂ ℓ   = (op-assign T ℓ̂ ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
-pattern assign? L M T ĝ g p = (op-assign? T ĝ g p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern assign  L M T ℓ̂ ℓ  = (op-assign  T ℓ̂ ℓ) ⦅ cons (ast L) (cons (ast M) nil) ⦆
+pattern assign? L M T ĝ p  = (op-assign? T ĝ p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
 pattern _⟨_⟩ M c           = (op-cast c) ⦅ cons (ast M) nil ⦆
 pattern prot PC v ℓ M A    = (op-prot A PC v ℓ) ⦅ cons (ast M) nil ⦆
 pattern prot! PC v ℓ M A   = (op-prot! A PC v ℓ) ⦅ cons (ast M) nil ⦆
