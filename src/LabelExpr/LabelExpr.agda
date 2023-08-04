@@ -21,7 +21,6 @@ open import CoercionExpr.CoercionExpr
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
-open import CoercionExpr.Stamping
 
 
 data LExpr : Set where
@@ -225,31 +224,6 @@ prec-inv (⊑-castr (⊑-castl ⊑-l c̅⊑ℓ) g⊑c̅′)  = ⟨ refl , comp-p
 ∥ l ℓ ⟪ c̅ ⟫ ∥ (v-cast (ir 𝓋 _)) = ∥ c̅ ∥ₗ 𝓋
 
 
-{- Stamping -}
-stampₑ : ∀ V → LVal V → StaticLabel → LExpr
-stampₑ (l ℓ) v-l low     = l ℓ
-stampₑ (l low) v-l high  = l low ⟪ id (l low) ⨾ ↑ ⟫
-stampₑ (l high) v-l high = l high
-stampₑ (l ℓ ⟪ c̅ ⟫) (v-cast (ir 𝓋 _)) ℓ′ = l ℓ ⟪ stampₗ c̅ 𝓋 ℓ′ ⟫
-
-stampₑ-wt : ∀ {V g ℓ}
-  → (v : LVal V)
-  → ⊢ V ⇐ g
-  → ⊢ stampₑ V v ℓ ⇐ (g ⋎̃ l ℓ)
-stampₑ-wt {g = g} {low} v-l ⊢V rewrite g⋎̃low≡g {g} = ⊢V
-stampₑ-wt {ℓ = high} (v-l {low}) ⊢l = ⊢cast ⊢l
-stampₑ-wt {ℓ = high} (v-l {high}) ⊢l = ⊢l
-stampₑ-wt (v-cast (ir 𝓋 _)) (⊢cast ⊢l) = ⊢cast ⊢l
-
-stampₑ-LVal : ∀ {V ℓ}
-  → (v : LVal V)
-  → LVal (stampₑ V v ℓ)
-stampₑ-LVal {V} {low} v-l = v-l
-stampₑ-LVal {V} {high} (v-l {low}) = v-cast (ir (up id) (λ ()))
-stampₑ-LVal {V} {high} (v-l {high}) = v-l
-stampₑ-LVal {V} {ℓ} (v-cast (ir 𝓋 x)) =
-  v-cast (ir (stampₗ-CVal _ 𝓋 ℓ) (stamp-not-id 𝓋 x))
-
 
 lexpr-sn : ∀ {A} L
   → ⊢ L ⇐ A
@@ -401,97 +375,3 @@ cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ cast r 𝓋 ⟩ r*) =
   ⟨ eq , _ —→⟨ cast r 𝓋 ⟩ ih ⟩
 cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
   contradiction r (LResult⌿→ fail)
-
-
-stamp⇒⋆↠LVal : ∀ {g ℓ V}
-  → (v : LVal V)
-  → ⊢ V ⇐ g
-    ----------------------------------------------------------------------
-  → ∃[ V′ ] (stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ V′) × LVal V′
-stamp⇒⋆↠LVal {ℓ = low} (v-l {ℓ}) ⊢l rewrite ℓ⋎low≡ℓ {ℓ} =
-  ⟨ _ ⟪ _ ⟫ , _ ∎ , v-cast (ir (inj id) (λ ())) ⟩
-stamp⇒⋆↠LVal {ℓ = high} (v-l {low}) ⊢l =
-  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = high} (v-l {high}) ⊢l =
-  ⟨ _ , _ ∎ , v-cast (ir (inj id) (λ ())) ⟩
-stamp⇒⋆↠LVal (v-cast (ir id x)) ⊢V =
-  contradiction refl (recompute (¬? (_ ==? _)) x)
-stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (inj id) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj id) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (id {l low})) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (id {l high})) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj id) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (inj (up id)) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (up id)) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
-  ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
-  where
-  ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-
-
-stampₑ-pres-prec : ∀ {ℓ} {M M′ g g′}
-  → (v  : LVal M)
-  → (v′ : LVal M′)
-  → ⊢ M ⊑ M′ ⇐ g ⊑ g′
-    ------------------------------------------------------------
-  → ⊢ stampₑ M v ℓ ⊑ stampₑ M′ v′ ℓ ⇐ (g ⋎̃ l ℓ) ⊑ (g′ ⋎̃ l ℓ)
-stampₑ-pres-prec {low} (v-l {ℓ}) v-l ⊑-l rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-l
-stampₑ-pres-prec {high} (v-l {low}) v-l ⊑-l = ⊑-cast ⊑-l (prec-refl _)
-stampₑ-pres-prec {high} (v-l {high}) v-l ⊑-l = ⊑-l
--- ⊢ ℓ ⊑ ℓ′ ⟨ c ⟩ cases are all impossible
-stampₑ-pres-prec v-l (v-cast (ir id x)) (⊑-castr ⊑-l (⊑-id l⊑l)) =
-  contradiction refl (recompute (¬? (_ ==? _)) x)
-stampₑ-pres-prec v-l (v-cast (ir (inj id) x)) (⊑-castr ⊑-l (⊑-cast _ l⊑l ()))
-stampₑ-pres-prec v-l (v-cast (ir (inj (up id)) x)) (⊑-castr ⊑-l (⊑-cast _ () _))
-stampₑ-pres-prec v-l (v-cast (ir (up id) x)) (⊑-castr ⊑-l (⊑-cast _ l⊑l ()))
-stampₑ-pres-prec {ℓ} (v-cast (ir id x)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
-  contradiction refl (recompute (¬? (_ ==? _)) x)
-stampₑ-pres-prec {low} (v-cast (ir (inj (id {l ℓ})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′)
-  rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-stampₑ-pres-prec {high} (v-cast (ir (inj (id {l low})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
-  ⊑-cast ⊑-l (⊑-castl (prec-refl _) l⊑l ⋆⊑)
-stampₑ-pres-prec {high} (v-cast (ir (inj (id {l high})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
-  ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-stampₑ-pres-prec {ℓ} (v-cast (ir (inj (up id)) _)) v-l (⊑-castl ⊑-l (⊑-cast _ () ⋆⊑))
-stampₑ-pres-prec {ℓ} (v-cast (ir (up id) _)) v-l (⊑-castl ⊑-l (⊑-cast _ l⊑l ()))
-stampₑ-pres-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
-  with prec→⊢ M⊑M′
-... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
-  with prec-inv M⊑M′
-... | ⟨ refl , c̅⊑c̅′ ⟩ =
-  ⊑-cast ⊑-l (stampₗ-pres-prec 𝓋 𝓋′ c̅⊑c̅′)
