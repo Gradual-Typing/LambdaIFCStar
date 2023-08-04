@@ -14,6 +14,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import Common.Utils
 open import CoercionExpr.SecurityLevel
+open import LabelExpr.Stamping
 open import CC2.Statics
 open import CC2.Frame public
 open import Memory.Heap Term Value
@@ -129,7 +130,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc′
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce (gc′ ⋎̃ l ℓ′) ⇒⋆ ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
+       (stamp!ₑ PC vc ℓ′) ⟪ d̅ ⟫ —↠ₑ PC′
     → (vc′ : LVal PC′)
     → V ⟨ c ⟩ —↠ W
     → Value W
@@ -145,7 +146,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc′
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce (gc′ ⋎̃ l ℓ′) ⇒⋆ ⟫ ⟪ d̅ ⟫ —↠ₑ bl p
+       (stamp!ₑ PC vc ℓ′) ⟪ d̅ ⟫ —↠ₑ bl p
       --------------------------------------------------------------------------- App!BlamePC
     → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→ blame p ∣ μ
 
@@ -157,7 +158,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc′
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce (gc′ ⋎̃ l ℓ′) ⇒⋆ ⟫ ⟪ d̅ ⟫ —↠ₑ PC′
+       (stamp!ₑ PC vc ℓ′) ⟪ d̅ ⟫ —↠ₑ PC′
     → (vc′ : LVal PC′)
     → V ⟨ c ⟩ —↠ blame p
       --------------------------------------------------------------------------- App!Blame
@@ -194,24 +195,22 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc
-    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       stampₑ PC vc ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
     → (vc′ : LVal PC′)
       ------------------------------------------------------------------ If!TrueCast
-    → if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
-         prot! PC′ vc′ ℓ′ M A ∣ μ
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
+         prot! (stamp!ₑ PC vc ℓ′) (stamp!ₑ-LVal vc) ℓ′ M A ∣ μ
 
 
   if!-false-cast : ∀ {A ℓ gc M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC PC′}
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc
-    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       stampₑ PC vc ℓ′ ⟪ coerce (gc ⋎̃ l ℓ′) ⇒⋆ ⟫ —↠ₑ PC′
     → (vc′ : LVal PC′)
       ------------------------------------------------------------------ If!FalseCast
-    → if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
-         prot! PC′ vc′ ℓ′ N A ∣ μ
+    → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+       if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
+         prot! (stamp!ₑ PC vc ℓ′) (stamp!ₑ-LVal vc) ℓ′ N A ∣ μ
 
 
   β-let : ∀ {V A N μ PC}
@@ -302,7 +301,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
+       (stamp!ₑ PC vc ℓ′) ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
     → LVal PC′
     → V ⟨ c ⟩ —↠ W
     → (w : Value W)
@@ -318,7 +317,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ bl q
+       (stamp!ₑ PC vc ℓ′) ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ bl q
       ------------------------------------------------------------------------------------ Assign?CastBlamePC
     → assign? (addr n ⟨ cast (ref c d) c̅ₙ ⟩) V T ĝ p ∣ μ ∣ PC —→ blame q ∣ μ
 
@@ -330,7 +329,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (𝓋  : CVal c̅ₙ)
     → ⊢ PC ⇐ gc
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       (stampₑ PC vc ℓ′) ⟪ coerce gc ⋎̃ l ℓ′ ⇒⋆ ⟫ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
+       (stamp!ₑ PC vc ℓ′) ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ PC′
     → LVal PC′
     → V ⟨ c ⟩ —↠ blame q
       ----------------------------------------------------------------------------------- Assign?CastBlame

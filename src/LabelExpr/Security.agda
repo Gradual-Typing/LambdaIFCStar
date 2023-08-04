@@ -23,6 +23,16 @@ open import CoercionExpr.Precision renaming (prec→⊑ to precₗ→⊑)
 open import CoercionExpr.SecurityLevel renaming (∥_∥ to ∥_∥ₗ)
 open import CoercionExpr.Stamping
 open import LabelExpr.LabelExpr
+open import LabelExpr.Stamping
+
+
+security-eqₑ : ∀ {V₁ V₂}
+  → (v₁ : LVal V₁)
+  → (v₂ : LVal V₂)
+  → V₁ ≡ V₂
+    --------------------------
+  → ∥ V₁ ∥ v₁ ≡ ∥ V₂ ∥ v₂
+security-eqₑ v₁ v₂ eq rewrite eq rewrite uniq-LVal v₁ v₂ = refl
 
 
 stampₑ-security : ∀ {V ℓ} (v : LVal V) → (∥ V ∥ v) ⋎ ℓ ≡ ∥ stampₑ V v ℓ ∥ (stampₑ-LVal v)
@@ -32,13 +42,10 @@ stampₑ-security {V = l high} {ℓ = high} v-l = refl
 stampₑ-security {V} {low}  (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 low
 stampₑ-security {V} {high} (v-cast (ir 𝓋 _)) = stampₗ-security _ 𝓋 high
 
-security-eqₑ : ∀ {V₁ V₂}
-  → (v₁ : LVal V₁)
-  → (v₂ : LVal V₂)
-  → V₁ ≡ V₂
-    --------------------------
-  → ∥ V₁ ∥ v₁ ≡ ∥ V₂ ∥ v₂
-security-eqₑ v₁ v₂ eq rewrite eq rewrite uniq-LVal v₁ v₂ = refl
+stamp!ₑ-security : ∀ {V ℓ} (v : LVal V) → (∥ V ∥ v) ⋎ ℓ ≡ ∥ stamp!ₑ V v ℓ ∥ (stamp!ₑ-LVal v)
+stamp!ₑ-security {V} {low} (v-l {ℓ}) rewrite ℓ⋎low≡ℓ {ℓ} = refl
+stamp!ₑ-security {V} {high} v-l = stamp!ₗ-security _ id high
+stamp!ₑ-security {V} {ℓ} (v-cast (ir v _)) = stamp!ₗ-security _ v ℓ
 
 
 cast-security : ∀ {g g′ V V′} {c̅ : CExpr g ⇒ g′}
@@ -77,146 +84,6 @@ cast-security (v-cast (ir 𝓋 _)) ⊢V
 ...   | refl = comp-security 𝓋 (cast-red-inv ↠V′) 𝓋′
 
 
-stamp⇒⋆-security : ∀ {g ℓ V V′}
-  → (v : LVal V)
-  → ⊢ V ⇐ g
-  → stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ V′
-  → (v′ : LVal V′)
-    ---------------------------------
-  → (∥ V ∥ v) ⋎ ℓ ≡ ∥ V′ ∥ v′
-stamp⇒⋆-security {ℓ = low} (v-l {ℓ}) ⊢l ↠V′ v′
-  rewrite ℓ⋎low≡ℓ {ℓ} with ↠V′
-... | _ —→⟨ r ⟩ _ = contradiction r (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
-... | _ ∎ with v′
-... | v-cast (ir (inj id) _) = refl
-stamp⇒⋆-security {ℓ = high} {V} {V′} (v-l {low}) ⊢l ↠V′ v′ = ∣V†∣≡∣V′∣
-  where
-  ♣ : (id (l low) ⨾ ↑ ⨾ id (l high) ⨾ high !) —→⁺ (id (l low) ⨾ ↑ ⨾ high !)
-  ♣ = _ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ
-  ♥ : l low ⟪ id (l low) ⨾ ↑ ⟫ ⟪ id (l high) ⨾ (high !) ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (up id) (λ ())) ⟩ _ —→⟨ cast ♣ (inj (up id)) ⟩ _ ∎
-  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj (up id)) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ ∎) (v-cast (ir (inj id) _)) = refl
-stamp⇒⋆-security {ℓ = high} (v-l {high}) ⊢l (_ —→⟨ V→M ⟩ _) v′ =
-  contradiction V→M (LVal⌿→ (v-cast (ir (inj id) (λ ()))))
-stamp⇒⋆-security {ℓ = low} (v-cast {ℓ} {l ℓ} {id (l ℓ)} (ir id x)) ⊢V ↠V′ v′ =
-  contradiction refl (recompute (¬? (_ ==? _)) x)
-stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {ℓ} {⋆} {_ ⨾ _ !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′
-  rewrite ℓ⋎low≡ℓ {ℓ} = ∣V†∣≡∣V′∣
-  where
-  ♥ : l ℓ ⟪ id (l ℓ) ⨾ ℓ ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l ℓ ⟪ id (l ℓ) ⨾ ℓ ! ⟫
-  ♥ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩ _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩ _ ∎
-  V† = l ℓ ⟪ id (l ℓ) ⨾ ℓ ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj id) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {⋆} {id (l low) ⨾ ↑ ⨾ high !} (ir (inj (up id)) _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩ _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩ _ ∎
-  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj (up id)) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = low} {V} {V′} (v-cast {low} {l high} {id (l low) ⨾ ↑} (ir (up id) _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l low ⟪ id (l low) ⨾ ↑ ⟫ ⟪ id (l high) ⨾ high ! ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj (up id)) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = high} (v-cast {c̅ = id (l low)} (ir id x)) (⊢cast ⊢l) ↠V′ v′ =
-  contradiction refl (recompute (¬? (_ ==? _)) x)
-stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id (l high)} (ir id _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l high ⟪ id (l high) ⟫ ⟪ id (l high) ⨾ high ! ⟫ —↠ₑ l high ⟪ id (l high) ⨾ high ! ⟫
-  ♥ = _ —→⟨ ξ β-id ⟩ _ ∎
-  V† = l high ⟪ id (l high) ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj id) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ low !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj (up id)) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = id _ ⨾ high !} (ir (inj id) _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l high ⟪ id (l high) ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l high ⟪ id (l high) ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
-      _ ∎
-  V† = l high ⟪ id (l high) ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj id) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ _ !} (ir (inj (up id)) _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫ ⟪ id ⋆ ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj (up id)) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-stamp⇒⋆-security {ℓ = high} {V} {V′} (v-cast {c̅ = _ ⨾ ↑} (ir (up id) _)) (⊢cast ⊢l) ↠V′ v′ =
-  ∣V†∣≡∣V′∣
-  where
-  ♥ : l low ⟪ id (l low) ⨾ ↑ ⟫ ⟪ id (l high) ⨾ high ! ⟫ —↠ₑ l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  ♥ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
-      _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
-      _ ∎
-  V† = l low ⟪ id (l low) ⨾ ↑ ⨾ high ! ⟫
-  v† : LVal V†
-  v† = v-cast (ir (inj (up id)) (λ ()))
-  eq : V† ≡ V′
-  eq = det-multₑ ♥ ↠V′ (success v†) (success v′)
-  ∣V†∣≡∣V′∣ : ∥ V† ∥ v† ≡ ∥ V′ ∥ v′
-  ∣V†∣≡∣V′∣ = security-eqₑ v† v′ eq
-
-
 stamp-cast-security : ∀ {g g′ ℓ V V′} {c̅ : CExpr (g ⋎̃ l ℓ) ⇒ g′}
   → (v : LVal V)
   → ⊢ V ⇐ g
@@ -229,32 +96,18 @@ stamp-cast-security {ℓ = ℓ} v ⊢V ↠V′ v′ =
   let leq = cast-security (stampₑ-LVal v) (stampₑ-wt v ⊢V) ↠V′ v′ in
   ≼-trans (≡→≼ eq) leq
 
-stamp⇒⋆-cast-security : ∀ {g g′ ℓ V V′} {c̅ : CExpr ⋆ ⇒ g′}
+stamp!-cast-security : ∀ {g g′ ℓ V V′} {c̅ : CExpr ⋆ ⇒ g′}
   → (v : LVal V)
   → ⊢ V ⇐ g
-  → stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ ⟪ c̅ ⟫ —↠ₑ V′
+  → stamp!ₑ V v ℓ ⟪ c̅ ⟫ —↠ₑ V′
   → (v′ : LVal V′)
     ---------------------------------
   → (∥ V ∥ v) ⋎ ℓ ≼ ∥ V′ ∥ v′
-stamp⇒⋆-cast-security {g} {g′} {ℓ} {V} {V′} {c̅} v ⊢V ↠V′ v′ =
-  case lexpr-sn (stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫) (⊢cast (stampₑ-wt v ⊢V)) of λ where
-  ⟨ W , ↠W , success w ⟩ →
-    let eq = stamp⇒⋆-security v ⊢V ↠W w in
-    let ⊢W = preserve-mult (⊢cast (stampₑ-wt v ⊢V)) ↠W in
-    case lexpr-sn (W ⟪ c̅ ⟫) (⊢cast ⊢W) of λ where
-    ⟨ W′ , ↠W′ , success w′ ⟩ →
-      let leq = cast-security w ⊢W ↠W′ w′ in
-      let r*  = ↠ₑ-trans (plug-congₑ ↠W) ↠W′ in
-      ≼-trans (≡→≼ eq) (subst (_ ≼_)
-        (security-eqₑ w′ v′ (det-multₑ r* ↠V′ (success w′) (success v′))) leq)
-    ⟨ blame q , ↠blameq , fail ⟩ →
-      let r* = ↠ₑ-trans (plug-congₑ ↠W) ↠blameq in
-      let eq = det-multₑ ↠V′ r* (success v′) fail in
-      case (subst LVal eq v′) of λ ()
-  ⟨ blame p , ↠blamep , fail ⟩ →
-    let r* = ↠ₑ-trans (plug-congₑ ↠blamep) (_ —→⟨ ξ-blame ⟩ _ ∎) in
-    let eq = det-multₑ ↠V′ r* (success v′) fail in
-    case (subst LVal eq v′) of λ ()
+stamp!-cast-security {g} {g′} {ℓ} {V} {V′} {c̅} v ⊢V ↠V′ v′ =
+  let eq  = stamp!ₑ-security {ℓ = ℓ} v in
+  let leq = cast-security (stamp!ₑ-LVal v) (stamp!ₑ-wt v ⊢V) ↠V′ v′ in
+  ≼-trans (≡→≼ eq) leq
+
 
 security-prec-mono : ∀ {g g′} {V W}
   → (v : LVal V)

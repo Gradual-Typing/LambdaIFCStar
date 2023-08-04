@@ -452,24 +452,24 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
          ⇐ ` Unit of l low ⊑ ` Unit of l low
 
 
-  ⊑-assign? : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′} {T T′ ĝ ĝ′ g g′} {p q}
+  ⊑-assign? : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′} {T T′ ĝ ĝ′} {p q}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
-         ⇐ Ref (T of ĝ) of g ⊑ Ref (T′ of ĝ′) of g′
+         ⇐ Ref (T of ĝ) of ⋆ ⊑ Ref (T′ of ĝ′) of ⋆
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
          ⇐ T of ĝ ⊑ T′ of ĝ′
       -------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ assign? L M T ĝ g p ⊑ assign? L′ M′ T′ ĝ′ g′ q
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ assign? L M T ĝ p ⊑ assign? L′ M′ T′ ĝ′ q
          ⇐ ` Unit of l low ⊑ ` Unit of l low
 
 
-  ⊑-assign?l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′} {T T′ ĝ ℓ̂ g ℓ} {p}
+  ⊑-assign?l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′} {T T′ ĝ ℓ̂ ℓ} {p}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
-         ⇐ Ref (T of ĝ) of g ⊑ Ref (T′ of l ℓ̂) of l ℓ
+         ⇐ Ref (T of ĝ) of ⋆ ⊑ Ref (T′ of l ℓ̂) of l ℓ
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
          ⇐ T of ĝ ⊑ T′ of l ℓ̂
     → ℓc ≼ ℓ̂ → ℓ ≼ ℓ̂
       -------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ assign? L M T ĝ g p ⊑ assign L′ M′ T′ ℓ̂ ℓ
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ assign? L M T ĝ p ⊑ assign L′ M′ T′ ℓ̂ ℓ
          ⇐ ` Unit of l low ⊑ ` Unit of l low
 
 

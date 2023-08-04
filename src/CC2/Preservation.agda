@@ -14,6 +14,7 @@ open import Function using (case_of_)
 
 open import Common.Utils
 open import Common.Types
+open import LabelExpr.Stamping
 open import LabelExpr.Security  {- reasoning about security levels of LExpr -}
 open import CC2.Statics
 open import CC2.Reduction
@@ -50,9 +51,9 @@ plug-inv (assign□ M _ ℓ̂ ℓ) (⊢assign ⊢L ⊢M x y) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢assign ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) x y) ⟩
 plug-inv (assign V □ _ _ ℓ̂ ℓ) (⊢assign ⊢L ⊢M x y) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢assign (relax-Σ ⊢L Σ′⊇Σ) ⊢M′ x y) ⟩
-plug-inv (assign?□ M x ĝ g x₁) (⊢assign? ⊢L ⊢M) =
+plug-inv (assign?□ M x ĝ p) (⊢assign? ⊢L ⊢M) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢assign? ⊢L′ (relax-Σ ⊢M Σ′⊇Σ)) ⟩
-plug-inv (assign? V □ x x₁ ĝ g x₂) (⊢assign? ⊢L ⊢M) =
+plug-inv (assign? V □ x x₁ ĝ p) (⊢assign? ⊢L ⊢M) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢assign? (relax-Σ ⊢L Σ′⊇Σ) ⊢M′) ⟩
 plug-inv (let□ _ _) (⊢let ⊢M ⊢N) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢let ⊢M′ (relax-Σ ⊢N Σ′⊇Σ)) ⟩
@@ -116,8 +117,8 @@ pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-cast v 
   rewrite eq | uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢prot! (⊢cast (substitution-pres ⊢N (⊢value-pc (cast-pres-mult (⊢cast ⊢V) ↠W) w)))
-                 (preserve-mult (⊢cast (⊢cast (stampₑ-wt vc† ⊢PC†))) ↠PC′)
-                 (stamp⇒⋆-cast-security vc† ⊢PC† ↠PC′ vc′) refl , ⊢μ ⟩
+                 (preserve-mult (⊢cast (stamp!ₑ-wt vc† ⊢PC†)) ↠PC′)
+                 (stamp!-cast-security vc† ⊢PC† ↠PC′ vc′) refl , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame-pc v vc† 𝓋 ⊢PC† ↠PC′) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app!-blame v vc† 𝓋 ⊢PC† ↠PC′ vc′ ↠blame) =
@@ -136,17 +137,15 @@ pres {Σ} vc ⊢PC (⊢if (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ (if-false-cast 
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢N (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
-                (if!-true-cast vc† 𝓋 ⊢PC† ↠PC′ vc′)
+                (if!-true-cast vc† 𝓋 ⊢PC† vc′)
   rewrite eq | uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
-    ⊢prot! ⊢M (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′)
-                 (≡→≼ (stamp⇒⋆-security vc† ⊢PC† ↠PC′ vc′)) refl , ⊢μ ⟩
+    ⊢prot! ⊢M (stamp!ₑ-wt vc† ⊢PC†) (≡→≼ (stamp!ₑ-security vc†)) refl , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ
-                (if!-false-cast vc† 𝓋 ⊢PC† ↠PC′ vc′)
+                (if!-false-cast vc† 𝓋 ⊢PC† vc′)
   rewrite eq | uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
-    ⊢prot! ⊢N (preserve-mult (⊢cast (stampₑ-wt vc† ⊢PC†)) ↠PC′)
-                 (≡→≼ (stamp⇒⋆-security vc† ⊢PC† ↠PC′ vc′)) refl , ⊢μ ⟩
+    ⊢prot! ⊢N (stamp!ₑ-wt vc† ⊢PC†) (≡→≼ (stamp!ₑ-security vc†)) refl , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢let ⊢V ⊢N) ⊢μ (β-let v) =
   ⟨ Σ , ⊇-refl Σ , substitution-pres ⊢N (⊢value-pc ⊢V v) , ⊢μ ⟩
 {- Reference creation -}
@@ -177,13 +176,10 @@ pres {Σ} vc ⊢PC (⊢assign (⊢addr hit) ⊢V _ _) ⊢μ (β-assign v) =
 pres {Σ} vc ⊢PC (⊢assign (⊢cast (⊢addr hit)) ⊢V _ _) ⊢μ (assign-cast v 𝓋 ↠W w) =
   let ⊢W = cast-pres-mult (⊢cast ⊢V) ↠W in
   ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢W w) w ⊢μ hit ⟩
-pres {Σ} vc ⊢PC (⊢assign? (⊢addr hit) ⊢V) ⊢μ (β-assign? v vc† ⊢PC† ↠PC′ vc′) =
-  ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢V v) v ⊢μ hit ⟩
 pres {Σ} vc ⊢PC (⊢assign? (⊢cast (⊢addr hit)) ⊢V) ⊢μ
                 (assign?-cast v vc† 𝓋 ⊢PC† ↠PC′ vc′ ↠W w) =
   let ⊢W = cast-pres-mult (⊢cast ⊢V) ↠W in
   ⟨ Σ , ⊇-refl Σ , ⊢const , ⊢μ-update (⊢value-pc ⊢W w) w ⊢μ hit ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign-blame               _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-blame-pc         _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame-pc  _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ (assign?-cast-blame _ _ _ _ _ _ _) = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
