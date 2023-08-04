@@ -26,17 +26,17 @@ data ⊢_⇒_ : Label → Label → Set where
   _??_ : ∀ ℓ (p : BlameLabel) → ⊢ ⋆ ⇒ l ℓ
 
 
-NotProj : ∀ (g₁ g₂ : Label) → Set
-NotProj g₁ g₂ = Concrete g₂ → Concrete g₁
+-- NotProj : ∀ (g₁ g₂ : Label) → Set
+-- NotProj g₁ g₂ = Concrete g₂ → Concrete g₁
 
 
-coerce-nproj : ∀ (g₁ g₂ : Label) → g₁ ≾ g₂ → NotProj g₁ g₂ → ⊢ g₁ ⇒ g₂
-coerce-nproj ⋆ ⋆ _ _ = id ⋆
-coerce-nproj (l ℓ) ⋆ ≾-⋆r _  = ℓ !
-coerce-nproj ⋆ (l ℓ) ≾-⋆l np = case np l of λ where ()
-coerce-nproj (l low)  (l low)  (≾-l l≼l) _ = id (l low)
-coerce-nproj (l low)  (l high) (≾-l l≼h) _ = ↑
-coerce-nproj (l high) (l high) (≾-l h≼h) _ = id (l high)
+-- coerce-nproj : ∀ (g₁ g₂ : Label) → g₁ ≾ g₂ → NotProj g₁ g₂ → ⊢ g₁ ⇒ g₂
+-- coerce-nproj ⋆ ⋆ _ _ = id ⋆
+-- coerce-nproj (l ℓ) ⋆ ≾-⋆r _  = ℓ !
+-- coerce-nproj ⋆ (l ℓ) ≾-⋆l np = case np l of λ where ()
+-- coerce-nproj (l low)  (l low)  (≾-l l≼l) _ = id (l low)
+-- coerce-nproj (l low)  (l high) (≾-l l≼h) _ = ↑
+-- coerce-nproj (l high) (l high) (≾-l h≼h) _ = id (l high)
 
 -- coerce : ∀ (g₁ g₂ : Label) → g₁ ≾ g₂ → BlameLabel → ⊢ g₁ ⇒ g₂
 -- coerce ⋆ (l ℓ)  g₁≾g₂ p = ℓ ?? p  {- requires a blame label when projecting -}
