@@ -210,3 +210,8 @@ prec-left-safe (⊑-cast (⊑-cast prec _ _) _ _) (_ —→⟨ ?-id _ ⟩ r*) =
   prec-left-safe prec r*
 prec-left-safe (⊑-cast (⊑-cast _ l⊑l _) _ ()) (_ —→⟨ ?-↑ _ ⟩ _)
 prec-left-safe (⊑-cast (⊑-cast _ l⊑l _) _ ()) (_ —→⟨ ?-⊥ _ ⟩ _ ∎)
+
+
+-- shorthands
+!⊑↑! : ⊢ id (l low) ⨾ (low !) ⊑ id (l low) ⨾ ↑ ⨾ (high !)
+!⊑↑! = ⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑

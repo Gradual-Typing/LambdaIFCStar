@@ -1,5 +1,6 @@
 module CoercionExpr.Stamping where
 
+open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; subst)
 
 open import Common.Utils
@@ -10,18 +11,33 @@ open import CoercionExpr.SecurityLevel
 open import CoercionExpr.Precision
 
 
-{- stampₗs a coercion expression -}
+{- Normal stamping on coercion values -}
+{- Stamps the target type of the coercion value and promotes its security by ℓ′ -}
 stampₗ : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → CVal c̅ → (ℓ′ : StaticLabel)
   → CExpr l ℓ ⇒ (g ⋎̃ l ℓ′)
-stampₗ {g = g} c̅ v low rewrite g⋎̃low≡g {g} = c̅
-stampₗ (id (l low)) id high = id (l low) ⨾ ↑
-stampₗ (id (l high)) id high = id (l high)
-stampₗ (id (l low) ⨾ low !) (inj id) high = id (l low) ⨾ ↑ ⨾ high !
-stampₗ (id (l high) ⨾ high !) (inj id) high = id (l high) ⨾ high !
+stampₗ {g = g} c̅                  v             low  rewrite g⋎̃low≡g {g} = c̅
+stampₗ (id (l low))               id            high = id (l low) ⨾ ↑
+stampₗ (id (l high))              id            high = id (l high)
+stampₗ (id (l low) ⨾ low !)       (inj id)      high = id (l low) ⨾ ↑ ⨾ high !
+stampₗ (id (l high) ⨾ high !)     (inj id)      high = id (l high) ⨾ high !
 stampₗ (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = id (l low) ⨾ ↑ ⨾ high !
-stampₗ (id (l low) ⨾ ↑) (up id) high = id (l low) ⨾ ↑
+stampₗ (id (l low) ⨾ ↑)          (up id)       high = id (l low) ⨾ ↑
+
+{- Injective stamping, which allows different security levels on less and more precise sides -}
+{- Returns an injected value whose security is promoted by ℓ′ -}
+stamp!ₗ : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → CVal c̅ → (ℓ′ : StaticLabel)
+  → CExpr l ℓ ⇒ ⋆
+stamp!ₗ {ℓ}  {⋆}    c̅              v             low  = c̅
+stamp!ₗ {ℓ₁} {l ℓ₂} c̅              v             low  = c̅ ⨾ ℓ₂ !
+stamp!ₗ (id (l low))               id            high = id (l low) ⨾ ↑ ⨾ high !
+stamp!ₗ (id (l high))              id            high = id (l high) ⨾ high !
+stamp!ₗ (id (l low) ⨾ low !)       (inj id)      high = id (l low) ⨾ ↑ ⨾ high !
+stamp!ₗ (id (l high) ⨾ high !)     (inj id)      high = id (l high) ⨾ high !
+stamp!ₗ (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = id (l low) ⨾ ↑ ⨾ high !
+stamp!ₗ (id (l low) ⨾ ↑)          (up id)       high = id (l low) ⨾ ↑ ⨾ high !
 
 
+{- Both stamping variants take a coercion value and return a coercion value -}
 stampₗ-CVal : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → (v : CVal c̅) → (ℓ′ : StaticLabel)
   → CVal (stampₗ c̅ v ℓ′)
 stampₗ-CVal {g = g} c̅ v low rewrite g⋎̃low≡g {g} = v
@@ -32,7 +48,19 @@ stampₗ-CVal (id (l high) ⨾ high !) (inj id) high = inj id
 stampₗ-CVal (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = inj (up id)
 stampₗ-CVal (id (l low) ⨾ ↑) (up id) high = up id
 
-{- coercion stampₗing is correct with respect to security level -}
+stamp!ₗ-CVal : ∀ {ℓ g} → (c̅ : CExpr l ℓ ⇒ g) → (v : CVal c̅) → (ℓ′ : StaticLabel)
+  → CVal (stamp!ₗ c̅ v ℓ′)
+stamp!ₗ-CVal {g = ⋆} c̅ v low = v
+stamp!ₗ-CVal {g = l _} c̅ v low = inj v
+stamp!ₗ-CVal (id (l low)) id high = inj (up id)
+stamp!ₗ-CVal (id (l high)) id high = inj id
+stamp!ₗ-CVal (id (l low) ⨾ low !) (inj id) high = inj (up id)
+stamp!ₗ-CVal (id (l high) ⨾ high !) (inj id) high = inj id
+stamp!ₗ-CVal (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = inj (up id)
+stamp!ₗ-CVal (id (l low) ⨾ ↑) (up id) high = inj (up id)
+
+
+{- Both stamping variants promote security by ℓ′ -}
 stampₗ-security : ∀ {ℓ g}
   → (c̅ : CExpr l ℓ ⇒ g)
   → (v : CVal c̅)
@@ -47,6 +75,22 @@ stampₗ-security (id (l low) ⨾ low !) (inj id) high = refl
 stampₗ-security (id (l high) ⨾ high !) (inj id) high = refl
 stampₗ-security (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = refl
 stampₗ-security (id (l low) ⨾ ↑) (up id) high = refl
+
+stamp!ₗ-security : ∀ {ℓ g}
+  → (c̅ : CExpr l ℓ ⇒ g)
+  → (v : CVal c̅)
+  → (ℓ′ : StaticLabel)
+    ---------------------------------------------------------
+  → (∥ c̅ ∥ v) ⋎ ℓ′ ≡ ∥ stamp!ₗ c̅ v ℓ′ ∥ (stamp!ₗ-CVal c̅ v ℓ′)
+stamp!ₗ-security {g = ⋆} c̅ v low rewrite ℓ⋎low≡ℓ {∥ c̅ ∥ v} = refl
+stamp!ₗ-security {g = l ℓ} c̅ id low rewrite ℓ⋎low≡ℓ {ℓ} = refl
+stamp!ₗ-security {g = l high} c̅ (up id) low = refl
+stamp!ₗ-security (id (l low)) id high = refl
+stamp!ₗ-security (id (l high)) id high = refl
+stamp!ₗ-security (id (l low) ⨾ low !) (inj id) high = refl
+stamp!ₗ-security (id (l high) ⨾ high !) (inj id) high = refl
+stamp!ₗ-security (id (l low) ⨾ ↑ ⨾ high !) (inj (up id)) high = refl
+stamp!ₗ-security (id (l low) ⨾ ↑) (up id) high = refl
 
 
 stampₗ-low : ∀ {ℓ g} {c̅ : CExpr l ℓ ⇒ g}
@@ -70,62 +114,107 @@ stamp-not-id (inj id) neq = neq
 stamp-not-id (inj (up id)) neq = neq
 stamp-not-id (up id) neq = neq
 
-stampₗ-pres-prec : ∀ {ℓ ℓ₁ ℓ₂ g₁ g₂} {c̅ : CExpr l ℓ₁ ⇒ g₁} {d̅ : CExpr l ℓ₂ ⇒ g₂}
+
+stampₗ-prec : ∀ {ℓ ℓ₁ g₁ g₂} {c̅ : CExpr l ℓ₁ ⇒ g₁} {d̅ : CExpr l ℓ₁ ⇒ g₂}
   → (v : CVal c̅)
   → (v′ : CVal d̅)
   → ⊢ c̅ ⊑ d̅
     ------------------------------------
   → ⊢ stampₗ c̅ v ℓ ⊑ stampₗ d̅ v′ ℓ
-stampₗ-pres-prec id id (⊑-id l⊑l) = prec-refl _
-stampₗ-pres-prec id (inj id) (⊑-castr _ l⊑l ())
-stampₗ-pres-prec id (inj (up id)) (⊑-castr _ l⊑l ())
-stampₗ-pres-prec id (up id) (⊑-castr _ l⊑l ())
-stampₗ-pres-prec {low} {low} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec id id (⊑-id l⊑l) = prec-refl _
+stampₗ-prec id (inj id) (⊑-castr _ l⊑l ())
+stampₗ-prec id (up id) (⊑-castr _ l⊑l ())
+stampₗ-prec {low} {low} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
   ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
-stampₗ-pres-prec {low} {high} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec {low} {high} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
   ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
-stampₗ-pres-prec {high} {low} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec {high} {low} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
   ⊑-castl (prec-refl _) l⊑l ⋆⊑
-stampₗ-pres-prec {high} {high} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec {high} {high} (inj id) id (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) =
   ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
-stampₗ-pres-prec (inj (up id)) id (⊑-castl (⊑-castl _ () _) l⊑l ⋆⊑)
-stampₗ-pres-prec (inj id) (inj id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) = prec-refl _
-stampₗ-pres-prec (inj (up id)) (inj id) (⊑-cast (⊑-castl _ () l⊑l) l⊑l ⋆⊑)
-stampₗ-pres-prec (inj id) (inj (up id)) (⊑-cast (⊑-castr _ () l⊑l) l⊑l ⋆⊑)
-stampₗ-pres-prec (inj (up id)) (inj (up id)) (⊑-cast (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) = prec-refl _
-stampₗ-pres-prec (inj id) (inj id) (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) = prec-refl _
-stampₗ-pres-prec {low} (inj id) (inj (up id)) (⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
+stampₗ-prec (inj id) (inj id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) = prec-refl _
+stampₗ-prec (inj (up id)) (inj (up id)) (⊑-cast (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) = prec-refl _
+stampₗ-prec (inj id) (inj id) (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) = prec-refl _
+stampₗ-prec {low} (inj id) (inj (up id)) (⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
   -- ⊢ id low ; low ! ⊑ id low ; ↑ ; high !
   ⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑
-stampₗ-pres-prec {high} (inj id) (inj (up id)) (⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
+stampₗ-prec {high} (inj id) (inj (up id)) (⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
   prec-refl _
-stampₗ-pres-prec (inj id) (inj (up id)) (⊑-castr (⊑-castl (⊑-castr _ () l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑)
-stampₗ-pres-prec {low} (inj id) (inj (up id)) (⊑-castr (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑) =
+stampₗ-prec {low} (inj id) (inj (up id)) _ =
   ⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑
-stampₗ-pres-prec {high} (inj id) (inj (up id)) (⊑-castr (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) ⋆⊑ ⋆⊑) =
+stampₗ-prec {high} (inj id) (inj (up id)) _ =
   prec-refl _
-stampₗ-pres-prec (inj (up id)) (inj id) (⊑-castr (⊑-castl (⊑-castl _ () l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑)
-stampₗ-pres-prec (inj (up id)) (inj (up id)) (⊑-castr c̅⊑d̅ _ _) = prec-refl _
-stampₗ-pres-prec {low} (inj id) (up id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
-stampₗ-pres-prec {high} (inj id) (up id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec (inj (up id)) (inj (up id)) (⊑-castr c̅⊑d̅ _ _) = prec-refl _
+stampₗ-prec {high} {low} (inj (up id)) (inj id) (⊑-castr (⊑-castl x () x₄) x₁ x₂)
+stampₗ-prec {low} {low} (inj (up id)) (inj id) (⊑-castr (⊑-castl x () x₄) x₁ x₂)
+stampₗ-prec {low} (inj id) (up id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
+stampₗ-prec {high} (inj id) (up id) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) =
   -- ⊢ id low ; ↑ ; high ! ⊑ id low ; ↑
   ⊑-castl (prec-refl _) l⊑l ⋆⊑
-stampₗ-pres-prec (inj id) (up id) (⊑-castl (⊑-castr _ () l⊑l) l⊑l ⋆⊑)
-stampₗ-pres-prec {low} (inj id) (up id) (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
+stampₗ-prec {low} (inj id) (up id) (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
   -- ⊢ id low ; low ! ⊑ id low ; ↑
   ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
-stampₗ-pres-prec {high} (inj id) (up id) (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
+stampₗ-prec {high} (inj id) (up id) (⊑-castr (⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑) =
   ⊑-castl (prec-refl _) l⊑l ⋆⊑
-stampₗ-pres-prec {low} (inj (up id)) (up id) (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec {low} (inj (up id)) (up id) (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) =
   ⊑-castl (prec-refl _) l⊑l ⋆⊑
-stampₗ-pres-prec {high} (inj (up id)) (up id) (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) =
+stampₗ-prec {high} (inj (up id)) (up id) (⊑-castl (⊑-cast (⊑-id l⊑l) l⊑l l⊑l) l⊑l ⋆⊑) =
   ⊑-castl (prec-refl _) l⊑l ⋆⊑
-stampₗ-pres-prec (inj (up id)) (up id) (⊑-castr (⊑-castl (⊑-castl _ l⊑l ()) _ _) _ _)
-stampₗ-pres-prec (up id) id (⊑-castl _ l⊑l ())
-stampₗ-pres-prec (up id) (inj id) (⊑-cast _ _ ())
-stampₗ-pres-prec (up id) (inj id) (⊑-castl _ () _)
-stampₗ-pres-prec (up id) (inj id) (⊑-castr _ _ ())
-stampₗ-pres-prec (up id) (inj (up id)) (⊑-cast _ _ ())
-stampₗ-pres-prec (up id) (inj (up id)) (⊑-castl _ () _)
-stampₗ-pres-prec (up id) (inj (up id)) (⊑-castr _ _ ())
-stampₗ-pres-prec (up id) (up id) c̅⊑d̅ = prec-refl _
+stampₗ-prec (inj (up id)) (up id) (⊑-castr (⊑-castl (⊑-castl _ l⊑l ()) _ _) _ _)
+stampₗ-prec (up id) id (⊑-castl _ l⊑l ())
+stampₗ-prec (up id) (inj id) (⊑-cast _ _ ())
+stampₗ-prec (up id) (inj id) (⊑-castl _ () _)
+stampₗ-prec (up id) (inj id) (⊑-castr _ _ ())
+stampₗ-prec (up id) (inj (up id)) (⊑-cast _ _ ())
+stampₗ-prec (up id) (inj (up id)) (⊑-castl _ () _)
+stampₗ-prec (up id) (inj (up id)) (⊑-castr _ _ ())
+stampₗ-prec (up id) (up id) c̅⊑d̅ = prec-refl _
+
+
+stamp!ₗ-prec : ∀ {ℓ ℓ₁ ℓ₂ g₁ g₂} {c̅ : CExpr l ℓ ⇒ g₁} {d̅ : CExpr l ℓ ⇒ g₂}
+  → (v  : CVal c̅)
+  → (v′ : CVal d̅)
+  → ⊢ c̅ ⊑ d̅
+  → ℓ₁ ≼ ℓ₂
+    ---------------------------------------
+  → ⊢ stamp!ₗ c̅ v ℓ₁ ⊑ stamp!ₗ d̅ v′ ℓ₂
+stamp!ₗ-prec id id (⊑-id l⊑l) l≼l = prec-refl _
+stamp!ₗ-prec {low} id id (⊑-id l⊑l) l≼h = !⊑↑!
+stamp!ₗ-prec {high} id id (⊑-id l⊑l) l≼h = prec-refl _
+stamp!ₗ-prec id id (⊑-id l⊑l) h≼h = prec-refl _
+stamp!ₗ-prec id (inj id) (⊑-castr _ l⊑l ()) _
+stamp!ₗ-prec id (up id) (⊑-castr _ l⊑l ()) _
+stamp!ₗ-prec {low} (inj id) id prec l≼l = ⊑-castr prec ⋆⊑ ⋆⊑
+stamp!ₗ-prec {high} (inj id) id prec l≼l = ⊑-castr prec ⋆⊑ ⋆⊑
+stamp!ₗ-prec {low} (inj id) id (⊑-castl prec l⊑l x₁) l≼h = !⊑↑!
+stamp!ₗ-prec {high} (inj id) id (⊑-castl prec l⊑l x₁) l≼h = prec-refl _
+stamp!ₗ-prec {low} (inj id) id (⊑-castl prec l⊑l x₁) h≼h = prec-refl _
+stamp!ₗ-prec {high} (inj id) id (⊑-castl prec l⊑l x₁) h≼h = prec-refl _
+stamp!ₗ-prec (inj id) (inj id) prec l≼l = prec-refl _
+stamp!ₗ-prec {low} (inj id) (inj id) prec l≼h = !⊑↑!
+stamp!ₗ-prec {high} (inj id) (inj id) prec l≼h = prec-refl _
+stamp!ₗ-prec (inj id) (inj id) prec h≼h = prec-refl _
+stamp!ₗ-prec (inj id) (inj (up id)) prec l≼l = !⊑↑!
+stamp!ₗ-prec (inj id) (inj (up id)) prec l≼h = !⊑↑!
+stamp!ₗ-prec (inj id) (inj (up id)) prec h≼h = prec-refl _
+stamp!ₗ-prec (inj id) (up id) prec l≼l = !⊑↑!
+stamp!ₗ-prec (inj id) (up id) prec l≼h = !⊑↑!
+stamp!ₗ-prec (inj id) (up id) prec h≼h = prec-refl _
+stamp!ₗ-prec (inj (up id)) id (⊑-castl prec () _) leq
+stamp!ₗ-prec (inj (up id)) (inj id) (⊑-castr (⊑-castl prec () _) _ _) leq
+stamp!ₗ-prec (inj (up id)) (inj (up id)) prec l≼l = prec-refl _
+stamp!ₗ-prec (inj (up id)) (inj (up id)) prec l≼h = prec-refl _
+stamp!ₗ-prec (inj (up id)) (inj (up id)) prec h≼h = prec-refl _
+stamp!ₗ-prec (inj (up id)) (up id) prec l≼l = prec-refl _
+stamp!ₗ-prec (inj (up id)) (up id) prec l≼h = prec-refl _
+stamp!ₗ-prec (inj (up id)) (up id) prec h≼h = prec-refl _
+stamp!ₗ-prec (up id) id (⊑-castl prec _ ()) leq
+stamp!ₗ-prec (up id) (inj id) (⊑-cast prec _ ()) leq
+stamp!ₗ-prec (up id) (inj id) (⊑-castl prec _ ()) leq
+stamp!ₗ-prec (up id) (inj id) (⊑-castr prec () _) leq
+stamp!ₗ-prec (up id) (inj (up id)) prec l≼l = prec-refl _
+stamp!ₗ-prec (up id) (inj (up id)) prec l≼h = prec-refl _
+stamp!ₗ-prec (up id) (inj (up id)) prec h≼h = prec-refl _
+stamp!ₗ-prec (up id) (up id) prec l≼l = prec-refl _
+stamp!ₗ-prec (up id) (up id) prec l≼h = prec-refl _
+stamp!ₗ-prec (up id) (up id) prec h≼h = prec-refl _
