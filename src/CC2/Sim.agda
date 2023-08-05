@@ -19,6 +19,7 @@ open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security
+open import LabelExpr.NSU
 open import CC2.Statics
 open import CC2.Reduction
 open import CC2.MultiStep
@@ -144,7 +145,7 @@ sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (assign-cast v
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (assign-blame v 𝓋 x) = {!!}
 
 sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-assign? L⊑L′ M⊑V′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC (assign?-cast v′ vc′† 𝓋′ ⊢PC′ ↠PC′₁ vc′₁ ↠W′ w′)
+    (⊑-assign? L⊑L′ M⊑V′) Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (assign?-cast v′ vc′† 𝓋′ ⊢PC′ ↠PC′₁ vc′₁ ↠W′ w′)
   rewrite uniq-LVal vc′† vc′
   with catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) L⊑L′
 ... | ⟨ V , v , L↠V , prec1 ⟩
@@ -154,9 +155,16 @@ sim {Γ} {Γ′} {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
 ... | V-cast V-addr (ir-ref 𝓋) | ⊑-cast (⊑-addr a b) c⊑c′ = {!!}
 ... | V-cast V-addr (ir-ref 𝓋) | ⊑-castl (⊑-castr (⊑-addr a b) x) y = {!!}
 ... | V-cast V-addr (ir-ref 𝓋) | ⊑-castr (⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑ℓ)) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′) =
-  let c̅⊑c̅′ = comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′ in
-  let ℓ≼ℓ′ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-  {!!}
+  ⟨ Σ , Σ′ , _ , {!!} , ♣ , ⊑-const , {!!} ⟩
+  where
+  c̅⊑c̅′ = comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′
+  ℓ≼ℓ′ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
+  ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
+  ♣ =
+    let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign PC⊑PC′ vc vc′ ℓ≼ℓ′ ↠PC′₁ vc′₁ in
+    trans-mult (plug-cong (assign?□ _ _ _ _) L↠V)
+        (trans-mult (plug-cong (assign? _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
+         (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 ⊢PC ↠PC₁ vc₁ {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎))
 
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (assign?-cast-blame-pc v vc′† 𝓋 x x₁) = {!!}
 sim vc vc′ M⊑M′ Γ⊑Γ′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (assign?-cast-blame v vc′† 𝓋 x x₁ x₂ x₃) = {!!}

@@ -26,7 +26,7 @@ open import LabelExpr.Stamping
 open import LabelExpr.GG
 
 
-sim-nsu-assign : ∀ {V V′ W′} {g g′ ℓ ℓ′ ℓ̂} {p}
+sim-nsu-assign : ∀ {V V′ W′} {g g′ ℓ ℓ′ ℓ̂} {p q}
   → ⊢ V ⊑ V′ ⇐ g ⊑ g′
   → (v  : LVal V )
   → (v′ : LVal V′)
@@ -34,11 +34,11 @@ sim-nsu-assign : ∀ {V V′ W′} {g g′ ℓ ℓ′ ℓ̂} {p}
   → stamp!ₑ V′ v′ ℓ′ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ W′
   → LVal W′
     ---------------------------------------------------------------------------
-  → ∃[ W ] (LVal W) × (stamp!ₑ V v ℓ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ —↠ₑ W)
-sim-nsu-assign {V} {V′} {W′} {g} {g′} {ℓ} {ℓ′} {ℓ̂} {p} V⊑V′ v v′ ℓ≼ℓ′ ↠W′ w′ =
+  → ∃[ W ] (LVal W) × (stamp!ₑ V v ℓ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l q ⟫ —↠ₑ W)
+sim-nsu-assign {V} {V′} {W′} {g} {g′} {ℓ} {ℓ′} {ℓ̂} {p} {q} V⊑V′ v v′ ℓ≼ℓ′ ↠W′ w′ =
   case sim-mult prec ↠W′ w′ of λ where
   ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
     where
-    prec : ⊢ stamp!ₑ V  v  ℓ  ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫        ⊑
+    prec : ⊢ stamp!ₑ V  v  ℓ  ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l q ⟫        ⊑
              stamp!ₑ V′ v′ ℓ′ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ ⇐ l ℓ̂ ⊑ l ℓ̂
-    prec = ⊑-cast (stamp!ₑ-prec v v′ V⊑V′ ℓ≼ℓ′) (prec-refl _)
+    prec = ⊑-cast (stamp!ₑ-prec v v′ V⊑V′ ℓ≼ℓ′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
