@@ -110,7 +110,7 @@ sim-cast {c̅ = c̅} {c̅′} M⊑M′ c̅⊑c̅′ (comp i′)
   let ♣ = ↠ₑ-trans (plug-congₑ M↠V)
                     (l ℓ ⟪ c̅₁ ⟫ ⟪ c̅ ⟫ —→⟨ comp i ⟩ _ ∎) in
   ⟨ l ℓ ⟪ c̅₁ ⨟ c̅ ⟫ , ♣ ,
-    ⊑-cast ⊑-l (comp-pres-prec c̅₁⊑c̅ᵢ c̅⊑c̅′) ⟩
+    ⊑-cast ⊑-l (comp-pres-⊑ c̅₁⊑c̅ᵢ c̅⊑c̅′) ⟩
 
 
 sim-castr : ∀ {g g₁′ g₂′} {M M′ N′} {c̅′ : CExpr g₁′ ⇒ g₂′}

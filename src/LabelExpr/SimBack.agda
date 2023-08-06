@@ -135,7 +135,7 @@ sim-back-cast {c̅ = c̅} {c̅′} M⊑M′ c̅⊑c̅′ (comp i)
   with prec-inv V⊑V′
 ... | ⟨ refl , c̅ᵢ⊑c̅ᵢ′ ⟩ =
   ⟨ l ℓ′ ⟪ c̅ᵢ′ ⨟ c̅′ ⟫ , ↠ₑ-trans (plug-congₑ M′↠V′) (_ —→⟨ comp i′ ⟩ _ ∎) ,
-    ⊑-cast ⊑-l (comp-pres-prec c̅ᵢ⊑c̅ᵢ′ c̅⊑c̅′) ⟩
+    ⊑-cast ⊑-l (comp-pres-⊑ c̅ᵢ⊑c̅ᵢ′ c̅⊑c̅′) ⟩
 
 sim-back-castl : ∀ {g₁ g₂ g′} {M M′ N} {c̅ : CExpr g₁ ⇒ g₂}
   → ⊢ M ⊑ M′ ⇐ g₁ ⊑ g′
