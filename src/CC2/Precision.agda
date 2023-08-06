@@ -206,6 +206,21 @@ coercion-prec-right→⊑ (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′) =
   ⟨ ⊑-ty g⊑g₁′ (⊑-fun gc⊑gc₁′ A⊑A′ B⊑B′) , ⊑-ty g⊑g₂′ (⊑-fun gc⊑gc₂′ A⊑C′ B⊑D′) ⟩
 
 
+comp-pres-prec : ∀ {A A′ B B′ C C′} {c : Cast A ⇒ B} {d : Cast B ⇒ C}
+                                 {c′ : Cast A′ ⇒ B′} {d′ : Cast B′ ⇒ C′}
+  → ⟨     c ⟩⊑⟨ c′      ⟩
+  → ⟨     d ⟩⊑⟨ d′      ⟩
+    -----------------------
+  → ⟨ c ⨟ d ⟩⊑⟨ c′ ⨟ d′ ⟩
+comp-pres-prec (⊑-base c̅⊑c̅′) (⊑-base d̅⊑d̅′) = ⊑-base (comp-pres-⊑ c̅⊑c̅′ d̅⊑d̅′)
+comp-pres-prec (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  ⊑-ref (comp-pres-prec c⊑A′ c⊑c′) (comp-pres-prec d⊑d′ d⊑A′)
+        (comp-pres-⊑ c̅⊑c̅′ c̅⊑g′)
+comp-pres-prec (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  ⊑-fun (comp-pres-⊑ d̅⊑gc′ d̅⊑d̅′) (comp-pres-prec c⊑A′ c⊑c′)
+        (comp-pres-prec d⊑d′ d⊑B′) (comp-pres-⊑ c̅⊑c̅′ c̅⊑g′)
+
+
 comp-pres-prec-ll : ∀ {A A′ B C} {c : Cast A ⇒ B} {d : Cast B ⇒ C}
   → ⟨     c ⟩⊑ A′
   → ⟨     d ⟩⊑ A′
@@ -681,6 +696,21 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-castr M⊑M′ A⊑c′) =
 {- Blame -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-blame ⊢M A⊑A′) =
   ⟨ ⊢M , ⊢blame , A⊑A′ ⟩
+
+
+cast-prec-inv : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {A A′ B B′ C C′ V W}
+                  {c : Cast A ⇒ B} {d : Cast A′ ⇒ B′}
+  → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⟨ c ⟩ ⊑ W ⟨ d ⟩ ⇐ C ⊑ C′
+  → RawValue V
+  → RawValue W
+    ---------------------------------------------------------------------------
+  → (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ W ⇐ A ⊑ A′) ×
+     (⟨ c ⟩⊑⟨ d ⟩) × (B ≡ C) × (B′ ≡ C′)
+cast-prec-inv (⊑-cast M⊑N c⊑d) v w = ⟨ M⊑N , c⊑d , refl , refl ⟩
+cast-prec-inv (⊑-castl (⊑-castr V⊑W A⊑d) c⊑B′) v w =
+  ⟨ V⊑W , comp-pres-prec-rl A⊑d c⊑B′ , refl , refl ⟩
+cast-prec-inv (⊑-castr (⊑-castl V⊑W c⊑A′) B⊑d) v w =
+  ⟨ V⊑W , comp-pres-prec-lr c⊑A′ B⊑d , refl , refl ⟩
 
 
 {- ● is not in the precision relation -}
