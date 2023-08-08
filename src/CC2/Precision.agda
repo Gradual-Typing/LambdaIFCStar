@@ -265,6 +265,36 @@ comp-pres-prec-lb (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) (⊑-fun d�
   ⊑-fun (comp-pres-⊑-bl d̅⊑d̅′ d̅⊑gc′) (comp-pres-prec-bl c⊑c′ c⊑A′)
         (comp-pres-prec-lb d⊑B′ d⊑d′) (comp-pres-⊑-lb c̅⊑g′ c̅⊑c̅′)
 
+comp-pres-prec-br : ∀ {A A′ B B′ C′} {c : Cast A ⇒ B}
+                      {c′ : Cast A′ ⇒ B′} {d′ : Cast B′ ⇒ C′}
+  → ⟨     c ⟩⊑⟨ c′ ⟩
+  →        B ⊑⟨ d′ ⟩
+    -----------------------
+  → ⟨ c ⟩⊑⟨ c′ ⨟ d′ ⟩
+
+comp-pres-prec-rb : ∀ {A A′ B B′ C′} {c : Cast A ⇒ B}
+                      {c′ : Cast A′ ⇒ B′} {d′ : Cast B′ ⇒ C′}
+  →        A ⊑⟨ c′ ⟩
+  → ⟨     c ⟩⊑⟨ d′ ⟩
+    -----------------------
+  → ⟨ c ⟩⊑⟨ c′ ⨟ d′ ⟩
+
+comp-pres-prec-br (⊑-base x) (⊑-base x′) = ⊑-base (comp-pres-⊑-br x x′)
+comp-pres-prec-br (⊑-ref x y z) (⊑-ref x′ y′ z′) =
+  ⊑-ref (comp-pres-prec-rb x′ x) (comp-pres-prec-br y y′)
+        (comp-pres-⊑-br z z′)
+comp-pres-prec-br (⊑-fun x y z w) (⊑-fun x′ y′ z′ w′) =
+  ⊑-fun (comp-pres-⊑-rb x′ x) (comp-pres-prec-rb y′ y)
+        (comp-pres-prec-br z z′) (comp-pres-⊑-br w w′)
+
+comp-pres-prec-rb (⊑-base x) (⊑-base x′) = ⊑-base (comp-pres-⊑-rb x x′)
+comp-pres-prec-rb (⊑-ref x y z) (⊑-ref x′ y′ z′) =
+  ⊑-ref (comp-pres-prec-br x′ x) (comp-pres-prec-rb y y′)
+        (comp-pres-⊑-rb z z′)
+comp-pres-prec-rb (⊑-fun x y z w) (⊑-fun x′ y′ z′ w′) =
+  ⊑-fun (comp-pres-⊑-br x′ x) (comp-pres-prec-br y′ y)
+        (comp-pres-prec-rb z z′) (comp-pres-⊑-rb w w′)
+
 comp-pres-prec-rl : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′}
   → A ⊑⟨ c′ ⟩
   → ⟨ c ⟩⊑ B′
