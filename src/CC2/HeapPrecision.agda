@@ -22,17 +22,17 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 open import Memory.HeapContext
 
 
--- ⊑μ-update : ∀ {Σ Σ′} {S T V W} {μ μ′} {n ℓ}
---   → Σ ; Σ′ ⊢ μ ⊑ μ′
---   → [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ W ⇐ S of l ℓ ⊑ T of l ℓ
---   → (v : Value V)
---   → (w : Value W)
---   -- → lookup-Σ Σ  (a⟦ ℓ ⟧ n) ≡ just S  {- updating a -}
---   -- → lookup-Σ Σ′ (a⟦ ℓ ⟧ n) ≡ just T
---     -------------------------------------------------------------------------
---   → Σ ; Σ′ ⊢ cons-μ (a⟦ ℓ ⟧ n) V v μ ⊑ cons-μ (a⟦ ℓ ⟧ n) W w μ′
--- ⊑μ-update {ℓ = low}  ⟨ μᴸ⊑μᴸ′ , μᴴ⊑μᴴ′ ⟩ V⊑W v w = ⟨ ⊑-∷ μᴸ⊑μᴸ′ V⊑W v w , μᴴ⊑μᴴ′ ⟩
--- ⊑μ-update {ℓ = high} ⟨ μᴸ⊑μᴸ′ , μᴴ⊑μᴴ′ ⟩ V⊑W v w = ⟨ μᴸ⊑μᴸ′ , ⊑-∷ μᴴ⊑μᴴ′ V⊑W v w ⟩
+⊑μ-update : ∀ {Σ Σ′} {S T V W} {μ μ′} {n ℓ}
+  → Σ ; Σ′ ⊢ μ ⊑ μ′
+  → [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ W ⇐ S of l ℓ ⊑ T of l ℓ
+  → (v : Value V)
+  → (w : Value W)
+  → lookup-Σ Σ  (a⟦ ℓ ⟧ n) ≡ just S  {- updating a -}
+  → lookup-Σ Σ′ (a⟦ ℓ ⟧ n) ≡ just T
+    -------------------------------------------------------------------------
+  → Σ ; Σ′ ⊢ cons-μ (a⟦ ℓ ⟧ n) V v μ ⊑ cons-μ (a⟦ ℓ ⟧ n) W w μ′
+⊑μ-update {ℓ = low}  ⟨ μᴸ⊑μᴸ′ , μᴴ⊑μᴴ′ ⟩ V⊑W v w a b = ⟨ ⊑-∷ μᴸ⊑μᴸ′ V⊑W v w a b , μᴴ⊑μᴴ′ ⟩
+⊑μ-update {ℓ = high} ⟨ μᴸ⊑μᴸ′ , μᴴ⊑μᴴ′ ⟩ V⊑W v w a b = ⟨ μᴸ⊑μᴸ′ , ⊑-∷ μᴴ⊑μᴴ′ V⊑W v w a b ⟩
 
 
 private

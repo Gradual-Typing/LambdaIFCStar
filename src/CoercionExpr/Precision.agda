@@ -215,3 +215,6 @@ prec-left-safe (⊑-cast (⊑-cast _ l⊑l _) _ ()) (_ —→⟨ ?-⊥ _ ⟩ _ �
 -- shorthands
 !⊑↑! : ⊢ id (l low) ⨾ (low !) ⊑ id (l low) ⨾ ↑ ⨾ (high !)
 !⊑↑! = ⊑-castr (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑) ⋆⊑ ⋆⊑
+
+↑!⊑↑ : ⊢ id (l low) ⨾ ↑ ⨾ (high !) ⊑ id (l low) ⨾ ↑
+↑!⊑↑ = ⊑-castl (prec-refl _) l⊑l ⋆⊑
