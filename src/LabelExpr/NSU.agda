@@ -26,6 +26,23 @@ open import LabelExpr.Stamping
 open import LabelExpr.GG
 
 
+sim-nsu-ref : ∀ {V V′ W′} {ℓ} {p q}
+  → ⊢ V ⊑ V′ ⇐ ⋆ ⊑ ⋆
+  → (v  : LVal V )
+  → (v′ : LVal V′)
+  → V′ ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ —↠ₑ W′
+  → LVal W′
+    -------------------------------------------------------------
+  → ∃[ W ] (LVal W) × (V ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l q ⟫ —↠ₑ W)
+sim-nsu-ref {V} {V′} {W′} {ℓ} {p} {q} V⊑V′ v v′ ↠W′ w′ =
+  case sim-mult prec ↠W′ w′ of λ where
+  ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
+    where
+    prec : ⊢ V  ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l q ⟫        ⊑
+             V′ ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ ⇐ l ℓ ⊑ l ℓ
+    prec = ⊑-cast V⊑V′ (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+
+
 sim-nsu-assign : ∀ {V V′ W′} {g g′ ℓ ℓ′ ℓ̂} {p q}
   → ⊢ V ⊑ V′ ⇐ g ⊑ g′
   → (v  : LVal V )

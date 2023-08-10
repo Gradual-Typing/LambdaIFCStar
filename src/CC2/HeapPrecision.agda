@@ -11,7 +11,7 @@ open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; subst; subst₂; sym)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; cong; subst; subst₂; sym)
 open import Function using (case_of_)
 
 open import Syntax hiding (_⨟_)
@@ -78,3 +78,24 @@ private
         ([] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ W ⇐ S of l ℓ ⊑ T of l ℓ)
 ⊑μ-lookup {w = w} {ℓ = low}  ⟨ μ⊑μ′ , _ ⟩ = ⊑μ-lookup-low  {w = w} μ⊑μ′
 ⊑μ-lookup {w = w} {ℓ = high} ⟨ _ , μ⊑μ′ ⟩ = ⊑μ-lookup-high {w = w} μ⊑μ′
+
+private
+  ⊑μ-length-low : ∀ {Σ Σ′} {μ μ′}
+    → Σ ; Σ′ ; low ⊢ μ ⊑ μ′
+    → length μ′ ≡ length μ
+  ⊑μ-length-low ⊑-∅ = refl
+  ⊑μ-length-low (⊑-∷ μ⊑μ′ _ _ _ _ _) = cong suc (⊑μ-length-low μ⊑μ′)
+
+  ⊑μ-length-high : ∀ {Σ Σ′} {μ μ′}
+    → Σ ; Σ′ ; high ⊢ μ ⊑ μ′
+    → length μ′ ≡ length μ
+  ⊑μ-length-high ⊑-∅ = refl
+  ⊑μ-length-high (⊑-∷ μ⊑μ′ _ _ _ _ _) = cong suc (⊑μ-length-high μ⊑μ′)
+
+⊑μ-fresh : ∀ {Σ Σ′} {μ μ′} {n ℓ}
+  → Σ ; Σ′ ⊢ μ ⊑ μ′
+  → a⟦ ℓ ⟧ n FreshIn μ′
+    -------------------------------------------------------------------------
+  → a⟦ ℓ ⟧ n FreshIn μ
+⊑μ-fresh {ℓ = low}  ⟨ μ⊑μ′ , _ ⟩ fresh rewrite ⊑μ-length-low  μ⊑μ′ = fresh
+⊑μ-fresh {ℓ = high} ⟨ _ , μ⊑μ′ ⟩ fresh rewrite ⊑μ-length-high μ⊑μ′ = fresh

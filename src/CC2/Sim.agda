@@ -29,7 +29,7 @@ open import CC2.HeapPrecision
 open import CC2.CatchUp
 open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
-open import Memory.Heap Term Value
+open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
@@ -132,7 +132,19 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (if!-true-cast vc′† �
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (if!-false-cast vc′† 𝓋 x vc″) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (β-let x) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (ref v x) = {!!}
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (ref? v x x₁ x₂) = {!!}
+
+{- ref? -}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+    (⊑-ref? {T = T} {T′} {ℓ} M⊑V′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (ref? {n = n} v′ fresh ↠PC′₁ vc′₁)
+  with catchup {μ = μ} {PC} v′ M⊑V′
+... | ⟨ V , v , M↠V , V⊑V′ ⟩ =
+  let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-ref PC⊑PC′ vc vc′ ↠PC′₁ vc′₁ in
+  ⟨  cons-Σ (a⟦ ℓ ⟧ n) T Σ , cons-Σ (a⟦ ℓ ⟧ n) T′ Σ′ , _ , {!!} ,
+    trans-mult (plug-cong (ref?⟦ _ ⟧□ _) M↠V)
+               (_ ∣ _ ∣ _ —→⟨ ref? v (⊑μ-fresh μ⊑μ′ fresh) ↠PC₁ vc₁ ⟩ _ ∣ _ ∣ _ ∎) ,
+    ⊑-addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ′) ,
+    {!!} ⟩
+
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ (ref?-blame-pc v x) = {!!}
 
 {- deref -}
