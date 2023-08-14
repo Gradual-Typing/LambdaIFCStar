@@ -138,10 +138,16 @@ postulate
   ⟨ wf-relaxᴸ V v wf , wf-relaxᴸ W w wf′ ,
     V₁ , v₁ , W₁ , w₁ , eq₁ , eq₁′ ,
     prec-relax-Σ V₁⊑W₁ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ ⟩
-⊑μ-new {Σ} {Σ′} {S} {T} {n = n₁} {low} Σ⊑Σ′ μ⊑μ′ V⊑W v w fresh fresh′ n high =
-  -- let Σ₂⊇Σ₁   = (⊇-fresh (a⟦ low ⟧ n) S {!!} fresh) in
-  -- let Σ₂′⊇Σ₁′ = (⊇-fresh (a⟦ low ⟧ n) T {!!} fresh′) in
-  {!!}
+⊑μ-new {Σ} {Σ′} {S} {T} {V} {W} {μ} {μ′} {n₁} {low}
+       Σ⊑Σ′ μ⊑μ′ V⊑W v w fresh fresh′ n high eq eq′ =
+  case μ⊑μ′ n high eq eq′ of λ where
+  ⟨ wfᴴ n<len , wfᴴ n<len′ , V₁ , v₁ , W₁ , w₁ , eq₁ , eq₁′ , V₁⊑W₁ ⟩ →
+    let ⟨ ⊢μ , ⊢μ′ ⟩ = ⊑μ→⊢μ Σ⊑Σ′ μ⊑μ′ in
+    let Σ₂⊇Σ₁   = ⊇-fresh (a⟦ low ⟧ n₁) S ⊢μ  fresh  in
+    let Σ₂′⊇Σ₁′ = ⊇-fresh (a⟦ low ⟧ n₁) T ⊢μ′ fresh′ in
+    ⟨ wfᴴ n<len , wfᴴ n<len′ ,
+      V₁ , v₁ , W₁ , w₁ , eq₁ , eq₁′ ,
+      prec-relax-Σ V₁⊑W₁ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ ⟩
 ⊑μ-new {Σ} {Σ′} {S} {T} {n = n} {high} Σ⊑Σ′ μ⊑μ′ V⊑W v w fresh fresh′ = {!!}
   -- let Σ₂⊇Σ₁   = (⊇-fresh (a⟦ low ⟧ n) S {!!} fresh) in
   -- let Σ₂′⊇Σ₁′ = (⊇-fresh (a⟦ low ⟧ n) T {!!} fresh′) in
