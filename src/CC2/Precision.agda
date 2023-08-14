@@ -48,16 +48,45 @@ data _⊑ₕ_ : (Σ Σ′ : HalfHeapContext) → Set where
 _⊑ₘ_ : (Σ Σ′ : HeapContext) → Set
 ⟨ Σᴸ , Σᴴ ⟩ ⊑ₘ ⟨ Σᴸ′ , Σᴴ′ ⟩ = (Σᴸ ⊑ₕ Σᴸ′) × (Σᴴ ⊑ₕ Σᴴ′)
 
-⊑ₕ→⊑ : ∀ {Σ Σ′ T T′ n}
+⊑ₕ→⊑-forward : ∀ {Σ Σ′ T n}
   → Σ ⊑ₕ Σ′
   → find _≟_ Σ  n ≡ just T
-  → find _≟_ Σ′ n ≡ just T′
-  → T ⊑ᵣ T′
-⊑ₕ→⊑ {⟨ n₀ , T ⟩ ∷ _} {⟨ n₀ , T′ ⟩ ∷ _} {n = n} (⊑-∷ T⊑T′ Σ⊑Σ′) eq eq′
+    --------------------------------------
+  → ∃[ T′ ] (find _≟_ Σ′ n ≡ just T′) × (T ⊑ᵣ T′)
+⊑ₕ→⊑-forward {⟨ n₀ , T ⟩ ∷ _} {⟨ n₀ , T′ ⟩ ∷ _} {n = n} (⊑-∷ T⊑T′ Σ⊑Σ′) eq
   with n ≟ n₀
-... | no _ = ⊑ₕ→⊑ Σ⊑Σ′ eq eq′
-... | yes refl with eq | eq′
-... | refl | refl = T⊑T′
+... | no _ = ⊑ₕ→⊑-forward Σ⊑Σ′ eq
+... | yes refl with eq
+... | refl = ⟨ _ , refl , T⊑T′ ⟩
+
+⊑ₘ→⊑-forward : ∀ {Σ Σ′ T n ℓ̂}
+  → Σ ⊑ₘ Σ′
+  → let a = a⟦ ℓ̂ ⟧ n in
+     lookup-Σ Σ  a ≡ just T
+  ------------------------------
+  → ∃[ T′ ] (lookup-Σ Σ′ a ≡ just T′) × (T ⊑ᵣ T′)
+⊑ₘ→⊑-forward {ℓ̂ = low}  ⟨ Σᴸ⊑ , _ ⟩ Σa≡T = ⊑ₕ→⊑-forward Σᴸ⊑ Σa≡T
+⊑ₘ→⊑-forward {ℓ̂ = high} ⟨ _ , Σᴴ⊑ ⟩ Σa≡T = ⊑ₕ→⊑-forward Σᴴ⊑ Σa≡T
+
+⊑ₕ→⊑-backward : ∀ {Σ Σ′ T′ n}
+  → Σ ⊑ₕ Σ′
+  → find _≟_ Σ′ n ≡ just T′
+    --------------------------------------
+  → ∃[ T ] (find _≟_ Σ n ≡ just T) × (T ⊑ᵣ T′)
+⊑ₕ→⊑-backward {⟨ n₀ , T ⟩ ∷ _} {⟨ n₀ , T′ ⟩ ∷ _} {n = n} (⊑-∷ T⊑T′ Σ⊑Σ′) eq
+  with n ≟ n₀
+... | no _ = ⊑ₕ→⊑-backward Σ⊑Σ′ eq
+... | yes refl with eq
+... | refl = ⟨ _ , refl , T⊑T′ ⟩
+
+⊑ₘ→⊑-backward : ∀ {Σ Σ′ T′ n ℓ̂}
+  → Σ ⊑ₘ Σ′
+  → let a = a⟦ ℓ̂ ⟧ n in
+     lookup-Σ Σ′ a ≡ just T′
+  ------------------------------
+  → ∃[ T ] (lookup-Σ Σ a ≡ just T) × (T ⊑ᵣ T′)
+⊑ₘ→⊑-backward {ℓ̂ = low}  ⟨ Σᴸ⊑ , _ ⟩ Σa≡T = ⊑ₕ→⊑-backward Σᴸ⊑ Σa≡T
+⊑ₘ→⊑-backward {ℓ̂ = high} ⟨ _ , Σᴴ⊑ ⟩ Σa≡T = ⊑ₕ→⊑-backward Σᴴ⊑ Σa≡T
 
 ⊑ₘ→⊑ : ∀ {Σ Σ′ T T′ n ℓ̂}
   → Σ ⊑ₘ Σ′
@@ -65,9 +94,10 @@ _⊑ₘ_ : (Σ Σ′ : HeapContext) → Set
      lookup-Σ Σ  a ≡ just T
   → lookup-Σ Σ′ a ≡ just T′
   → T ⊑ᵣ T′
-⊑ₘ→⊑ {ℓ̂ = low}  ⟨ Σᴸ⊑ , _ ⟩ Σa≡T Σ′a≡T′ = ⊑ₕ→⊑ Σᴸ⊑ Σa≡T Σ′a≡T′
-⊑ₘ→⊑ {ℓ̂ = high} ⟨ _ , Σᴴ⊑ ⟩ Σa≡T Σ′a≡T′ = ⊑ₕ→⊑ Σᴴ⊑ Σa≡T Σ′a≡T′
-
+⊑ₘ→⊑ {Σ} {Σ′} {T} {T′} {n} {ℓ̂} Σ⊑Σ′ eq eq′
+  with ⊑ₘ→⊑-forward {ℓ̂ = ℓ̂} Σ⊑Σ′ eq
+... | ⟨ T″ , eq″ , T⊑T″ ⟩ with trans (sym eq′) eq″
+... | refl = T⊑T″
 
 infix 4 ⟨_⟩⊑⟨_⟩
 infix 4 ⟨_⟩⊑_
@@ -751,24 +781,6 @@ _⋤● : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′} M
 ●⋤_ : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′} M
   → ¬ (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ ● ⊑ M ⇐ A ⊑ A′)
 (●⋤ (M ⟨ c ⟩)) (⊑-castr ●⊑M A⊑c) = (●⋤ M) ●⊑M
-
-
-data _;_;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) → ∀ ℓ → (μ μ′ : HalfHeap) → Set where
-
-  ⊑-∅ : ∀ {Σ Σ′ ℓ} → Σ ; Σ′ ; ℓ ⊢ [] ⊑ []
-
-  ⊑-∷ : ∀ {Σ Σ′ ℓ} {μ μ′ n} {V V′} {T T′}
-    → Σ ; Σ′ ; ℓ ⊢ μ ⊑ μ′
-    → [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ V′ ⇐ T of l ℓ ⊑ T′ of l ℓ
-    → (v  : Value V )
-    → (v′ : Value V′)
-    → lookup-Σ Σ  (a⟦ ℓ ⟧ n) ≡ just T
-    → lookup-Σ Σ′ (a⟦ ℓ ⟧ n) ≡ just T′
-      --------------------------------------------------------------------------------
-    → Σ ; Σ′ ; ℓ ⊢ (⟨ n , V & v ⟩ ∷ μ) ⊑ (⟨ n , V′ & v′ ⟩ ∷ μ′)
-
-_;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) (μ μ′ : Heap) → Set
-Σ ; Σ′ ⊢ ⟨ μᴸ , μᴴ ⟩ ⊑ ⟨ μᴸ′ , μᴴ′ ⟩ = (Σ ; Σ′ ; low ⊢ μᴸ ⊑ μᴸ′) × (Σ ; Σ′ ; high ⊢ μᴴ ⊑ μᴴ′)
 
 
 value-⊑-pc : ∀ {Γ Γ′ Σ Σ′ gc₁ gc₁′ gc₂ gc₂′ ℓv₁ ℓv₁′ ℓv₂ ℓv₂′} {A B} {V W}

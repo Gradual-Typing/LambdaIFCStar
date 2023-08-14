@@ -24,12 +24,12 @@ data WFAddr_In_ : Addr → Heap → Set where
     → WFAddr a⟦ high ⟧ n In ⟨ μᴸ , μᴴ ⟩
 
 {- Relax by extending the heap -}
-wf-relaxᴸ : ∀ {n m μᴸ μᴴ} V v
+wf-relaxᴸ : ∀ {n m μᴸ μᴴ μᴴ′} V v
   → WFAddr (a⟦ low ⟧ n) In ⟨                 μᴸ , μᴴ ⟩
-  → WFAddr (a⟦ low ⟧ n) In ⟨ ⟨ m , V & v ⟩ ∷ μᴸ , μᴴ ⟩
+  → WFAddr (a⟦ low ⟧ n) In ⟨ ⟨ m , V & v ⟩ ∷ μᴸ , μᴴ′ ⟩
 wf-relaxᴸ {μᴸ = μᴸ} V v (wfᴸ n<len) = wfᴸ (<-trans n<len (n<1+n (length μᴸ)))
 
-wf-relaxᴴ : ∀ {n m μᴸ μᴴ} V v
-  → WFAddr (a⟦ high ⟧ n) In ⟨ μᴸ ,                 μᴴ ⟩
-  → WFAddr (a⟦ high ⟧ n) In ⟨ μᴸ , ⟨ m , V & v ⟩ ∷ μᴴ ⟩
+wf-relaxᴴ : ∀ {n m μᴸ μᴴ μᴸ′} V v
+  → WFAddr (a⟦ high ⟧ n) In ⟨ μᴸ  ,                 μᴴ ⟩
+  → WFAddr (a⟦ high ⟧ n) In ⟨ μᴸ′ , ⟨ m , V & v ⟩ ∷ μᴴ ⟩
 wf-relaxᴴ {μᴴ = μᴴ} V v (wfᴴ n<len) = wfᴴ (<-trans n<len (n<1+n (length μᴴ)))
