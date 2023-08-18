@@ -157,7 +157,31 @@ postulate
     ⟨ wfᴸ n<len , wfᴸ n<len′ ,
       V₁ , v₁ , W₁ , w₁ , eq₁ , eq₁′ ,
       prec-relax-Σ V₁⊑W₁ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ ⟩
-⊑μ-new {Σ} {Σ′} {S} {T} {n = n₁} {high} Σ⊑Σ′ μ⊑μ′ V⊑W v w fresh fresh′ n high eq eq′ = {!!}
+⊑μ-new {Σ} {Σ′} {S} {T} {V} {W} {μ} {μ′} {n₁} {high}
+       Σ⊑Σ′ μ⊑μ′ V⊑W v w fresh fresh′ n high eq eq′
+  with n ≟ n₁
+... | yes refl =
+  let ⟨ ⊢μ , ⊢μ′ ⟩ = ⊑μ→⊢μ Σ⊑Σ′ μ⊑μ′ in
+  let Σ₂⊇Σ₁   = ⊇-fresh (a⟦ high ⟧ n) S ⊢μ  fresh  in
+  let Σ₂′⊇Σ₁′ = ⊇-fresh (a⟦ high ⟧ n) T ⊢μ′ fresh′ in
+  case ⟨ eq , eq′ ⟩ of λ where
+    ⟨ refl , refl ⟩ →
+      ⟨ wfᴴ n₁<1+len , wfᴴ n₁<1+len′ ,
+        V , v , W , w , refl , refl ,
+        prec-relax-Σ V⊑W Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ ⟩
+  where
+  n₁<1+len : n₁ < 1 + (length (proj₂ μ))
+  n₁<1+len rewrite fresh = ≤-refl
+  n₁<1+len′ : n₁ < 1 + (length (proj₂ μ′))
+  n₁<1+len′ rewrite fresh′ = ≤-refl
+... | no _ =
+  let ⟨ wf , wf′ , V₁ , v₁ , W₁ , w₁ , eq₁ , eq₁′ , V₁⊑W₁ ⟩ = μ⊑μ′ n high eq eq′ in
+  let ⟨ ⊢μ , ⊢μ′ ⟩ = ⊑μ→⊢μ Σ⊑Σ′ μ⊑μ′ in
+  let Σ₂⊇Σ₁   = ⊇-fresh (a⟦ high ⟧ n₁) S ⊢μ  fresh  in
+  let Σ₂′⊇Σ₁′ = ⊇-fresh (a⟦ high ⟧ n₁) T ⊢μ′ fresh′ in
+  ⟨ wf-relaxᴴ V v wf , wf-relaxᴴ W w wf′ ,
+    V₁ , v₁ , W₁ , w₁ , eq₁ , eq₁′ ,
+    prec-relax-Σ V₁⊑W₁ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ ⟩
 
 
 -- ⊑μ-update : ∀ {Σ Σ′} {S T V W} {μ μ′} {n ℓ}
