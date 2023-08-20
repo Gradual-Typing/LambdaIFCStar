@@ -75,31 +75,44 @@ _;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) (μ μ′ : Heap) → Set
     let ⟨ ⊢V , ⊢V′ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ V⊑V′ in
     ⟨ wf′ , V′ , v′ , μ′a≡V′ , ⊢V′ ⟩
 
-postulate
-  prec-relax-Σ : ∀ {Σ₁ Σ₂ Σ₁′ Σ₂′} {A B} {M N}
-    → [] ; [] ∣ Σ₁ ; Σ₁′ ∣ l low ; l low ∣ low ; low ⊢ M ⊑ N ⇐ A ⊑ B
-    → Σ₂  ⊇ Σ₁
-    → Σ₂′ ⊇ Σ₁′
-      -----------------------------
-    → [] ; [] ∣ Σ₂ ; Σ₂′ ∣ l low ; l low ∣ low ; low ⊢ M ⊑ N ⇐ A ⊑ B
--- prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} M⊑N Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
 
--- (⊑-addr {n = n} {ℓ} {ℓ̂} a b) (V-raw V-addr) (V-raw V-addr) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
---   ⊑-addr (Σ₂⊇Σ₁ (a⟦ ℓ̂ ⟧ n) a) (Σ₂′⊇Σ₁′ (a⟦ ℓ̂ ⟧ n) b)
--- prec-relax-Σ (⊑-lam x y z) (V-raw V-ƛ) (V-raw V-ƛ) a b = ⊑-lam x y {!z!}
--- prec-relax-Σ V⊑W (V-raw V-const) (V-raw V-const) a b = {!!}
--- prec-relax-Σ (⊑-castr V⊑W x) (V-raw v) (V-cast w i′) a b =
---   ⊑-castr (prec-relax-Σ V⊑W (V-raw v) (V-raw w) a b) x
--- prec-relax-Σ (⊑-castl V⊑W x) (V-cast v i) (V-raw w) a b =
---   ⊑-castl (prec-relax-Σ V⊑W (V-raw v) (V-raw w) a b) x
--- prec-relax-Σ (⊑-cast V⊑W x) (V-cast v i) (V-cast w i′) a b =
---   ⊑-cast (prec-relax-Σ V⊑W (V-raw v) (V-raw w) a b) x
--- prec-relax-Σ (⊑-castl V⊑W x) (V-cast v i) (V-cast w i′) a b =
---   ⊑-castl (prec-relax-Σ V⊑W (V-raw v) (V-cast w i′) a b) x
--- prec-relax-Σ (⊑-castr V⊑W x) (V-cast v i) (V-cast w i′) a b =
---   ⊑-castr (prec-relax-Σ V⊑W (V-cast v i) (V-raw w) a b) x
--- prec-relax-Σ V⊑W V-● w = contradiction V⊑W (●⋤ _)
--- prec-relax-Σ V⊑W v V-● = contradiction V⊑W (_ ⋤●)
+prec-relax-Σ : ∀ {Γ Γ′ Σ₁ Σ₂ Σ₁′ Σ₂′ gc gc′ ℓv ℓv′} {A B} {M N}
+  → Γ ; Γ′ ∣ Σ₁ ; Σ₁′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ N ⇐ A ⊑ B
+  → Σ₂  ⊇ Σ₁
+  → Σ₂′ ⊇ Σ₁′
+    -----------------------------
+  → Γ ; Γ′ ∣ Σ₂ ; Σ₂′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ N ⇐ A ⊑ B
+prec-relax-Σ (⊑-var x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-var x y
+prec-relax-Σ ⊑-const Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-const
+prec-relax-Σ (⊑-addr {n = n} {ℓ̂ = ℓ̂} eq eq′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-addr (Σ₂⊇Σ₁ (a⟦ ℓ̂ ⟧ n) eq) (Σ₂′⊇Σ₁′ (a⟦ ℓ̂ ⟧ n) eq′)
+prec-relax-Σ (⊑-lam g⊑g′ A⊑A′ N⊑N′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-lam g⊑g′ A⊑A′ (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-app L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-app (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-app! M⊑N M⊑N₁ x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-app!l M⊑N M⊑N₁ x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-if M⊑N x x₁ x₂ x₃) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-if! M⊑N x x₁ x₂ x₃) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-if!l M⊑N x x₁ x₂ x₃) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-let M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-ref M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-ref? M⊑N) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-ref?l M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-deref M⊑N x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-deref! M⊑N x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-deref!l M⊑N x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-assign M⊑N M⊑N₁ x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-assign? M⊑N M⊑N₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-assign?l M⊑N M⊑N₁ x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-prot M⊑N x x₁ x₂ x₃ x₄) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-prot! M⊑N x x₁ x₂ x₃ x₄ x₅) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-prot!l M⊑N x x₁ x₂ x₃ x₄ x₅) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-cast M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-castl M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-castr M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ (⊑-blame ⊢M A⊑A′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-blame (relax-Σ ⊢M Σ₂⊇Σ₁) A⊑A′
 
 
 ⊑μ-new : ∀ {Σ Σ′} {S T V W} {μ μ′} {n ℓ}
