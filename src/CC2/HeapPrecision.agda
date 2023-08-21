@@ -88,17 +88,23 @@ prec-relax-Σ (⊑-addr {n = n} {ℓ̂ = ℓ̂} eq eq′) Σ₂⊇Σ₁ Σ₂′
   ⊑-addr (Σ₂⊇Σ₁ (a⟦ ℓ̂ ⟧ n) eq) (Σ₂′⊇Σ₁′ (a⟦ ℓ̂ ⟧ n) eq′)
 prec-relax-Σ (⊑-lam g⊑g′ A⊑A′ N⊑N′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-lam g⊑g′ A⊑A′ (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-app L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+prec-relax-Σ (⊑-app L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-app (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-app! M⊑N M⊑N₁ x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-app!l M⊑N M⊑N₁ x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-if M⊑N x x₁ x₂ x₃) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-if! M⊑N x x₁ x₂ x₃) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-if!l M⊑N x x₁ x₂ x₃) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-let M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-ref M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-ref? M⊑N) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
-prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-ref?l M⊑N x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
+prec-relax-Σ (⊑-app! L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-app! (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-app!l L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-app!l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-if L⊑L′ M⊑M′ N⊑N′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-if (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-if! L⊑L′ M⊑M′ N⊑N′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-if! (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-if!l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-let M⊑M′ N⊑N′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-let (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
+prec-relax-Σ (⊑-ref M⊑M′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-ref (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
+prec-relax-Σ (⊑-ref? M⊑M′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-ref? (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
+prec-relax-Σ (⊑-ref?l M⊑M′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-ref?l (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
 prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-deref M⊑N x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
 prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-deref! M⊑N x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
 prec-relax-Σ {Σ₁} {Σ₂} {Σ₁′} {Σ₂′} (⊑-deref!l M⊑N x x₁) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = {!!}
