@@ -208,17 +208,41 @@ prec-relax-Σ (⊑-blame ⊢M A⊑A′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-
     prec-relax-Σ V₁⊑W₁ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ ⟩
 
 
--- ⊑μ-update : ∀ {Σ Σ′} {S T V W} {μ μ′} {n ℓ}
---   → Σ ; Σ′ ⊢ μ ⊑ μ′
---   → [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ W ⇐ S of l ℓ ⊑ T of l ℓ
---   → (v : Value V)
---   → (w : Value W)
---   → lookup-Σ Σ  (a⟦ ℓ ⟧ n) ≡ just S  {- updating a -}
---   → lookup-Σ Σ′ (a⟦ ℓ ⟧ n) ≡ just T
---     -------------------------------------------------------------------------
---   → Σ ; Σ′ ⊢ cons-μ (a⟦ ℓ ⟧ n) V v μ ⊑ cons-μ (a⟦ ℓ ⟧ n) W w μ′
--- ⊑μ-update {ℓ = low}  ⟨ μᴸ⊑μᴸ′ , μᴴ⊑μᴴ′ ⟩ V⊑W v w a b = ⟨ ⊑-∷ μᴸ⊑μᴸ′ V⊑W v w a b , μᴴ⊑μᴴ′ ⟩
--- ⊑μ-update {ℓ = high} ⟨ μᴸ⊑μᴸ′ , μᴴ⊑μᴴ′ ⟩ V⊑W v w a b = ⟨ μᴸ⊑μᴸ′ , ⊑-∷ μᴴ⊑μᴴ′ V⊑W v w a b ⟩
+⊑μ-update : ∀ {Σ Σ′} {S T V V′} {μ μ′} {n ℓ}
+  → Σ ; Σ′ ⊢ μ ⊑ μ′
+  → [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ V′ ⇐ S of l ℓ ⊑ T of l ℓ
+  → (v  : Value V )
+  → (v′ : Value V′)
+  → lookup-Σ Σ  (a⟦ ℓ ⟧ n) ≡ just S  {- updating a -}
+  → lookup-Σ Σ′ (a⟦ ℓ ⟧ n) ≡ just T
+    -------------------------------------------------------------------------
+  → Σ ; Σ′ ⊢ cons-μ (a⟦ ℓ ⟧ n) V v μ ⊑ cons-μ (a⟦ ℓ ⟧ n) V′ v′ μ′
+⊑μ-update {n = n₁} {low}  μ⊑μ′ V⊑V′ v v′ eq₁ eq₁′ n low eq eq′
+  with n ≟ n₁
+... | yes refl =
+  case ⟨ trans (sym eq) eq₁ , trans (sym eq′) eq₁′ ⟩ of λ where
+  ⟨ refl , refl ⟩ →
+    let ⟨ wf , wf′ , W , w , W′ , w′ , eq₂ , eq₂′ , W⊑W′ ⟩ = μ⊑μ′ n low eq eq′ in
+    ⟨ wf-relaxᴸ _ v wf , wf-relaxᴸ _ v′ wf′ , _ , v , _ , v′ , refl , refl , V⊑V′ ⟩
+... | no  _ =
+  let ⟨ wf , wf′ , rest ⟩ = μ⊑μ′ n low eq eq′ in
+  ⟨ wf-relaxᴸ _ v wf , wf-relaxᴸ _ v′ wf′ , rest ⟩
+⊑μ-update {n = n₁} {low}  μ⊑μ′ V⊑V′ v v′ eq₁ eq₁′ n high eq eq′ =
+  case μ⊑μ′ n high eq eq′ of λ where
+  ⟨ wfᴴ x , wfᴴ y , rest ⟩ → ⟨ wfᴴ x , wfᴴ y , rest ⟩
+⊑μ-update {n = n₁} {high} μ⊑μ′ V⊑V′ v v′ eq₁ eq₁′ n low eq eq′ =
+  case μ⊑μ′ n low eq eq′ of λ where
+  ⟨ wfᴸ x , wfᴸ y , rest ⟩ → ⟨ wfᴸ x , wfᴸ y , rest ⟩
+⊑μ-update {n = n₁} {high} μ⊑μ′ V⊑V′ v v′ eq₁ eq₁′ n high eq eq′
+  with n ≟ n₁
+... | yes refl =
+  case ⟨ trans (sym eq) eq₁ , trans (sym eq′) eq₁′ ⟩ of λ where
+  ⟨ refl , refl ⟩ →
+    let ⟨ wf , wf′ , W , w , W′ , w′ , eq₂ , eq₂′ , W⊑W′ ⟩ = μ⊑μ′ n high eq eq′ in
+    ⟨ wf-relaxᴴ _ v wf , wf-relaxᴴ _ v′ wf′ , _ , v , _ , v′ , refl , refl , V⊑V′ ⟩
+... | no  _ =
+  let ⟨ wf , wf′ , rest ⟩ = μ⊑μ′ n high eq eq′ in
+  ⟨ wf-relaxᴴ _ v wf , wf-relaxᴴ _ v′ wf′ , rest ⟩
 
 
 -- private
