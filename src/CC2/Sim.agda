@@ -31,6 +31,8 @@ open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
+open import CC2.Simulation.App
+
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
   → (vc  : LVal PC)
@@ -66,68 +68,10 @@ sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (cast x x₁) = {!!}
 
 {- β -}
-sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-app {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β vM′ vc′†)
-  rewrite uniq-LVal vc′† vc′
-  with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
-... | ⟨ V , V-raw V-ƛ , L↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ =
-  case catchup {μ = μ} {PC} vM′ M⊑M′ of λ where
-  ⟨ W , w , M↠W , W⊑M′ ⟩ →
-    let ♣ = trans-mult (plug-cong (app□ M _ _ _) L↠V)
-              (trans-mult (plug-cong (app _ □ (V-raw V-ƛ) _ _ _) M↠W)
-              (_ ∣ _ ∣ _ —→⟨ β w vc ⟩ _ ∣ _ ∣ _ ∎)) in
-    let N[W]⊑N′[M′] = substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W⊑M′ w vM′) in
-    ⟨ Σ , Σ′ , _ , μ , ♣ ,
-      ⊑-prot N[W]⊑N′[M′] (stampₑ-prec vc vc′ PC⊑PC′) (≡→≼ (stampₑ-security vc)) (≡→≼ (stampₑ-security vc′)) eq eq′ ,
-      μ⊑μ′ , size-eq ⟩
-... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,
-        L↠V , ⊑-castl (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun {gc₁ = gc₁} d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) ⟩
-  with catchup {μ = μ} {PC} vM′ M⊑M′
-...   | ⟨ W , w , M↠W , W⊑M′ ⟩
-  with catchup {μ = μ} {PC} vM′ (⊑-castl W⊑M′ c⊑A′)
-...   | ⟨ W₁ , w₁ , W⟨c⟩↠W₁ , W₁⊑M′ ⟩ =
-  let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
-  let ♣ = trans-mult (plug-cong (app□ M _ _ _) L↠V)
-              (trans-mult (plug-cong (app _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _ _) M↠W)
-              (_ ∣ _ ∣ _ —→⟨ app-cast w vc 𝓋 ↠PC₁ vc₁ (cast-reduction-inv w W⟨c⟩↠W₁ refl) w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
-  let N[W₁]⊑N′[M′] = substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑M′ w₁ vM′) in
-  ⟨ Σ , Σ′ , _ , μ , ♣ ,
-    ⊑-prot (⊑-castl N[W₁]⊑N′[M′] d⊑B′) PC₁⊑stampPC′ (stamp-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ ,
-    μ⊑μ′ , size-eq ⟩
-  where
-  ⊢W = proj₁ (cc-prec-inv ⊑*-∅ Σ⊑Σ′ W⊑M′)
-  ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
-  prec : (stampₑ PC vc ℓ ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
-                   ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
-  prec = ⊑-castl (stampₑ-prec vc vc′ PC⊑PC′) d̅⊑gc′
-sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
-    Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β vM′ vc′†)
-  rewrite uniq-LVal vc′† vc′
-  with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
-... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
-... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,
-        L↠V , ⊑-castl (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun {gc₁ = gc₁} {.⋆} d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) ⟩
-  with catchup {μ = μ} {PC} vM′ M⊑M′
-...   | ⟨ W , w , M↠W , W⊑M′ ⟩
-  with catchup {μ = μ} {PC} vM′ (⊑-castl W⊑M′ c⊑A′)
-...   | ⟨ W₁ , w₁ , W⟨c⟩↠W₁ , W₁⊑M′ ⟩ =
-  let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
-  let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
-              (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-              (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ↠PC₁ vc₁ (cast-reduction-inv w W⟨c⟩↠W₁ refl) w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
-  ⟨ Σ , Σ′ , _ , μ , ♣ ,
-    ⊑-prot!l (⊑-castl (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑M′ w₁ vM′)) d⊑B′)
-             PC₁⊑stampPC′
-             (stamp!-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) , μ⊑μ′ , size-eq ⟩
-  where
-  ∥PC∥⋎∥c̅∥≡∥stamp∥ = stampₑ-security {ℓ = ∥ c̅ ∥ₗ 𝓋} vc
-  ∥c̅∥≡ℓ = security-prec-left _ 𝓋 c̅⊑g′
-  ⊢PC = proj₁ (prec→⊢ PC⊑PC′)
-  ⊢W = proj₁ (cc-prec-inv ⊑*-∅ Σ⊑Σ′ W⊑M′)
-  prec : (stamp!ₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
-                   ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
-  prec rewrite ∥c̅∥≡ℓ = ⊑-castl (stamp!ₑ-left-prec vc vc′ PC⊑PC′) d̅⊑gc′
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β vM′ vc′†)
+  rewrite uniq-LVal vc′† vc′ =
+  let ⟨ N , ♣ , prec ⟩ = sim-app vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq vM′ in
+  ⟨ Σ , Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-cast v vc′† 𝓋 x vc″ x₁ x₂) = {!!}
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-blame-pc v vc′† 𝓋 x) =
