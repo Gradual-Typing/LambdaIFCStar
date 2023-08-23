@@ -38,3 +38,22 @@ a⟦ high ⟧ n FreshIn ⟨ μᴸ , μᴴ ⟩ = n ≡ length μᴴ
 gen-fresh : ∀ μ {ℓ} → ∃[ n ] (a⟦ ℓ ⟧ n FreshIn μ)
 gen-fresh ⟨ μᴸ , μᴴ ⟩ {low } = ⟨ length μᴸ , refl ⟩
 gen-fresh ⟨ μᴸ , μᴴ ⟩ {high} = ⟨ length μᴴ , refl ⟩
+
+SizeEq : Heap → Heap → Set
+SizeEq ⟨ μᴸ , μᴴ ⟩ ⟨ μᴸ′ , μᴴ′ ⟩ = length μᴸ ≡ length μᴸ′ × length μᴴ ≡ length μᴴ′
+
+size-eq-fresh : ∀ {μ μ′} {n ℓ}
+  → SizeEq μ μ′
+  → a⟦ ℓ ⟧ n FreshIn μ′
+    -------------------------------------------------------------------------
+  → a⟦ ℓ ⟧ n FreshIn μ
+size-eq-fresh {ℓ = low}  ⟨ eq-low , _ ⟩ fresh rewrite eq-low = fresh
+size-eq-fresh {ℓ = high} ⟨ _ , eq-high ⟩ fresh rewrite eq-high = fresh
+
+size-eq-fresh-back : ∀ {μ μ′} {n ℓ}
+  → SizeEq μ μ′
+  → a⟦ ℓ ⟧ n FreshIn μ
+    -------------------------------------------------------------------------
+  → a⟦ ℓ ⟧ n FreshIn μ′
+size-eq-fresh-back {ℓ = low}  ⟨ eq-low , _ ⟩ fresh rewrite eq-low = fresh
+size-eq-fresh-back {ℓ = high} ⟨ _ , eq-high ⟩ fresh rewrite eq-high = fresh

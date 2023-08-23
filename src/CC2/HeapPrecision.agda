@@ -244,6 +244,15 @@ prec-relax-Σ (⊑-blame ⊢M A⊑A′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-
   let ⟨ wf , wf′ , rest ⟩ = μ⊑μ′ n high eq eq′ in
   ⟨ wf-relaxᴴ _ v wf , wf-relaxᴴ _ v′ wf′ , rest ⟩
 
+size-eq-cons : ∀ {μ μ′} {V W v w} {n ℓ}
+  → SizeEq μ μ′
+    ----------------------------------------------------------------
+  → SizeEq (cons-μ (a⟦ ℓ ⟧ n) V v μ) (cons-μ (a⟦ ℓ ⟧ n) W w μ′)
+size-eq-cons {μ = ⟨ μᴸ , μᴴ ⟩} {⟨ μᴸ′ , μᴴ′ ⟩} {ℓ = low}  ⟨ eq-low , eq-high ⟩ =
+  ⟨ cong suc eq-low , eq-high ⟩
+size-eq-cons {μ = ⟨ μᴸ , μᴴ ⟩} {⟨ μᴸ′ , μᴴ′ ⟩} {ℓ = high} ⟨ eq-low , eq-high ⟩ =
+  ⟨ eq-low , cong suc eq-high ⟩
+
 
 -- private
 --   ⊑μ-lookup-low : ∀ {Σ Σ′ T T′} {W w} {μ μ′} {n}
@@ -288,24 +297,3 @@ prec-relax-Σ (⊑-blame ⊢M A⊑A′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-
 --         ([] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ W ⇐ S of l ℓ ⊑ T of l ℓ)
 -- ⊑μ-lookup {w = w} {ℓ = low}  ⟨ μ⊑μ′ , _ ⟩ = ⊑μ-lookup-low  {w = w} μ⊑μ′
 -- ⊑μ-lookup {w = w} {ℓ = high} ⟨ _ , μ⊑μ′ ⟩ = ⊑μ-lookup-high {w = w} μ⊑μ′
-
--- private
---   ⊑μ-length-low : ∀ {Σ Σ′} {μ μ′}
---     → Σ ; Σ′ ; low ⊢ μ ⊑ μ′
---     → length μ′ ≡ length μ
---   ⊑μ-length-low ⊑-∅ = refl
---   ⊑μ-length-low (⊑-∷ μ⊑μ′ _ _ _ _ _) = cong suc (⊑μ-length-low μ⊑μ′)
-
---   ⊑μ-length-high : ∀ {Σ Σ′} {μ μ′}
---     → Σ ; Σ′ ; high ⊢ μ ⊑ μ′
---     → length μ′ ≡ length μ
---   ⊑μ-length-high ⊑-∅ = refl
---   ⊑μ-length-high (⊑-∷ μ⊑μ′ _ _ _ _ _) = cong suc (⊑μ-length-high μ⊑μ′)
-
--- ⊑μ-fresh : ∀ {Σ Σ′} {μ μ′} {n ℓ}
---   → Σ ; Σ′ ⊢ μ ⊑ μ′
---   → a⟦ ℓ ⟧ n FreshIn μ′
---     -------------------------------------------------------------------------
---   → a⟦ ℓ ⟧ n FreshIn μ
--- ⊑μ-fresh {ℓ = low}  ⟨ μ⊑μ′ , _ ⟩ fresh rewrite ⊑μ-length-low  μ⊑μ′ = fresh
--- ⊑μ-fresh {ℓ = high} ⟨ _ , μ⊑μ′ ⟩ fresh rewrite ⊑μ-length-high μ⊑μ′ = fresh
