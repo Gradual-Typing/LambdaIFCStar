@@ -146,11 +146,12 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
 ... | ⟨ V , v , M↠V , V⊑V′ ⟩ =
   let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-ref PC⊑PC′ vc vc′ ↠PC′₁ vc′₁ in
   let fresh = size-eq-fresh size-eq fresh′ in
-  ⟨  cons-Σ (a⟦ ℓ ⟧ n) T Σ , cons-Σ (a⟦ ℓ ⟧ n) T′ Σ′ , _ , cons-μ (a⟦ ℓ ⟧ n) _ v μ ,
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , cons-Σ (a⟦ ℓ ⟧ n) T′ Σ′ , _ , cons-μ (a⟦ ℓ ⟧ n) _ v μ ,
     trans-mult (plug-cong (ref?⟦ _ ⟧□ _) M↠V)
                (_ ∣ _ ∣ _ —→⟨ ref? v fresh ↠PC₁ vc₁ ⟩ _ ∣ _ ∣ _ ∎) ,
     ⊑-addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ′) ,
-    ⊑μ-new Σ⊑Σ′ μ⊑μ′ (value-⊑-pc V⊑V′ v v′) v v′ fresh fresh′ , size-eq-cons {v = v} {v′} {n} {ℓ} size-eq ⟩
+    ⊑μ-new Σ⊑Σ′ μ⊑μ′ (value-⊑-pc V⊑V′ v v′) v v′ fresh fresh′ ,
+    size-eq-cons {v = v} {v′} {n} {ℓ} size-eq ⟩
 
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ref?-blame-pc v x) = {!!}
 
@@ -158,30 +159,33 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ref?-blame-pc v 
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     (⊑-deref M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref {v = v′} μ′a≡V′)
   with catchup {μ = μ} {PC} (V-raw V-addr) M⊑M′
-... | ⟨ addr _ , V-raw V-addr , L↠V , ⊑-addr a b ⟩ = {!!}
-  -- let ⟨ V , v , μa≡V , V⊑V′ ⟩ = ? {- ⊑μ-lookup {w = v′} μ⊑μ′ μ′a≡V′ a b -} in
-  -- ⟨ Σ , Σ′ , _ , μ ,
-  --   trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref {v = v} μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
-  --   ⊑-prot (value-⊑-pc V⊑V′ v v′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ,
-  --   μ⊑μ′ ⟩
+... | ⟨ addr _ , V-raw V-addr , L↠V , ⊑-addr {n = n} {ℓ̂ = ℓ} a b ⟩ =
+  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
+  case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+  refl → ⟨ Σ , Σ′ , _ , μ ,
+    trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref {v = v} μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
+    ⊑-prot (value-⊑-pc V⊑V′ v v′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ,
+    μ⊑μ′ , size-eq ⟩
 ... | ⟨ addr _ ⟨ cast (ref c d) c̅ ⟩ , V-cast V-addr (ir-ref 𝓋) ,
-        L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ = {!!}
-  -- let ⟨ V , v , μa≡V , V⊑V′ ⟩ = ? {- ⊑μ-lookup {w = v′} {ℓ = ℓ} {n} μ⊑μ′ μ′a≡V′ a b -} in
-  -- ⟨ Σ , Σ′ , _ , μ ,
-  --   trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
-  --   ⊑-prot (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ,
-  --   μ⊑μ′ ⟩
+        L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ =
+  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
+  case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+  refl → ⟨ Σ , Σ′ , _ , μ ,
+    trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
+    ⊑-prot (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ,
+    μ⊑μ′ , size-eq ⟩
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     (⊑-deref!l M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref {v = v′} μ′a≡V′)
   with catchup {μ = μ} {PC} (V-raw V-addr) M⊑M′
 ... | ⟨ addr _ , V-raw V-addr , L↠V , () ⟩
 ... | ⟨ addr _ ⟨ cast (ref c d) c̅ ⟩ , V-cast V-addr (ir-ref 𝓋) ,
-        L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ = {!!}
-  -- let ⟨ V , v , μa≡V , V⊑V′ ⟩ = ? {- ⊑μ-lookup {w = v′} {ℓ = ℓ} {n} μ⊑μ′ μ′a≡V′ a b -} in
-  -- ⟨ Σ , Σ′ , _ , μ ,
-  --   trans-mult (plug-cong (!!□ _ ) L↠V) (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
-  --   ⊑-prot!l (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ (≡→≼ (security-prec-left _ 𝓋 c̅⊑g′)) ,
-  --   μ⊑μ′ ⟩
+        L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ =
+  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
+  case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+  refl → ⟨ Σ , Σ′ , _ , μ ,
+    trans-mult (plug-cong (!!□ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
+    ⊑-prot!l (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ (≡→≼ (security-prec-left _ 𝓋 c̅⊑g′)) ,
+    μ⊑μ′ , size-eq ⟩
 
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref-cast 𝓋 x) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref!-cast 𝓋 x) = {!!}
