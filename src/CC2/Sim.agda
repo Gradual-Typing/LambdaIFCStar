@@ -96,7 +96,31 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-false-cast vc
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-true-cast vc′† 𝓋) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-false-cast vc′† 𝓋) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-let x) = {!!}
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ref v x) = {!!}
+
+{- ref -}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  (⊑-ref {T = T} {T′} {ℓ} M⊑V′ ℓc≼ℓ) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ref {n = n} v′ fresh′)
+  with catchup {μ = μ} {PC} v′ M⊑V′
+... | ⟨ V , v , M↠V , V⊑V′ ⟩ =
+  let fresh = size-eq-fresh size-eq fresh′ in
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , cons-Σ (a⟦ ℓ ⟧ n) T′ Σ′ , _ , cons-μ (a⟦ ℓ ⟧ n) _ v μ ,
+    trans-mult (plug-cong (ref⟦ _ ⟧□) M↠V)
+               (_ ∣ _ ∣ _ —→⟨ ref v fresh ⟩ _ ∣ _ ∣ _ ∎) ,
+    ⊑-addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ′) ,
+    ⊑μ-new Σ⊑Σ′ μ⊑μ′ (value-⊑-pc V⊑V′ v v′) v v′ fresh fresh′ ,
+    size-eq-cons {v = v} {v′} {n} {ℓ} size-eq ⟩
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  (⊑-ref?l {T = T} {T′} {ℓ} M⊑V′ ℓc≼ℓ) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ref {n = n} v′ fresh′)
+  with catchup {μ = μ} {PC} v′ M⊑V′
+... | ⟨ V , v , M↠V , V⊑V′ ⟩ =
+  let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-ref-left PC⊑PC′ vc vc′ ℓc≼ℓ in
+  let fresh = size-eq-fresh size-eq fresh′ in
+  ⟨ cons-Σ (a⟦ ℓ ⟧ n) T Σ , cons-Σ (a⟦ ℓ ⟧ n) T′ Σ′ , _ , cons-μ (a⟦ ℓ ⟧ n) _ v μ ,
+    trans-mult (plug-cong (ref?⟦ _ ⟧□ _) M↠V)
+               (_ ∣ _ ∣ _ —→⟨ ref? v fresh ↠PC₁ vc₁ ⟩ _ ∣ _ ∣ _ ∎) ,
+    ⊑-addr (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ) (lookup-Σ-cons (a⟦ ℓ ⟧ n) Σ′) ,
+    ⊑μ-new Σ⊑Σ′ μ⊑μ′ (value-⊑-pc V⊑V′ v v′) v v′ fresh fresh′ ,
+    size-eq-cons {v = v} {v′} {n} {ℓ} size-eq ⟩
 
 {- ref? -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
