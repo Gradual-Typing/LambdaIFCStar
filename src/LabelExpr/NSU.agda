@@ -7,7 +7,8 @@ open import Data.List hiding ([_])
 open import Data.Product renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_)
 open import Data.Maybe
-open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary using (¬_; Dec; yes; no; recompute)
+open import Relation.Nullary.Negation using (contradiction; ¬?)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Function using (case_of_)
 
@@ -41,6 +42,37 @@ sim-nsu-ref {V} {V′} {W′} {ℓ} {p} {q} V⊑V′ v v′ ↠W′ w′ =
     prec : ⊢ V  ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l q ⟫        ⊑
              V′ ⟪ coerceₗ {⋆} {l ℓ} ≾-⋆l p ⟫ ⇐ l ℓ ⊑ l ℓ
     prec = ⊑-cast V⊑V′ (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+
+sim-nsu-ref-left : ∀ {V V′} {ℓ₁ ℓ₂} {p}
+  → ⊢ V ⊑ V′ ⇐ ⋆ ⊑ l ℓ₁
+  → (v  : LVal V )
+  → (v′ : LVal V′)
+  → ℓ₁ ≼ ℓ₂
+    -------------------------------------------------------------
+  → ∃[ W ] (LVal W) × (V ⟪ coerceₗ {⋆} {l ℓ₂} ≾-⋆l p ⟫ —↠ₑ W)
+sim-nsu-ref-left {V} {V′} {p = p} V⊑V′ v v′ l≼l =
+  case catchup v′ prec of λ where
+  ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
+    where
+    prec : ⊢ V  ⟪ id ⋆ ⨾ low ?? p ⟫ ⊑ V′ ⇐ l low ⊑ l low
+    prec = ⊑-castl V⊑V′ (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+sim-nsu-ref-left {V} {V′} {p = p} V⊑V′ v v′ l≼h
+  with prec→⊢ V⊑V′ | v′
+... | ⟨ _ , ⊢cast ⊢l ⟩ | v-cast (ir id low≢low) =
+  contradiction refl (recompute (¬? (_ ==? _)) low≢low)
+... | ⟨ _ , ⊢l ⟩ | v-l =
+  case catchup (v-cast (ir (up id) λ ())) prec of λ where
+  ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
+    where  {- we need to insert an upcast on the more precise side -}
+    prec : ⊢ V  ⟪ id ⋆ ⨾ high ?? p ⟫           ⊑
+             V′ ⟪ id (l low) ⨾ ↑  ⟫ ⇐ l high ⊑ l high
+    prec = ⊑-cast V⊑V′ (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+sim-nsu-ref-left {V} {V′} {p = p} V⊑V′ v v′ h≼h =
+  case catchup v′ prec of λ where
+  ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
+    where
+    prec : ⊢ V  ⟪ id ⋆ ⨾ high ?? p ⟫ ⊑ V′ ⇐ l high ⊑ l high
+    prec = ⊑-castl V⊑V′ (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 
 
 sim-nsu-assign : ∀ {V V′ W′} {g g′ ℓ ℓ′ ℓ̂} {p q}
