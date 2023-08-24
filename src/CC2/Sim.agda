@@ -33,6 +33,7 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 open import CC2.Simulation.App
 open import CC2.Simulation.Assign?Cast
+open import CC2.Simulation.Deref
 
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
@@ -117,35 +118,9 @@ sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′
 
 {- deref -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-deref M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref {v = v′} μ′a≡V′)
-  with catchup {μ = μ} {PC} (V-raw V-addr) M⊑M′
-... | ⟨ addr _ , V-raw V-addr , L↠V , ⊑-addr {n = n} {ℓ̂ = ℓ} a b ⟩ =
-  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
-  case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
-  refl → ⟨ Σ , Σ′ , _ , μ ,
-    trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref {v = v} μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
-    ⊑-prot (value-⊑-pc V⊑V′ v v′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ,
-    μ⊑μ′ , size-eq ⟩
-... | ⟨ addr _ ⟨ cast (ref c d) c̅ ⟩ , V-cast V-addr (ir-ref 𝓋) ,
-        L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ =
-  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
-  case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
-  refl → ⟨ Σ , Σ′ , _ , μ ,
-    trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
-    ⊑-prot (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ,
-    μ⊑μ′ , size-eq ⟩
-sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-deref!l M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref {v = v′} μ′a≡V′)
-  with catchup {μ = μ} {PC} (V-raw V-addr) M⊑M′
-... | ⟨ addr _ , V-raw V-addr , L↠V , () ⟩
-... | ⟨ addr _ ⟨ cast (ref c d) c̅ ⟩ , V-cast V-addr (ir-ref 𝓋) ,
-        L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ =
-  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
-  case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
-  refl → ⟨ Σ , Σ′ , _ , μ ,
-    trans-mult (plug-cong (!!□ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
-    ⊑-prot!l (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ (≡→≼ (security-prec-left _ 𝓋 c̅⊑g′)) ,
-    μ⊑μ′ , size-eq ⟩
+    M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref {v = v′} μ′a≡V′) =
+  let ⟨ N , ♣ , prec ⟩ = sim-deref vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ μ′a≡V′ in
+  ⟨ Σ , Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref-cast 𝓋 x) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref!-cast 𝓋 x) = {!!}
@@ -160,7 +135,6 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign?-cast v′ vc′† 𝓋′ ↠PC′₁ vc′₁ ↠W′ w′)
     rewrite uniq-LVal vc′† vc′ =
     ⟨ Σ , Σ′ , sim-assign?-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq  v′ 𝓋′ ↠PC′₁ vc′₁ ↠W′ w′ ⟩
-
 
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign?-cast-blame-pc v vc′† 𝓋 x) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
