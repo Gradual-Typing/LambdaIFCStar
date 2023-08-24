@@ -32,6 +32,7 @@ open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 open import CC2.Simulation.App
+open import CC2.Simulation.Assign?Cast
 
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
@@ -156,50 +157,10 @@ sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′
 
 {- assign?-cast -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-assign? L⊑L′ M⊑V′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign?-cast v′ vc′† 𝓋′ ↠PC′₁ vc′₁ ↠W′ w′)
-  rewrite uniq-LVal vc′† vc′
-  with catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) L⊑L′
-... | ⟨ V , v , L↠V , prec1 ⟩
-  with catchup {μ = μ} {PC} v′ M⊑V′
-... | ⟨ W , w , M↠W , prec2 ⟩
-  with v | prec1
-... | V-cast V-addr (ir-ref 𝓋)
-    | ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) =
-  let ℓ≼ℓ′ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-  let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign PC⊑PC′ vc vc′ ℓ≼ℓ′ ↠PC′₁ vc′₁ in
-  let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast prec2 w v′ c⊑c′ ↠W′ w′ in
-  let ♣ = trans-mult (plug-cong (assign?□ _ _ _ _) L↠V)
-        (trans-mult (plug-cong (assign? _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
-         (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
-  ⟨ Σ , Σ′ , _ , cons-μ _ W₁ w₁ _ , ♣ , ⊑-const ,
-    ⊑μ-update μ⊑μ′ (value-⊑-pc W₁⊑W′ w₁ w′) w₁ w′ a b ,
-    size-eq-cons {v = w₁} {w′} {n} {ℓ} size-eq ⟩
-... | V-cast V-addr (ir-ref 𝓋)
-    | ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref A⊑c′ A⊑d′ ℓ⊑c̅′)) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
-  let c̅⊑c̅′ = comp-pres-⊑-rl ℓ⊑c̅′ c̅⊑g′
-      ℓ≼ℓ′ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-  let c⊑c′ = comp-pres-prec-lr c⊑A′ A⊑c′ in
-  let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign PC⊑PC′ vc vc′ ℓ≼ℓ′ ↠PC′₁ vc′₁ in
-  let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast prec2 w v′ c⊑c′ ↠W′ w′ in
-  let ♣ = trans-mult (plug-cong (assign?□ _ _ _ _) L↠V)
-        (trans-mult (plug-cong (assign? _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
-         (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
-  ⟨ Σ , Σ′ , _ , cons-μ _ W₁ w₁ _ , ♣ , ⊑-const ,
-    ⊑μ-update μ⊑μ′ (value-⊑-pc W₁⊑W′ w₁ w′) w₁ w′ a b ,
-    size-eq-cons {v = w₁} {w′} {n} {ℓ} size-eq ⟩
-... | V-cast V-addr (ir-ref 𝓋)
-    | ⊑-castr (⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑ℓ)) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′) =
-  let c̅⊑c̅′ = comp-pres-⊑-lr c̅⊑ℓ g⊑c̅′
-      ℓ≼ℓ′ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-  let c⊑c′ = comp-pres-prec-rl A⊑c′ c⊑A′ in
-  let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign PC⊑PC′ vc vc′ ℓ≼ℓ′ ↠PC′₁ vc′₁ in
-  let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast prec2 w v′ c⊑c′ ↠W′ w′ in
-  let ♣ = trans-mult (plug-cong (assign?□ _ _ _ _) L↠V)
-        (trans-mult (plug-cong (assign? _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
-         (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
-  ⟨ Σ , Σ′ , _ , cons-μ _ W₁ w₁ _ , ♣ , ⊑-const ,
-    ⊑μ-update μ⊑μ′ (value-⊑-pc W₁⊑W′ w₁ w′) w₁ w′ a b ,
-    size-eq-cons {v = w₁} {w′} {n} {ℓ} size-eq ⟩
+    M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign?-cast v′ vc′† 𝓋′ ↠PC′₁ vc′₁ ↠W′ w′)
+    rewrite uniq-LVal vc′† vc′ =
+    ⟨ Σ , Σ′ , sim-assign?-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq  v′ 𝓋′ ↠PC′₁ vc′₁ ↠W′ w′ ⟩
+
 
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign?-cast-blame-pc v vc′† 𝓋 x) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
