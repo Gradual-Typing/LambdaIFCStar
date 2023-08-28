@@ -91,3 +91,20 @@ sim-nsu-assign {V} {V′} {W′} {g} {g′} {ℓ} {ℓ′} {ℓ̂} {p} {q} V⊑V
     prec : ⊢ stamp!ₑ V  v  ℓ  ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l q ⟫        ⊑
              stamp!ₑ V′ v′ ℓ′ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ ⇐ l ℓ̂ ⊑ l ℓ̂
     prec = ⊑-cast (stamp!ₑ-prec v v′ V⊑V′ ℓ≼ℓ′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+
+sim-nsu-assign-left : ∀ {V V′} {g ℓ₁ ℓ₂ ℓ₃} {p}
+  → ⊢ V ⊑ V′ ⇐ g ⊑ l ℓ₁
+  → (v  : LVal V )
+  → (v′ : LVal V′)
+  → ℓ₁ ≼ ℓ₃ → ℓ₂ ≼ ℓ₃
+    ---------------------------------------------------------------------------
+  → ∃[ W ] (LVal W) × (stamp!ₑ V v ℓ₂ ⟪ coerceₗ {⋆} {l ℓ₃} ≾-⋆l p ⟫ —↠ₑ W)
+sim-nsu-assign-left {V} {V′} {g′} {.low} {ℓ₂} {.low} {p} V⊑V′ v v′ l≼l ℓ₂≼ℓ₃ = {!!}
+sim-nsu-assign-left {V} {V′} {g′} {.low} {ℓ₂} {.high} {p} V⊑V′ v v′ l≼h ℓ₂≼ℓ₃ =
+  {!!}
+sim-nsu-assign-left {V} {V′} {g′} {.high} {ℓ₂} {.high} {p} V⊑V′ v v′ h≼h ℓ₂≼high =
+  case catchup v′ prec of λ where
+  ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
+    where
+    prec : ∀ {ℓ} → ⊢ stamp!ₑ V v ℓ ⟪ id ⋆ ⨾ high ?? p ⟫ ⊑ V′ ⇐ l high ⊑ l high
+    prec = {!!}
