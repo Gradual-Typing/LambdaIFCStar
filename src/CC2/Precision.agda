@@ -22,7 +22,7 @@ open import CC2.Statics
 open import Memory.HeapContext
 
 open import CC2.CoercionPrecision public
-open import CC2.HeapPrecision public
+open import CC2.HeapContextPrecision public
 
 
 infix 4 _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_
