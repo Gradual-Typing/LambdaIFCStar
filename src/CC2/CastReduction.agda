@@ -117,3 +117,35 @@ cast-pres-mult : ∀ {Σ gc ℓv A M N}
   → [] ; Σ ; gc ; ℓv ⊢ N ⇐ A
 cast-pres-mult ⊢M (_ ∎)                 = ⊢M
 cast-pres-mult ⊢M (_ —→⟨ M→L ⟩ L↠N) = cast-pres-mult (cast-pres ⊢M M→L) L↠N
+
+
+{- (id A) is identity -}
+cast-id-id : ∀ {Γ Σ gc ℓv A V}
+  → Value V
+  → Γ ; Σ ; gc ; ℓv ⊢ V ⇐ A
+    ----------------------------------------
+  → ∃[ W ] (V ⟨ coerce-id A ⟩ —↠ W) × Value W
+cast-id-id {A = ` x of g} (V-raw V-const) ⊢const =
+  ⟨ _ , _ —→⟨ cast-id ⟩ _ ∎ , V-raw V-const ⟩
+cast-id-id {A = ` ι of g} (V-cast V-const (ir-base 𝓋 x)) (⊢cast ⊢const) =
+  ⟨ _ ,
+    _ —→⟨ cast-comp V-const (ir-base 𝓋 x) ⟩
+    _ —→⟨ cast V-const (_ —→ₗ⟨ id 𝓋 ⟩ _ ∎ₗ) 𝓋 ⟩
+    _ ∎ ,
+    V-cast V-const (ir-base 𝓋 x) ⟩
+cast-id-id {A = (Ref A) of g} (V-raw V-addr) (⊢addr x) =
+  ⟨ _ , _ ∎ , V-cast V-addr (ir-ref id) ⟩
+cast-id-id {A = (Ref A) of g} (V-cast V-addr (ir-ref 𝓋)) (⊢cast (⊢addr x)) =
+  ⟨ _ ,
+    _ —→⟨ cast-comp V-addr (ir-ref 𝓋) ⟩
+    _ —→⟨ cast V-addr (_ —→ₗ⟨ id 𝓋 ⟩ _ ∎ₗ) 𝓋 ⟩
+    _ ∎ ,
+    V-cast V-addr (ir-ref 𝓋) ⟩
+cast-id-id {A = ⟦ gc ⟧ A ⇒ B of g} (V-raw V-ƛ) (⊢lam ⊢N) =
+  ⟨ _ , _ ∎ , V-cast V-ƛ (ir-fun id) ⟩
+cast-id-id {A = ⟦ gc ⟧ A ⇒ B of g} (V-cast V-ƛ (ir-fun 𝓋)) (⊢cast (⊢lam ⊢N)) =
+  ⟨ _ ,
+    _ —→⟨ cast-comp V-ƛ (ir-fun 𝓋) ⟩
+    _ —→⟨ cast V-ƛ (_ —→ₗ⟨ id 𝓋 ⟩ _ ∎ₗ) 𝓋 ⟩
+    _ ∎ ,
+    V-cast V-ƛ (ir-fun 𝓋) ⟩
