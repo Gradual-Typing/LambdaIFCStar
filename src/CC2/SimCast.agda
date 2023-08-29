@@ -17,7 +17,7 @@ open import Memory.HeapContext
 open import CoercionExpr.CoercionExpr using (CVal⌿→)
 open import CoercionExpr.Precision
 open import CoercionExpr.GG using (sim-mult)
-open import CoercionExpr.CatchUp using (catchup)
+open import CoercionExpr.CatchUp using (catchup; catchup-to-id)
 open import CC2.Statics
 open import CC2.CastReduction
 open import CC2.Precision
@@ -31,7 +31,9 @@ sim-cast : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B B′ V V′ W�
   → V′ ⟨ c′ ⟩ —↠ W′
   → Value W′
     --------------------------------------
-  → ∃[ W ] (Value W) × (V ⟨ c ⟩ —↠ W) × (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ W ⊑ W′ ⇐ B ⊑ B′)
+  → ∃[ W ]    Value W  ×
+       (V ⟨ c ⟩ —↠ W) ×
+       (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ W ⊑ W′ ⇐ B ⊑ B′)
 sim-cast ⊑-const (V-raw V-const) (V-raw V-const) (⊑-base c̅⊑c̅′) (_ ∎) (V-cast _ (ir-base 𝓋′ _)) =
   case catchup _ _ 𝓋′ c̅⊑c̅′ of λ where
   ⟨ d̅ , id , _ ∎ₗ , d̅⊑c̅′ ⟩ →
@@ -111,7 +113,6 @@ sim-cast V⊑V′ (V-raw _) (V-cast x₁ x₂) c⊑c′ (_ ∎) (V-cast () _)
 sim-cast {c = c} {c′} (⊑-castr V⊑V′ A⊑d′) (V-raw v) (V-cast {c = d′} v′ i′) c⊑c′ (_ —→⟨ cast-comp _ _ ⟩ r*) w′ =
   let c⊑d′⨟c′ = comp-pres-prec-rb A⊑d′ c⊑c′ in
   sim-cast V⊑V′ (V-raw v) (V-raw v′) c⊑d′⨟c′ r* w′
-
 sim-cast {c = c} {c′} (⊑-castl V⊑V′ d⊑A′) (V-cast {V = V} {c = d} v i) (V-raw v′) c⊑c′ r* w′ =
   let d⨟c⊑c′ : ⟨ d ⨟ c ⟩⊑⟨ c′ ⟩
       d⨟c⊑c′ = comp-pres-prec-lb d⊑A′ c⊑c′ in
@@ -127,6 +128,7 @@ sim-cast V⟨d⟩⊑V′⟨d′⟩ (V-cast {V = V} {c} v i) (V-cast {V = V′} {
 sim-cast V⊑V′ v V-●  c⊑c′ ↠W′ w′ = contradiction V⊑V′ (_ ⋤●)
 sim-cast V⊑V′ V-● v′ c⊑c′ ↠W′ w′ = contradiction V⊑V′ (●⋤ _)
 
+
 sim-cast-left : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B V V′} {c : Cast A ⇒ B}
   → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ V′ ⇐ A ⊑ A′
   → Value V
@@ -136,8 +138,49 @@ sim-cast-left : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B V V′} {c
   → ∃[ W ]    Value W  ×
        (V ⟨ c ⟩ —↠ W) ×
        (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ W ⊑ V′ ⇐ B ⊑ A′)
-sim-cast-left V⊑V′ (V-raw x) (V-raw x₁) c⊑A′ = {!!}
-sim-cast-left V⊑V′ (V-raw x) (V-cast x₁ x₂) c⊑A′ = {!!}
+sim-cast-left ⊑-const (V-raw V-const) (V-raw V-const) (⊑-base c̅⊑g′) =
+  case catchup-to-id _ (⊑-left-expand c̅⊑g′) of λ where
+  ⟨ d̅ , id , _ ∎ₗ , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-raw V-const ,
+      _ —→⟨ cast-id ⟩ _ ∎ , ⊑-const ⟩
+  ⟨ d̅ , id , _ —→ₗ⟨ r ⟩ r* , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-raw V-const ,
+      _ —→⟨ cast V-const (_ —→ₗ⟨ r ⟩ r*) id ⟩ _ —→⟨ cast-id ⟩ _ ∎ , ⊑-const ⟩
+  ⟨ d̅ , inj 𝓋 , _ ∎ₗ , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-const (ir-base (inj 𝓋) λ ()) , _ ∎ ,
+      ⊑-castl ⊑-const (⊑-base (⊑-left-contract d̅⊑c̅′)) ⟩
+  ⟨ d̅ , inj 𝓋 , _ —→ₗ⟨ r ⟩ r* , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-const (ir-base (inj 𝓋) (λ ())) ,
+      _ —→⟨ cast V-const (_ —→ₗ⟨ r ⟩ r*) (inj 𝓋) ⟩ _ ∎ ,
+      ⊑-castl ⊑-const (⊑-base (⊑-left-contract d̅⊑c̅′)) ⟩
+  ⟨ d̅ , up id , _ ∎ₗ , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-const (ir-base (up id) λ ()) , _ ∎ ,
+      ⊑-castl ⊑-const (⊑-base (⊑-left-contract d̅⊑c̅′)) ⟩
+  ⟨ d̅ , up id , _ —→ₗ⟨ r ⟩ r* , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-const (ir-base (up id) (λ ())) ,
+      _ —→⟨ cast V-const (_ —→ₗ⟨ r ⟩ r*) (up id) ⟩ _ ∎ ,
+      ⊑-castl ⊑-const (⊑-base (⊑-left-contract d̅⊑c̅′)) ⟩
+sim-cast-left (⊑-addr x y) (V-raw V-addr) (V-raw V-addr) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  case catchup-to-id _ (⊑-left-expand c̅⊑g′) of λ where
+  ⟨ d̅ , 𝓋 , _ ∎ₗ , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-addr (ir-ref 𝓋) , _ ∎ ,
+      ⊑-castl (⊑-addr x y) (⊑-ref c⊑A′ d⊑A′ (⊑-left-contract d̅⊑c̅′)) ⟩
+  ⟨ d̅ , 𝓋 , _ —→ₗ⟨ r ⟩ r* , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-addr (ir-ref 𝓋) ,
+      _ —→⟨ cast V-addr (_ —→ₗ⟨ r ⟩ r*) 𝓋 ⟩ _ ∎ ,
+      ⊑-castl (⊑-addr x y) (⊑-ref c⊑A′ d⊑A′ (⊑-left-contract d̅⊑c̅′)) ⟩
+sim-cast-left (⊑-lam g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  case catchup-to-id _ (⊑-left-expand c̅⊑g′) of λ where
+  ⟨ d̅ , 𝓋 , _ ∎ₗ , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-ƛ (ir-fun 𝓋) , _ ∎ ,
+      ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-left-contract d̅⊑c̅′)) ⟩
+  ⟨ d̅ , 𝓋 , _ —→ₗ⟨ r ⟩ r* , d̅⊑c̅′ ⟩ →
+    ⟨ _ , V-cast V-ƛ (ir-fun 𝓋) ,
+      _ —→⟨ cast V-ƛ (_ —→ₗ⟨ r ⟩ r*) 𝓋 ⟩ _ ∎ ,
+      ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-left-contract d̅⊑c̅′)) ⟩
+sim-cast-left (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) c⊑A′ =
+  let c⊑c′ = comp-pres-prec-rl A⊑c′ c⊑A′ in
+  sim-cast V⊑V′ (V-raw v) (V-raw v′) c⊑c′ (_ ∎) (V-cast v′ i′)
 sim-cast-left (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) d⊑A′ =
   let c⨟d⊑A′ = comp-pres-prec-ll c⊑A′ d⊑A′ in
   let ⟨ W , w , ↠W , W⊑W′ ⟩ = sim-cast-left V⊑V′ (V-raw v) (V-raw v′) c⨟d⊑A′ in
