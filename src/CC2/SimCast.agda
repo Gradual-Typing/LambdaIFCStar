@@ -127,13 +127,26 @@ sim-cast V⟨d⟩⊑V′⟨d′⟩ (V-cast {V = V} {c} v i) (V-cast {V = V′} {
 sim-cast V⊑V′ v V-●  c⊑c′ ↠W′ w′ = contradiction V⊑V′ (_ ⋤●)
 sim-cast V⊑V′ V-● v′ c⊑c′ ↠W′ w′ = contradiction V⊑V′ (●⋤ _)
 
--- sim-cast : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B B′ M M′ N′}
---              {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′}
---   → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
---   → ⟨ c ⟩⊑⟨ c′ ⟩
---   → M′ ⟨ c′ ⟩ —→ N′
---   → ∃[ N ] (M ⟨ c ⟩ —↠ N) × (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′ ⇐ A ⊑ A′)
--- sim-cast M⊑M′ c⊑c′ (cast x x₁ x₂) = {!!}
--- sim-cast M⊑M′ c⊑c′ (cast-blame x x₁) = {!!}
--- sim-cast M⊑M′ c⊑c′ cast-id = {!!}
--- sim-cast M⊑M′ c⊑c′ (cast-comp x x₁) = {!!}
+sim-cast-left : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B V V′} {c : Cast A ⇒ B}
+  → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ V′ ⇐ A ⊑ A′
+  → Value V
+  → Value V′
+  → ⟨ c ⟩⊑ A′
+    -------------------------------------------------------------------
+  → ∃[ W ]    Value W  ×
+       (V ⟨ c ⟩ —↠ W) ×
+       (Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ W ⊑ V′ ⇐ B ⊑ A′)
+sim-cast-left V⊑V′ (V-raw x) (V-raw x₁) c⊑A′ = {!!}
+sim-cast-left V⊑V′ (V-raw x) (V-cast x₁ x₂) c⊑A′ = {!!}
+sim-cast-left (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) d⊑A′ =
+  let c⨟d⊑A′ = comp-pres-prec-ll c⊑A′ d⊑A′ in
+  let ⟨ W , w , ↠W , W⊑W′ ⟩ = sim-cast-left V⊑V′ (V-raw v) (V-raw v′) c⨟d⊑A′ in
+  ⟨ W , w , _ —→⟨ cast-comp v i ⟩ ↠W , W⊑W′ ⟩
+sim-cast-left V⟨c⟩⊑V′⟨c′⟩ (V-cast {V = V} {c} v i) (V-cast {V = V′} {c′} v′ i′) d⊑A′
+  with cast-prec-inv V⟨c⟩⊑V′⟨c′⟩ v v′
+... | ⟨ V⊑V′ , c⊑c′ , refl , refl ⟩ =
+  let c⨟d⊑c′ = comp-pres-prec-bl c⊑c′ d⊑A′ in
+  let ⟨ W , w , ↠W , W⊑W′ ⟩ = sim-cast V⊑V′ (V-raw v) (V-raw v′) c⨟d⊑c′ (_ ∎) (V-cast v′ i′) in
+  ⟨ W , w , _ —→⟨ cast-comp v i ⟩ ↠W , W⊑W′ ⟩
+sim-cast-left V⊑V′ V-● v′ c⊑A′ = contradiction V⊑V′ (●⋤ _)
+sim-cast-left V⊑V′ v V-● c⊑A′ = contradiction V⊑V′ (_ ⋤●)
