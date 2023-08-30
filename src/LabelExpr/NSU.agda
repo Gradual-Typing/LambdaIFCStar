@@ -92,20 +92,26 @@ sim-nsu-assign {V} {V′} {W′} {g} {g′} {ℓ} {ℓ′} {ℓ̂} {p} {q} V⊑V
              stamp!ₑ V′ v′ ℓ′ ⟪ coerceₗ {⋆} {l ℓ̂} ≾-⋆l p ⟫ ⇐ l ℓ̂ ⊑ l ℓ̂
     prec = ⊑-cast (stamp!ₑ-prec v v′ V⊑V′ ℓ≼ℓ′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 
-postulate
-  sim-nsu-assign-left : ∀ {V V′} {g ℓ₁ ℓ₂ ℓ₃} {p}
-    → ⊢ V ⊑ V′ ⇐ g ⊑ l ℓ₁
-    → (v  : LVal V )
-    → (v′ : LVal V′)
-    → ℓ₁ ≼ ℓ₃ → ℓ₂ ≼ ℓ₃
-      ---------------------------------------------------------------------------
-    → ∃[ W ] (LVal W) × (stamp!ₑ V v ℓ₂ ⟪ coerceₗ {⋆} {l ℓ₃} ≾-⋆l p ⟫ —↠ₑ W)
--- sim-nsu-assign-left {V} {V′} {g′} {.low} {ℓ₂} {.low} {p} V⊑V′ v v′ l≼l ℓ₂≼ℓ₃ = {!!}
--- sim-nsu-assign-left {V} {V′} {g′} {.low} {ℓ₂} {.high} {p} V⊑V′ v v′ l≼h ℓ₂≼ℓ₃ =
---   {!!}
--- sim-nsu-assign-left {V} {V′} {g′} {.high} {ℓ₂} {.high} {p} V⊑V′ v v′ h≼h ℓ₂≼high =
---   case catchup v′ prec of λ where
---   ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
---     where
---     prec : ∀ {ℓ} → ⊢ stamp!ₑ V v ℓ ⟪ id ⋆ ⨾ high ?? p ⟫ ⊑ V′ ⇐ l high ⊑ l high
---     prec = {!!}
+
+sim-nsu-assign-left : ∀ {V V′} {g ℓ₁ ℓ₂ ℓ₃} {p}
+  → ⊢ V ⊑ V′ ⇐ g ⊑ l ℓ₁
+  → (v  : LVal V )
+  → (v′ : LVal V′)
+  → ℓ₁ ≼ ℓ₃ → ℓ₂ ≼ ℓ₃
+    ---------------------------------------------------------------------------
+   → ∃[ W ] (LVal W) × (stamp!ₑ V v ℓ₂ ⟪ coerceₗ {⋆} {l ℓ₃} ≾-⋆l p ⟫ —↠ₑ W)
+sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.low}  {p} V⊑V′ v v′ l≼l l≼l = {!!}
+sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.high} {p} V⊑V′ v v′ l≼h l≼h = {!!}
+sim-nsu-assign-left {V} {V′} {g′} {.low}  {.high} {.high} {p} V⊑V′ v v′ l≼h h≼h =
+  let ⟨ ⊢V , ⊢V′ ⟩ = prec→⊢ V⊑V′ in
+  let v′-stamped = stampₑ-LVal v′ in
+  let ♣ : stampₑ V′ v′ high ⟪ id (l high) ⟫ —↠ₑ stampₑ V′ v′ high
+      ♣ = cast-id-id v′-stamped (stampₑ-wt v′ ⊢V′) in
+  case sim-mult prec ♣ v′-stamped of λ where
+  ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
+    where
+    prec : ⊢ stamp!ₑ V  v  high  ⟪ id ⋆ ⨾ high ?? p ⟫        ⊑
+             stampₑ V′ v′ high ⟪ id (l high) ⟫ ⇐ l high ⊑ l high
+    prec = ⊑-cast (stamp!ₑ-left-prec v v′ V⊑V′) (⊑-castl (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+sim-nsu-assign-left {V} {V′} {g′} {.high} {.low}  {.high} {p} V⊑V′ v v′ h≼h l≼h = {!!}
+sim-nsu-assign-left {V} {V′} {g′} {.high} {.high} {.high} {p} V⊑V′ v v′ h≼h h≼h = {!!}
