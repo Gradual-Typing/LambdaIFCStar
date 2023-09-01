@@ -101,7 +101,18 @@ sim-nsu-assign-left : ∀ {V V′} {g ℓ₁ ℓ₂ ℓ₃} {p}
     ---------------------------------------------------------------------------
    → ∃[ W ] (LVal W) × (stamp!ₑ V v ℓ₂ ⟪ coerceₗ {⋆} {l ℓ₃} ≾-⋆l p ⟫ —↠ₑ W)
 sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.low}  {p} V⊑V′ v v′ l≼l l≼l = {!!}
-sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.high} {p} V⊑V′ v v′ l≼h l≼h = {!!}
+sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.high} {p} V⊑V′ v v′ l≼h l≼h
+  with prec→⊢ V⊑V′ | v′
+... | ⟨ ⊢V , ⊢V′ ⟩ =
+  case ⟨ ⊢V′ , v′ ⟩ of λ where
+  ⟨ ⊢l , v-l ⟩ →
+    case catchup {!v-cast!} prec of λ where
+    ⟨ W , w , ↠W , _ ⟩ → {!!}
+  ⟨ ⊢cast ⊢l , v-cast (ir id x) ⟩ → contradiction refl (recompute (¬? (_ ==? _)) x)
+      where
+      prec : ⊢ stamp!ₑ V  v  low  ⟪ id ⋆ ⨾ high ?? p ⟫        ⊑
+               stampₑ  V′ v′ low ⟪ id (l low) ⨾ ↑ ⟫ ⇐ l high ⊑ l high
+      prec = ⊑-cast (stamp!ₑ-left-prec v v′ V⊑V′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 sim-nsu-assign-left {V} {V′} {g′} {.low}  {.high} {.high} {p} V⊑V′ v v′ l≼h h≼h =
   let ⟨ ⊢V , ⊢V′ ⟩ = prec→⊢ V⊑V′ in
   let v′-stamped = stampₑ-LVal v′ in
@@ -111,7 +122,7 @@ sim-nsu-assign-left {V} {V′} {g′} {.low}  {.high} {.high} {p} V⊑V′ v v�
   ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
     where
     prec : ⊢ stamp!ₑ V  v  high  ⟪ id ⋆ ⨾ high ?? p ⟫        ⊑
-             stampₑ V′ v′ high ⟪ id (l high) ⟫ ⇐ l high ⊑ l high
+             stampₑ  V′ v′ high ⟪ id (l high) ⟫ ⇐ l high ⊑ l high
     prec = ⊑-cast (stamp!ₑ-left-prec v v′ V⊑V′) (⊑-castl (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 sim-nsu-assign-left {V} {V′} {g′} {.high} {.low}  {.high} {p} V⊑V′ v v′ h≼h l≼h = {!!}
 sim-nsu-assign-left {V} {V′} {g′} {.high} {.high} {.high} {p} V⊑V′ v v′ h≼h h≼h = {!!}
