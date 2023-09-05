@@ -375,3 +375,11 @@ cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ cast r 𝓋 ⟩ r*) =
   ⟨ eq , _ —→⟨ cast r 𝓋 ⟩ ih ⟩
 cast-to-label-inv (l _ ⟪ _ ⟫ —→⟨ blame _ ⟩ _ —→⟨ r ⟩ _) =
   contradiction r (LResult⌿→ fail)
+
+cast-id-id : ∀ {g} {V}
+  → LVal V
+  → ⊢ V ⇐ g
+  → V ⟪ id g ⟫ —↠ₑ V
+cast-id-id v-l ⊢l = _ —→⟨ β-id ⟩ _ ∎
+cast-id-id (v-cast (ir 𝓋 x)) (⊢cast ⊢l) =
+  _ —→⟨ comp (ir 𝓋 x) ⟩ _ —→⟨ cast (_ —→ₗ⟨ id 𝓋 ⟩ _ ∎ₗ) 𝓋 ⟩ _ ∎
