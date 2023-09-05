@@ -33,6 +33,7 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 open import CC2.Simulation.App
 open import CC2.Simulation.Assign
+open import CC2.Simulation.AssignCast
 open import CC2.Simulation.Assign?Cast
 open import CC2.Simulation.Deref
 
@@ -154,7 +155,9 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref!-cast 𝓋
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-assign v) =
   ⟨ Σ , Σ′ , sim-assign vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v ⟩
 
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign-cast v 𝓋 x w) = {!!}
+{- assign-cast -}
+sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign-cast v′ 𝓋′ ↠W′ w′) =
+    ⟨ Σ , Σ′ , sim-assign-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq  v′ 𝓋′ ↠W′ w′ ⟩
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (assign-blame v 𝓋 x) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
