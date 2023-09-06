@@ -1,6 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-} -- FIXME
-
-
 module CC2.Simulation.AssignCast where
 
 open import Data.Nat
@@ -60,7 +57,19 @@ sim-assign-cast : ∀ {Σ Σ′ gc gc′} {M V′ W′ μ₁ μ₁′ PC PC′} 
 sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     (⊑-assign L⊑L′ M⊑V′ ℓc≼ℓ̂ ℓ≼ℓ̂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠W′ w′ = {!!}
 sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-assign?l L⊑L′ M⊑V′ ℓc≼ℓ̂ ℓ≼ℓ̂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠W′ w′ = {!!}
+    (⊑-assign?l L⊑L′ M⊑V′ ℓc≼ℓ̂ ℓ≼ℓ̂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠W′ w′
+  with catchup {μ = μ} {PC} v′ M⊑V′
+... | ⟨ W , w , M↠W , prec2 ⟩
+  with catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) L⊑L′
+... | ⟨ V , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
+... | ⟨ V , V-cast {c = c} V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr a b) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) ⟩ =
+  -- let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign-left PC⊑PC′ vc vc′ ℓc≼ℓ̂ ℓ≼ℓ̂ in
+  let ♣ = trans-mult (plug-cong (assign?□ _ _ _ _) L↠V)
+          (trans-mult (plug-cong (assign? _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
+            (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 {!!} {!!} {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
+  ⟨ {!!} , {!!} , ♣ , ⊑-const , {!!} , {!!} ⟩
+... | ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr a b) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′)) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ = {!!}
+... | ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr a b) _) _ ⟩ = {!!}
 sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠W′ w′
   with sim-assign-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠W′ w′
