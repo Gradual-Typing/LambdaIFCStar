@@ -169,3 +169,8 @@ comp-security {c̅ₙ = c̅ₙ} {c̅ ⨾ high ?? p} {d̅ₙ} v r* v′
   let eq = det-mult ♣ r* (success (up id)) (success v′) in
   subst (_ ≼_) (security-eq (up id) v′ eq) (_ ≼high)
 comp-security {c̅ = ⊥ _ _ p} v (_ ∎) ()
+
+-- If a coercion expr has a static type, then its security level is equal to the type
+static-security : ∀ {ℓ₁ ℓ₂} → (c̅ : CExpr l ℓ₁ ⇒ l ℓ₂) → (𝓋 : CVal c̅) → ∥ c̅ ∥ 𝓋 ≡ ℓ₂
+static-security (id (l ℓ))        id      = refl
+static-security (id (l low) ⨾ ↑) (up id) = refl
