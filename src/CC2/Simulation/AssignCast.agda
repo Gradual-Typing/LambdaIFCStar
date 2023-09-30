@@ -29,6 +29,7 @@ open import CC2.HeapPrecision
 open import CC2.CatchUp
 open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
+open import CC2.CastSubtyping
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 
@@ -62,11 +63,15 @@ sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
 ... | ⟨ W , w , M↠W , prec2 ⟩
   with catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) L⊑L′
 ... | ⟨ V , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
-... | ⟨ V , V-cast {c = c} V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr a b) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) ⟩ =
-  -- let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign-left PC⊑PC′ vc vc′ ℓc≼ℓ̂ ℓ≼ℓ̂ in
+... | ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr a b) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) ⟩ =
+  let ⟨ _ , ⊢V′ , _ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ prec2 in
+  let ℓ̂≼ℓ̂₁ = cast-≼ v′ ⊢V′ ↠W′ w′ in
+  let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
+  let ∣c̅∣≼ℓ = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
+  let ⟨ PC₁ , vc₁ , ↠PC₁ ⟩ = sim-nsu-assign-left PC⊑PC′ vc vc′ (≼-trans ℓc≼ℓ̂ ℓ̂≼ℓ̂₁) (≼-trans ∣c̅∣≼ℓ (≼-trans ℓ≼ℓ̂ ℓ̂≼ℓ̂₁)) in
   let ♣ = trans-mult (plug-cong (assign?□ _ _ _ _) L↠V)
           (trans-mult (plug-cong (assign? _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
-            (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 {!!} {!!} {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
+            (_ ∣ _ ∣ _ —→⟨ assign?-cast w vc 𝓋 ↠PC₁ vc₁ {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
   ⟨ {!!} , {!!} , ♣ , ⊑-const , {!!} , {!!} ⟩
 ... | ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr a b) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′)) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ = {!!}
 ... | ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr a b) _) _ ⟩ = {!!}
