@@ -21,6 +21,7 @@ open import CoercionExpr.GG using (sim-mult)
 open import CoercionExpr.CatchUp using (catchup; catchup-to-id)
 open import CC2.Statics
 open import CC2.CastReduction
+open import CC2.Reduction using (Value⌿→) renaming (cast to app-cast)
 open import CC2.Precision
 
 
@@ -196,6 +197,9 @@ sim-cast-left V⊑V′ V-● v′ c⊑A′ = contradiction V⊑V′ (●⋤ _)
 sim-cast-left V⊑V′ v V-● c⊑A′ = contradiction V⊑V′ (_ ⋤●)
 
 
+{- A better `sim-cast-right` should look like `sim-cast-left`. In that case,
+   we need to prove that cast reduction is deterministic, so I guess this
+   version is good enough for now. -}
 sim-cast-right : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B′ V V′ W′} {c′ : Cast A′ ⇒ B′}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ V′ ⇐ A ⊑ A′
     → Value V
@@ -214,6 +218,18 @@ sim-cast-right V⊑V′ v v′ (⊑-ref x y g⊑c̅′) (_ —→⟨ cast vᵣ c
 sim-cast-right V⊑V′ v v′ (⊑-fun x y z g⊑c̅′) (_ —→⟨ cast vᵣ c̅′→⁺c̅ₙ 𝓋 ⟩ r*) w′ =
   let g⊑c̅ₙ = pres-prec-right-mult g⊑c̅′ (→⁺-impl-↠ c̅′→⁺c̅ₙ) in
   sim-cast-right V⊑V′ v v′ (⊑-fun x y z g⊑c̅ₙ) r* w′
-sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-blame x x₁ ⟩ r*) w′ = {!!}
-sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-id ⟩ r*) w′ = {!!}
-sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-comp x x₁ ⟩ r*) w′ = {!!}
+sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-blame x x₁ ⟩ _ ∎) (V-raw ())
+sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-id ⟩ _ ∎) (V-raw V-const) = V⊑V′
+-- those two case below require some thinking
+sim-cast-right (⊑-cast V⊑V′ c⊑c′) (V-cast vᵣ i) (V-cast vᵣ′ i′) A⊑c′₁ (_ —→⟨ cast-comp vᵣ′† i′† ⟩ r*) w′
+  with sim-cast V⊑V′ (V-raw vᵣ) (V-raw vᵣ′) (comp-pres-prec-br c⊑c′ A⊑c′₁) r* w′
+... | ⟨ W , w , _ ∎ , prec ⟩ = prec
+... | ⟨ W , w , _ —→⟨ r ⟩ _ , prec ⟩ =
+  contradiction (app-cast (V-raw vᵣ) r) (Value⌿→ {μ = ∅} {PC = l low} (V-cast vᵣ i))
+sim-cast-right (⊑-castl (⊑-castr V⊑V′ A⊑c′) c⊑A′) (V-cast vᵣ i) v′ B⊑c₁′ (_ —→⟨ cast-comp vᵣ′ i′ ⟩ r*) w′
+  with sim-cast V⊑V′ (V-raw vᵣ) (V-raw vᵣ′) (comp-pres-prec-br (comp-pres-prec-rl A⊑c′ c⊑A′) B⊑c₁′) r* w′
+... | ⟨ W , w , _ ∎ , prec ⟩ = prec
+... | ⟨ W , w , _ —→⟨ r ⟩ _ , prec ⟩ =
+  contradiction (app-cast (V-raw vᵣ) r) (Value⌿→ {μ = ∅} {PC = l low} (V-cast vᵣ i))
+sim-cast-right (⊑-castr V⊑V′ A⊑c′₁) v v′ A⊑c′ (_ —→⟨ cast-comp vᵣ i ⟩ r*) w′ =
+  sim-cast-right V⊑V′ v (V-raw vᵣ) (comp-pres-prec-rr A⊑c′₁ A⊑c′) r* w′

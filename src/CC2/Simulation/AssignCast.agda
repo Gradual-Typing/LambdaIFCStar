@@ -64,9 +64,10 @@ sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
     let ♣ = trans-mult (plug-cong (assign□ _ _ _ _) L↠V)
             (trans-mult (plug-cong (assign _ □ (V-raw V-addr) _ _ _) M↠W)
               (_ ∣ _ ∣ _ —→⟨ β-assign w ⟩ _ ∣ _ ∣ _ ∎)) in
-    ⟨ _ , cons-μ _ W w _ , ♣ , ⊑-const ,
-      ⊑μ-update μ⊑μ′ {!!} w w′ a b ,
-      size-eq-cons {v = w} {w′} {n} {ℓ̂} size-eq ⟩
+    let W⊑W′ = sim-cast-right W⊑V′ w v′ A⊑c′ ↠W′ w′ in
+      ⟨ _ , cons-μ _ W w _ , ♣ , ⊑-const ,
+        ⊑μ-update μ⊑μ′ (value-⊑-pc W⊑W′ w w′) w w′ a b ,
+        size-eq-cons {v = w} {w′} {n} {ℓ̂} size-eq ⟩
   ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) ⟩ →
     {!!}
   ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′)) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ →

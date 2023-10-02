@@ -187,6 +187,19 @@ comp-pres-prec-ll (⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′)
   ⊑-fun (comp-pres-⊑-ll d̅₂⊑gc′ d̅₁⊑gc′) (comp-pres-prec-ll c₂⊑A′ c₁⊑A′)
         (comp-pres-prec-ll d₁⊑B′ d₂⊑B′) (comp-pres-⊑-ll c̅₁⊑g′ c̅₂⊑g′)
 
+comp-pres-prec-rr : ∀ {A A′ B′ C′} {c : Cast A′ ⇒ B′} {d : Cast B′ ⇒ C′}
+  → A ⊑⟨     c ⟩
+  → A ⊑⟨     d ⟩
+    -----------------------
+  → A ⊑⟨ c ⨟ d ⟩
+comp-pres-prec-rr (⊑-base c̅⊑g′) (⊑-base d̅⊑g′) = ⊑-base (comp-pres-⊑-rr c̅⊑g′ d̅⊑g′)
+comp-pres-prec-rr (⊑-ref c₁⊑A′ d₁⊑A′ c̅⊑g′) (⊑-ref c₂⊑A′ d₂⊑A′ d̅⊑g′) =
+  ⊑-ref (comp-pres-prec-rr c₂⊑A′ c₁⊑A′) (comp-pres-prec-rr d₁⊑A′ d₂⊑A′)
+        (comp-pres-⊑-rr c̅⊑g′ d̅⊑g′)
+comp-pres-prec-rr (⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′) (⊑-fun d̅₂⊑gc′ c₂⊑A′ d₂⊑B′ c̅₂⊑g′) =
+  ⊑-fun (comp-pres-⊑-rr d̅₂⊑gc′ d̅₁⊑gc′) (comp-pres-prec-rr c₂⊑A′ c₁⊑A′)
+        (comp-pres-prec-rr d₁⊑B′ d₂⊑B′) (comp-pres-⊑-rr c̅₁⊑g′ c̅₂⊑g′)
+
 
 comp-pres-prec-bl : ∀ {A A′ B B′ C} {c : Cast A ⇒ B} {d : Cast B ⇒ C}
                       {c′ : Cast A′ ⇒ B′}
