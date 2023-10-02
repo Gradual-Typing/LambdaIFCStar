@@ -16,6 +16,7 @@ open import Common.Utils
 open import Memory.HeapContext
 open import CoercionExpr.CoercionExpr using (CVal⌿→)
 open import CoercionExpr.Precision
+open import CoercionExpr.CatchUpBack using (catchup-back)
 open import CoercionExpr.GG using (sim-mult)
 open import CoercionExpr.CatchUp using (catchup; catchup-to-id)
 open import CC2.Statics
@@ -193,3 +194,26 @@ sim-cast-left V⟨c⟩⊑V′⟨c′⟩ (V-cast {V = V} {c} v i) (V-cast {V = V�
   ⟨ W , w , _ —→⟨ cast-comp v i ⟩ ↠W , W⊑W′ ⟩
 sim-cast-left V⊑V′ V-● v′ c⊑A′ = contradiction V⊑V′ (●⋤ _)
 sim-cast-left V⊑V′ v V-● c⊑A′ = contradiction V⊑V′ (_ ⋤●)
+
+
+sim-cast-right : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B′ V V′ W′} {c′ : Cast A′ ⇒ B′}
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ V′ ⇐ A ⊑ A′
+    → Value V
+    → Value V′
+    → A ⊑⟨ c′ ⟩
+    → V′ ⟨ c′ ⟩ —↠ W′
+    → Value W′
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ W′ ⇐ A ⊑ B′
+sim-cast-right V⊑V′ v v′ A⊑c′ (_ ∎) w′ = ⊑-castr V⊑V′ A⊑c′
+sim-cast-right V⊑V′ v v′ (⊑-base g⊑c̅′) (_ —→⟨ cast vᵣ c̅′→⁺c̅ₙ 𝓋 ⟩ r*) w′ =
+  let g⊑c̅ₙ = pres-prec-right-mult g⊑c̅′ (→⁺-impl-↠ c̅′→⁺c̅ₙ) in
+  sim-cast-right V⊑V′ v v′ (⊑-base g⊑c̅ₙ) r* w′
+sim-cast-right V⊑V′ v v′ (⊑-ref x y g⊑c̅′) (_ —→⟨ cast vᵣ c̅′→⁺c̅ₙ 𝓋 ⟩ r*) w′ =
+  let g⊑c̅ₙ = pres-prec-right-mult g⊑c̅′ (→⁺-impl-↠ c̅′→⁺c̅ₙ) in
+  sim-cast-right V⊑V′ v v′ (⊑-ref x y g⊑c̅ₙ) r* w′
+sim-cast-right V⊑V′ v v′ (⊑-fun x y z g⊑c̅′) (_ —→⟨ cast vᵣ c̅′→⁺c̅ₙ 𝓋 ⟩ r*) w′ =
+  let g⊑c̅ₙ = pres-prec-right-mult g⊑c̅′ (→⁺-impl-↠ c̅′→⁺c̅ₙ) in
+  sim-cast-right V⊑V′ v v′ (⊑-fun x y z g⊑c̅ₙ) r* w′
+sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-blame x x₁ ⟩ r*) w′ = {!!}
+sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-id ⟩ r*) w′ = {!!}
+sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-comp x x₁ ⟩ r*) w′ = {!!}
