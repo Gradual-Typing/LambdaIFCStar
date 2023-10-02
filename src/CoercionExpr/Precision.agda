@@ -108,28 +108,6 @@ coerce⇒⋆-prec ⋆⊑ = ⊑-id ⋆⊑
 coerce⇒⋆-prec l⊑l = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
 
 
-pres-prec-left : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
-  → ⊢l c̅₁ ⊑ g′
-  → c̅₁ —→ c̅₂
-  → ⊢l c̅₂ ⊑ g′
-pres-prec-left (⊑-cast prec g₁⊑g′ g₂⊑g′) (ξ r) =
-  ⊑-cast (pres-prec-left prec r) g₁⊑g′ g₂⊑g′
-pres-prec-left (⊑-cast () x x₁) ξ-⊥
-pres-prec-left (⊑-cast prec _ _) (id x) = prec
-pres-prec-left (⊑-cast (⊑-cast prec l⊑l ⋆⊑) ⋆⊑ l⊑l) (?-id x) = prec
-pres-prec-left (⊑-cast (⊑-cast _ l⊑l ⋆⊑) ⋆⊑ ()) (?-↑ x)
-pres-prec-left (⊑-cast (⊑-cast prec l⊑l ⋆⊑) ⋆⊑ ()) (?-⊥ x)
-
-pres-prec-left-mult : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
-  → ⊢l c̅₁ ⊑ g′
-  → c̅₁ —↠ c̅₂
-  → ⊢l c̅₂ ⊑ g′
-pres-prec-left-mult prec (_ ∎) = prec
-pres-prec-left-mult prec (_ —→⟨ r ⟩ r*) =
-  let prec′ = pres-prec-left prec r in
-  pres-prec-left-mult prec′ r*
-
-
 prec→⊑ : ∀ {g₁ g₁′ g₂ g₂′} (c̅ : CExpr g₁ ⇒ g₂) (c̅′ : CExpr g₁′ ⇒ g₂′)
   → ⊢ c̅ ⊑ c̅′
   → (g₁ ⊑ₗ g₁′) × (g₂ ⊑ₗ g₂′)
@@ -185,6 +163,44 @@ prec-right→⊑ (⊥ _ _ _) (⊑-⊥ x y) = ⟨ x , y ⟩
 ⊑-right-contract (⊑-id g⊑g′) = ⊑-id g⊑g′
 ⊑-right-contract (⊑-castr id⊑c̅′ g⊑g₁′ g⊑g₂′) = ⊑-cast (⊑-right-contract id⊑c̅′) g⊑g₁′ g⊑g₂′
 ⊑-right-contract (⊑-⊥ g⊑g₁′ g⊑g₂′) = ⊑-⊥ g⊑g₁′ g⊑g₂′
+
+
+pres-prec-left : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
+  → ⊢l c̅₁ ⊑ g′
+  → c̅₁ —→ c̅₂
+  → ⊢l c̅₂ ⊑ g′
+pres-prec-left (⊑-cast prec g₁⊑g′ g₂⊑g′) (ξ r) =
+  ⊑-cast (pres-prec-left prec r) g₁⊑g′ g₂⊑g′
+pres-prec-left (⊑-cast () x x₁) ξ-⊥
+pres-prec-left (⊑-cast prec _ _) (id x) = prec
+pres-prec-left (⊑-cast (⊑-cast prec l⊑l ⋆⊑) ⋆⊑ l⊑l) (?-id x) = prec
+pres-prec-left (⊑-cast (⊑-cast _ l⊑l ⋆⊑) ⋆⊑ ()) (?-↑ x)
+pres-prec-left (⊑-cast (⊑-cast prec l⊑l ⋆⊑) ⋆⊑ ()) (?-⊥ x)
+
+pres-prec-left-mult : ∀ {g₁ g₂ g′} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
+  → ⊢l c̅₁ ⊑ g′
+  → c̅₁ —↠ c̅₂
+  → ⊢l c̅₂ ⊑ g′
+pres-prec-left-mult prec (_ ∎) = prec
+pres-prec-left-mult prec (_ —→⟨ r ⟩ r*) = pres-prec-left-mult (pres-prec-left prec r) r*
+
+pres-prec-right : ∀ {g g₁ g₂} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
+  → ⊢r g ⊑ c̅₁
+  → c̅₁ —→ c̅₂
+  → ⊢r g ⊑ c̅₂
+pres-prec-right (⊑-cast prec g⊑g₃ g⊑g₂) (ξ r) = ⊑-cast (pres-prec-right prec r) g⊑g₃ g⊑g₂
+pres-prec-right (⊑-cast (⊑-⊥ g⊑g₁ _) _ g⊑g₂) ξ-⊥ = ⊑-⊥ g⊑g₁ g⊑g₂
+pres-prec-right (⊑-cast prec _ _) (id _) = prec
+pres-prec-right (⊑-cast (⊑-cast prec _ _) ⋆⊑ _) (?-id _) = prec
+pres-prec-right (⊑-cast (⊑-cast prec _ _) ⋆⊑ _) (?-↑ _) = ⊑-cast prec ⋆⊑ ⋆⊑
+pres-prec-right (⊑-cast (⊑-cast prec _ _) _ g⊑low) (?-⊥ _) = ⊑-⊥ (proj₁ (prec-right→⊑ _ prec)) g⊑low
+
+pres-prec-right-mult : ∀ {g g₁ g₂} {c̅₁ c̅₂ : CExpr g₁ ⇒ g₂}
+  → ⊢r g ⊑ c̅₁
+  → c̅₁ —↠ c̅₂
+  → ⊢r g ⊑ c̅₂
+pres-prec-right-mult prec (_ ∎) = prec
+pres-prec-right-mult prec (_ —→⟨ r ⟩ r*) = pres-prec-right-mult (pres-prec-right prec r) r*
 
 
 prec-inj-left : ∀ {g g′ ℓ}
