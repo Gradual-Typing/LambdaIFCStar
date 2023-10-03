@@ -54,7 +54,16 @@ sim-deref!-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
       (⊑-deref! M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′
   with catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) M⊑M′
 ... | ⟨ addr _ , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
-... | ⟨ _ , V-cast V-addr _ , L↠V , ⊑-cast (⊑-addr a b) c⊑c′ ⟩ = {!!}
+... | ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑c′ ⟩ =
+  let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+  let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
+                     (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+  case c⊑c′ of λ where
+  (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+    case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+    refl →
+      let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
+      ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼∣c̅′∣ ⟩
 ... | ⟨ _ , V-cast V-addr _ , L↠V , ⊑-castl (⊑-castr (⊑-addr a b) A⊑c′) c⊑A′ ⟩ =
   {!!}
 ... | ⟨ _ , V-cast V-const _ , L↠V , ⊑-castl (⊑-castr () _) c⊑A′ ⟩
