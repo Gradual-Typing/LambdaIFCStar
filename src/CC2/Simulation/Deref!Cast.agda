@@ -44,10 +44,24 @@ sim-deref!-cast : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ B�
   → PC ⊑ PC′ ⇐ gc ⊑ gc′
   → SizeEq μ μ′
   → (v′ : Value V′)
-  → (𝓋 : CVal c̅ₙ)
+  → (𝓋′ : CVal c̅ₙ)
   → lookup-μ μ′ (a⟦ ℓ̂ ⟧ n) ≡ just (V′ & v′)
     -------------------
-  → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
+  → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋′ in
         ∃[ N ] (M ∣ μ ∣ PC —↠ N ∣ μ) ×
              ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ prot! (l high) v-l ℓ′ (V′ ⟨ d ⟩) B′ ⇐ A ⊑ A′)
-sim-deref!-cast vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋 μ′a≡V′ = ?
+sim-deref!-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
+      (⊑-deref! M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′
+  with catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) M⊑M′
+... | ⟨ addr _ , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
+... | ⟨ _ , V-cast V-addr _ , L↠V , ⊑-cast (⊑-addr a b) c⊑c′ ⟩ = {!!}
+... | ⟨ _ , V-cast V-addr _ , L↠V , ⊑-castl (⊑-castr (⊑-addr a b) A⊑c′) c⊑A′ ⟩ =
+  {!!}
+... | ⟨ _ , V-cast V-const _ , L↠V , ⊑-castl (⊑-castr () _) c⊑A′ ⟩
+... | ⟨ _ , V-cast V-ƛ _ , L↠V , ⊑-castl (⊑-castr () _) c⊑A′ ⟩
+... | ⟨ _ , V-cast _ _ , L↠V , ⊑-castr (⊑-castl (⊑-addr a b) c⊑A′) A⊑c′ ⟩ =
+  {!!}
+sim-deref!-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋 μ′a≡V′
+  with sim-deref!-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋 μ′a≡V′
+... | ⟨ N , M↠N , N⊑N′ ⟩ =
+  ⟨ N ⟨ c ⟩ , plug-cong □⟨ c ⟩ M↠N , ⊑-castl N⊑N′ c⊑A′ ⟩
