@@ -31,11 +31,13 @@ open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
+{- One lemma for each reduction rule (on the more precise side) -}
 open import CC2.Simulation.App
 open import CC2.Simulation.Assign
 open import CC2.Simulation.AssignCast
 open import CC2.Simulation.Assign?Cast
 open import CC2.Simulation.Deref
+open import CC2.Simulation.Deref!Cast
 
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
@@ -148,8 +150,14 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
   let ⟨ N , ♣ , prec ⟩ = sim-deref vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ μ′a≡V′ in
   ⟨ Σ , Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
+{- deref-cast -}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref-cast 𝓋 x) = {!!}
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref!-cast 𝓋 x) = {!!}
+
+{- deref!-cast -}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+    M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (deref!-cast {v = v′} 𝓋 μ′a≡V′) =
+  let ⟨ N , ♣ , prec ⟩ = sim-deref!-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋 μ′a≡V′ in
+  ⟨ Σ , Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
 {- assign -}
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-assign v) =
