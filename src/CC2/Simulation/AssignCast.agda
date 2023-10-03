@@ -69,11 +69,31 @@ sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc�
         ⊑μ-update μ⊑μ′ (value-⊑-pc W⊑W′ w w′) w w′ a b ,
         size-eq-cons {v = w} {w′} {n} {ℓ̂} size-eq ⟩
   ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) ⟩ →
-    {!!}
+    let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑V′ w v′ c⊑c′ ↠W′ w′ in
+    let ♣ = trans-mult (plug-cong (assign□ _ _ _ _) L↠V)
+          (trans-mult (plug-cong (assign _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
+          (_ ∣ _ ∣ _ —→⟨ assign-cast w 𝓋 ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+    ⟨ _ , cons-μ _ W₁ w₁ _ , ♣ , ⊑-const ,
+      ⊑μ-update μ⊑μ′ (value-⊑-pc W₁⊑W′ w₁ w′) w₁ w′ a b ,
+      size-eq-cons {v = w₁} {w′} {n} {ℓ̂} size-eq ⟩
   ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′)) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ →
-    {!!}
+    let c⊑c′ = comp-pres-prec-lr c⊑A′ A⊑c′ in
+    let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑V′ w v′ c⊑c′ ↠W′ w′ in
+    let ♣ = trans-mult (plug-cong (assign□ _ _ _ _) L↠V)
+          (trans-mult (plug-cong (assign _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
+          (_ ∣ _ ∣ _ —→⟨ assign-cast w 𝓋 ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+    ⟨ _ , cons-μ _ W₁ w₁ _ , ♣ , ⊑-const ,
+      ⊑μ-update μ⊑μ′ (value-⊑-pc W₁⊑W′ w₁ w′) w₁ w′ a b ,
+      size-eq-cons {v = w₁} {w′} {n} {ℓ̂} size-eq ⟩
   ⟨ V , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′)) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′) ⟩ →
-    {!!}
+    let c⊑c′ = comp-pres-prec-rl A⊑c′ c⊑A′ in
+    let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑V′ w v′ c⊑c′ ↠W′ w′ in
+    let ♣ = trans-mult (plug-cong (assign□ _ _ _ _) L↠V)
+          (trans-mult (plug-cong (assign _ □ (V-cast V-addr (ir-ref 𝓋)) _ _ _) M↠W)
+          (_ ∣ _ ∣ _ —→⟨ assign-cast w 𝓋 ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+    ⟨ _ , cons-μ _ W₁ w₁ _ , ♣ , ⊑-const ,
+      ⊑μ-update μ⊑μ′ (value-⊑-pc W₁⊑W′ w₁ w′) w₁ w′ a b ,
+      size-eq-cons {v = w₁} {w′} {n} {ℓ̂} size-eq ⟩
 sim-assign-cast {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     (⊑-assign?l L⊑L′ M⊑V′ ℓc≼ℓ̂ ℓ≼ℓ̂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠W′ w′
   with catchup {μ = μ} {PC} v′ M⊑V′
