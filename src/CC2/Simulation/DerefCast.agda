@@ -49,8 +49,91 @@ sim-deref-cast : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ B′
     ---------------------------------------------
   → ∃[ N ] (M ∣ μ ∣ PC —↠ N ∣ μ) ×
             ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ prot (l high) v-l ℓ₂ (V′ ⟨ d ⟩) B′ ⇐ A ⊑ A′)
-sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′ (⊑-deref prec x x₁) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ = {!!}
-sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′ (⊑-deref!l prec x x₁) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ = {!!}
+sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
+  (⊑-deref M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ =
+  case catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) M⊑M′ of λ where
+  ⟨ _ , V-raw V-addr , L↠V , ⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) A⊑c′ ⟩ →
+    let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    let ♣ = trans-mult (plug-cong (!□ _ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref {v = v} μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    -- case c⊑c′ of λ where
+    -- (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+      case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+      refl →
+        ⟨ _ , ♣ , ⊑-prot ? ⊑-l (_ ≼high) (_ ≼high) eq eq′ ⟩
+  ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑c′ ⟩ →
+    let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    let ♣ = trans-mult (plug-cong (!□ _ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    case c⊑c′ of λ where
+    (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+      case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+      refl →
+        ⟨ _ , ♣ , ⊑-prot (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ⟩
+  ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) A⊑c′) c⊑A′ ⟩ → {!!}
+    -- let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    -- let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
+    --                    (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    -- case (comp-pres-prec-rl A⊑c′ c⊑A′) of λ where
+    -- (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+    --   case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+    --   refl →
+    --     let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
+    --         ∣c̅∣≼ℓ₂   = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
+    --     ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼ℓ₂ ⟩
+  ⟨ _ , V-cast V-const _ , L↠V , ⊑-castl (⊑-castr () A⊑c′) c⊑A′ ⟩
+  ⟨ _ , V-cast V-ƛ _ , L↠V , ⊑-castl (⊑-castr () A⊑c′) c⊑A′ ⟩
+  ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑A′) A⊑c′ ⟩ → {!!}
+  ⟨ _ , V-cast V-const _ , L↠V , ⊑-castr (⊑-castl () A⊑c′) c⊑A′ ⟩
+  ⟨ _ , V-cast V-ƛ _ , L↠V , ⊑-castr (⊑-castl () A⊑c′) c⊑A′ ⟩
+  ⟨ ● , V-● , _ , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
+    -- let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    -- let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
+    --                    (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    -- case (comp-pres-prec-lr c⊑A′ A⊑c′) of λ where
+    -- (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+    --   case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+    --   refl →
+    --     let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
+    --         ∣c̅∣≼ℓ₂   = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
+    --     ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼ℓ₂ ⟩
+sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
+  (⊑-deref!l M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ =
+  case catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) M⊑M′ of λ where
+  ⟨ addr _ , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
+  ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑c′ ⟩ →
+    let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    case c⊑c′ of λ where
+    (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+      case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+      refl →
+        let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
+            ∣c̅∣≼ℓ₂   = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
+        ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼ℓ₂ ⟩
+  ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) A⊑c′) c⊑A′ ⟩ →
+    let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    case (comp-pres-prec-rl A⊑c′ c⊑A′) of λ where
+    (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+      case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+      refl →
+        let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
+            ∣c̅∣≼ℓ₂   = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
+        ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼ℓ₂ ⟩
+  ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑A′) A⊑c′ ⟩ →
+    let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
+    let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    case (comp-pres-prec-lr c⊑A′ A⊑c′) of λ where
+    (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
+      case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
+      refl →
+        let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
+            ∣c̅∣≼ℓ₂   = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
+        ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼ℓ₂ ⟩
 sim-deref-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′
   with sim-deref-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′
 ... | ⟨ N , M↠N , N⊑N′ ⟩ =
