@@ -58,7 +58,10 @@ sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC�
        ([] ; [] ∣ Σ₂ ; Σ₂′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′ ⇐ A ⊑ A′) ×
        (Σ₂ ; Σ₂′ ⊢ μ₂ ⊑ μ₂′) ×
        (SizeEq μ₂ μ₂′)
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ξ M′→N′) = {!!}
+{- ξ -}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ξ M′→N′) = {!!}
+
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq ξ-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
@@ -83,7 +86,16 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot-val v) = {!
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot!-ctx M′→N′) = {!!}
+
+{- prot!-ctx -}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  (⊑-prot! {vc = vc₁} {vc₁′} M⊑M′ PC₁⊑PC₁′ ℓv₁⋎ℓ≼ℓv₂ ℓv₁′⋎ℓ≼ℓv₂′ eq eq′ ℓ≼ℓ′)
+  Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot!-ctx M′→N′) =
+  let ⟨ Σ₂ , Σ₂′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+        sim vc₁ vc₁′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC₁⊑PC₁′ size-eq M′→N′ in
+  ⟨ Σ₂ , Σ₂′ , _ , μ₂ , prot!-ctx-mult vc₁ M↠N ,
+    ⊑-prot! N⊑N′ PC₁⊑PC₁′ ℓv₁⋎ℓ≼ℓv₂ ℓv₁′⋎ℓ≼ℓv₂′ eq eq′ ℓ≼ℓ′ , μ₂⊑μ₂′ , size-eq′ ⟩
+
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot!-val v) = {!!}
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot!-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
