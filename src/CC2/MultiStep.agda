@@ -58,6 +58,14 @@ plug-cong F (_ ∣ _ ∣ _ ∎) = _ ∣ _ ∣ _ ∎
 plug-cong F (L ∣ μ ∣ PC —→⟨ L→M ⟩ M↠N) =
   plug L F ∣ μ ∣ PC —→⟨ ξ L→M ⟩ plug-cong F M↠N
 
+prot-ctx-mult : ∀ {M N μ μ′ PC PC′} {A ℓ}
+  → (vc′ : LVal PC′)
+  → M ∣ μ ∣ PC′ —↠ N ∣ μ′
+  → prot PC′ vc′ ℓ M A ∣ μ ∣ PC —↠ prot PC′ vc′ ℓ N A ∣ μ′
+prot-ctx-mult vc′ (_ ∣ _ ∣ _ ∎) = _ ∣ _ ∣ _ ∎
+prot-ctx-mult {PC = PC} {PC′} vc′ (L ∣ μ ∣ .PC′ —→⟨ L→M ⟩ M↠N) =
+  _ ∣ μ ∣ PC —→⟨ prot-ctx L→M ⟩ prot-ctx-mult vc′ M↠N
+
 
 -- pres-mult : ∀ {Σ gc pc M M′ A μ μ′}
 --   → [] ; Σ ; gc ; pc ⊢ M ⦂ A
