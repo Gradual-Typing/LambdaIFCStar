@@ -78,19 +78,28 @@ canonical⋆ (V-raw V-const) ()
 canonical⋆ (V-cast {V = W} {c} w i) (⊢cast ⊢W) = ⟨ _ , c , _ , refl , i , ⊢W ⟩
 
 
+-- stamp-val : ∀ V → Value V → (A : Type) → StaticLabel → Term
+-- stamp-val (addr n) (V-raw V-addr) A low = addr n
+-- stamp-val (addr n) (V-raw V-addr) (Ref A of l low) high =
+--   addr n ⟨ cast (coerceᵣ-id (Ref A)) (id (l low) ⨾ ↑) ⟩
+-- stamp-val (addr n) (V-raw V-addr) (Ref A of l high) high = addr n
+-- stamp-val (ƛ N) (V-raw V-ƛ) A low = ƛ N
+-- stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l low) high =
+--   ƛ N ⟨ cast (coerceᵣ-id (⟦ g ⟧ A ⇒ B)) (id (l low) ⨾ ↑) ⟩
+-- stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l high) high = ƛ N
+-- stamp-val ($ k) (V-raw V-const) A low = $ k
+-- stamp-val ($ k) (V-raw V-const) (` ι of l low) high =
+--   $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
+-- stamp-val ($ k) (V-raw V-const) (` ι of l high) high = $ k
+-- stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
+-- -- other impossible cases suppose ⊢ V ⇐ A
+-- stamp-val V v A ℓ = ●
+
 stamp-val : ∀ V → Value V → (A : Type) → StaticLabel → Term
-stamp-val (addr n) (V-raw V-addr) A low = addr n
-stamp-val (addr n) (V-raw V-addr) (Ref A of l low) high =
-  addr n ⟨ cast (coerceᵣ-id (Ref A)) (id (l low) ⨾ ↑) ⟩
-stamp-val (addr n) (V-raw V-addr) (Ref A of l high) high = addr n
-stamp-val (ƛ N) (V-raw V-ƛ) A low = ƛ N
-stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l low) high =
-  ƛ N ⟨ cast (coerceᵣ-id (⟦ g ⟧ A ⇒ B)) (id (l low) ⨾ ↑) ⟩
-stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l high) high = ƛ N
-stamp-val ($ k) (V-raw V-const) A low = $ k
-stamp-val ($ k) (V-raw V-const) (` ι of l low) high =
-  $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
-stamp-val ($ k) (V-raw V-const) (` ι of l high) high = $ k
+stamp-val V (V-raw v)             _ low  = V
+stamp-val V (V-raw v) (T of l high) high = V
+stamp-val V (V-raw v) (T of l low ) high =
+  V ⟨ cast (coerceᵣ-id T) (id (l low) ⨾ ↑) ⟩
 stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
 -- other impossible cases suppose ⊢ V ⇐ A
 stamp-val V v A ℓ = ●
