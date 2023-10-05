@@ -56,12 +56,13 @@ sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC�
     ------------------------------------------------------
   → ∃[ Σ₂ ] ∃[ Σ₂′ ]
        (Σ₂ ⊇ Σ₁) × (Σ₂′ ⊇ Σ₁′) ×
-     (∃[ N ] ∃[ μ₂ ]
+     ∃[ N ] ∃[ μ₂ ]
        (M ∣ μ₁ ∣ PC —↠ N ∣ μ₂) ×
        ([] ; [] ∣ Σ₂ ; Σ₂′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′ ⇐ A ⊑ A′) ×
        (Σ₂ ; Σ₂′ ⊢ μ₂ ⊑ μ₂′) ×
-       (SizeEq μ₂ μ₂′))
+       (SizeEq μ₂ μ₂′)
 
+-- reasoning about evaluation contexts
 sim-ξ : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′} {F : Frame}
   → (vc  : LVal PC)
   → (vc′ : LVal PC′)
@@ -74,7 +75,9 @@ sim-ξ : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC P
   → SizeEq μ₁ μ₁′
   → M′ ∣ μ₁′ ∣ PC′ —→ N′ ∣ μ₂′
     ------------------------------------------------------
-  → ∃[ Σ₂ ] ∃[ Σ₂′ ] ∃[ N ] ∃[ μ₂ ]
+  → ∃[ Σ₂ ] ∃[ Σ₂′ ]
+       (Σ₂ ⊇ Σ₁) × (Σ₂′ ⊇ Σ₁′) ×
+     ∃[ N ] ∃[ μ₂ ]
        (M ∣ μ₁ ∣ PC —↠ N ∣ μ₂) ×
        ([] ; [] ∣ Σ₂ ; Σ₂′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ plug N′ F ⇐ A ⊑ A′) ×
        (Σ₂ ; Σ₂′ ⊢ μ₂ ⊑ μ₂′) ×
@@ -83,13 +86,13 @@ sim-ξ {F = app□ M A B ℓ}
       vc vc′ (⊑-app L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ =
   let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , L↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
            sim vc vc′ L⊑L′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ in
-  ⟨ _ , _ , _ , _ , plug-cong (app□ _ _ _ _) L↠N ,
+  ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ , plug-cong (app□ _ _ _ _) L↠N ,
     ⊑-app N⊑N′ (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
 sim-ξ {F = app□ M A B ℓ}
       vc vc′ (⊑-app!l L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ =
   let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , L↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
            sim vc vc′ L⊑L′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ in
-  ⟨ _ , _ , _ , _ , plug-cong (app!□ _ _ _) L↠N ,
+  ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ , plug-cong (app!□ _ _ _) L↠N ,
     ⊑-app!l N⊑N′ (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
 sim-ξ {μ₁ = μ} {PC = PC} {PC′} {F = app V′ □ v′ A B ℓ}
       vc vc′ (⊑-app L⊑V′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
@@ -97,7 +100,7 @@ sim-ξ {μ₁ = μ} {PC = PC} {PC′} {F = app V′ □ v′ A B ℓ}
   ⟨ V , v , L↠V , V⊑V′ ⟩ →
     let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
              sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ in
-    ⟨ _ , _ , _ , _ ,
+    ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ ,
       trans-mult (plug-cong (app□ _ _ _ _) L↠V)
                  (plug-cong (app V □ v _ _ _) M↠N) ,
       ⊑-app (prec-relax-Σ V⊑V′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) N⊑N′ eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
@@ -119,13 +122,14 @@ sim-ξ {F = if!□ x M N} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ siz
 sim-ξ {F = □⟨ c ⟩} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
 sim-ξ vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
   case sim-ξ vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ of λ where
-  ⟨ Σ₂ , Σ₂′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ →
-    ⟨ Σ₂ , Σ₂′ , N ⟨ c ⟩ , μ₂ , plug-cong □⟨ c ⟩ M↠N , ⊑-castl N⊑N′ c⊑A′ , μ₂⊑μ₂′ , size-eq′ ⟩
+  ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ →
+    ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N ⟨ c ⟩ , μ₂ ,
+      plug-cong □⟨ c ⟩ M↠N , ⊑-castl N⊑N′ c⊑A′ , μ₂⊑μ₂′ , size-eq′ ⟩
 
 
 {- ξ -}
-sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
-  M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ξ M′→N′) = {!!} -- sim-ξ vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′
+sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (ξ M′→N′) =
+  sim-ξ vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′
 
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq ξ-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
