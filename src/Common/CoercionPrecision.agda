@@ -1,6 +1,6 @@
 open import Common.Types
 
-module CC2.CoercionPrecision where
+module Common.CoercionPrecision where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -16,7 +16,7 @@ open import Function using (case_of_)
 
 open import Syntax hiding (_⨟_)
 open import Common.Utils
-open import CC2.Statics
+open import Common.Coercions
 open import CoercionExpr.Precision
   renaming (prec→⊑ to cexpr-prec→⊑; ⊢l_⊑_ to ⊢ₗ_⊑_; ⊢r_⊑_ to ⊢ᵣ_⊑_)
 open import CoercionExpr.SyntacComp renaming (_⨟_ to _⊹⊹_)

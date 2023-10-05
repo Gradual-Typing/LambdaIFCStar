@@ -18,10 +18,10 @@ open import Function using (case_of_)
 
 open import Syntax hiding (_⨟_)
 open import Common.Utils
-open import CC2.Statics
-open import Memory.HeapContext
+open import Common.CoercionPrecision public
 
-open import CC2.CoercionPrecision public
+open import Memory.HeapContext
+open import CC2.Statics
 open import CC2.HeapContextPrecision public
 
 
