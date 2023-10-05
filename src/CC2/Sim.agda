@@ -104,12 +104,34 @@ sim-ξ {μ₁ = μ} {PC = PC} {PC′} {F = app V′ □ v′ A B ℓ}
       trans-mult (plug-cong (app□ _ _ _ _) L↠V)
                  (plug-cong (app V □ v _ _ _) M↠N) ,
       ⊑-app (prec-relax-Σ V⊑V′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) N⊑N′ eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
-sim-ξ {F = app V □ v A B ℓ} vc vc′ (⊑-app!l M⊑M′ M⊑M′₁ x₂ x₃) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
-sim-ξ {F = app V □ v A B ℓ} vc vc′ (⊑-castl M⊑M′ x₂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
-sim-ξ {F = app!□ M A B} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
-sim-ξ {F = app! V □ x A B} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
-sim-ξ {F = ref⟦ x ⟧□} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
-sim-ξ {F = ref?⟦ x ⟧□ x₁} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
+sim-ξ {μ₁ = μ} {PC = PC} {F = app V′ □ v′ A B ℓ}
+      vc vc′ (⊑-app!l L⊑V′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
+  case catchup {μ = μ} {PC} v′ L⊑V′ of λ where
+  ⟨ V , v , L↠V , V⊑V′ ⟩ →
+    let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+             sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ in
+    ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ ,
+      trans-mult (plug-cong (app!□ _ _ _) L↠V)
+                 (plug-cong (app! V □ v _ _) M↠N) ,
+      ⊑-app!l (prec-relax-Σ V⊑V′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) N⊑N′ eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
+sim-ξ {F = app!□ M′ A B} vc vc′ (⊑-app! L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ =
+  let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , L↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+           sim vc vc′ L⊑L′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ in
+  ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ , plug-cong (app!□ _ _ _) L↠N ,
+    ⊑-app! N⊑N′ (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
+sim-ξ {μ₁ = μ} {PC = PC} {F = app! V′ □ v′ A B}
+      vc vc′ (⊑-app! L⊑V′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
+  case catchup {μ = μ} {PC} v′ L⊑V′ of λ where
+  ⟨ V , v , L↠V , V⊑V′ ⟩ →
+    let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+             sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ in
+    ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ ,
+      trans-mult (plug-cong (app!□ _ _ _) L↠V)
+                 (plug-cong (app! V □ v _ _) M↠N) ,
+      ⊑-app! (prec-relax-Σ V⊑V′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) N⊑N′ eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
+sim-ξ {F = ref⟦ ℓ ⟧□} vc vc′ (⊑-ref M⊑M′ x) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
+sim-ξ {F = ref⟦ ℓ ⟧□} vc vc′ (⊑-ref?l M⊑M′ x) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
+sim-ξ {F = ref?⟦ ℓ ⟧□ p} vc vc′ (⊑-ref? M⊑M′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
 sim-ξ {F = !□ x x₁} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
 sim-ξ {F = !!□ x} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
 sim-ξ {F = assign□ M x ℓ̂ ℓ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
@@ -119,7 +141,15 @@ sim-ξ {F = assign? V □ x x₁ ĝ x₂} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ�
 sim-ξ {F = let□ x x₁} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
 sim-ξ {F = if□ x x₁ M N} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
 sim-ξ {F = if!□ x M N} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
-sim-ξ {F = □⟨ c ⟩} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
+sim-ξ {F = □⟨ c′ ⟩} vc vc′ (⊑-cast M⊑M′ c⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
+  let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+           sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ in
+  ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ , plug-cong □⟨ _ ⟩ M↠N ,
+    ⊑-cast N⊑N′ c⊑c′ , μ₂⊑μ₂′ , size-eq′ ⟩
+sim-ξ {F = □⟨ c′ ⟩} vc vc′ (⊑-castr M⊑M′ A⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
+  let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+           sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ in
+  ⟨ _ , _ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , _ , M↠N , ⊑-castr N⊑N′ A⊑c′ , μ₂⊑μ₂′ , size-eq′ ⟩
 sim-ξ vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ =
   case sim-ξ vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ of λ where
   ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , M↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ →
