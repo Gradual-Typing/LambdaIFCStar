@@ -84,7 +84,7 @@ sim-ξ {Σ} {Σ′} {.(l _)} {.(l _)} {μ₁ = μ} {PC = PC} {PC′} {F = app□
   {!!}
 sim-ξ {Σ} {Σ′} {gc} {.(l _)} {μ₁ = μ} {PC = PC} {PC′} {F = app□ M A B x}
       vc vc′ (⊑-app!l L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ =
-  let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , , N , μ₂ , L↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
+  let ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , N , μ₂ , L↠N , N⊑N′ , μ₂⊑μ₂′ , size-eq′ ⟩ =
            sim vc vc′ L⊑L′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq L′→N′ in
   ⟨ _ , _ , _ , _ , plug-cong (app!□ {!!} {!!} {!!}) L↠N , ⊑-app!l N⊑N′ {!M⊑M′!} eq eq′ , μ₂⊑μ₂′ , size-eq′ ⟩
 sim-ξ {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} {F = app V □ x A B x₁} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq M′→N′ = {!!}
