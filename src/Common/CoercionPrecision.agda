@@ -290,12 +290,36 @@ comp-pres-prec-lr (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) (⊑-fun gc
         (comp-pres-prec-lr d⊑B′ B⊑d′) (comp-pres-⊑-lr c̅⊑g′ g⊑c̅′)
 
 
+prec-coerce-id : ∀ {A A′}
+  → A ⊑ A′
+  → ⟨ coerce-id A ⟩⊑ A′
+prec-coerce-id (⊑-ty g₁⊑g₂ ⊑-ι) = ⊑-base (⊑-id g₁⊑g₂)
+prec-coerce-id (⊑-ty g₁⊑g₂ (⊑-ref A⊑B)) =
+  ⊑-ref (prec-coerce-id A⊑B) (prec-coerce-id A⊑B) (⊑-id g₁⊑g₂)
+prec-coerce-id (⊑-ty x (⊑-fun x₁ x₂ x₃)) =
+  ⊑-fun (⊑-id x₁) (prec-coerce-id x₂) (prec-coerce-id x₃) (⊑-id x)
 
-prec-left-expand : ∀ {A A′ B} {c : Cast A ⇒ B}
+prec-left-coerce-id : ∀ {A A′ B} {c : Cast A ⇒ B}
   → ⟨ c ⟩⊑ A′
   → ⟨ c ⟩⊑⟨ coerce-id A′ ⟩
-prec-left-expand (⊑-base c̅⊑g′) = ⊑-base (⊑-left-expand c̅⊑g′)
-prec-left-expand (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
-  ⊑-ref (prec-left-expand c⊑A′) (prec-left-expand d⊑A′) (⊑-left-expand c̅⊑g′)
-prec-left-expand (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
-  ⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-expand c⊑A′) (prec-left-expand d⊑B′) (⊑-left-expand c̅⊑g′)
+prec-left-coerce-id (⊑-base c̅⊑g′) = ⊑-base (⊑-left-expand c̅⊑g′)
+prec-left-coerce-id (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  ⊑-ref (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑A′) (⊑-left-expand c̅⊑g′)
+prec-left-coerce-id (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  ⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑B′) (⊑-left-expand c̅⊑g′)
+
+
+stamp⋆-left-prec : ∀ {A A′} {ℓ}
+  → A ⊑ A′
+    ----------------------------------------------
+  → ⟨ stamp A , ℓ ⇒stamp⋆ ⟩⊑ stamp A′ (l ℓ)
+stamp⋆-left-prec (⊑-ty ⋆⊑ ⊑-ι) = ⊑-base (⊑-id ⋆⊑)
+stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-ref A⊑A′)) =
+  ⊑-ref (prec-coerce-id A⊑A′) (prec-coerce-id A⊑A′) (⊑-id ⋆⊑)
+stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
+  ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) (⊑-id ⋆⊑)
+stamp⋆-left-prec (⊑-ty l⊑l ⊑-ι) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp⋆-left-prec (⊑-ty l⊑l (⊑-ref A⊑A′)) =
+  ⊑-ref (prec-coerce-id A⊑A′) (prec-coerce-id A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp⋆-left-prec (⊑-ty l⊑l (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
+  ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
