@@ -38,7 +38,15 @@ stamp-val-prec {A = .(⟦ _ ⟧ _ ⇒ _) of l low} {ℓ = high} (⊑-ty _ (⊑-f
   ⊑-cast (⊑-lam x y z) (⊑-fun (⊑-id g⊑g′) (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) (prec-refl _))
 stamp-val-prec {A = A} {A′} {ℓ = low} A⊑A′ V⊑V′ (V-raw _) (V-raw _)
   rewrite stamp-low A | stamp-low A′ = V⊑V′
-stamp-val-prec {ℓ = ℓ} A⊑A′ prec (V-raw x) (V-cast x₁ x₂) = {!!}
+stamp-val-prec {A = T of ⋆} {ℓ = high} A⊑A′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) = {!!}
+stamp-val-prec {A = T of l high} {ℓ = high} A⊑A′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) =
+  ⊑-castr V⊑V′ (stamp-ir-high-prec-right A⊑c′ i′)
+stamp-val-prec {A = T of l low} {ℓ = high} A⊑A′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) = {!!}
+stamp-val-prec {A = A} {A′} {ℓ = low} A⊑A′ (⊑-castr V⊑V′ A⊑c′) (V-raw x) (V-cast x₁ i)
+  rewrite stamp-low A with i
+... | ir-base {g = g} _ _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′
+... | ir-ref {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′
+... | ir-fun {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′
 stamp-val-prec {ℓ = ℓ} A⊑A′ prec (V-cast x x₁) (V-raw x₂) = {!!}
 stamp-val-prec {ℓ = ℓ} A⊑A′ prec (V-cast x x₁) (V-cast x₂ x₃) = {!!}
 stamp-val-prec _ V⊑W v V-● = contradiction V⊑W (_ ⋤●)
