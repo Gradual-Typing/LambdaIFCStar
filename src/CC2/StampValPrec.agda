@@ -53,15 +53,28 @@ stamp-val-prec {A = T of ⋆} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑
   ⟨ V-addr , () , _ ⟩
   ⟨ V-ƛ , () , _ ⟩
 stamp-val-prec {A = T of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) =
-  ⊑-castr V⊑V′ (stamp-ir-high-prec-right A⊑c′ i′)
+  ⊑-castr V⊑V′ (stamp-ir-high-on-high-right A⊑c′ i′)
 stamp-val-prec {A = T of l low} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) =
-  ⊑-cast V⊑V′ (stamp-ir-high-prec A⊑c′ i′)
+  ⊑-cast V⊑V′  (stamp-ir-high-on-low-right A⊑c′ i′)
 stamp-val-prec {A = A} {A′} {ℓ = low} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw x) (V-cast x₁ i)
   rewrite stamp-low A with i
 ... | ir-base {g = g} _ _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′
 ... | ir-ref {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′
 ... | ir-fun {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′
-stamp-val-prec {ℓ = ℓ} Γ⊑Γ′ Σ⊑Σ′ prec (V-cast x x₁) (V-raw x₂) = {!!}
+stamp-val-prec {A′ = T of ⋆} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) =
+  case ⟨ v′ , cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ V⊑V′ ⟩ of λ where
+  ⟨ V-const , _ , () ⟩
+  ⟨ V-addr , _ , () ⟩
+  ⟨ V-ƛ , _ , () ⟩
+stamp-val-prec {A′ = T of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) =
+  {!!}
+stamp-val-prec {A′ = T of l low} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) =
+  {!!}
+stamp-val-prec {A = A} {A′} {ℓ = low} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′)
+  rewrite stamp-low A′ with i
+... | ir-base {g = g} _ _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′
+... | ir-ref {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′
+... | ir-fun {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′
 stamp-val-prec {ℓ = ℓ} Γ⊑Γ′ Σ⊑Σ′ prec (V-cast x x₁) (V-cast x₂ x₃) = {!!}
 stamp-val-prec _ _ V⊑W v V-● = contradiction V⊑W (_ ⋤●)
 stamp-val-prec _ _ V⊑W V-● w = contradiction V⊑W (●⋤ _)
