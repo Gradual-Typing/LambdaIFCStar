@@ -30,9 +30,9 @@ stamp-val-prec : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {A A′ V V′} {
         ⇐ stamp A (l ℓ) ⊑ stamp A′ (l ℓ)
 stamp-val-prec {A = T of ⋆} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw v) (V-raw v′) =
   case ⟨ v , cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ V⊑V′ ⟩ of λ where
-  ⟨ V-const , () ⟩
-  ⟨ V-addr , () ⟩
-  ⟨ V-ƛ , () ⟩
+  ⟨ V-const , () , _ ⟩
+  ⟨ V-addr , () , _ ⟩
+  ⟨ V-ƛ , () , _ ⟩
 stamp-val-prec {A = ` _ of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ ⊑-const (V-raw x) (V-raw x₁) = ⊑-const
 stamp-val-prec {A = Ref (_ of l _) of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-addr a b) (V-raw _) (V-raw _) = ⊑-addr a b
 stamp-val-prec {A = ⟦ _ ⟧ _ ⇒ _ of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-lam x y z) (V-raw _) (V-raw _) = ⊑-lam x y z
@@ -49,12 +49,13 @@ stamp-val-prec {A = A} {A′} {ℓ = low} Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw 
   rewrite stamp-low A | stamp-low A′ = V⊑V′
 stamp-val-prec {A = T of ⋆} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) =
   case ⟨ v , cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ V⊑V′ ⟩ of λ where
-  ⟨ V-const , () ⟩
-  ⟨ V-addr , () ⟩
-  ⟨ V-ƛ , () ⟩
+  ⟨ V-const , () , _ ⟩
+  ⟨ V-addr , () , _ ⟩
+  ⟨ V-ƛ , () , _ ⟩
 stamp-val-prec {A = T of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) =
   ⊑-castr V⊑V′ (stamp-ir-high-prec-right A⊑c′ i′)
-stamp-val-prec {A = T of l low} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) = {!!}
+stamp-val-prec {A = T of l low} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw v) (V-cast v′ i′) =
+  ⊑-cast V⊑V′ (stamp-ir-high-prec A⊑c′ i′)
 stamp-val-prec {A = A} {A′} {ℓ = low} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ A⊑c′) (V-raw x) (V-cast x₁ i)
   rewrite stamp-low A with i
 ... | ir-base {g = g} _ _ rewrite g⋎̃low≡g {g} = ⊑-castr V⊑V′ A⊑c′

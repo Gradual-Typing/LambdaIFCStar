@@ -14,9 +14,10 @@ open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; trans; subst; subst₂; sym)
 open import Function using (case_of_)
 
-open import Syntax hiding (_⨟_)
+open import Syntax hiding (_⨟_; ↑)
 open import Common.Utils
 open import Common.Coercions
+open import CoercionExpr.CoercionExpr
 open import CoercionExpr.Precision
   renaming (prec→⊑ to cexpr-prec→⊑; ⊢l_⊑_ to ⊢ₗ_⊑_; ⊢r_⊑_ to ⊢ᵣ_⊑_)
 open import CoercionExpr.SyntacComp renaming (_⨟_ to _⊹⊹_)
@@ -318,6 +319,15 @@ prec-left-coerce-id (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
 prec-left-coerce-id (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
   ⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑B′) (⊑-left-expand c̅⊑g′)
 
+prec-right-coerce-id : ∀ {A A′ B′} {c′ : Cast A′ ⇒ B′}
+  → A ⊑⟨ c′ ⟩
+  → ⟨ coerce-id A ⟩⊑⟨ c′ ⟩
+prec-right-coerce-id (⊑-base c̅⊑g′) = ⊑-base (⊑-right-expand c̅⊑g′)
+prec-right-coerce-id (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) =
+  ⊑-ref (prec-right-coerce-id c⊑A′) (prec-right-coerce-id d⊑A′) (⊑-right-expand c̅⊑g′)
+prec-right-coerce-id (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
+  ⊑-fun (⊑-right-expand d̅⊑gc′) (prec-right-coerce-id c⊑A′) (prec-right-coerce-id d⊑B′) (⊑-right-expand c̅⊑g′)
+
 
 stamp⋆-left-prec : ∀ {A A′} {ℓ}
   → A ⊑ A′
@@ -352,3 +362,26 @@ stamp-ir-high-prec-right (⊑-fun _ _ _ (⊑-cast _ _ ())) (ir-fun (inj CVal.id)
 stamp-ir-high-prec-right (⊑-fun _ _ _ (⊑-cast _ _ ())) (ir-fun (inj (up CVal.id)))
 stamp-ir-high-prec-right (⊑-fun _ _ _ (⊑-cast _ () _)) (ir-fun (up CVal.id))
 stamp-ir-high-prec-right (⊑-fun _ _ _ (⊑-⊥ _ _)) (ir-fun ())
+
+stamp-ir-high-prec : ∀ {T A B} {c′ : Cast A ⇒ B}
+  → T of l low ⊑⟨ c′ ⟩
+  → (i′ : Irreducible c′)
+  → ⟨ cast (coerceᵣ-id T) (CExpr_⇒_.id (l low) ⨾ ↑) ⟩⊑⟨ stamp-ir c′ i′ high ⟩
+stamp-ir-high-prec _ (ir-base CVal.id ℓ≢ℓ) = contradiction refl ℓ≢ℓ
+stamp-ir-high-prec (⊑-base (⊑-cast (⊑-id l⊑l) x₂ ())) (ir-base (inj CVal.id) _)
+stamp-ir-high-prec (⊑-base (⊑-cast _ _ ())) (ir-base (inj (up CVal.id)) _)
+stamp-ir-high-prec (⊑-base (⊑-cast _ _ ())) (ir-base (up CVal.id) _)
+stamp-ir-high-prec (⊑-ref A⊑c′ A⊑d′ (⊑-id l⊑l)) (ir-ref CVal.id) =
+  ⊑-ref (prec-right-coerce-id A⊑c′) (prec-right-coerce-id A⊑d′) (prec-refl _)
+stamp-ir-high-prec (⊑-ref A⊑c′ A⊑d′ (⊑-cast _ _ ())) (ir-ref (inj CVal.id))
+stamp-ir-high-prec (⊑-ref A⊑c′ A⊑d′ (⊑-cast _ _ ())) (ir-ref (inj (up CVal.id)))
+stamp-ir-high-prec (⊑-ref A⊑c′ A⊑d′ (⊑-cast _ l⊑l _)) (ir-ref (up CVal.id)) =
+  ⊑-ref (prec-right-coerce-id A⊑c′) (prec-right-coerce-id A⊑d′) (prec-refl _)
+stamp-ir-high-prec (⊑-ref _ _ (⊑-⊥ _ _)) (ir-ref ())
+stamp-ir-high-prec (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ (⊑-id l⊑l)) (ir-fun CVal.id) =
+  ⊑-fun (⊑-right-expand gc⊑d̅′) (prec-right-coerce-id A⊑c′) (prec-right-coerce-id B⊑d′) (prec-refl _)
+stamp-ir-high-prec (⊑-fun _ _ _ (⊑-cast _ _ ())) (ir-fun (inj CVal.id))
+stamp-ir-high-prec (⊑-fun _ _ _ (⊑-cast _ _ ())) (ir-fun (inj (up CVal.id)))
+stamp-ir-high-prec (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ (⊑-cast _ l⊑l _)) (ir-fun (up CVal.id)) =
+  ⊑-fun (⊑-right-expand gc⊑d̅′) (prec-right-coerce-id A⊑c′) (prec-right-coerce-id B⊑d′) (prec-refl _)
+stamp-ir-high-prec (⊑-fun _ _ _ (⊑-⊥ _ _)) (ir-fun ())
