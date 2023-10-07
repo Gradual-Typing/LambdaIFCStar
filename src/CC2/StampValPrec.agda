@@ -67,9 +67,9 @@ stamp-val-prec {A′ = T of ⋆} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V
   ⟨ V-addr , _ , () ⟩
   ⟨ V-ƛ , _ , () ⟩
 stamp-val-prec {A′ = T of l high} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) =
-  {!!}
+  ⊑-castl V⊑V′ (stamp-ir-high-on-high-left c⊑A′ i)
 stamp-val-prec {A′ = T of l low} {ℓ = high} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′) =
-  {!!}
+  ⊑-cast V⊑V′ (stamp-ir-high-on-low-left c⊑A′ i)
 stamp-val-prec {A = A} {A′} {ℓ = low} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V′ c⊑A′) (V-cast v i) (V-raw v′)
   rewrite stamp-low A′ with i
 ... | ir-base {g = g} _ _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′

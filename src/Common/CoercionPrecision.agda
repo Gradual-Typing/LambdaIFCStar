@@ -363,6 +363,22 @@ stamp-ir-high-on-high-right (⊑-fun _ _ _ (⊑-cast _ _ ())) (ir-fun (inj (up C
 stamp-ir-high-on-high-right (⊑-fun _ _ _ (⊑-cast _ () _)) (ir-fun (up CVal.id))
 stamp-ir-high-on-high-right (⊑-fun _ _ _ (⊑-⊥ _ _)) (ir-fun ())
 
+stamp-ir-high-on-high-left : ∀ {T′ A B} {c : Cast A ⇒ B}
+  → ⟨ c ⟩⊑ T′ of l high
+  → (i : Irreducible c)
+  → ⟨ stamp-ir c i high ⟩⊑ T′ of l high
+stamp-ir-high-on-high-left (⊑-base (⊑-id l⊑l)) (ir-base CVal.id high≢high) = contradiction refl high≢high
+stamp-ir-high-on-high-left (⊑-base (⊑-cast (⊑-id l⊑l) y ⋆⊑)) (ir-base (inj CVal.id) _) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp-ir-high-on-high-left (⊑-base (⊑-cast (⊑-cast (⊑-id ()) _ _) _ ⋆⊑)) (ir-base (inj (up CVal.id)) _)
+stamp-ir-high-on-high-left (⊑-ref c⊑A′ d⊑A′ (⊑-id l⊑l)) (ir-ref CVal.id) = ⊑-ref c⊑A′ d⊑A′ (⊑-id l⊑l)
+stamp-ir-high-on-high-left (⊑-ref c⊑A′ d⊑A′ (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)) (ir-ref (inj CVal.id)) =
+  ⊑-ref c⊑A′ d⊑A′ (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp-ir-high-on-high-left (⊑-ref c⊑A′ d⊑A′ (⊑-cast (⊑-cast (⊑-id ()) _ _) y ⋆⊑)) (ir-ref (inj (up CVal.id)))
+stamp-ir-high-on-high-left (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-id l⊑l)) (ir-fun CVal.id) = (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-id l⊑l))
+stamp-ir-high-on-high-left (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)) (ir-fun (inj CVal.id)) =
+  ⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp-ir-high-on-high-left (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-cast (⊑-cast _ () _) _ ⋆⊑)) (ir-fun (inj (up CVal.id)))
+
 stamp-ir-high-on-low-right : ∀ {T A B} {c′ : Cast A ⇒ B}
   → T of l low ⊑⟨ c′ ⟩
   → (i′ : Irreducible c′)
@@ -385,3 +401,24 @@ stamp-ir-high-on-low-right (⊑-fun _ _ _ (⊑-cast _ _ ())) (ir-fun (inj (up CV
 stamp-ir-high-on-low-right (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ (⊑-cast _ l⊑l _)) (ir-fun (up CVal.id)) =
   ⊑-fun (⊑-right-expand gc⊑d̅′) (prec-right-coerce-id A⊑c′) (prec-right-coerce-id B⊑d′) (prec-refl _)
 stamp-ir-high-on-low-right (⊑-fun _ _ _ (⊑-⊥ _ _)) (ir-fun ())
+
+stamp-ir-high-on-low-left : ∀ {T′ A B} {c : Cast A ⇒ B}
+  → ⟨ c ⟩⊑ T′ of l low
+  → (i : Irreducible c)
+  → ⟨ stamp-ir c i high ⟩⊑⟨ cast (coerceᵣ-id T′) (CExpr_⇒_.id (l low) ⨾ ↑) ⟩
+stamp-ir-high-on-low-left (⊑-base (⊑-id l⊑l)) (ir-base CVal.id high≢high) = contradiction refl high≢high
+stamp-ir-high-on-low-left (⊑-base (⊑-cast (⊑-id l⊑l) y ⋆⊑)) (ir-base (inj CVal.id) _) = ⊑-base ↑!⊑↑
+stamp-ir-high-on-low-left (⊑-base (⊑-cast (⊑-cast (⊑-id l⊑l) _ _) _ ⋆⊑)) (ir-base (inj (up CVal.id)) _) =
+  ⊑-base ↑!⊑↑
+stamp-ir-high-on-low-left (⊑-ref c⊑A′ d⊑A′ (⊑-id l⊑l)) (ir-ref CVal.id) =
+  ⊑-ref (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑A′) (prec-refl _)
+stamp-ir-high-on-low-left (⊑-ref c⊑A′ d⊑A′ (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)) (ir-ref (inj CVal.id)) =
+  ⊑-ref (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑A′) ↑!⊑↑
+stamp-ir-high-on-low-left (⊑-ref c⊑A′ d⊑A′ (⊑-cast (⊑-cast (⊑-id l⊑l) _ _) y ⋆⊑)) (ir-ref (inj (up CVal.id))) =
+  ⊑-ref (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑A′) ↑!⊑↑
+stamp-ir-high-on-low-left (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-id l⊑l)) (ir-fun CVal.id) =
+  ⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑B′) (prec-refl _)
+stamp-ir-high-on-low-left (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)) (ir-fun (inj CVal.id)) =
+  ⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑B′) ↑!⊑↑
+stamp-ir-high-on-low-left (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ (⊑-cast (⊑-cast _ l⊑l _) _ ⋆⊑)) (ir-fun (inj (up CVal.id))) =
+  ⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑B′) ↑!⊑↑
