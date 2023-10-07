@@ -75,6 +75,11 @@ stamp-val-prec {A = A} {A′} {ℓ = low} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl V⊑V
 ... | ir-base {g = g} _ _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′
 ... | ir-ref {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′
 ... | ir-fun {g = g} _ rewrite g⋎̃low≡g {g} = ⊑-castl V⊑V′ c⊑A′
-stamp-val-prec {ℓ = ℓ} Γ⊑Γ′ Σ⊑Σ′ prec (V-cast x x₁) (V-cast x₂ x₃) = {!!}
+stamp-val-prec {A = A} {A′} {ℓ = ℓ} Γ⊑Γ′ Σ⊑Σ′ (⊑-cast V⊑V′ c⊑c′) (V-cast v i) (V-cast v′ i′) =
+  ⊑-cast V⊑V′ (stamp-ir-prec c⊑c′ i i′)
+stamp-val-prec {A = A} {A′} {ℓ = ℓ} Γ⊑Γ′ Σ⊑Σ′ (⊑-castl (⊑-castr V⊑V′ A⊑c′) c⊑A′) (V-cast v i) (V-cast v′ i′) =
+  ⊑-cast V⊑V′ (stamp-ir-prec (comp-pres-prec-rl A⊑c′ c⊑A′) i i′)
+stamp-val-prec {A = A} {A′} {ℓ = ℓ} Γ⊑Γ′ Σ⊑Σ′ (⊑-castr (⊑-castl V⊑V′ c⊑A′) A⊑c′) (V-cast v i) (V-cast v′ i′) =
+  ⊑-cast V⊑V′ (stamp-ir-prec (comp-pres-prec-lr c⊑A′ A⊑c′) i i′)
 stamp-val-prec _ _ V⊑W v V-● = contradiction V⊑W (_ ⋤●)
 stamp-val-prec _ _ V⊑W V-● w = contradiction V⊑W (●⋤ _)
