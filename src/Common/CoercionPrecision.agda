@@ -18,6 +18,7 @@ open import Syntax hiding (_⨟_; ↑)
 open import Common.Utils
 open import Common.Coercions
 open import CoercionExpr.CoercionExpr
+open import CoercionExpr.Stamping
 open import CoercionExpr.Precision
   renaming (prec→⊑ to cexpr-prec→⊑; ⊢l_⊑_ to ⊢ₗ_⊑_; ⊢r_⊑_ to ⊢ᵣ_⊑_)
 open import CoercionExpr.SyntacComp renaming (_⨟_ to _⊹⊹_)
@@ -343,6 +344,18 @@ stamp⋆-left-prec (⊑-ty l⊑l (⊑-ref A⊑A′)) =
   ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
 stamp⋆-left-prec (⊑-ty l⊑l (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
   ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+
+stamp-ir-prec : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′} {ℓ}
+  → ⟨ c ⟩⊑⟨ c′ ⟩
+  → (i  : Irreducible c )
+  → (i′ : Irreducible c′)
+  → ⟨ stamp-ir c i ℓ ⟩⊑⟨ stamp-ir c′ i′ ℓ ⟩
+stamp-ir-prec (⊑-base c̅⊑c̅′) (ir-base 𝓋 x) (ir-base 𝓋′ x′) with cexpr-prec→⊑ _ _ c̅⊑c̅′
+... | ⟨ l⊑l , _ ⟩ = ⊑-base (stampₗ-prec 𝓋 𝓋′ c̅⊑c̅′)
+stamp-ir-prec (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) (ir-ref 𝓋) (ir-ref 𝓋′) with cexpr-prec→⊑ _ _ c̅⊑c̅′
+... | ⟨ l⊑l , _ ⟩ = ⊑-ref c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
+stamp-ir-prec (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (ir-fun 𝓋) (ir-fun 𝓋′) with cexpr-prec→⊑ _ _ c̅⊑c̅′
+... | ⟨ l⊑l , _ ⟩ = ⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
 
 stamp-ir-high-on-high-right : ∀ {T A B} {c′ : Cast A ⇒ B}
   → T of l high ⊑⟨ c′ ⟩
