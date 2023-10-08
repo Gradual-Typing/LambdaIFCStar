@@ -36,37 +36,6 @@ data Result : Term → Set where
   fail    : ∀ {p}            → Result (blame p)
 
 
-{- I don't think we need the value canonical form lemmas anymore -}
--- data Fun : Term → HeapContext → Type → Set where
---   Fun-ƛ : ∀ {Σ g A B N ℓ}
---     → (∀ {ℓv} → A ∷ [] ; Σ ; g ; ℓv ⊢ N ⇐ B)
---       ----------------------------------------------------- Lambda
---     → Fun (ƛ N) Σ (⟦ g ⟧ A ⇒ B of l ℓ)
-
---   Fun-proxy : ∀ {Σ gc₁ gc₂ A₁ A₂ B₁ B₂ g₁ g₂ N}
---                 {c : Cast (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁) ⇒ (⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂)}
---     → Fun (ƛ N) Σ (⟦ gc₁ ⟧ A₁ ⇒ B₁ of g₁)
---     → Irreducible c
---       ----------------------------------------------------- Function Proxy
---     → Fun ((ƛ N) ⟨ c ⟩) Σ (⟦ gc₂ ⟧ A₂ ⇒ B₂ of g₂)
-
--- -- Sanity checks
--- fun-is-value : ∀ {Σ V gc A B g}
---   → Fun V Σ (⟦ gc ⟧ A ⇒ B of g)
---   → Value V
--- fun-is-value (Fun-ƛ _) = V-raw V-ƛ
--- fun-is-value (Fun-proxy (Fun-ƛ ⊢N) i) = V-cast V-ƛ i
-
--- -- Canonical form of value of function type
--- canonical-fun : ∀ {Σ gc gc′ pc A B g V}
---   → [] ; Σ ; gc ; pc ⊢ V ⇐ ⟦ gc′ ⟧ A ⇒ B of g
---   → Value V
---   → Fun V Σ (⟦ gc′ ⟧ A ⇒ B of g)
--- canonical-fun (⊢lam ⊢N) (V-raw V-ƛ) = Fun-ƛ ⊢N
--- canonical-fun (⊢cast (⊢lam ⊢N)) (V-cast V-ƛ i) =
---   Fun-proxy (Fun-ƛ ⊢N) i
-
-
 canonical⋆ : ∀ {Γ Σ gc ℓv V T}
   → Value V
   → Γ ; Σ ; gc ; ℓv ⊢ V ⇐ T of ⋆
@@ -78,30 +47,13 @@ canonical⋆ (V-raw V-const) ()
 canonical⋆ (V-cast {V = W} {c} w i) (⊢cast ⊢W) = ⟨ _ , c , _ , refl , i , ⊢W ⟩
 
 
--- stamp-val : ∀ V → Value V → (A : Type) → StaticLabel → Term
--- stamp-val (addr n) (V-raw V-addr) A low = addr n
--- stamp-val (addr n) (V-raw V-addr) (Ref A of l low) high =
---   addr n ⟨ cast (coerceᵣ-id (Ref A)) (id (l low) ⨾ ↑) ⟩
--- stamp-val (addr n) (V-raw V-addr) (Ref A of l high) high = addr n
--- stamp-val (ƛ N) (V-raw V-ƛ) A low = ƛ N
--- stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l low) high =
---   ƛ N ⟨ cast (coerceᵣ-id (⟦ g ⟧ A ⇒ B)) (id (l low) ⨾ ↑) ⟩
--- stamp-val (ƛ N) (V-raw V-ƛ) (⟦ g ⟧ A ⇒ B of l high) high = ƛ N
--- stamp-val ($ k) (V-raw V-const) A low = $ k
--- stamp-val ($ k) (V-raw V-const) (` ι of l low) high =
---   $ k ⟨ cast (id ι) (id (l low) ⨾ ↑) ⟩
--- stamp-val ($ k) (V-raw V-const) (` ι of l high) high = $ k
--- stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
--- -- other impossible cases suppose ⊢ V ⇐ A
--- stamp-val V v A ℓ = ●
-
 stamp-val : ∀ V → Value V → (A : Type) → StaticLabel → Term
 stamp-val V (V-raw v)             _ low  = V
 stamp-val V (V-raw v) (T of l high) high = V
 stamp-val V (V-raw v) (T of l low ) high =
   V ⟨ cast (coerceᵣ-id T) (id (l low) ⨾ ↑) ⟩
 stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
--- other impossible cases suppose ⊢ V ⇐ A
+-- impossible, suppose ⊢ V ⇐ A
 stamp-val V v A ℓ = ●
 
 stamp-val-wt : ∀ {Σ gc ℓv A V ℓ}
@@ -124,7 +76,7 @@ stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = ⊢const
 stamp-val-wt {A = A} {V} {ℓ} (V-cast v i) (⊢cast ⊢V) = ⊢cast ⊢V
 
 
--- A stamped value is value
+-- Stamping a value gets a value
 stamp-val-value : ∀ {Σ gc ℓv A V ℓ}
   → (v : Value V)
   → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
