@@ -17,6 +17,7 @@ open import CoercionExpr.SecurityLevel
 open import LabelExpr.Stamping
 open import CC2.Statics
 open import CC2.Frame public
+open import CC2.Stamping
 open import Memory.Heap Term Value
 
 

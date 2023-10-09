@@ -17,6 +17,7 @@ open import CoercionExpr.Precision
 open import Memory.HeapContext
 open import CC2.Statics
 open import CC2.Precision
+open import CC2.Stamping public
 
 
 stamp-val-prec : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {A A′ V V′} {ℓ}
