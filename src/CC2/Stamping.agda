@@ -51,6 +51,16 @@ stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
 stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = ⊢const
 stamp-val-wt {A = A} {V} {ℓ} (V-cast v i) (⊢cast ⊢V) = ⊢cast ⊢V
 
+stamp-val!-wt : ∀ {Σ gc ℓv A V ℓ}
+  → (v : Value V)
+  → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
+    -------------------------------------------------------------
+  → [] ; Σ ; gc ; ℓv ⊢ stamp-val! V v A ℓ ⇐ stamp A ⋆
+stamp-val!-wt (V-raw V-addr) (⊢addr a) = ⊢cast (⊢addr a)
+stamp-val!-wt (V-raw V-ƛ) (⊢lam ⊢N) = ⊢cast (⊢lam ⊢N)
+stamp-val!-wt (V-raw V-const) ⊢const = ⊢cast ⊢const
+stamp-val!-wt (V-cast v i) (⊢cast ⊢V) = ⊢cast ⊢V
+
 
 -- Stamping a value gets a value
 stamp-val-value : ∀ {Σ gc ℓv A V ℓ}
@@ -70,6 +80,19 @@ stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
   V-cast V-const (ir-base (up id) (λ ()))
 stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-raw V-const
 stamp-val-value (V-cast v i) ⊢V = V-cast v (stamp-ir-irreducible i)
+
+stamp-val!-value : ∀ {Σ gc ℓv A V ℓ}
+  → (v : Value V)
+  → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
+  → Value (stamp-val! V v A ℓ)
+stamp-val!-value {ℓ = low} (V-raw V-addr) (⊢addr a) = V-cast V-addr (ir-ref (inj id))
+stamp-val!-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = low} a) = V-cast V-addr (ir-ref (inj (up id)))
+stamp-val!-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = high} a) = V-cast V-addr (ir-ref (inj id))
+stamp-val!-value (V-raw V-ƛ) (⊢lam ⊢N) = {!!}
+stamp-val!-value {ℓ = low} (V-raw V-const) ⊢const = V-cast V-const (ir-base (inj id) (λ ()))
+stamp-val!-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) = V-cast V-const (ir-base (inj (up id)) (λ ()))
+stamp-val!-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-cast V-const (ir-base (inj id) (λ ()))
+stamp-val!-value (V-cast v i) ⊢V = V-cast {!v!} {!!}
 
 
 stamp-val-low : ∀ {Σ gc ℓv A V}

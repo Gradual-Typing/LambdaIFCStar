@@ -112,9 +112,22 @@ stamp-ir-irreducible (ir-ref 𝓋) = ir-ref (stampₗ-CVal _ 𝓋 _)
 stamp-ir-irreducible (ir-fun 𝓋) = ir-fun (stampₗ-CVal _ 𝓋 _)
 
 stamp-ir! : ∀ {A B} (c : Cast A ⇒ B) → Irreducible c → (ℓ : StaticLabel) → Cast A ⇒ stamp B ⋆
-stamp-ir! {B = T of g} (cast cᵣ c̅) (ir-base 𝓋 _) ℓ rewrite g⋎̃⋆≡⋆ {g} = cast cᵣ (stamp!ₗ c̅ 𝓋 ℓ)
-stamp-ir! {B = T of g} (cast cᵣ c̅) (ir-ref  𝓋)   ℓ rewrite g⋎̃⋆≡⋆ {g} = cast cᵣ (stamp!ₗ c̅ 𝓋 ℓ)
-stamp-ir! {B = T of g} (cast cᵣ c̅) (ir-fun  𝓋)   ℓ rewrite g⋎̃⋆≡⋆ {g} = cast cᵣ (stamp!ₗ c̅ 𝓋 ℓ)
+stamp-ir! {B = T of g} (cast cᵣ c̅) (ir-base 𝓋 _) ℓ rewrite g⋎̃⋆≡⋆ {g} =
+  cast cᵣ (stamp!ₗ c̅ 𝓋 ℓ)
+stamp-ir! {B = T of g} (cast cᵣ c̅) (ir-ref  𝓋)   ℓ rewrite g⋎̃⋆≡⋆ {g} =
+  cast cᵣ (stamp!ₗ c̅ 𝓋 ℓ)
+stamp-ir! {B = T of g} (cast cᵣ c̅) (ir-fun  𝓋)   ℓ rewrite g⋎̃⋆≡⋆ {g} =
+  cast cᵣ (stamp!ₗ c̅ 𝓋 ℓ)
+
+stamp-ir!-irreducible : ∀ {A B} {c : Cast A ⇒ B} {ℓ}
+  → (i : Irreducible c)
+  → Irreducible (stamp-ir! c i ℓ)
+stamp-ir!-irreducible {B = T of g} (ir-base 𝓋 x) rewrite g⋎̃⋆≡⋆ {g} =
+  ir-base (stamp!ₗ-CVal _ 𝓋 _) λ ()
+stamp-ir!-irreducible {B = T of g} (ir-ref 𝓋) rewrite g⋎̃⋆≡⋆ {g} =
+  ir-ref (stamp!ₗ-CVal _ 𝓋 _)
+stamp-ir!-irreducible {B = T of g} (ir-fun 𝓋) rewrite g⋎̃⋆≡⋆ {g} =
+  ir-fun (stamp!ₗ-CVal _ 𝓋 _)
 
 
 {- Syntactical composition -}
