@@ -91,7 +91,7 @@ pres vc ⊢PC (⊢prot! {vc = vc′} ⊢M ⊢PC′ x eq) ⊢μ (prot!-ctx M→N)
   let ⟨ Σ′ , Σ′⊇Σ , ⊢M′ , ⊢μ′ ⟩  = pres vc′ ⊢PC′ ⊢M ⊢μ M→N in
   ⟨ Σ′ , Σ′⊇Σ , ⊢prot! ⊢M′ ⊢PC′ x eq , ⊢μ′ ⟩
 pres {Σ} vc ⊢PC (⊢prot! ⊢V ⊢PC′ x refl) ⊢μ (prot!-val v) =
-  ⟨ Σ , ⊇-refl Σ , ⊢cast (stamp-val-wt v (⊢value-pc ⊢V v)) , ⊢μ ⟩
+  ⟨ Σ , ⊇-refl Σ , stamp-val!-wt v (⊢value-pc ⊢V v) , ⊢μ ⟩
 pres {Σ} vc ⊢PC ⊢M ⊢μ prot!-blame = ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- Casting -}
 pres {Σ} vc ⊢PC ⊢V⟨c⟩ ⊢μ (cast v V⟨c⟩→M) =

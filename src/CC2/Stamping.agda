@@ -88,11 +88,13 @@ stamp-val!-value : ∀ {Σ gc ℓv A V ℓ}
 stamp-val!-value {ℓ = low} (V-raw V-addr) (⊢addr a) = V-cast V-addr (ir-ref (inj id))
 stamp-val!-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = low} a) = V-cast V-addr (ir-ref (inj (up id)))
 stamp-val!-value {ℓ = high} (V-raw V-addr) (⊢addr {ℓ = high} a) = V-cast V-addr (ir-ref (inj id))
-stamp-val!-value (V-raw V-ƛ) (⊢lam ⊢N) = {!!}
+stamp-val!-value {ℓ = low} (V-raw V-ƛ) (⊢lam ⊢N) = V-cast V-ƛ (ir-fun (inj id))
+stamp-val!-value {ℓ = high} (V-raw V-ƛ) (⊢lam {ℓ = low} ⊢N) = V-cast V-ƛ (ir-fun (inj (up id)))
+stamp-val!-value {ℓ = high} (V-raw V-ƛ) (⊢lam {ℓ = high} ⊢N) = V-cast V-ƛ (ir-fun (inj id))
 stamp-val!-value {ℓ = low} (V-raw V-const) ⊢const = V-cast V-const (ir-base (inj id) (λ ()))
 stamp-val!-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) = V-cast V-const (ir-base (inj (up id)) (λ ()))
 stamp-val!-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-cast V-const (ir-base (inj id) (λ ()))
-stamp-val!-value (V-cast v i) ⊢V = V-cast {!v!} {!!}
+stamp-val!-value (V-cast v i) ⊢V = V-cast v (stamp-ir!-irreducible i)
 
 
 stamp-val-low : ∀ {Σ gc ℓv A V}

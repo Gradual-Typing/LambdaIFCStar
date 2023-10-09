@@ -65,7 +65,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
   prot!-val : ∀ {V μ PC PC′ A ℓ} {vc}
     → (v  : Value V)
       --------------------------------------------------------------------------------- Protect!Value
-    → prot! PC vc ℓ V A ∣ μ ∣ PC′ —→ stamp-val V v A ℓ ⟨ stamp A , ℓ ⇒stamp⋆ ⟩ ∣ μ
+    → prot! PC vc ℓ V A ∣ μ ∣ PC′ —→ stamp-val! V v A ℓ ∣ μ
 
 
   prot!-blame : ∀ {μ PC PC′ A ℓ p} {vc}

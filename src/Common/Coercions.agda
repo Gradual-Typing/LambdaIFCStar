@@ -93,9 +93,9 @@ coerceᵣ-id (⟦ g ⟧ A ⇒ B) = fun (id g) (coerce-id A) (coerce-id B)
 coerce-id (T of g) = cast (coerceᵣ-id T) (id g)
 
 
-stamp_,_⇒stamp⋆ : ∀ A ℓ → Cast (stamp A (l ℓ)) ⇒ (stamp A ⋆)
-stamp (T of g) , ℓ ⇒stamp⋆ rewrite g⋎̃⋆≡⋆ {g} =
-  cast (coerceᵣ-id T) (coerce (g ⋎̃ l ℓ) ⇒⋆)
+-- stamp_,_⇒stamp⋆ : ∀ A ℓ → Cast (stamp A (l ℓ)) ⇒ (stamp A ⋆)
+-- stamp (T of g) , ℓ ⇒stamp⋆ rewrite g⋎̃⋆≡⋆ {g} =
+--   cast (coerceᵣ-id T) (coerce (g ⋎̃ l ℓ) ⇒⋆)
 
 
 stamp-ir : ∀ {A B} (c : Cast A ⇒ B) → Irreducible c → ∀ ℓ → Cast A ⇒ stamp B (l ℓ)

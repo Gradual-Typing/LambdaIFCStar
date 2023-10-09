@@ -330,20 +330,20 @@ prec-right-coerce-id (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
   ⊑-fun (⊑-right-expand d̅⊑gc′) (prec-right-coerce-id c⊑A′) (prec-right-coerce-id d⊑B′) (⊑-right-expand c̅⊑g′)
 
 
-stamp⋆-left-prec : ∀ {A A′} {ℓ}
-  → A ⊑ A′
-    ----------------------------------------------
-  → ⟨ stamp A , ℓ ⇒stamp⋆ ⟩⊑ stamp A′ (l ℓ)
-stamp⋆-left-prec (⊑-ty ⋆⊑ ⊑-ι) = ⊑-base (⊑-id ⋆⊑)
-stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-ref A⊑A′)) =
-  ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-id ⋆⊑)
-stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
-  ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-id ⋆⊑)
-stamp⋆-left-prec (⊑-ty l⊑l ⊑-ι) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-stamp⋆-left-prec (⊑-ty l⊑l (⊑-ref A⊑A′)) =
-  ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-stamp⋆-left-prec (⊑-ty l⊑l (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
-  ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+-- stamp⋆-left-prec : ∀ {A A′} {ℓ}
+--   → A ⊑ A′
+--     ----------------------------------------------
+--   → ⟨ stamp A , ℓ ⇒stamp⋆ ⟩⊑ stamp A′ (l ℓ)
+-- stamp⋆-left-prec (⊑-ty ⋆⊑ ⊑-ι) = ⊑-base (⊑-id ⋆⊑)
+-- stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-ref A⊑A′)) =
+--   ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-id ⋆⊑)
+-- stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
+--   ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-id ⋆⊑)
+-- stamp⋆-left-prec (⊑-ty l⊑l ⊑-ι) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+-- stamp⋆-left-prec (⊑-ty l⊑l (⊑-ref A⊑A′)) =
+--   ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+-- stamp⋆-left-prec (⊑-ty l⊑l (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
+--   ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
 
 stamp-ir-prec : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′} {ℓ}
   → ⟨ c ⟩⊑⟨ c′ ⟩
