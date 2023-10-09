@@ -286,7 +286,7 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     ⟨ W , w , ↠W , W⊑stampV′ ⟩ →
       ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , μ ,
         trans-mult (prot!-ctx-mult vc₁ M↠V) (_ ∣ _ ∣ _ —→⟨ prot!-val v ⟩ ↠W) ,
-        ? , μ⊑μ′ , size-eq ⟩
+        {!!} , μ⊑μ′ , size-eq ⟩
 
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in

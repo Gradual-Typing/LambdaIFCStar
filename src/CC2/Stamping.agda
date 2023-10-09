@@ -11,6 +11,7 @@ open import Common.Utils
 open import Common.Types
 open import Common.Coercions
 open import Memory.HeapContext
+open import CoercionExpr.Stamping
 open import CC2.Syntax
 open import CC2.Typing
 open import CC2.Values
@@ -24,6 +25,12 @@ stamp-val V (V-raw v) (T of l low ) high =
 stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
 -- impossible, suppose ⊢ V ⇐ A
 stamp-val V v A ℓ = ●
+
+stamp-val! : ∀ V → Value V → (A : Type) → StaticLabel → Term
+stamp-val! V         (V-raw v) (T of l ℓ) ℓ′ = V ⟨ cast (coerceᵣ-id T) (stamp!ₗ (id (l ℓ)) id ℓ′) ⟩
+stamp-val! (V ⟨ c ⟩) (V-cast v i)       A ℓ  = V ⟨ stamp-ir! c i ℓ ⟩
+-- impossible, suppose ⊢ V ⇐ A
+stamp-val! V v A ℓ = ●
 
 stamp-val-wt : ∀ {Σ gc ℓv A V ℓ}
   → (v : Value V)
