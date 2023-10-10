@@ -14,6 +14,7 @@ open import Function using (case_of_)
 
 open import Common.Utils
 open import CoercionExpr.Precision
+open import CoercionExpr.Stamping
 open import Memory.HeapContext
 open import CC2.Statics
 open import CC2.Precision
@@ -39,11 +40,26 @@ stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr {n = n} {high} {ℓ̂} a b)
   ⊑-castl (⊑-addr a b) (⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam {ℓ = low} g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) l≼h =
   let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} (⊑*-∷ A⊑A′ Γ⊑Γ′) Σ⊑Σ′ N⊑N′ in
-  ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun (⊑-id g⊑g′) (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam {ℓ = high} g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) l≼h = {!!}
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ ⊑-const (V-raw V-const) (V-raw V-const) l≼h = {!!}
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw x) (V-raw x₁) h≼h = {!!}
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw x) (V-cast x₁ x₂) ℓ≼ℓ′ = {!!}
+  ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun (⊑-id g⊑g′)
+         (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) !⊑↑)
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam {ℓ = high} g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) l≼h =
+  let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} (⊑*-∷ A⊑A′ Γ⊑Γ′) Σ⊑Σ′ N⊑N′ in
+  ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun (⊑-id g⊑g′)
+          (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = low}) (V-raw V-const) (V-raw V-const) l≼h =
+  ⊑-cast ⊑-const (⊑-base !⊑↑)
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = high}) (V-raw V-const) (V-raw V-const) l≼h =
+  ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr a b) (V-raw V-addr) (V-raw V-addr) h≼h = {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) h≼h = {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = low}) (V-raw V-const) (V-raw V-const) h≼h =
+  ⊑-cast ⊑-const (⊑-base ↑!⊑↑)
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = high}) (V-raw V-const) (V-raw V-const) h≼h =
+  ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr ⊑-const (⊑-base ℓ⊑c̅′)) (V-raw V-const) (V-cast V-const (ir-base 𝓋′ _)) ℓ≼ℓ′ =
+  ⊑-cast ⊑-const (⊑-base (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand ℓ⊑c̅′) ℓ≼ℓ′))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ _) (V-raw V-addr) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ _) (V-raw V-ƛ) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast x x₁) v′ ℓ≼ℓ′ = {!!}
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑● v V-● = contradiction V⊑● (_ ⋤●)
