@@ -1,4 +1,4 @@
-module CC2.SimCast where
+module Simulation.Cast where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

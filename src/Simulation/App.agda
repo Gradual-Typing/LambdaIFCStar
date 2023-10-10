@@ -1,4 +1,4 @@
-module CC2.Simulation.App where
+module Simulation.App where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -27,9 +27,11 @@ open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapPrecision
 open import CC2.CatchUp
-open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
+
+open import Simulation.Cast
+
 
 sim-app : ∀ {Σ Σ′ gc gc′} {M N′ V′ μ μ′ PC PC′} {A A′ B′ C′} {ℓ}
   → (vc  : LVal PC)
@@ -42,12 +44,13 @@ sim-app : ∀ {Σ Σ′ gc gc′} {M N′ V′ μ μ′ PC PC′} {A A′ B′ C
   → PC ⊑ PC′ ⇐ gc ⊑ gc′
   → SizeEq μ μ′
   → Value V′
-    -------------------
+    --------------------------------------------------------------------------
   → ∃[ N ] (M ∣ μ ∣ PC —↠ N ∣ μ) ×
-            ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ prot (stampₑ PC′ vc′ ℓ) (stampₑ-LVal vc′) ℓ (N′ [ V′ ]) C′ ⇐ A ⊑ A′)
+            ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢
+              N ⊑ prot (stampₑ PC′ vc′ ℓ) (stampₑ-LVal vc′) ℓ (N′ [ V′ ]) C′
+              ⇐ A ⊑ A′)
 sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
     (⊑-app {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′
-  -- rewrite uniq-LVal vc′† vc′
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , ⊑-lam g⊑g′ A⊑A′ N⊑N′ ⟩ =
   case catchup {μ = μ} {PC} v′ M⊑M′ of λ where
@@ -80,7 +83,6 @@ sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
 sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
     (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
     Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′
-  -- rewrite uniq-LVal vc′† vc′
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
 ... | ⟨ ƛ N ⟨ cast (fun d̅ c d) c̅ ⟩ , V-cast V-ƛ (ir-fun 𝓋) ,

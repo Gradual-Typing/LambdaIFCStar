@@ -1,4 +1,4 @@
-module CC2.Simulation.Deref where
+module Simulation.Deref where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -27,9 +27,11 @@ open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapPrecision
 open import CC2.CatchUp
-open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
+
+open import Simulation.Cast
+
 
 sim-deref : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ T n ℓ ℓ̂}
   → (vc  : LVal PC)
@@ -43,9 +45,11 @@ sim-deref : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ T n ℓ �
   → SizeEq μ μ′
   → (v′ : Value V′)
   → lookup-μ μ′ (a⟦ ℓ̂ ⟧ n) ≡ just (V′ & v′)
-    -------------------
+    -------------------------------------------------------
   → ∃[ N ] (M ∣ μ ∣ PC —↠ N ∣ μ) ×
-            ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ N ⊑ prot (l high) v-l ℓ V′ (T of l ℓ̂) ⇐ A ⊑ A′)
+            ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢
+              N ⊑ prot (l high) v-l ℓ V′ (T of l ℓ̂)
+              ⇐ A ⊑ A′)
 sim-deref {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
     (⊑-deref M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ μ′a≡V′
   with catchup {μ = μ} {PC} (V-raw V-addr) M⊑M′

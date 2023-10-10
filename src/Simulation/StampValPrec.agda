@@ -1,4 +1,4 @@
-module CC2.StampValPrec where
+module Simulation.StampValPrec where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

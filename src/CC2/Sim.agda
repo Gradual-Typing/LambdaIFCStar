@@ -28,19 +28,19 @@ open import CC2.Precision
 open import CC2.HeapTyping using (⊇-fresh)
 open import CC2.HeapPrecision
 open import CC2.CatchUp
-open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 {- One lemma for each reduction rule (on the more precise side) -}
-open import CC2.Simulation.App
-open import CC2.Simulation.Assign
-open import CC2.Simulation.AssignCast
-open import CC2.Simulation.Assign?Cast
-open import CC2.Simulation.Deref
-open import CC2.Simulation.Deref!Cast
-open import CC2.Simulation.DerefCast
-open import CC2.StampValPrec
+open import Simulation.Cast
+open import Simulation.App
+open import Simulation.Assign
+open import Simulation.AssignCast
+open import Simulation.Assign?Cast
+open import Simulation.Deref
+open import Simulation.Deref!Cast
+open import Simulation.DerefCast
+open import Simulation.StampValPrec
 
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}

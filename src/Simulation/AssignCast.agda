@@ -1,4 +1,4 @@
-module CC2.Simulation.AssignCast where
+module Simulation.AssignCast where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -27,10 +27,11 @@ open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapPrecision
 open import CC2.CatchUp
-open import CC2.SimCast
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import CC2.CastSubtyping
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
+
+open import Simulation.Cast
 
 
 sim-assign-cast : ∀ {Σ Σ′ gc gc′} {M V′ W′ μ₁ μ₁′ PC PC′} {A A′ S T n ℓ₁ ℓ₂ ℓ̂₁ ℓ̂₂}
@@ -48,7 +49,7 @@ sim-assign-cast : ∀ {Σ Σ′ gc gc′} {M V′ W′ μ₁ μ₁′ PC PC′} 
   → (𝓋′ : CVal c̅)
   → V′ ⟨ c ⟩ —↠ W′
   → (w′ : Value W′)
-    -------------------
+    --------------------------------------------------
   → let μ₂′ = cons-μ (a⟦ ℓ̂₁ ⟧ n) W′ w′ μ₁′ in
      ∃[ N ] ∃[ μ₂ ]
        (M ∣ μ₁ ∣ PC —↠ N ∣ μ₂) ×
