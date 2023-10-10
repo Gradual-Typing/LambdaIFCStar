@@ -62,7 +62,11 @@ stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr (⊑-addr a b) (⊑-ref A�
   ⊑-cast (⊑-addr a b)
     (⊑-ref (prec-right-coerce-id A⊑c′) (prec-right-coerce-id A⊑d′)
            (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ _) (V-raw V-ƛ) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′))
+                               (V-raw V-ƛ) (V-cast V-ƛ (ir-fun 𝓋′)) ℓ≼ℓ′ =
+  ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′)
+    (⊑-fun (⊑-right-expand gc⊑d̅′) (prec-right-coerce-id A⊑c′) (prec-right-coerce-id B⊑d′)
+           (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast x x₁) v′ ℓ≼ℓ′ = {!!}
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑● v V-● = contradiction V⊑● (_ ⋤●)
