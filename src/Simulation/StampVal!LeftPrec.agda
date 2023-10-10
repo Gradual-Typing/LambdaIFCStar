@@ -56,9 +56,12 @@ stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = low}) (V-raw V-cons
   ⊑-cast ⊑-const (⊑-base ↑!⊑↑)
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = high}) (V-raw V-const) (V-raw V-const) h≼h =
   ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr ⊑-const (⊑-base ℓ⊑c̅′)) (V-raw V-const) (V-cast V-const (ir-base 𝓋′ _)) ℓ≼ℓ′ =
-  ⊑-cast ⊑-const (⊑-base (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand ℓ⊑c̅′) ℓ≼ℓ′))
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ _) (V-raw V-addr) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr ⊑-const (⊑-base g⊑c̅′)) (V-raw V-const) (V-cast V-const (ir-base 𝓋′ _)) ℓ≼ℓ′ =
+  ⊑-cast ⊑-const (⊑-base (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr (⊑-addr a b) (⊑-ref A⊑c′ A⊑d′ g⊑c̅′)) (V-raw V-addr) (V-cast V-addr (ir-ref 𝓋′)) ℓ≼ℓ′ =
+  ⊑-cast (⊑-addr a b)
+    (⊑-ref (prec-right-coerce-id A⊑c′) (prec-right-coerce-id A⊑d′)
+           (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr V⊑V′ _) (V-raw V-ƛ) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast x x₁) v′ ℓ≼ℓ′ = {!!}
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
