@@ -282,11 +282,9 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
   case catchup {μ = μ} {PC₁} v′ M⊑V′ of λ where
   ⟨ V , v , M↠V , V⊑V′ ⟩ →
     let ⟨ ⊢V , ⊢V′ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ V⊑V′ in
-    case catchup {μ = μ} (stamp-val-value v′ ⊢V′) (⊑-castl (stamp-val-prec ⊑*-∅ Σ⊑Σ′ V⊑V′ v v′) (stamp⋆-left-prec A⊑A′)) of λ where
-    ⟨ W , w , ↠W , W⊑stampV′ ⟩ →
-      ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , μ ,
-        trans-mult (prot!-ctx-mult vc₁ M↠V) (_ ∣ _ ∣ _ —→⟨ prot!-val v ⟩ _ ∣ _ ∣ _ ∎) ,
-        {!!} , μ⊑μ′ , size-eq ⟩
+    ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , μ ,
+      trans-mult (prot!-ctx-mult vc₁ M↠V) (_ ∣ _ ∣ _ —→⟨ prot!-val v ⟩ _ ∣ _ ∣ _ ∎) ,
+      {!!} , μ⊑μ′ , size-eq ⟩
 
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
