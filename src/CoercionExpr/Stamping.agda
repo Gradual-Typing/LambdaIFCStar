@@ -270,3 +270,15 @@ stamp!ₗ-prec (up id) (inj (up id)) prec h≼h = prec-refl _
 stamp!ₗ-prec (up id) (up id) prec l≼l = prec-refl _
 stamp!ₗ-prec (up id) (up id) prec l≼h = prec-refl _
 stamp!ₗ-prec (up id) (up id) prec h≼h = prec-refl _
+
+stamp!ₗ⊑↑ : ∀ {g ℓ} (c̅ : CExpr l low ⇒ g)
+  → (𝓋 : CVal c̅)
+  → ⊢ stamp!ₗ c̅ 𝓋 ℓ ⊑ id (l low) ⨾ ↑
+stamp!ₗ⊑↑ {ℓ = high} (id .(l low)) id = ↑!⊑↑
+stamp!ₗ⊑↑ {ℓ = low} (id .(l low)) id = !⊑↑
+stamp!ₗ⊑↑ {ℓ = high} (id .(l low) ⨾ (_ !)) (inj id) = ↑!⊑↑
+stamp!ₗ⊑↑ {ℓ = low} (id .(l low) ⨾ (_ !)) (inj id) = !⊑↑
+stamp!ₗ⊑↑ {ℓ = high} (id .(l low) ⨾ ↑ ⨾ (_ !)) (inj (up id)) = ↑!⊑↑
+stamp!ₗ⊑↑ {ℓ = low} (id .(l low) ⨾ ↑ ⨾ (_ !)) (inj (up id)) = ↑!⊑↑
+stamp!ₗ⊑↑ {ℓ = high} (id .(l low) ⨾ ↑) (up id) = ↑!⊑↑
+stamp!ₗ⊑↑ {ℓ = low} (id .(l low) ⨾ ↑) (up id) = ↑!⊑↑
