@@ -194,7 +194,7 @@ stamp!ₑ-left-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
   with prec→⊢ M⊑M′
 ... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
   with prec-inv M⊑M′
-... | ⟨ refl , c̅⊑c̅′ ⟩ = ⊑-cast ⊑-l (stamp!ₗ-left-prec 𝓋 𝓋′ c̅⊑c̅′)
+... | ⟨ refl , c̅⊑c̅′ ⟩ = ⊑-cast ⊑-l (stamp!ₗ-left-prec 𝓋 𝓋′ c̅⊑c̅′ ≼-refl)
 
 stamp!ₑ-prec : ∀ {ℓ ℓ′} {V V′ g g′}
   → (v  : LVal V)
