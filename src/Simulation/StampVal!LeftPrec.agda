@@ -31,7 +31,18 @@ stamp-val!-left-prec : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {A A′ V V
     ------------------------------------------------------------------------------------
   → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ stamp-val! V v A ℓ ⊑ stamp-val V′ v′ A′ ℓ′
         ⇐ stamp A ⋆ ⊑ stamp A′ (l ℓ′)
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw x) (V-raw x₁) l≼l = {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr {n = n} {ℓ} {ℓ̂} a b) (V-raw V-addr) (V-raw V-addr) l≼l
+  rewrite ℓ⋎low≡ℓ {ℓ} =
+  let A⊑A′ = ⊑-ty l⊑l (⊑ₘ→⊑ {n = n} {ℓ̂} Σ⊑Σ′ a b) in
+  ⊑-castl (⊑-addr a b) (⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam {ℓ = ℓ} g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) l≼l
+  rewrite ℓ⋎low≡ℓ {ℓ} =
+  let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} (⊑*-∷ A⊑A′ Γ⊑Γ′) Σ⊑Σ′ N⊑N′ in
+  ⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun (⊑-id g⊑g′)
+          (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-const {ℓ = ℓ}) (V-raw V-const) (V-raw V-const) l≼l
+  rewrite ℓ⋎low≡ℓ {ℓ} =
+  ⊑-castl ⊑-const (⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr {n = n} {low} {ℓ̂} a b) (V-raw V-addr) (V-raw V-addr) l≼h =
   let A⊑A′ = ⊑-ty l⊑l (⊑ₘ→⊑ {n = n} {ℓ̂} Σ⊑Σ′ a b) in
   ⊑-cast (⊑-addr a b) (⊑-ref (prec-coerce-id A⊑A′) (prec-coerce-id A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑))
