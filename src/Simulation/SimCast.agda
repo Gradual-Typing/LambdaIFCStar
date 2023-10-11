@@ -1,4 +1,4 @@
-module Simulation.Cast where
+module Simulation.SimCast where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
