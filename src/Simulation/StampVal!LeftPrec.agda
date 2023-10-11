@@ -75,15 +75,23 @@ stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl ⊑-const (⊑-base c̅⊑
 ... | l≼h | high = ⊑-castl ⊑-const (⊑-base (stamp!ₗ⊑ℓ _ c̅⊑g′ 𝓋 l≼h))
 ... | h≼h | low = ⊑-cast ⊑-const (⊑-base (stamp!ₗ⊑↑ _ 𝓋))
 ... | h≼h | high = ⊑-castl ⊑-const (⊑-base (stamp!ₗ⊑ℓ _ c̅⊑g′ 𝓋 h≼h))
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′)) (V-cast V-addr (ir-ref 𝓋)) (V-raw V-addr) ℓ≼ℓ′ = {!!}
-  -- ⊑-cast (⊑-addr a b)
-  --   (⊑-ref (prec-right-coerce-id A⊑c′) (prec-right-coerce-id A⊑d′)
-  --          (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′)) (V-cast V-addr (ir-ref {ℓ = ℓ₁} {g} 𝓋)) (V-raw V-addr) ℓ≼ℓ′
+  rewrite g⋎̃⋆≡⋆ {g} with ℓ≼ℓ′ | ℓ₁
+... | l≼l | low = ⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ (stamp!ₗ⊑ℓ _ c̅⊑g′ 𝓋 l≼l))
+... | l≼l | high = ⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ (stamp!ₗ⊑ℓ _ c̅⊑g′ 𝓋 l≼h))
+... | l≼h | low = ⊑-cast (⊑-addr a b) (⊑-ref (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑A′) (stamp!ₗ⊑↑ _ 𝓋))
+... | l≼h | high = ⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ (stamp!ₗ⊑ℓ _ c̅⊑g′ 𝓋 l≼h))
+... | h≼h | low = ⊑-cast (⊑-addr a b) (⊑-ref  (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑A′) (stamp!ₗ⊑↑ _ 𝓋))
+... | h≼h | high = ⊑-castl (⊑-addr a b) (⊑-ref c⊑A′ d⊑A′ (stamp!ₗ⊑ℓ _ c̅⊑g′ 𝓋 h≼h))
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′))
-                               (V-cast V-ƛ (ir-fun 𝓋)) (V-raw V-ƛ) ℓ≼ℓ′ = {!!}
-  -- ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′)
-  --   (⊑-fun (⊑-right-expand gc⊑d̅′) (prec-right-coerce-id A⊑c′) (prec-right-coerce-id B⊑d′)
-  --          (stamp!ₗ-left-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
-stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+                               (V-cast V-ƛ (ir-fun 𝓋)) (V-raw V-ƛ) ℓ≼ℓ′ =
+  {!!}
+stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-cast v′ i′) ℓ≼ℓ′
+  with cast-prec-inv V⊑V′ v v′ | i | i′
+... | ⟨ ⊑-const , ⊑-base c̅⊑c̅′ , refl , refl ⟩ | ir-base {g = g} 𝓋 _ | ir-base 𝓋′ _ rewrite g⋎̃⋆≡⋆ {g} =
+  ⊑-cast ⊑-const (⊑-base (stamp!ₗ-left-prec 𝓋 𝓋′ c̅⊑c̅′ ℓ≼ℓ′))
+... | ⟨ ⊑-addr a b , c⊑c′ , refl , refl ⟩ | ir-ref {g = g} 𝓋 | ir-ref 𝓋′ rewrite g⋎̃⋆≡⋆ {g} =
+  ⊑-cast (⊑-addr a b) (⊑-ref {!!} {!!} {!!})
+... | ⟨ ⊑-lam g⊑g′ A⊑A′ N⊑N′ , c⊑c′ , refl , refl ⟩ | ir-fun {g = g} 𝓋 | ir-fun 𝓋′ rewrite g⋎̃⋆≡⋆ {g} = {!!}
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
 stamp-val!-left-prec Γ⊑Γ′ Σ⊑Σ′ V⊑● v V-● = contradiction V⊑● (_ ⋤●)
