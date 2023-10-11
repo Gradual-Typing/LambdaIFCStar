@@ -33,6 +33,7 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 {- One lemma for each reduction rule (on the more precise side) -}
 open import Simulation.SimCast
+open import Simulation.Cast
 open import Simulation.App
 open import Simulation.Assign
 open import Simulation.AssignCast
@@ -305,7 +306,10 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot!-val v) = {
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot!-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (cast v′ V′⟨c′⟩→N) = {!!}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (cast v′ r) =
+  let ⟨ N , ♣ , prec ⟩ = sim-cast-step vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ r in
+  ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
 {- β -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β vM′ vc′†)

@@ -30,7 +30,7 @@ open import CC2.CatchUp
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
-open import Simulation.Cast
+open import Simulation.SimCast
 
 
 sim-deref!-cast : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ B′ T n ℓ ℓ̂}

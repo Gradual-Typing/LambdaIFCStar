@@ -31,7 +31,7 @@ open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import CC2.CastSubtyping
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
-open import Simulation.Cast
+open import Simulation.SimCast
 
 
 sim-assign-cast : ∀ {Σ Σ′ gc gc′} {M V′ W′ μ₁ μ₁′ PC PC′} {A A′ S T n ℓ₁ ℓ₂ ℓ̂₁ ℓ̂₂}
