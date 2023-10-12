@@ -79,10 +79,68 @@ sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-cast M⊑V′ c⊑c′) Σ⊑Σ�
                       _ ∣ _ ∣ _ —→⟨ cast (V-raw V-const) (cast V-const (comp-→⁺ ↠c̅ₙ (inj 𝓋)) (inj 𝓋)) ⟩
                       _ ∣ _ ∣ _ ∎) ,
           ⊑-cast ⊑-const (⊑-base c̅ₙ⊑c̅ₙ′) ⟩
-    ⟨ ⊑-ref _ _ _ , ⊑-ref _ _ _ , _ ⟩ → {!!}
-    ⟨ ⊑-fun _ _ _ _ , ⊑-fun _ _ _ _ , _ ⟩ → {!!}
+    ⟨ ⊑-ref c₁⊑A′ d₁⊑A′ c̅₁⊑g′ , ⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′ , ⊑-addr a b ⟩ →
+      case sim-mult (comp-pres-⊑-lb c̅₁⊑g′ c̅⊑c̅′) 𝓋′ (→⁺-impl-↠ c̅′→⁺c̅ₙ) of λ where
+      ⟨ c̅ₙ , id , ↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ →
+        ⟨ _ ,
+          trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                     (_ ∣ _ ∣ _ —→⟨ cast (V-cast V-addr i) (cast-comp V-addr i) ⟩
+                      _ ∣ _ ∣ _ —→⟨ cast (V-raw V-addr) (cast V-addr (comp-→⁺ ↠c̅ₙ CVal.id) CVal.id) ⟩
+                      _ ∣ _ ∣ _ ∎) ,
+          ⊑-cast (⊑-addr a b) (⊑-ref (comp-pres-prec-bl c⊑c′ c₁⊑A′) (comp-pres-prec-lb d₁⊑A′ d⊑d′) c̅ₙ⊑c̅ₙ′) ⟩
+      ⟨ c̅ₙ , up id , ↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ →
+        ⟨ _ ,
+          trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                     (_ ∣ _ ∣ _ —→⟨ cast (V-cast V-addr i) (cast-comp V-addr i) ⟩
+                      _ ∣ _ ∣ _ —→⟨ cast (V-raw V-addr) (cast V-addr (comp-→⁺ ↠c̅ₙ (up CVal.id)) (up CVal.id)) ⟩
+                      _ ∣ _ ∣ _ ∎) ,
+          ⊑-cast (⊑-addr a b) (⊑-ref (comp-pres-prec-bl c⊑c′ c₁⊑A′) (comp-pres-prec-lb d₁⊑A′ d⊑d′) c̅ₙ⊑c̅ₙ′) ⟩
+      ⟨ c̅ₙ , inj 𝓋 , ↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ →
+        ⟨ _ ,
+          trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                     (_ ∣ _ ∣ _ —→⟨ cast (V-cast V-addr i) (cast-comp V-addr i) ⟩
+                      _ ∣ _ ∣ _ —→⟨ cast (V-raw V-addr) (cast V-addr (comp-→⁺ ↠c̅ₙ (inj 𝓋)) (inj 𝓋)) ⟩
+                      _ ∣ _ ∣ _ ∎) ,
+          ⊑-cast (⊑-addr a b) (⊑-ref (comp-pres-prec-bl c⊑c′ c₁⊑A′) (comp-pres-prec-lb d₁⊑A′ d⊑d′) c̅ₙ⊑c̅ₙ′) ⟩
+    ⟨ ⊑-fun d̅₁⊑gc′ c₁⊑A′ d₁⊑B′ c̅₁⊑g′ , ⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′ , ⊑-lam gc⊑gc′ A⊑A′ N⊑N′ ⟩ →
+      case sim-mult (comp-pres-⊑-lb c̅₁⊑g′ c̅⊑c̅′) 𝓋′ (→⁺-impl-↠ c̅′→⁺c̅ₙ) of λ where
+      ⟨ c̅ₙ , id , ↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ →
+        ⟨ _ ,
+          trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                     (_ ∣ _ ∣ _ —→⟨ cast (V-cast V-ƛ i) (cast-comp V-ƛ i) ⟩
+                      _ ∣ _ ∣ _ —→⟨ cast (V-raw V-ƛ) (cast V-ƛ (comp-→⁺ ↠c̅ₙ CVal.id) CVal.id) ⟩
+                      _ ∣ _ ∣ _ ∎) ,
+          ⊑-cast (⊑-lam gc⊑gc′ A⊑A′ N⊑N′)
+                 (⊑-fun (comp-pres-⊑-bl d̅⊑d̅′ d̅₁⊑gc′)
+                        (comp-pres-prec-bl c⊑c′ c₁⊑A′)
+                        (comp-pres-prec-lb d₁⊑B′ d⊑d′) c̅ₙ⊑c̅ₙ′) ⟩
+      ⟨ c̅ₙ , up id , ↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ →
+        ⟨ _ ,
+          trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                     (_ ∣ _ ∣ _ —→⟨ cast (V-cast V-ƛ i) (cast-comp V-ƛ i) ⟩
+                      _ ∣ _ ∣ _ —→⟨ cast (V-raw V-ƛ) (cast V-ƛ (comp-→⁺ ↠c̅ₙ (up CVal.id)) (up CVal.id)) ⟩
+                      _ ∣ _ ∣ _ ∎) ,
+          ⊑-cast (⊑-lam gc⊑gc′ A⊑A′ N⊑N′)
+                 (⊑-fun (comp-pres-⊑-bl    d̅⊑d̅′ d̅₁⊑gc′)
+                        (comp-pres-prec-bl c⊑c′ c₁⊑A′)
+                        (comp-pres-prec-lb d₁⊑B′ d⊑d′) c̅ₙ⊑c̅ₙ′) ⟩
+      ⟨ c̅ₙ , inj 𝓋 , ↠c̅ₙ , c̅ₙ⊑c̅ₙ′ ⟩ →
+        ⟨ _ ,
+          trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                     (_ ∣ _ ∣ _ —→⟨ cast (V-cast V-ƛ i) (cast-comp V-ƛ i) ⟩
+                      _ ∣ _ ∣ _ —→⟨ cast (V-raw V-ƛ) (cast V-ƛ (comp-→⁺ ↠c̅ₙ (inj 𝓋)) (inj 𝓋)) ⟩
+                      _ ∣ _ ∣ _ ∎) ,
+          ⊑-cast (⊑-lam gc⊑gc′ A⊑A′ N⊑N′)
+                 (⊑-fun (comp-pres-⊑-bl    d̅⊑d̅′  d̅₁⊑gc′)
+                        (comp-pres-prec-bl c⊑c′  c₁⊑A′)
+                        (comp-pres-prec-lb d₁⊑B′ d⊑d′) c̅ₙ⊑c̅ₙ′) ⟩
   ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
-sim-cast-step vc vc′ (⊑-castr prec x₃) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast x x₁ x₂) = {!!}
+sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-castr M⊑V′ x₃) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast x x₁ x₂) =
+  case catchup {μ = μ} {PC = PC} v′ M⊑V′ of λ where
+  ⟨ _ , V-raw v , M↠V , V⊑V′ ⟩ → {!!}
+  ⟨ _ , V-cast v i , M↠V , ⊑-castl V⊑V′ c₁⊑A′ ⟩ →
+    {!!}
+  ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
 sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-blame x x₁) = {!!}
 sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ cast-id = {!!}
 sim-cast-step vc vc′ (⊑-cast prec x₂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-comp x x₁) = {!!}
