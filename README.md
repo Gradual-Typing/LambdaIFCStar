@@ -18,8 +18,8 @@ You can check proofs and explore examples by following the steps:
 
 ### Software dependencies for checking proofs:
 
-- [Agda](https://wiki.portal.chalmers.se/agda) `2.6.3`
-- [Standard library](https://github.com/agda/agda-stdlib) `v1.7.2 (b2e6385)`
+- [Agda](https://wiki.portal.chalmers.se/agda) `2.6.4`
+- [Standard library](https://github.com/agda/agda-stdlib) `v1.7.3 (0817da6)`
 - [Abstract binding trees](https://github.com/jsiek/abstract-binding-trees/)
 - [GNU Make](https://www.gnu.org/software/make/)
 
