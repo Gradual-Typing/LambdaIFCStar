@@ -15,9 +15,10 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec; ⊑-right-contract)
+open import CoercionExpr.CoercionExpr using (det-mult; success; fail)
+open import CoercionExpr.Precision using (coerce⇒⋆-prec; ⊑-right-contract; ⊑-right-expand)
 open import CoercionExpr.SyntacComp
-open import CoercionExpr.GG using (sim-mult)
+open import CoercionExpr.GG renaming (catchup to catchupₗ; catchup-back to catchupₗ-back)
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security
 open import LabelExpr.Stamping
@@ -159,7 +160,35 @@ sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-cast M⊑V′ c⊑c′) Σ⊑Σ�
   ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
 sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-castr M⊑V′ A⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast vᵣ′ c̅′→⁺c̅ₙ′ 𝓋′) =
   case catchup {μ = μ} {PC = PC} v′ M⊑V′ of λ where
-  ⟨ _ , V-raw v , M↠V , V⊑V′ ⟩ → {!!}
+  ⟨ _ , V-raw v , M↠V , V⊑V′ ⟩ →
+    case ⟨ A⊑c′ , V⊑V′ ⟩ of λ where
+    ⟨ ⊑-base g⊑c̅′ , ⊑-const ⟩ →
+      let id⊑c̅′ = ⊑-right-expand g⊑c̅′ in
+      case catchupₗ-back _ _ CVal.id id⊑c̅′ of λ where
+      ⟨ _ , ↠c̅ₙ′ , v-v 𝓋† id⊑c̅ₙ′ ⟩ →
+        case det-mult ↠c̅ₙ′ (→⁺-impl-↠ c̅′→⁺c̅ₙ′) (success 𝓋†) (success 𝓋′) of λ where
+        refl → ⟨ _ , M↠V , ⊑-castr V⊑V′ (⊑-base (⊑-right-contract id⊑c̅ₙ′)) ⟩
+      ⟨ _ , ↠⊥ , v-⊥ _ ⟩ →
+        case det-mult ↠⊥ (→⁺-impl-↠ c̅′→⁺c̅ₙ′) fail (success 𝓋′) of λ where
+        refl → case 𝓋′ of λ where ()
+    ⟨ ⊑-ref A⊑c′ A⊑d′ g⊑c̅′ , ⊑-addr _ _ ⟩ →
+      let id⊑c̅′ = ⊑-right-expand g⊑c̅′ in
+      case catchupₗ-back _ _ CVal.id id⊑c̅′ of λ where
+      ⟨ _ , ↠c̅ₙ′ , v-v 𝓋† id⊑c̅ₙ′ ⟩ →
+        case det-mult ↠c̅ₙ′ (→⁺-impl-↠ c̅′→⁺c̅ₙ′) (success 𝓋†) (success 𝓋′) of λ where
+        refl → ⟨ _ , M↠V , ⊑-castr V⊑V′ (⊑-ref A⊑c′ A⊑d′ (⊑-right-contract id⊑c̅ₙ′)) ⟩
+      ⟨ _ , ↠⊥ , v-⊥ _ ⟩ →
+        case det-mult ↠⊥ (→⁺-impl-↠ c̅′→⁺c̅ₙ′) fail (success 𝓋′) of λ where
+        refl → case 𝓋′ of λ where ()
+    ⟨ ⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ g⊑c̅′ , ⊑-lam _ _ _ ⟩ →
+      let id⊑c̅′ = ⊑-right-expand g⊑c̅′ in
+      case catchupₗ-back _ _ CVal.id id⊑c̅′ of λ where
+      ⟨ _ , ↠c̅ₙ′ , v-v 𝓋† id⊑c̅ₙ′ ⟩ →
+        case det-mult ↠c̅ₙ′ (→⁺-impl-↠ c̅′→⁺c̅ₙ′) (success 𝓋†) (success 𝓋′) of λ where
+        refl → ⟨ _ , M↠V , ⊑-castr V⊑V′ (⊑-fun gc⊑d̅′ A⊑c′ B⊑d′ (⊑-right-contract id⊑c̅ₙ′)) ⟩
+      ⟨ _ , ↠⊥ , v-⊥ _ ⟩ →
+        case det-mult ↠⊥ (→⁺-impl-↠ c̅′→⁺c̅ₙ′) fail (success 𝓋′) of λ where
+        refl → case 𝓋′ of λ where ()
   ⟨ _ , V-cast v i , M↠V , ⊑-castl V⊑V′ c₁⊑A′ ⟩ →
     case ⟨ comp-pres-prec-lr c₁⊑A′ A⊑c′ , V⊑V′ ⟩ of λ where
     ⟨ ⊑-base c̅⊑c̅′ , ⊑-const ⟩ →
