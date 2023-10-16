@@ -246,10 +246,31 @@ sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-castr M⊑V′ A⊑c′) Σ⊑Σ
                         _ ∣ _ ∣ _ ∎) ,
           ⊑-cast (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅ₙ⊑c̅ₙ′) ⟩
   ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
-sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-blame x x₁) = {!!}
+sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-blame vᵣ c̅↠⊥) = {!!}
 sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ cast-id = {!!}
-sim-cast-step vc vc′ (⊑-cast prec x₂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-comp x x₁) = {!!}
-sim-cast-step vc vc′ (⊑-castr prec x₂) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-comp x x₁) = {!!}
+sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-cast prec c⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-comp vᵣ′ i′) =
+  case catchup {μ = μ} {PC = PC} (V-cast vᵣ′ i′) prec of λ where
+  ⟨ _ , V-raw v , M↠V , ⊑-castr V⊑V′ A⊑cᵢ′ ⟩ →
+    ⟨ _ , plug-cong □⟨ _ ⟩ M↠V , ⊑-cast V⊑V′ (comp-pres-prec-rb A⊑cᵢ′ c⊑c′) ⟩
+  ⟨ _ , V-cast vᵣ i , M↠V , V⊑V′ ⟩ →
+    case cast-prec-inv V⊑V′ vᵣ vᵣ′ of λ where
+    ⟨ W⊑W′ , cᵢ⊑cᵢ′ , refl , refl ⟩ →
+      ⟨ _ ,
+        trans-mult (plug-cong □⟨ _ ⟩ M↠V)
+                   (_ ∣ _ ∣ _ —→⟨ cast (V-cast vᵣ i) (cast-comp vᵣ i) ⟩ _ ∣ _ ∣ _ ∎) ,
+        ⊑-cast W⊑W′ (comp-pres-prec cᵢ⊑cᵢ′ c⊑c′) ⟩
+  ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
+sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-castr prec A⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-comp vᵣ′ i′) =
+  case catchup {μ = μ} {PC = PC} (V-cast vᵣ′ i′) prec of λ where
+  ⟨ _ , V-raw v , M↠V , ⊑-castr V⊑V′ A⊑cᵢ′ ⟩ →
+    ⟨ _ , M↠V , ⊑-castr V⊑V′ (comp-pres-prec-rr A⊑cᵢ′ A⊑c′) ⟩
+  ⟨ _ , V-cast vᵣ i , M↠V , V⊑V′ ⟩ →
+    case cast-prec-inv V⊑V′ vᵣ vᵣ′ of λ where
+    ⟨ W⊑W′ , cᵢ⊑cᵢ′ , refl , refl ⟩ →
+      ⟨ _ ,
+        M↠V ,
+        ⊑-cast W⊑W′ (comp-pres-prec-br cᵢ⊑cᵢ′ A⊑c′) ⟩
+  ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
 sim-cast-step vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ r =
   case sim-cast-step vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ r of λ where
   ⟨ N , M↠N , N⊑N′ ⟩ →
