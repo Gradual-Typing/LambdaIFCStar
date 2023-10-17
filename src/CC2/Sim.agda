@@ -43,6 +43,7 @@ open import Simulation.Deref!Cast
 open import Simulation.DerefCast
 open import Simulation.StampValPrec
 open import Simulation.StampVal!LeftPrec
+open import Simulation.StampVal!Prec
 
 
 sim : ∀ {Σ₁ Σ₁′ gc gc′} {M M′ N′ μ₁ μ₁′ μ₂′ PC PC′} {A A′}
@@ -302,10 +303,20 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
   ⟨ Σ₂ , Σ₂′ , Σ₂⊇Σ₁ , Σ₂′⊇Σ₁′ , _ , μ₂ , prot!-ctx-mult vc₁ M↠N ,
     ⊑-prot! N⊑N′ PC₁⊑PC₁′ ℓv₁⋎ℓ≼ℓv₂ ℓv₁′⋎ℓ≼ℓv₂′ eq eq′ ℓ≼ℓ′ , μ₂⊑μ₂′ , size-eq′ ⟩
 
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot!-val v) = {!!}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  (⊑-prot! {PC = PC₁} {vc = vc₁} {vc₁′} M⊑V′ PC₁⊑PC₁′ x y eq eq′ ℓ≼ℓ′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (prot!-val v′)
+  rewrite eq | eq′ =
+  case catchup {μ = μ} {PC₁} v′ M⊑V′ of λ where
+  ⟨ V , v , M↠V , V⊑V′ ⟩ →
+    let ⟨ ⊢V , ⊢V′ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ V⊑V′ in
+    ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , μ ,
+      trans-mult (prot!-ctx-mult vc₁ M↠V) (_ ∣ _ ∣ _ —→⟨ prot!-val v ⟩ _ ∣ _ ∣ _ ∎) ,
+      stamp-val!-prec ⊑*-∅ Σ⊑Σ′ (value-⊑-pc V⊑V′ v v′) v v′ ℓ≼ℓ′ , μ⊑μ′ , size-eq ⟩
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot!-blame =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
+
+{- cast -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
   M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (cast v′ r) =
   let ⟨ N , ♣ , prec ⟩ = sim-cast-step vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ r in
