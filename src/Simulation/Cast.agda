@@ -16,7 +16,8 @@ open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
 open import CoercionExpr.CoercionExpr using (det-mult; success; fail)
-open import CoercionExpr.Precision using (coerce⇒⋆-prec; ⊑-right-contract; ⊑-right-expand)
+open import CoercionExpr.Precision
+  using (coerce⇒⋆-prec; ⊑-right-contract; ⊑-right-expand; ⊑-left-contract; ⊑-left-expand)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.GG renaming (catchup to catchupₗ; catchup-back to catchupₗ-back)
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
@@ -246,8 +247,15 @@ sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-castr M⊑V′ A⊑c′) Σ⊑Σ
                         _ ∣ _ ∣ _ ∎) ,
           ⊑-cast (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅ₙ⊑c̅ₙ′) ⟩
   ⟨ _ , V-● , M↠● , ●⊑V′ ⟩ → contradiction ●⊑V′ (●⋤ _)
-sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-blame vᵣ c̅↠⊥) = {!!}
-sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ cast-id = {!!}
+sim-cast-step vc vc′ prec Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-blame vᵣ c̅↠⊥) =
+  let ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ prec in
+  ⟨ _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ ⟩
+sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-cast prec (⊑-base c̅⊑id)) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ cast-id =
+  case catchup {μ = μ} {PC = PC} v′ prec of λ where
+  ⟨ _ , _ , M↠V , V⊑V′ ⟩ → ⟨ _ , plug-cong □⟨ _ ⟩ M↠V , ⊑-castl V⊑V′ (⊑-base (⊑-left-contract c̅⊑id)) ⟩
+sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-castr prec A⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ cast-id =
+  case catchup {μ = μ} {PC = PC} v′ prec of λ where
+  ⟨ _ , _ , M↠V , V⊑V′ ⟩ → ⟨ _ , M↠V , V⊑V′ ⟩
 sim-cast-step {μ = μ} {PC = PC} vc vc′ (⊑-cast prec c⊑c′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ (cast-comp vᵣ′ i′) =
   case catchup {μ = μ} {PC = PC} (V-cast vᵣ′ i′) prec of λ where
   ⟨ _ , V-raw v , M↠V , ⊑-castr V⊑V′ A⊑cᵢ′ ⟩ →
