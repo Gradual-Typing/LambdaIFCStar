@@ -41,6 +41,7 @@ stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr {n = n} {ℓ} {ℓ̂} a b) (V-ra
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) ℓ≼ℓ′ =
   let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} (⊑*-∷ A⊑A′ Γ⊑Γ′) Σ⊑Σ′ N⊑N′ in
   ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun (⊑-id g⊑g′) (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) (stamp!ₗ-prec id id (⊑-id l⊑l) ℓ≼ℓ′))
+-- raw value on one side wrapped value on the other
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr (⊑-addr a b) A⊑c′) (V-raw V-addr) (V-cast V-addr (ir-ref {g = g} 𝓋′)) ℓ≼ℓ′
   rewrite g⋎̃⋆≡⋆ {g} =
   case A⊑c′ of λ where
@@ -72,11 +73,14 @@ stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl (⊑-lam g⊑g′ A⊑A′ N⊑
     ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′)
            (⊑-fun (⊑-left-expand d̅⊑gc′) (prec-left-coerce-id c⊑A′) (prec-left-coerce-id d⊑B′)
                   (stamp!ₗ-prec 𝓋 id (⊑-left-expand c̅⊑g′) ℓ≼ℓ′))
-stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl ⊑-const c⊑A′) (V-cast V-const (ir-base {g = g} 𝓋′ x)) (V-raw V-const) ℓ≼ℓ′ = {!!}
-  -- rewrite g⋎̃⋆≡⋆ {g} =
-  -- case A⊑c′ of λ where
-  -- (⊑-base g⊑c̅′) →
-  --   ⊑-cast ⊑-const (⊑-base (stamp!ₗ-prec id 𝓋′ (⊑-right-expand g⊑c̅′) ℓ≼ℓ′))
-stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl ⊑-const c⊑A′) (V-cast V-const (ir-base {g = g} 𝓋 x)) (V-raw V-const) ℓ≼ℓ′
+  rewrite g⋎̃⋆≡⋆ {g} =
+  case c⊑A′ of λ where
+  (⊑-base c̅⊑g′) →
+    ⊑-cast ⊑-const (⊑-base (stamp!ₗ-prec 𝓋 id (⊑-left-expand c̅⊑g′) ℓ≼ℓ′))
+-- wrapped values on both sides
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-cast v′ i′) ℓ≼ℓ′ =
+  case cast-prec-inv V⊑V′ v v′ of λ where
+  ⟨ W⊑W′ , c⊑c′ , refl , refl ⟩ → ⊑-cast {!W⊑W′!} {!!}
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑● v V-● = contradiction V⊑● (_ ⋤●)

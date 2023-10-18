@@ -330,32 +330,21 @@ prec-right-coerce-id (⊑-fun d̅⊑gc′ c⊑A′ d⊑B′ c̅⊑g′) =
   ⊑-fun (⊑-right-expand d̅⊑gc′) (prec-right-coerce-id c⊑A′) (prec-right-coerce-id d⊑B′) (⊑-right-expand c̅⊑g′)
 
 
--- stamp⋆-left-prec : ∀ {A A′} {ℓ}
---   → A ⊑ A′
---     ----------------------------------------------
---   → ⟨ stamp A , ℓ ⇒stamp⋆ ⟩⊑ stamp A′ (l ℓ)
--- stamp⋆-left-prec (⊑-ty ⋆⊑ ⊑-ι) = ⊑-base (⊑-id ⋆⊑)
--- stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-ref A⊑A′)) =
---   ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-id ⋆⊑)
--- stamp⋆-left-prec (⊑-ty ⋆⊑ (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
---   ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-id ⋆⊑)
--- stamp⋆-left-prec (⊑-ty l⊑l ⊑-ι) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
--- stamp⋆-left-prec (⊑-ty l⊑l (⊑-ref A⊑A′)) =
---   ⊑-ref (prec-coerce-id-left A⊑A′) (prec-coerce-id-left A⊑A′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
--- stamp⋆-left-prec (⊑-ty l⊑l (⊑-fun gᶜ⊑gᶜ′ A⊑A′ B⊑B′)) =
---   ⊑-fun (⊑-id gᶜ⊑gᶜ′) (prec-coerce-id-left A⊑A′) (prec-coerce-id-left B⊑B′) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-
 stamp-ir-prec : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′} {ℓ}
   → ⟨ c ⟩⊑⟨ c′ ⟩
   → (i  : Irreducible c )
   → (i′ : Irreducible c′)
+    ------------------------------------------------------------
   → ⟨ stamp-ir c i ℓ ⟩⊑⟨ stamp-ir c′ i′ ℓ ⟩
-stamp-ir-prec (⊑-base c̅⊑c̅′) (ir-base 𝓋 x) (ir-base 𝓋′ x′) with cexpr-prec→⊑ _ _ c̅⊑c̅′
-... | ⟨ l⊑l , _ ⟩ = ⊑-base (stampₗ-prec 𝓋 𝓋′ c̅⊑c̅′)
-stamp-ir-prec (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) (ir-ref 𝓋) (ir-ref 𝓋′) with cexpr-prec→⊑ _ _ c̅⊑c̅′
-... | ⟨ l⊑l , _ ⟩ = ⊑-ref c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
-stamp-ir-prec (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (ir-fun 𝓋) (ir-fun 𝓋′) with cexpr-prec→⊑ _ _ c̅⊑c̅′
-... | ⟨ l⊑l , _ ⟩ = ⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
+stamp-ir-prec (⊑-base c̅⊑c̅′) (ir-base 𝓋 x) (ir-base 𝓋′ x′) =
+  case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
+  ⟨ l⊑l , _ ⟩ → ⊑-base (stampₗ-prec 𝓋 𝓋′ c̅⊑c̅′)
+stamp-ir-prec (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) (ir-ref 𝓋) (ir-ref 𝓋′) =
+  case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
+  ⟨ l⊑l , _ ⟩ → ⊑-ref c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
+stamp-ir-prec (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (ir-fun 𝓋) (ir-fun 𝓋′) =
+  case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
+  ⟨ l⊑l , _ ⟩ → ⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
 
 stamp-ir-high-on-high-right : ∀ {T A B} {c′ : Cast A ⇒ B}
   → T of l high ⊑⟨ c′ ⟩
