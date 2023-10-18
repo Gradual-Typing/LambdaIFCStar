@@ -32,11 +32,19 @@ stamp-val!-prec : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {A A′ V V′} 
       ------------------------------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ stamp-val! V v A ℓ ⊑ stamp-val! V′ v′ A′ ℓ′
         ⇐ stamp A ⋆ ⊑ stamp A′ ⋆
+-- if raw value on both sides
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ ⊑-const (V-raw V-const) (V-raw V-const) ℓ≼ℓ′ =
   ⊑-cast ⊑-const (⊑-base (stamp!ₗ-prec id id (⊑-id l⊑l) ℓ≼ℓ′))
-stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr a b) (V-raw V-addr) (V-raw V-addr) ℓ≼ℓ′ = {!!}
-stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) ℓ≼ℓ′ = {!!}
-stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw v) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-addr {n = n} {ℓ} {ℓ̂} a b) (V-raw V-addr) (V-raw V-addr) ℓ≼ℓ′ =
+  let A⊑A′ = ⊑-ty l⊑l (⊑ₘ→⊑ {n = n} {ℓ̂} Σ⊑Σ′ a b) in
+  ⊑-cast (⊑-addr a b) (⊑-ref (prec-coerce-id A⊑A′) (prec-coerce-id A⊑A′) (stamp!ₗ-prec id id (⊑-id l⊑l) ℓ≼ℓ′))
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-lam g⊑g′ A⊑A′ N⊑N′) (V-raw V-ƛ) (V-raw V-ƛ) ℓ≼ℓ′ =
+  let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} (⊑*-∷ A⊑A′ Γ⊑Γ′) Σ⊑Σ′ N⊑N′ in
+  ⊑-cast (⊑-lam g⊑g′ A⊑A′ N⊑N′) (⊑-fun (⊑-id g⊑g′) (prec-coerce-id A⊑A′) (prec-coerce-id B⊑B′) (stamp!ₗ-prec id id (⊑-id l⊑l) ℓ≼ℓ′))
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castr (⊑-addr a b) _) (V-raw V-addr) (V-cast V-addr i′) ℓ≼ℓ′ =
+  {!!}
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw V-ƛ) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
+stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-raw V-const) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-raw v′) ℓ≼ℓ′ = {!!}
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-cast v′ i′) ℓ≼ℓ′ = {!!}
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
