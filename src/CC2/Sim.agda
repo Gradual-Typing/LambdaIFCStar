@@ -35,6 +35,7 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 open import Simulation.SimCast
 open import Simulation.Cast
 open import Simulation.App
+open import Simulation.AppCast
 open import Simulation.Assign
 open import Simulation.AssignCast
 open import Simulation.Assign?Cast
@@ -328,7 +329,11 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′ M⊑M′ �
   let ⟨ N , ♣ , prec ⟩ = sim-app vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq vM′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-cast v vc′† 𝓋 x vc″ x₁ x₂) = {!!}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-cast v′ vc′₁ 𝓋′ ↠PC′₂ vc′₂ ↠W′ w′)
+  rewrite uniq-LVal vc′₁ vc′ =
+  let ⟨ N , ♣ , prec ⟩ = sim-app-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC′₂ vc′₂ ↠W′ w′ in
+  ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-blame-pc v vc′† 𝓋 x) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
