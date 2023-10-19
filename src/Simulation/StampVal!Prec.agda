@@ -81,6 +81,6 @@ stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ (⊑-castl ⊑-const c⊑A′) (V-cast V-c
 -- wrapped values on both sides
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑V′ (V-cast v i) (V-cast v′ i′) ℓ≼ℓ′ =
   case cast-prec-inv V⊑V′ v v′ of λ where
-  ⟨ W⊑W′ , c⊑c′ , refl , refl ⟩ → ⊑-cast {!W⊑W′!} {!!}
+  ⟨ W⊑W′ , c⊑c′ , refl , refl ⟩ → ⊑-cast W⊑W′ (stamp-ir!-prec c⊑c′ i i′ ℓ≼ℓ′)
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ ●⊑V′ V-● v′ = contradiction ●⊑V′ (●⋤ _)
 stamp-val!-prec Γ⊑Γ′ Σ⊑Σ′ V⊑● v V-● = contradiction V⊑● (_ ⋤●)
