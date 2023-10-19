@@ -346,6 +346,27 @@ stamp-ir-prec (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (ir-fun 𝓋
   case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
   ⟨ l⊑l , _ ⟩ → ⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ (stampₗ-prec _ _ c̅⊑c̅′)
 
+stamp-ir!-prec : ∀ {A A′ B B′} {c : Cast A ⇒ B} {c′ : Cast A′ ⇒ B′} {ℓ ℓ′}
+  → ⟨ c ⟩⊑⟨ c′ ⟩
+  → (i  : Irreducible c )
+  → (i′ : Irreducible c′)
+  → ℓ ≼ ℓ′
+    ------------------------------------------------------------
+  → ⟨ stamp-ir! c i ℓ ⟩⊑⟨ stamp-ir! c′ i′ ℓ′ ⟩
+stamp-ir!-prec (⊑-base c̅⊑c̅′) (ir-base {g = g} 𝓋 x) (ir-base {g = g′} 𝓋′ x′) ℓ≼ℓ′
+  rewrite g⋎̃⋆≡⋆ {g} | g⋎̃⋆≡⋆ {g′} =
+    case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
+    ⟨ l⊑l , _ ⟩ → ⊑-base (stamp!ₗ-prec 𝓋 𝓋′ c̅⊑c̅′ ℓ≼ℓ′)
+stamp-ir!-prec (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) (ir-ref {g = g} 𝓋) (ir-ref {g = g′} 𝓋′) ℓ≼ℓ′
+  rewrite g⋎̃⋆≡⋆ {g} | g⋎̃⋆≡⋆ {g′} =
+  case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
+  ⟨ l⊑l , _ ⟩ → ⊑-ref c⊑c′ d⊑d′ (stamp!ₗ-prec _ _ c̅⊑c̅′ ℓ≼ℓ′)
+stamp-ir!-prec (⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′) (ir-fun {g = g} 𝓋) (ir-fun {g = g′} 𝓋′) ℓ≼ℓ′
+  rewrite g⋎̃⋆≡⋆ {g} | g⋎̃⋆≡⋆ {g′} =
+  case cexpr-prec→⊑ _ _ c̅⊑c̅′ of λ where
+  ⟨ l⊑l , _ ⟩ → ⊑-fun d̅⊑d̅′ c⊑c′ d⊑d′ (stamp!ₗ-prec _ _ c̅⊑c̅′ ℓ≼ℓ′)
+
+
 stamp-ir-high-on-high-right : ∀ {T A B} {c′ : Cast A ⇒ B}
   → T of l high ⊑⟨ c′ ⟩
   → (i′ : Irreducible c′)
