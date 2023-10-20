@@ -106,7 +106,7 @@ sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   ⊢W = proj₁ (cc-prec-inv ⊑*-∅ Σ⊑Σ′ W⊑M′)
   prec : (stamp!ₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ d̅ ⟫) ⊑ stampₑ PC′ vc′ ℓ
                    ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
-  prec rewrite ∥c̅∥≡ℓ = ⊑-castl (stamp!ₑ-left-prec vc vc′ PC⊑PC′) d̅⊑gc′
+  prec rewrite ∥c̅∥≡ℓ = ⊑-castl (stamp!ₑ-left-prec vc vc′ PC⊑PC′ ≼-refl) d̅⊑gc′
 sim-app vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′
   with sim-app vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′
 ... | ⟨ N , M↠N , N⊑N′ ⟩ =

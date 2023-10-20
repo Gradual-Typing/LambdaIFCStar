@@ -106,7 +106,7 @@ sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.low}  {p} V⊑V′ v v�
   where
   prec : ⊢ stamp!ₑ V  v  low ⟪ id ⋆ ⨾ low ?? p ⟫ ⊑
            stampₑ  V′ v′ low            ⇐ l low ⊑ l low
-  prec = ⊑-castl (stamp!ₑ-left-prec v v′ V⊑V′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+  prec = ⊑-castl (stamp!ₑ-left-prec v v′ V⊑V′ ≼-refl) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 sim-nsu-assign-left {V} {l ℓ} {g′} {.low}  {.low}  {.high} {p} V⊑V′ v v-l l≼h l≼h
   with prec→⊢ V⊑V′
 ... | ⟨ _ , ⊢l ⟩ =
@@ -115,7 +115,7 @@ sim-nsu-assign-left {V} {l ℓ} {g′} {.low}  {.low}  {.high} {p} V⊑V′ v v-
       where
       prec : ⊢ stamp!ₑ V       v   low ⟪ id ⋆ ⨾ high ?? p ⟫           ⊑
                stampₑ  (l low) v-l low ⟪ id (l low) ⨾  ↑ ⟫ ⇐ l high ⊑ l high
-      prec = ⊑-cast (stamp!ₑ-left-prec v v-l V⊑V′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+      prec = ⊑-cast (stamp!ₑ-left-prec v v-l V⊑V′ ≼-refl) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 sim-nsu-assign-left {V} {V′} {g′} {.low}  {.low}  {.high} {p} V⊑V′ v (v-cast (ir 𝓋 x)) l≼h l≼h
   with prec→⊢ V⊑V′ | 𝓋
 ... | ⟨ _ , ⊢cast ⊢l ⟩ | id =
@@ -130,11 +130,11 @@ sim-nsu-assign-left {V} {V′} {g′} {.low}  {.high} {.high} {p} V⊑V′ v v�
     where
     prec : ⊢ stamp!ₑ V  v  high ⟪ id ⋆ ⨾ high ?? p ⟫           ⊑
              stampₑ  V′ v′ high ⟪ id (l high)      ⟫ ⇐ l high ⊑ l high
-    prec = ⊑-cast (stamp!ₑ-left-prec v v′ V⊑V′) (⊑-castl (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+    prec = ⊑-cast (stamp!ₑ-left-prec v v′ V⊑V′ ≼-refl) (⊑-castl (⊑-id ⋆⊑) ⋆⊑ l⊑l)
 sim-nsu-assign-left {V} {V′} {g′} {.high} {ℓ}  {.high} {p} V⊑V′ v v′ h≼h ℓ≼hi =
   case catchup (stampₑ-LVal v′) prec of λ where
     ⟨ W , w , ↠W , _ ⟩ → ⟨ W , w , ↠W ⟩
   where
   prec : ⊢ stamp!ₑ V  v  ℓ ⟪ id ⋆ ⨾ high ?? p ⟫ ⊑
            stampₑ  V′ v′ ℓ            ⇐ l high ⊑ l high
-  prec = ⊑-castl (stamp!ₑ-left-prec v v′ V⊑V′) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)
+  prec = ⊑-castl (stamp!ₑ-left-prec v v′ V⊑V′ ≼-refl) (⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l)

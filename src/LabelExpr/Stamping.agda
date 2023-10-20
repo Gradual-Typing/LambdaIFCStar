@@ -165,36 +165,44 @@ stampₑ-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
 ... | ⟨ refl , c̅⊑c̅′ ⟩ =
   ⊑-cast ⊑-l (stampₗ-prec 𝓋 𝓋′ c̅⊑c̅′)
 
-stamp!ₑ-left-prec : ∀ {ℓ} {V V′ g g′}
+stamp!ₑ-left-prec : ∀ {ℓ₁ ℓ₂} {V V′ g g′}
   → (v  : LVal V)
   → (v′ : LVal V′)
   → ⊢ V ⊑ V′ ⇐ g ⊑ g′
+  → ℓ₁ ≼ ℓ₂
     ------------------------------------------------------------
-  → ⊢ stamp!ₑ V v ℓ ⊑ stampₑ V′ v′ ℓ ⇐ ⋆ ⊑ (g′ ⋎̃ l ℓ)
-stamp!ₑ-left-prec {low} (v-l {ℓ}) v-l ⊑-l rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-stamp!ₑ-left-prec {high} (v-l {low}) v-l ⊑-l = ⊑-cast ⊑-l ↑!⊑↑
-stamp!ₑ-left-prec {high} (v-l {high}) v-l ⊑-l = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+  → ⊢ stamp!ₑ V v ℓ₁ ⊑ stampₑ V′ v′ ℓ₂ ⇐ ⋆ ⊑ (g′ ⋎̃ l ℓ₂)
+stamp!ₑ-left-prec {low} (v-l {ℓ}) v-l ⊑-l l≼l
+  rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp!ₑ-left-prec {low} (v-l {low}) v-l ⊑-l l≼h = ⊑-cast ⊑-l !⊑↑
+stamp!ₑ-left-prec {low} (v-l {high}) v-l ⊑-l l≼h = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp!ₑ-left-prec {high} (v-l {low}) v-l ⊑-l h≼h = ⊑-cast ⊑-l ↑!⊑↑
+stamp!ₑ-left-prec {high} (v-l {high}) v-l ⊑-l h≼h = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
 -- ⊢ ℓ ⊑ ℓ′ ⟨ c ⟩ cases are all impossible
-stamp!ₑ-left-prec v-l (v-cast (ir id x)) (⊑-castr ⊑-l (⊑-id l⊑l)) =
+stamp!ₑ-left-prec v-l (v-cast (ir id x)) (⊑-castr ⊑-l (⊑-id l⊑l)) ℓ₁≼ℓ₂ =
   contradiction refl (recompute (¬? (_ ==? _)) x)
 stamp!ₑ-left-prec v-l (v-cast (ir (inj id) x)) (⊑-castr ⊑-l (⊑-cast _ l⊑l ()))
 stamp!ₑ-left-prec v-l (v-cast (ir (inj (up id)) x)) (⊑-castr ⊑-l (⊑-cast _ () _))
 stamp!ₑ-left-prec v-l (v-cast (ir (up id) x)) (⊑-castr ⊑-l (⊑-cast _ l⊑l ()))
-stamp!ₑ-left-prec {ℓ} (v-cast (ir id x)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+stamp!ₑ-left-prec {ℓ} (v-cast (ir id x)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) ℓ₁≼ℓ₂ =
   contradiction refl (recompute (¬? (_ ==? _)) x)
-stamp!ₑ-left-prec {low} (v-cast (ir (inj (id {l ℓ})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′)
+stamp!ₑ-left-prec {low} (v-cast (ir (inj (id {l ℓ})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) l≼l
   rewrite ℓ⋎low≡ℓ {ℓ} = ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
-stamp!ₑ-left-prec {high} (v-cast (ir (inj (id {l low})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+stamp!ₑ-left-prec {low} (v-cast (ir (inj (id {l low})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) l≼h =
+  ⊑-cast ⊑-l !⊑↑
+stamp!ₑ-left-prec {low} (v-cast (ir (inj (id {l high})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) l≼h =
+  ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+stamp!ₑ-left-prec {high} (v-cast (ir (inj (id {l low})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) h≼h =
   ⊑-cast ⊑-l (⊑-castl (prec-refl _) l⊑l ⋆⊑)
-stamp!ₑ-left-prec {high} (v-cast (ir (inj (id {l high})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) =
+stamp!ₑ-left-prec {high} (v-cast (ir (inj (id {l high})) _)) v-l (⊑-castl ⊑-l c̅⊑ℓ′) h≼h =
   ⊑-castl ⊑-l (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
 stamp!ₑ-left-prec {ℓ} (v-cast (ir (inj (up id)) _)) v-l (⊑-castl ⊑-l (⊑-cast _ () ⋆⊑))
 stamp!ₑ-left-prec {ℓ} (v-cast (ir (up id) _)) v-l (⊑-castl ⊑-l (⊑-cast _ l⊑l ()))
-stamp!ₑ-left-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
+stamp!ₑ-left-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′ ℓ₁≼ℓ₂
   with prec→⊢ M⊑M′
 ... | ⟨ ⊢cast ⊢l , ⊢cast ⊢l ⟩
   with prec-inv M⊑M′
-... | ⟨ refl , c̅⊑c̅′ ⟩ = ⊑-cast ⊑-l (stamp!ₗ-left-prec 𝓋 𝓋′ c̅⊑c̅′ ≼-refl)
+... | ⟨ refl , c̅⊑c̅′ ⟩ = ⊑-cast ⊑-l (stamp!ₗ-left-prec 𝓋 𝓋′ c̅⊑c̅′ ℓ₁≼ℓ₂)
 
 stamp!ₑ-prec : ∀ {ℓ ℓ′} {V V′ g g′}
   → (v  : LVal V)
