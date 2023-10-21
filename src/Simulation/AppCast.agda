@@ -76,10 +76,11 @@ sim-app-cast {Σ} {Σ′} {gc} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ = �
           let ∣c̅∣≼ℓ₂ : ∥ c̅ ∥ₗ 𝓋 ≼ ℓ₂
               ∣c̅∣≼ℓ₂ = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
           let pc-prec : (stamp!ₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ d̅ ⟫) ⊑ (stampₑ PC′ vc′ ℓ₂ ⟪ d̅′ ⟫) ⇐ _ ⊑ g₁
-              pc-prec = ⊑-cast (stamp!ₑ-left-prec vc vc′ PC⊑PC′ {!!}) d̅⊑d̅′ in
+              pc-prec = ⊑-cast (stamp!ₑ-left-prec vc vc′ PC⊑PC′ ∣c̅∣≼ℓ₂) d̅⊑d̅′ in
+          let ⟨ PC₁ , vc₁ , ↠PC₁ , pc-prec′ ⟩ = sim-mult pc-prec ↠PC″ vc″ in
           let ♣ = trans-mult (plug-cong (app!□ _ _ _) L↠V)
                   (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-                  (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 {!!} {!!} {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
+                  (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ↠PC₁ vc₁ {!!} {!!} ⟩ _ ∣ _ ∣ _ ∎)) in
           ⟨ _ , ♣ , {!!} ⟩
     ⟨ V-● , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
 -- ... | ⟨ V , V-raw V-ƛ , L↠V , ⊑-castr x y ⟩ = {!!}
