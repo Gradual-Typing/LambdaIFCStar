@@ -207,6 +207,7 @@ sim-cast-right : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′ A A′ B′ V V′
     → A ⊑⟨ c′ ⟩
     → V′ ⟨ c′ ⟩ —↠ W′
     → Value W′
+      -------------------------------------------------------------
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ V ⊑ W′ ⇐ A ⊑ B′
 sim-cast-right V⊑V′ v v′ A⊑c′ (_ ∎) w′ = ⊑-castr V⊑V′ A⊑c′
 sim-cast-right V⊑V′ v v′ (⊑-base g⊑c̅′) (_ —→⟨ cast vᵣ c̅′→⁺c̅ₙ 𝓋 ⟩ r*) w′ =
@@ -220,7 +221,7 @@ sim-cast-right V⊑V′ v v′ (⊑-fun x y z g⊑c̅′) (_ —→⟨ cast vᵣ
   sim-cast-right V⊑V′ v v′ (⊑-fun x y z g⊑c̅ₙ) r* w′
 sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-blame x x₁ ⟩ _ ∎) (V-raw ())
 sim-cast-right V⊑V′ v v′ A⊑c′ (_ —→⟨ cast-id ⟩ _ ∎) (V-raw V-const) = V⊑V′
--- those two case below require some thinking
+-- the two cases below require some thinking
 sim-cast-right (⊑-cast V⊑V′ c⊑c′) (V-cast vᵣ i) (V-cast vᵣ′ i′) A⊑c′₁ (_ —→⟨ cast-comp vᵣ′† i′† ⟩ r*) w′
   with sim-cast V⊑V′ (V-raw vᵣ) (V-raw vᵣ′) (comp-pres-prec-br c⊑c′ A⊑c′₁) r* w′
 ... | ⟨ W , w , _ ∎ , prec ⟩ = prec
