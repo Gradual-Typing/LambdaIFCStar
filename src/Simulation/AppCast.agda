@@ -73,27 +73,21 @@ sim-app-cast {Σ} {Σ′} {.(l _)} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ 
         ⟨ _ , ♣ ,
           ⊑-prot (⊑-castr N[W]⊑N′[W′] B⊑d′) stampPC⊑PC″
                  (≡→≼ (stampₑ-security vc)) (stamp-cast-security vc′ ⊢PC′ ↠PC″ vc″) eq eq′ ⟩
-      ⟨ V-cast v i , prec ⟩ → {!!}
-        -- case ⟨ v , cast-prec-inv prec v V-ƛ ⟩ of λ where
-        -- ⟨ V-ƛ , ⊑-lam gc⊑gc′ A⊑A′ N⊑N′ , c⊑c′ , refl , refl ⟩ →
-        --   case ⟨ i , c⊑c′ ⟩ of λ where
-        --   ⟨ ir-fun {c = c} {d} {c̅} {d̅} 𝓋 , ⊑-fun {d̅′ = d̅′} {c̅′ = c̅′} d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′ ⟩ →
-        --     let ∣c̅∣≼∣c̅′∣ : ∥ c̅ ∥ₗ 𝓋 ≼ ∥ c̅′ ∥ₗ 𝓋′
-        --         ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′
-        --         ∣c̅∣≼ℓ₂ : ∥ c̅ ∥ₗ 𝓋 ≼ ℓ₂
-        --         ∣c̅∣≼ℓ₂ = subst (λ □ → _ ≼ □) (static-security _ 𝓋′) ∣c̅∣≼∣c̅′∣ in
-        --     let pc-prec : (stamp!ₑ PC vc (∥ c̅ ∥ₗ 𝓋) ⟪ d̅ ⟫) ⊑ (stampₑ PC′ vc′ ℓ₂ ⟪ d̅′ ⟫) ⇐ _ ⊑ g₁
-        --         pc-prec = ⊑-cast (stamp!ₑ-left-prec vc vc′ PC⊑PC′ ∣c̅∣≼ℓ₂) d̅⊑d̅′ in
-        --     let ⟨ PC₁ , vc₁ , ↠PC₁ , pc-prec′ ⟩ = sim-mult pc-prec ↠PC″ vc″ in
-        --     let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑M′ w v′ c⊑c′ ↠W′ w′ in
-        --     let ♣ = trans-mult (plug-cong (app!□ _ _ _) L↠V)
-        --             (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-        --             (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
-        --     ⟨ _ , ♣ ,
-        --       ⊑-prot!l (⊑-cast (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑W′ w₁ w′)) d⊑d′)
-        --         pc-prec′ (stamp!-cast-security vc ⊢PC ↠PC₁ vc₁)
-        --         (stamp-cast-security vc′ ⊢PC′ ↠PC″ vc″)
-        --         eq eq′ ∣c̅∣≼ℓ₂ ⟩
+      ⟨ V-cast v i , prec ⟩ →
+        case ⟨ v , cast-prec-inv prec v V-ƛ ⟩ of λ where
+        ⟨ V-ƛ , ⊑-lam gc⊑gc′ A⊑A′ N⊑N′ , c⊑c′ , refl , refl ⟩ →
+          case ⟨ i , c⊑c′ ⟩ of λ where
+          ⟨ ir-fun {c = c} {d} {c̅} {d̅} 𝓋 , ⊑-fun {d̅′ = d̅′} {c̅′ = c̅′} d̅⊑d̅′ c⊑c′ d⊑d′ c̅⊑c̅′ ⟩ →
+            let ⟨ PC₁ , vc₁ , ↠PC₁ , pc-prec′ ⟩ = sim-mult (⊑-cast (stampₑ-prec vc vc′ PC⊑PC′) d̅⊑d̅′) ↠PC″ vc″ in
+            let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑V′ w v′ c⊑c′ ↠W′ w′ in
+            let ♣ = trans-mult (plug-cong (app□ _ _ _ _) L↠V)
+                    (trans-mult (plug-cong (app _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _ _) M↠W)
+                    (_ ∣ _ ∣ _ —→⟨ app-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+            ⟨ _ , ♣ ,
+              ⊑-prot (⊑-cast (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑W′ w₁ w′)) d⊑d′)
+                pc-prec′ (stamp-cast-security vc ⊢PC ↠PC₁ vc₁)
+                (stamp-cast-security vc′ ⊢PC′ ↠PC″ vc″)
+                eq eq′ ⟩
       ⟨ V-● , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
 sim-app-cast {Σ} {Σ′} {gc} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ = ℓ₁} {ℓ₂} {g₁} {g₂} vc vc′
   (⊑-app!l L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
