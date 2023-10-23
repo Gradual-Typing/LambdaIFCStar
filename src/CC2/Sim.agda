@@ -353,7 +353,13 @@ sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-true-cast vc�
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-false-cast vc′†) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-true-cast vc′† 𝓋) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-false-cast vc′† 𝓋) = {!!}
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-let x) = {!!}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} vc vc′ (⊑-let M⊑V′ N⊑N′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-let v′) =
+  case catchup {μ = μ} {PC} v′ M⊑V′ of λ where
+  ⟨ V , v , M↠V , V⊑V′ ⟩ →
+    ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ ,
+      trans-mult (plug-cong (let□ _ _) M↠V)
+                 (_ ∣ _ ∣ _ —→⟨ β-let v ⟩ _ ∣ _ ∣ _ ∎) ,
+      substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc V⊑V′ v v′) , μ⊑μ′ , size-eq ⟩
 
 {- ref -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
