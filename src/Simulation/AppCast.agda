@@ -69,9 +69,9 @@ sim-app-cast {Σ} {Σ′} {.(l _)} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ 
                            (trans-mult (plug-cong (app _ □ (V-raw V-ƛ) _ _ _) M↠W)
                            (_ ∣ _ ∣ _ —→⟨ β w vc ⟩ _ ∣ _ ∣ _ ∎)) in
         let N[W]⊑N′[W′] = substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W⊑W′ w w′) in
-        let stampPC⊑PC″ = catchup-back-success ? ? ↠PC″ vc″ in
+        let stampPC⊑PC″ = catchup-back-success (stampₑ-LVal vc) (⊑-castr (stampₑ-prec vc vc′ PC⊑PC′) gc⊑d̅′) ↠PC″ vc″ in
         ⟨ _ , ♣ ,
-          ⊑-prot (⊑-castr N[W]⊑N′[W′] B⊑d′) {!!}
+          ⊑-prot (⊑-castr N[W]⊑N′[W′] B⊑d′) stampPC⊑PC″
                  (≡→≼ (stampₑ-security vc)) (stamp-cast-security vc′ ⊢PC′ ↠PC″ vc″) eq eq′ ⟩
       ⟨ V-cast v i , prec ⟩ → {!!}
         -- case ⟨ v , cast-prec-inv prec v V-ƛ ⟩ of λ where
