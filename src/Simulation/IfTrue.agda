@@ -49,10 +49,16 @@ sim-if-true : ∀ {Σ Σ′ gc gc′} {M M′ N′ μ μ′ PC PC′} {A A′ B�
                      N ⊑ prot (stampₑ PC′ vc′ ℓ) (stampₑ-LVal vc′) ℓ M′ B′
                   ⇐ A ⊑ A′
 sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-if {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq = ?
+    (⊑-if {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
+  case catchup {μ = μ} {PC} (V-raw V-const) L⊑L′ of λ where
+  ⟨ $ true , V-raw V-const , L↠V , ⊑-const ⟩ →
+    ⟨ _ , trans-mult (plug-cong (if□ _ _ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ β-if-true vc ⟩ _ ∣ _ ∣ _ ∎) ,
+      ⊑-prot M⊑M′ (stampₑ-prec vc vc′ PC⊑PC′) (≡→≼ (stampₑ-security vc)) (≡→≼ (stampₑ-security vc′)) eq eq′ ⟩
+  ⟨ $ true ⟨ cast (id ι) c̅ ⟩ , V-cast V-const (ir-base 𝓋 x) ,
+    L↠V , ⊑-castl ⊑-const (⊑-base c̅⊑g′) ⟩ → {!!}
 sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
     (⊑-if!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq eq′)
-    Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq = ?
+    Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq = {!!}
 sim-if-true vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
   case sim-if-true vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq of λ where
   ⟨ N , M↠N , N⊑N′ ⟩ →
