@@ -15,11 +15,8 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
-open import CoercionExpr.SyntacComp
 open import LabelExpr.Security
 open import LabelExpr.Stamping
-open import LabelExpr.CatchUpBack using (catchup-back-success)
 open import LabelExpr.GG
 open import CC2.Statics
 open import CC2.Reduction
@@ -27,7 +24,6 @@ open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapPrecision
 open import CC2.CatchUp
-open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
 open import Simulation.SimCast
