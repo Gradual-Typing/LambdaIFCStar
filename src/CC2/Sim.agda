@@ -36,6 +36,7 @@ open import Simulation.SimCast
 open import Simulation.Cast
 open import Simulation.App
 open import Simulation.AppCast
+open import Simulation.App!Cast
 open import Simulation.Assign
 open import Simulation.AssignCast
 open import Simulation.Assign?Cast
@@ -329,6 +330,7 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′ M⊑M′ �
   let ⟨ N , ♣ , prec ⟩ = sim-app vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq vM′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 
+{- app-cast -}
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
   M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-cast v′ vc′₁ 𝓋′ ↠PC′₂ vc′₂ ↠W′ w′)
   rewrite uniq-LVal vc′₁ vc′ =
@@ -340,19 +342,28 @@ sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app-blame v vc′† 𝓋 x vc″ x₁) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app!-cast v vc′† 𝓋 _ _ _ _) = {!!}
+
+{- app!-cast -}
+sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
+  M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app!-cast v′ vc′₁ 𝓋′ ↠PC′₂ vc′₂ ↠W′ w′)
+  rewrite uniq-LVal vc′₁ vc′ =
+  let ⟨ N , ♣ , prec ⟩ = sim-app!-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC′₂ vc′₂ ↠W′ w′ in
+  ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app!-blame-pc v vc′† 𝓋 _) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (app!-blame v vc′† 𝓋 _ _ _) =
   let ⟨ ⊢M , _ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ M⊑M′ in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , _ , _ , _ ∣ _ ∣ _ ∎ , ⊑-blame ⊢M A⊑A′ , μ⊑μ′ , size-eq ⟩
+
+{- if -}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-if-true vc′†) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-if-false vc′†) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-true-cast vc′†) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-false-cast vc′†) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-true-cast vc′† 𝓋) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-false-cast vc′† 𝓋) = {!!}
+
 sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} vc vc′ (⊑-let M⊑V′ N⊑N′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-let v′) =
   case catchup {μ = μ} {PC} v′ M⊑V′ of λ where
   ⟨ V , v , M↠V , V⊑V′ ⟩ →
