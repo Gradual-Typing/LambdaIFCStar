@@ -38,6 +38,7 @@ open import Simulation.App
 open import Simulation.AppCast
 open import Simulation.App!Cast
 open import Simulation.IfTrue
+open import Simulation.IfTrueCast
 open import Simulation.Assign
 open import Simulation.AssignCast
 open import Simulation.Assign?Cast
@@ -363,8 +364,15 @@ sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′
   let ⟨ N , ♣ , prec ⟩ = sim-if-true vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq in
   ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (β-if-false vc′†) = {!!}
-sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-true-cast vc′†) = {!!}
+
+{- if-cast -}
+sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-true-cast vc′†)
+  rewrite uniq-LVal vc′† vc′ =
+  let ⟨ N , ♣ , prec ⟩ = sim-if-true-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq in
+  ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , N , μ , ♣ , prec , μ⊑μ′ , size-eq ⟩
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if-false-cast vc′†) = {!!}
+
+{- if!-cast -}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-true-cast vc′† 𝓋) = {!!}
 sim vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq (if!-false-cast vc′† 𝓋) = {!!}
 
