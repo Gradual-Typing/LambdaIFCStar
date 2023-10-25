@@ -134,7 +134,7 @@ Important technical definitions:
     big-step evaluation of erased $\lambda_{\mathtt{SEC}}^\Rightarrow$.
   - [`CC.Interp`](./src/CC/Interp.agda): a stepper that produces reduction sequences.
 
-+ [`CC2`](./src/CC2): contains the second variant of the cast calculus (CC)
++ [`CC2`](./src/CC2): contains the second variant of the cast calculus (CC2)
                       which has *vigilant (sticky) and coercive casts*
   - [`CC2.Syntax`](./src/CC2/Syntax.agda)
   - [`CC2.Typing`](./src/CC2/Typing.agda)
@@ -144,7 +144,14 @@ Important technical definitions:
     small-step reduction semantics of $\lambda_{\mathtt{SEC}}^\Rightarrow$ variant 2
     + [`CC2.CastReduction`](./src/CC2/CastReduction.agda):
       cast reduction rules
-
+    + [`CC2.Stamping`](./src/CC2/Stamping.agda):
+      value stamping (`stamp-val`) and value injective stamping (`stamp-val!`)
+    + [`CC2.MultiStep`](./src/CC2/MultiStep.agda):
+      multi-step reduction, reflexive transitive closure of single-step reductions
+  - [`CC2.Precision`](./src/CC2/Precision.agda)
+      precision relation between CC2 terms
+  -[`Simulation.Simulation`](./src/Simulation/Simulation.agda)
+      the main simulation lemma for DGG, driven by more precise side
 
 + [`PrettyPrinter`](./src/PrettyPrinter)
   - [`PrettyPrinter.Console`](./src/PrettyPrinter/Console):
