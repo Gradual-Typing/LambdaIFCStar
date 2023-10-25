@@ -1,4 +1,4 @@
-module CC2.Sim where
+module Simulation.Simulation where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -27,7 +27,7 @@ open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapTyping using (⊇-fresh)
 open import CC2.HeapPrecision
-open import CC2.CatchUp
+open import Simulation.CatchUp
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 

@@ -1,4 +1,4 @@
-module CC2.CatchUp where
+module Simulation.CatchUp where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

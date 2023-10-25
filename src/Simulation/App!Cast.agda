@@ -25,7 +25,7 @@ open import CC2.Reduction
 open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapPrecision
-open import CC2.CatchUp
+open import Simulation.CatchUp
 open import CC2.SubstPrecision using (substitution-pres-⊑)
 open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 
