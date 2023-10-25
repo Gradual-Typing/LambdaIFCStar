@@ -18,34 +18,31 @@ open import CC2.Statics
 open import Memory.HeapTyping Term Value _;_;_;_⊢_⇐_ public
 
 
-postulate
-  relax-Σ : ∀ {Γ Σ Σ′ gc pc M A}
+relax-Σ : ∀ {Γ Σ Σ′ gc pc M A}
     → Γ ; Σ ; gc ; pc ⊢ M ⇐ A
     → Σ′ ⊇ Σ
-      ---------------------
+      -----------------------------------
     → Γ ; Σ′ ; gc ; pc ⊢ M ⇐ A
--- relax-Σ ⊢const Σ′⊇Σ = ⊢const
--- relax-Σ (⊢addr {n = n} {ℓ̂ = ℓ̂} eq) Σ′⊇Σ = ⊢addr (Σ′⊇Σ (a⟦ ℓ̂ ⟧ n) eq)
--- relax-Σ (⊢var Γ∋x) Σ′⊇Σ = ⊢var Γ∋x
--- relax-Σ (⊢lam ⊢M) Σ′⊇Σ = ⊢lam (relax-Σ ⊢M Σ′⊇Σ)
--- relax-Σ (⊢app ⊢L ⊢M pc′≼ℓᶜ ℓ≼ℓᶜ) Σ′⊇Σ = ⊢app (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) pc′≼ℓᶜ ℓ≼ℓᶜ
--- relax-Σ (⊢app? ⊢L ⊢M) Σ′⊇Σ = ⊢app? (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
--- relax-Σ (⊢app✓ ⊢L ⊢M pc≼ℓᶜ ℓ≼ℓᶜ) Σ′⊇Σ = ⊢app✓ (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) pc≼ℓᶜ ℓ≼ℓᶜ
--- relax-Σ (⊢if ⊢L ⊢M ⊢N) Σ′⊇Σ = ⊢if (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
--- relax-Σ (⊢if⋆ ⊢L ⊢M ⊢N) Σ′⊇Σ = ⊢if⋆ (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
--- relax-Σ (⊢let ⊢M ⊢N) Σ′⊇Σ = ⊢let (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
--- relax-Σ (⊢ref ⊢M pc′≼ℓ) Σ′⊇Σ = ⊢ref (relax-Σ ⊢M Σ′⊇Σ) pc′≼ℓ
--- relax-Σ (⊢ref? ⊢M) Σ′⊇Σ = ⊢ref? (relax-Σ ⊢M Σ′⊇Σ)
--- relax-Σ (⊢ref✓ ⊢M pc≼ℓ) Σ′⊇Σ = ⊢ref✓ (relax-Σ ⊢M Σ′⊇Σ) pc≼ℓ
--- relax-Σ (⊢deref ⊢M) Σ′⊇Σ = ⊢deref (relax-Σ ⊢M Σ′⊇Σ)
--- relax-Σ (⊢assign ⊢L ⊢M ℓ≼ℓ̂ pc′≼ℓ̂) Σ′⊇Σ = ⊢assign (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) ℓ≼ℓ̂ pc′≼ℓ̂
--- relax-Σ (⊢assign? ⊢L ⊢M) Σ′⊇Σ = ⊢assign? (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
--- relax-Σ (⊢assign✓ ⊢L ⊢M ℓ≼ℓ̂ pc≼ℓ̂) Σ′⊇Σ = ⊢assign✓ (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) ℓ≼ℓ̂ pc≼ℓ̂
--- relax-Σ (⊢prot ⊢M pc~g) Σ′⊇Σ = ⊢prot (relax-Σ ⊢M Σ′⊇Σ) pc~g
--- relax-Σ (⊢cast ⊢M) Σ′⊇Σ = ⊢cast (relax-Σ ⊢M Σ′⊇Σ)
--- relax-Σ ⊢err Σ′⊇Σ = ⊢err
--- relax-Σ (⊢sub ⊢M A<:B) Σ′⊇Σ = ⊢sub (relax-Σ ⊢M Σ′⊇Σ) A<:B
--- relax-Σ (⊢sub-pc ⊢M gc<:gc′) Σ′⊇Σ = ⊢sub-pc (relax-Σ ⊢M Σ′⊇Σ) gc<:gc′
+relax-Σ ⊢const Σ′⊇Σ = ⊢const
+relax-Σ (⊢addr {n = n} {ℓ̂ = ℓ̂} eq) Σ′⊇Σ = ⊢addr (Σ′⊇Σ (a⟦ ℓ̂ ⟧ n) eq)
+relax-Σ (⊢var Γ∋x) Σ′⊇Σ = ⊢var Γ∋x
+relax-Σ (⊢lam ⊢M) Σ′⊇Σ = ⊢lam (relax-Σ ⊢M Σ′⊇Σ)
+relax-Σ (⊢app ⊢L ⊢M eq) Σ′⊇Σ = ⊢app (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) eq
+relax-Σ (⊢app! ⊢L ⊢M eq) Σ′⊇Σ = ⊢app! (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) eq
+relax-Σ (⊢if ⊢L ⊢M ⊢N eq) Σ′⊇Σ = ⊢if (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq
+relax-Σ (⊢if! ⊢L ⊢M ⊢N eq) Σ′⊇Σ = ⊢if! (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq
+relax-Σ (⊢let ⊢M ⊢N) Σ′⊇Σ = ⊢let (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
+relax-Σ (⊢ref ⊢M x) Σ′⊇Σ = ⊢ref (relax-Σ ⊢M Σ′⊇Σ) x
+relax-Σ (⊢ref? ⊢M) Σ′⊇Σ = ⊢ref? (relax-Σ ⊢M Σ′⊇Σ)
+relax-Σ (⊢deref ⊢M eq) Σ′⊇Σ = ⊢deref (relax-Σ ⊢M Σ′⊇Σ) eq
+relax-Σ (⊢deref! ⊢M eq) Σ′⊇Σ = ⊢deref! (relax-Σ ⊢M Σ′⊇Σ) eq
+relax-Σ (⊢assign ⊢L ⊢M x y) Σ′⊇Σ = ⊢assign (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) x y
+relax-Σ (⊢assign? ⊢L ⊢M) Σ′⊇Σ = ⊢assign? (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
+relax-Σ (⊢prot ⊢M ⊢PC x eq) Σ′⊇Σ = ⊢prot (relax-Σ ⊢M Σ′⊇Σ) ⊢PC x eq
+relax-Σ (⊢prot! ⊢M ⊢PC x eq) Σ′⊇Σ = ⊢prot! (relax-Σ ⊢M Σ′⊇Σ) ⊢PC x eq
+relax-Σ (⊢cast ⊢M) Σ′⊇Σ = ⊢cast (relax-Σ ⊢M Σ′⊇Σ)
+relax-Σ ⊢blame Σ′⊇Σ = ⊢blame
+
 
 ⊇-fresh : ∀ {Σ μ} a T → Σ ⊢ μ → a FreshIn μ → cons-Σ a T Σ ⊇ Σ
 ⊇-fresh {Σ} {⟨ μᴸ , μᴴ ⟩} (a⟦ high ⟧ n₁) T ⊢μ fresh (a⟦ high ⟧ n) eq
