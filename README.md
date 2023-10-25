@@ -150,8 +150,10 @@ Important technical definitions:
       multi-step reduction, reflexive transitive closure of single-step reductions
   - [`CC2.Precision`](./src/CC2/Precision.agda)
       precision relation between CC2 terms
-  -[`Simulation.Simulation`](./src/Simulation/Simulation.agda)
+  - [`Simulation.Simulation`](./src/Simulation/Simulation.agda)
       the main simulation lemma for DGG, driven by more precise side
+    + [`Simulation.CatchUp`](./src/Simulation/CatchUp.agda)
+        the catch-up lemma, where less precise is catching up to a more precise value
 
 + [`PrettyPrinter`](./src/PrettyPrinter)
   - [`PrettyPrinter.Console`](./src/PrettyPrinter/Console):
