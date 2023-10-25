@@ -109,8 +109,8 @@ Important technical definitions:
 
 + [`Memory`](./src/Memory): the memory model of $\lambda_{\mathtt{SEC}}^\star$.
 
-+ [`CC`](./src/CC): contains the statics and operational semantics of
-  the cast calculus.
++ [`CC`](./src/CC): contains one variant of the cast calculus (CC)
+                    which has *vigilant (sticky) but non-coercive casts*
   - [`CC.CCSyntax`](./src/CC/CCSyntax.agda):
     presents the syntax of $\lambda_{\mathtt{SEC}}^\Rightarrow$.
   - [`CC.CCTyping`](./src/CC/CCTyping.agda):
@@ -133,6 +133,18 @@ Important technical definitions:
   - [`CC.BigStepErased`](./src/CC/BigStepErased.agda):
     big-step evaluation of erased $\lambda_{\mathtt{SEC}}^\Rightarrow$.
   - [`CC.Interp`](./src/CC/Interp.agda): a stepper that produces reduction sequences.
+
++ [`CC2`](./src/CC2): contains the second variant of the cast calculus (CC)
+                      which has *vigilant (sticky) and coercive casts*
+  - [`CC2.Syntax`](./src/CC2/Syntax.agda)
+  - [`CC2.Typing`](./src/CC2/Typing.agda)
+  - [`CC2.HeapTyping`](./src/CC2/HeapTyping.agda)
+  - [`CC2.Values`](./src/CC2/Values.agda)
+  - [`CC2.Reduction`](./src/CC2/Reduction.agda):
+    small-step reduction semantics of $\lambda_{\mathtt{SEC}}^\Rightarrow$ variant 2
+    + [`CC2.CastReduction`](./src/CC2/CastReduction.agda):
+      cast reduction rules
+
 
 + [`PrettyPrinter`](./src/PrettyPrinter)
   - [`PrettyPrinter.Console`](./src/PrettyPrinter/Console):
