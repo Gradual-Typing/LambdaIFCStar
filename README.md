@@ -51,15 +51,15 @@ build everything first and then run `bin/RunDemo`.
 
 # Project Code Structure (selected)
 
-All Agda source files are located in the [`src/`](./src) directory
+All Agda source files are located in the [`src/`](src/) directory
 and end with `.agda`.
 
 There are three top-level modules: one contains all type-check-able proofs;
 the other two compile to executable binaries:
 
-+ [`Proofs`](./src/Proofs.agda): sources the proofs of important meta-theoretical results
++ [`Proofs`](src/Proofs.agda): sources the proofs of important meta-theoretical results
   in the following modules:
-  - [`CC.TypeSafety`](./src/CC/TypeSafety.agda):
+  - [`CC.TypeSafety`](src/CC/TypeSafety.agda):
     $\lambda_{\mathtt{SEC}}^\Rightarrow$ is type safe by
     satisfying progress and preservation.
   - [`CC.BigStepPreservation`](./src/CC/BigStepPreservation.agda):
