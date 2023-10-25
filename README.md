@@ -62,6 +62,8 @@ the other two compile to executable binaries:
   - [`CC.TypeSafety`](src/CC/TypeSafety.agda):
     $\lambda_{\mathtt{SEC}}^\Rightarrow$ is type safe by
     satisfying progress and preservation.
+    + [`CC2.Progress`](src/CC2/Progress.agda) and [`CC2.Preservation`](src/CC2/Preservation.agda):
+      the CC2 version
   - [`CC.BigStepPreservation`](./src/CC/BigStepPreservation.agda):
     Big-step evaluation to value is type safe.
   - [`CC.BigStepErasedDeterministic`](./src/CC/BigStepErasedDeterministic.agda):
@@ -72,6 +74,10 @@ the other two compile to executable binaries:
   - [`CC.Compile`](./src/CC/Compile.agda):
     Compilation from $\lambda_{\mathtt{SEC}}^\star$
     to $\lambda_{\mathtt{SEC}}^\Rightarrow$ preserves types.
+  - [`Simulation.Simulation`](./src/Simulation/Simulation.agda)
+      the main simulation lemma for DGG, driven by more precise side
+    + [`Simulation.CatchUp`](./src/Simulation/CatchUp.agda)
+        the catch-up lemma, where less precise is catching up to a more precise value
 
 + [`RunDemo`](./src/RunDemo.agda): runs the stepper on $\lambda_{\mathtt{SEC}}^\star$
   programs in the following modules and pretty-prints their reduction
@@ -149,14 +155,11 @@ Important technical definitions:
     + [`CC2.MultiStep`](./src/CC2/MultiStep.agda):
       multi-step reduction, reflexive transitive closure of single-step reductions
   - [`CC2.Precision`](./src/CC2/Precision.agda)
-      precision relation between CC2 terms
-  - [`Simulation.Simulation`](./src/Simulation/Simulation.agda)
-      the main simulation lemma for DGG, driven by more precise side
-    + [`Simulation.CatchUp`](./src/Simulation/CatchUp.agda)
-        the catch-up lemma, where less precise is catching up to a more precise value
+      the precision relation between CC2 terms
+
 
 + [`PrettyPrinter`](./src/PrettyPrinter)
   - [`PrettyPrinter.Console`](./src/PrettyPrinter/Console):
-    prints to console / tty.
+    prints to console (tty).
   - [`PrettyPrinter.GraphViz`](./src/PrettyPrinter/GraphViz):
     prints in GraphViz visualizer format.
