@@ -262,6 +262,10 @@ join-≼′ l≼h l≼h = l≼h
 join-≼′ l≼h h≼h = h≼h
 join-≼′ h≼h _ = h≼h
 
+ℓ₁⋎ℓ₂≼ℓ : ∀ {ℓ ℓ₁ ℓ₂} → ℓ₁ ≼ ℓ → ℓ₂ ≼ ℓ → (ℓ₁ ⋎ ℓ₂) ≼ ℓ
+ℓ₁⋎ℓ₂≼ℓ {ℓ} {ℓ₁} {ℓ₂} ℓ₁≼ℓ ℓ₂≼ℓ =
+  subst (λ □ → _ ≼ □) (ℓ⋎ℓ≡ℓ {ℓ}) (join-≼′ ℓ₁≼ℓ ℓ₂≼ℓ)
+
 
 {- **** Label consistent join **** -}
 _⋎̃_ : Label → Label → Label

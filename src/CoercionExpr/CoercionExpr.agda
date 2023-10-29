@@ -33,12 +33,19 @@ coerce_⇒⋆ : ∀ g → CExpr g ⇒ ⋆
 coerce_⇒⋆    ⋆  = id ⋆
 coerce_⇒⋆ (l ℓ) = id (l ℓ) ⨾ ℓ !
 
+coerce-≼ : ∀ {ℓ₁ ℓ₂} → ℓ₁ ≼ ℓ₂ → CExpr l ℓ₁ ⇒ l ℓ₂
+coerce-≼ l≼l = id (l low)
+coerce-≼ l≼h = id (l low) ⨾ ↑
+coerce-≼ h≼h = id (l high)
+
 coerceₗ : ∀ {g₁ g₂} → g₁ ≾ g₂ → BlameLabel → CExpr g₁ ⇒ g₂
-coerceₗ {g}      {⋆}      _         _ = coerce g ⇒⋆
-coerceₗ {⋆}      {l ℓ}    ≾-⋆l      p = id ⋆ ⨾ ℓ ?? p
-coerceₗ {l low}  {l low}  (≾-l l≼l) _ = id (l low)
-coerceₗ {l low}  {l high} (≾-l l≼h) _ = id (l low) ⨾ ↑
-coerceₗ {l high} {l high} (≾-l h≼h) _ = id (l high)
+coerceₗ {g}    {⋆}    _           _ = coerce g ⇒⋆
+coerceₗ {l ℓ₁} {l ℓ₂} (≾-l ℓ₁≼ℓ₂) _ = coerce-≼ ℓ₁≼ℓ₂
+coerceₗ {⋆}    {l ℓ}  ≾-⋆l        p = id ⋆ ⨾ ℓ ?? p
+
+coerce-<:ₗ : ∀ {g₁ g₂} → g₁ <:ₗ g₂ → CExpr g₁ ⇒ g₂
+coerce-<:ₗ <:-⋆ = id ⋆
+coerce-<:ₗ (<:-l ℓ₁≼ℓ₂) = coerce-≼ ℓ₁≼ℓ₂
 
 
 -- data CVal : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
