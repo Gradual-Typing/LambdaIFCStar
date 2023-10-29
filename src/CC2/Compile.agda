@@ -26,8 +26,7 @@ open import CC2.Typing public
 compile : ∀ {Γ gc A} (M : Term) → Γ ; gc ⊢ᴳ M ⦂ A → CCTerm
 compile ($ᴳ k of ℓ) ⊢const = $ k
 compile (`ᴳ x) (⊢var x∈Γ)  = ` x
-compile (ƛ g , A ˙ N of ℓ) (⊢lam {A = .A} {B} ⊢N) =
-  let N′ = compile N ⊢N in ƛ N′
+compile (ƛ g , A ˙ N of ℓ) (⊢lam ⊢N) = ƛ (compile N ⊢N)
 compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′) =
     case ⟨ g≾gc′ , gc≾gc′ ⟩ of λ where
     ⟨ ≾-l {ℓ} {ℓᶜ} ℓ≼ℓᶜ , ≾-l {pc} {.ℓᶜ} pc≼ℓᶜ ⟩ →
@@ -36,8 +35,8 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
       app (compile L ⊢L ⟨ coerce-<: sub ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B ℓ
     ⟨ _ , _ ⟩ →
       let csub₁ : ⟦ gc′ ⟧ A ⇒ B of g ≲ ⟦ ⋆ ⟧ A ⇒ B of ⋆
-          csub₁ = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl ≲-refl) in
-      let csub₂ : stamp B ⋆ ≲ stamp B g
+          csub₁ = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl ≲-refl)
+          csub₂ : stamp B ⋆ ≲ stamp B g
           csub₂ = proj₁ (~→≲ (stamp-~ ~-refl ⋆~)) in
       (app! (compile L ⊢L ⟨ coerce csub₁ p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B) ⟨ coerce csub₂ p ⟩
 compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) =
@@ -55,10 +54,7 @@ compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L 
             csub₂ = proj₁ (~→≲ (stamp-~ ~-refl ⋆~)) in
         (if! (L′ ⟨ coerce csub₁ p ⟩) C M′ N′) ⟨ coerce csub₂ p ⟩
 compile (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A) = compile M ⊢M ⟨ coerce A′≲A p ⟩
-compile (`let M `in N) (⊢let {A = A} ⊢M ⊢N) =
-  let M′ = compile M ⊢M in
-  let N′ = compile N ⊢N in
-  `let M′ A N′
+compile (`let M `in N) (⊢let {A = A} ⊢M ⊢N) = `let (compile M ⊢M) A (compile N ⊢N)
 compile (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ) =
   let M′ = compile M ⊢M ⟨ coerce Tg≲Tℓ p ⟩ in
   case gc of λ where
@@ -73,7 +69,6 @@ compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲T
   ⟨ ≾-l {ℓ} {ℓ̂} g≼ĝ , ≾-l gc≼ĝ ⟩ →
       assign (compile L ⊢L) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ℓ̂ ℓ
   ⟨ _ , _ ⟩ →
-    -- let A≲T⋆ = A≲Tg→A≲T⋆ A≲Tĝ in
     let csub : Ref (T of ĝ) of g ≲ Ref (T of ĝ) of ⋆
         csub = ≲-ty ≾-⋆r ≲ᵣ-refl in
       assign? (compile L ⊢L ⟨ coerce csub p ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
