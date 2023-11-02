@@ -51,7 +51,7 @@ build everything first and then run `bin/RunDemo`.
 
 # Project Code Structure (selected)
 
-All Agda source files are located in the [`src/`](src/) directory
+All Agda source files are located in the [`src`](./src) directory
 and end with `.agda`.
 
 There are three top-level modules: one contains all type-check-able proofs;
