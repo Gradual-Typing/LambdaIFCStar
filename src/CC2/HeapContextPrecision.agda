@@ -42,6 +42,13 @@ data _⊑ₕ_ : (Σ Σ′ : HalfHeapContext) → Set where
 _⊑ₘ_ : (Σ Σ′ : HeapContext) → Set
 ⟨ Σᴸ , Σᴴ ⟩ ⊑ₘ ⟨ Σᴸ′ , Σᴴ′ ⟩ = (Σᴸ ⊑ₕ Σᴸ′) × (Σᴴ ⊑ₕ Σᴴ′)
 
+⊑ₘ-cons : ∀ {Σ Σ′ n ℓ T T′}
+  → T ⊑ᵣ T′
+  → Σ ⊑ₘ Σ′
+  → cons-Σ (a⟦ ℓ ⟧ n) T Σ ⊑ₘ cons-Σ (a⟦ ℓ ⟧ n) T′ Σ′
+⊑ₘ-cons {ℓ = low}  T⊑T′ ⟨ left , right ⟩ = ⟨ ⊑-∷ T⊑T′ left , right ⟩
+⊑ₘ-cons {ℓ = high} T⊑T′ ⟨ left , right ⟩ = ⟨ left , ⊑-∷ T⊑T′ right ⟩
+
 ⊑ₕ→⊑-forward : ∀ {Σ Σ′ T n}
   → Σ ⊑ₕ Σ′
   → find _≟_ Σ  n ≡ just T

@@ -63,6 +63,8 @@ pattern ⟨_,_,_,_,_,_,_⟩ x y z w u v p = ⟨ x , ⟨ y , ⟨ z , ⟨ w , ⟨ 
 pattern ⟨_,_,_,_,_,_,_,_⟩ x y z w u v p q = ⟨ x , ⟨ y , ⟨ z , ⟨ w , ⟨ u , ⟨ v , ⟨ p , q ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
 pattern ⟨_,_,_,_,_,_,_,_,_⟩ x y z w u v p q i = ⟨ x , ⟨ y , ⟨ z , ⟨ w , ⟨ u , ⟨ v , ⟨ p , ⟨ q , i ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
 pattern ⟨_,_,_,_,_,_,_,_,_,_⟩ x y z w u v p q i j = ⟨ x , ⟨ y , ⟨ z , ⟨ w , ⟨ u , ⟨ v , ⟨ p , ⟨ q , ⟨ i , j ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
+pattern ⟨_,_,_,_,_,_,_,_,_,_,_⟩ x y z w u v p q i j k = ⟨ x , ⟨ y , ⟨ z , ⟨ w , ⟨ u , ⟨ v , ⟨ p , ⟨ q , ⟨ i , ⟨ j , k ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
+pattern ⟨_,_,_,_,_,_,_,_,_,_,_,_⟩ x y z w u v p q i j k m = ⟨ x , ⟨ y , ⟨ z , ⟨ w , ⟨ u , ⟨ v , ⟨ p , ⟨ q , ⟨ i , ⟨ j , ⟨ k , m ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩ ⟩
 
 pattern ∅ = ⟨ [] , [] ⟩
 
