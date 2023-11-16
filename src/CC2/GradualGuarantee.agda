@@ -46,3 +46,14 @@ gg M⊑M′ Σ₁⊑Σ₁′ μ₁⊑μ₁′ size-eq (_ ∣ _ ∣ l low —→�
     case gg N⊑N′ Σ₂⊑Σ₂′ μ₂⊑μ₂′ size-eq′ N′↠V′ v′ of λ where
     ⟨ V , μ₃ , Σ₃ , Σ₃′ , N↠V , v , V⊑V′ ⟩ →
       ⟨ V , μ₃ , Σ₃ , Σ₃′ , trans-mult M↠N N↠V , v , V⊑V′ ⟩
+
+gradual-guarantee : ∀ {A A′ M M′ V′ μ′}
+  → [] ; [] ∣ ∅ ; ∅ ∣ l low ; l low ∣ low ; low ⊢ M ⊑ M′ ⇐ A ⊑ A′
+  → M′ ∣ ∅ ∣ l low —↠ V′ ∣ μ′
+  → Value V′
+    ----------------------------------------------
+  → ∃[ V ] ∃[ μ ] ∃[ Σ₂ ] ∃[ Σ₂′ ]
+       (M ∣ ∅ ∣ l low —↠ V ∣ μ) ×
+       (Value V) ×
+       ([] ; [] ∣ Σ₂ ; Σ₂′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ V′ ⇐ A ⊑ A′)
+gradual-guarantee M⊑M′ M′↠V′ v′ = gg M⊑M′ ⟨ ⊑-∅ , ⊑-∅ ⟩ (λ { _ low ()}) ⟨ refl , refl ⟩ M′↠V′ v′
