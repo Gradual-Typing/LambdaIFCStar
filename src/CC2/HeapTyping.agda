@@ -28,18 +28,17 @@ relax-Σ (⊢addr {n = n} {ℓ̂ = ℓ̂} eq) Σ′⊇Σ = ⊢addr (Σ′⊇Σ (
 relax-Σ (⊢var Γ∋x) Σ′⊇Σ = ⊢var Γ∋x
 relax-Σ (⊢lam ⊢M) Σ′⊇Σ = ⊢lam (relax-Σ ⊢M Σ′⊇Σ)
 relax-Σ (⊢app ⊢L ⊢M eq) Σ′⊇Σ = ⊢app (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) eq
-relax-Σ (⊢app! ⊢L ⊢M eq) Σ′⊇Σ = ⊢app! (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) eq
+relax-Σ (⊢app! ⊢L ⊢M) Σ′⊇Σ = ⊢app! (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
 relax-Σ (⊢if ⊢L ⊢M ⊢N eq) Σ′⊇Σ = ⊢if (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq
-relax-Σ (⊢if! ⊢L ⊢M ⊢N eq) Σ′⊇Σ = ⊢if! (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq
+relax-Σ (⊢if! ⊢L ⊢M ⊢N) Σ′⊇Σ = ⊢if! (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
 relax-Σ (⊢let ⊢M ⊢N) Σ′⊇Σ = ⊢let (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)
 relax-Σ (⊢ref ⊢M x) Σ′⊇Σ = ⊢ref (relax-Σ ⊢M Σ′⊇Σ) x
 relax-Σ (⊢ref? ⊢M) Σ′⊇Σ = ⊢ref? (relax-Σ ⊢M Σ′⊇Σ)
 relax-Σ (⊢deref ⊢M eq) Σ′⊇Σ = ⊢deref (relax-Σ ⊢M Σ′⊇Σ) eq
-relax-Σ (⊢deref! ⊢M eq) Σ′⊇Σ = ⊢deref! (relax-Σ ⊢M Σ′⊇Σ) eq
+relax-Σ (⊢deref! ⊢M) Σ′⊇Σ = ⊢deref! (relax-Σ ⊢M Σ′⊇Σ)
 relax-Σ (⊢assign ⊢L ⊢M x y) Σ′⊇Σ = ⊢assign (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ) x y
 relax-Σ (⊢assign? ⊢L ⊢M) Σ′⊇Σ = ⊢assign? (relax-Σ ⊢L Σ′⊇Σ) (relax-Σ ⊢M Σ′⊇Σ)
 relax-Σ (⊢prot ⊢M ⊢PC x eq) Σ′⊇Σ = ⊢prot (relax-Σ ⊢M Σ′⊇Σ) ⊢PC x eq
-relax-Σ (⊢prot! ⊢M ⊢PC x eq) Σ′⊇Σ = ⊢prot! (relax-Σ ⊢M Σ′⊇Σ) ⊢PC x eq
 relax-Σ (⊢cast ⊢M) Σ′⊇Σ = ⊢cast (relax-Σ ⊢M Σ′⊇Σ)
 relax-Σ ⊢blame Σ′⊇Σ = ⊢blame
 

@@ -56,23 +56,6 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → prot PC vc ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
 
 
-  prot!-ctx : ∀ {M M′ μ μ′ PC PC′ A ℓ} {vc}
-    →                 M ∣ μ ∣ PC  —→ M′ ∣ μ′
-      ------------------------------------------------------------- Protect!Context
-    → prot! PC vc ℓ M A ∣ μ ∣ PC′ —→ prot! PC vc ℓ M′ A ∣ μ′
-
-
-  prot!-val : ∀ {V μ PC PC′ A ℓ} {vc}
-    → (v  : Value V)
-      --------------------------------------------------------------------------------- Protect!Value
-    → prot! PC vc ℓ V A ∣ μ ∣ PC′ —→ stamp-val! V v A ℓ ∣ μ
-
-
-  prot!-blame : ∀ {μ PC PC′ A ℓ p} {vc}
-      ------------------------------------------------------------- Protect!Blame
-    → prot! PC vc ℓ (blame p) A ∣ μ ∣ PC′ —→ blame p ∣ μ
-
-
   cast : ∀ {A B V M} {c : Cast A ⇒ B} {μ PC}
     → Value V
     → V ⟨ c ⟩ —→ M
@@ -124,8 +107,8 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → app (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ℓ₂ ∣ μ ∣ PC —→ blame p ∣ μ
 
 
-  app!-cast : ∀ {N V W A B C D gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
-                {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′}
+  app!-cast : ∀ {N V W A B C T gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                {c : Cast C ⇒ A} {d : Cast B ⇒ T of ⋆} {μ PC PC′}
     → (v  : Value V)
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
@@ -135,23 +118,23 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → V ⟨ c ⟩ —↠ W
     → Value W
       -------------------------------------------------------------------------- App!Cast
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→
-         prot! PC′ vc′ ℓ′ ((N [ W ]) ⟨ d ⟩) D ∣ μ
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C T ∣ μ ∣ PC —→
+         prot PC′ vc′ ℓ′ ((N [ W ]) ⟨ d ⟩) (T of ⋆) ∣ μ
 
 
-  app!-blame-pc : ∀ {N V A B C D gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
-                    {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC p}
+  app!-blame-pc : ∀ {N V A B C T gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                    {c : Cast C ⇒ A} {d : Cast B ⇒ T of ⋆} {μ PC p}
     → (v  : Value V)
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
        (stamp!ₑ PC vc ℓ′) ⟪ d̅ ⟫ —↠ₑ bl p
       --------------------------------------------------------------------------- App!BlamePC
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→ blame p ∣ μ
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C T ∣ μ ∣ PC —→ blame p ∣ μ
 
 
-  app!-blame : ∀ {N V A B C D gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
-                 {c : Cast C ⇒ A} {d : Cast B ⇒ D} {μ PC PC′ p}
+  app!-blame : ∀ {N V A B C T gc ℓ} {d̅ : CExpr ⋆ ⇒ gc} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                 {c : Cast C ⇒ A} {d : Cast B ⇒ T of ⋆} {μ PC PC′ p}
     → (v  : Value V)
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
@@ -160,7 +143,7 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
     → (vc′ : LVal PC′)
     → V ⟨ c ⟩ —↠ blame p
       --------------------------------------------------------------------------- App!Blame
-    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C D ∣ μ ∣ PC —→ blame p ∣ μ
+    → app! (ƛ N ⟨ cast (fun d̅ c d) c̅ₙ ⟩) V C T ∣ μ ∣ PC —→ blame p ∣ μ
 
 
   β-if-true : ∀ {A ℓ M N μ PC}
@@ -189,22 +172,22 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
          prot (stampₑ PC vc high) (stampₑ-LVal vc) high N A ∣ μ
 
 
-  if!-true-cast : ∀ {A ℓ M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC}
+  if!-true-cast : ∀ {T ℓ M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC}
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
       ------------------------------------------------------------------ If!TrueCast
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
-         prot! (stamp!ₑ PC vc ℓ′) (stamp!ₑ-LVal vc) ℓ′ M A ∣ μ
+       if! ($ true ⟨ cast (id Bool) c̅ₙ ⟩) T M N ∣ μ ∣ PC —→
+         prot (stamp!ₑ PC vc ℓ′) (stamp!ₑ-LVal vc) ℓ′ M (T of ⋆) ∣ μ
 
 
-  if!-false-cast : ∀ {A ℓ M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC}
+  if!-false-cast : ∀ {T ℓ M N} {c̅ₙ : CExpr l ℓ ⇒ ⋆} {μ PC}
     → (vc : LVal PC)
     → (𝓋  : CVal c̅ₙ)
       ------------------------------------------------------------------ If!FalseCast
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) A M N ∣ μ ∣ PC —→
-         prot! (stamp!ₑ PC vc ℓ′) (stamp!ₑ-LVal vc) ℓ′ N A ∣ μ
+       if! ($ false ⟨ cast (id Bool) c̅ₙ ⟩) T M N ∣ μ ∣ PC —→
+         prot (stamp!ₑ PC vc ℓ′) (stamp!ₑ-LVal vc) ℓ′ N (T of ⋆) ∣ μ
 
 
   β-let : ∀ {V A N μ PC}
@@ -252,14 +235,14 @@ data _∣_∣_—→_∣_ : Term → Heap → LExpr → Term → Heap → Set wh
          prot (l high) v-l ℓ₂ (V ⟨ d ⟩) A ∣ μ
 
 
-  deref!-cast : ∀ {A T ℓ̂ ℓ V v n} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
-                 {c : Cast A ⇒ T of l ℓ̂} {d : Cast T of l ℓ̂ ⇒ A} {μ PC}
+  deref!-cast : ∀ {S T ℓ̂ ℓ V v n} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+                 {c : Cast S of ⋆ ⇒ T of l ℓ̂} {d : Cast T of l ℓ̂ ⇒ S of ⋆} {μ PC}
     → (𝓋 : CVal c̅ₙ)
     → lookup-μ μ (a⟦ ℓ̂ ⟧ n) ≡ just (V & v)
       ---------------------------------------------------------------------- Deref!Cast
     → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋 in
-       !! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) A ∣ μ ∣ PC —→
-           prot! (l high) v-l ℓ′ (V ⟨ d ⟩) A ∣ μ
+       !! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) S ∣ μ ∣ PC —→
+           prot (l high) v-l ℓ′ (V ⟨ d ⟩) (S of ⋆) ∣ μ
 
 
   β-assign : ∀ {T ℓ̂ ℓ V n} {μ PC}

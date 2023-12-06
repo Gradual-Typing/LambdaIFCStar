@@ -32,21 +32,20 @@ rename-pres (⊢var Γ∋x) ⊢ρ = ⊢var (⊢ρ Γ∋x)
 rename-pres {Γ} {Δ} (⊢lam ⊢N) ⊢ρ =
   ⊢lam (rename-pres ⊢N (λ {x} {A} → ext-pres {Γ} {Δ} ⊢ρ {x} {A}))
 rename-pres (⊢app  ⊢L ⊢M eq) ⊢ρ = ⊢app  (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) eq
-rename-pres (⊢app! ⊢L ⊢M eq) ⊢ρ = ⊢app! (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) eq
+rename-pres (⊢app! ⊢L ⊢M) ⊢ρ = ⊢app! (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢if ⊢L ⊢M ⊢N eq) ⊢ρ =
   ⊢if (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N ⊢ρ) eq
-rename-pres (⊢if! ⊢L ⊢M ⊢N eq) ⊢ρ =
-  ⊢if! (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N ⊢ρ) eq
+rename-pres (⊢if! ⊢L ⊢M ⊢N) ⊢ρ =
+  ⊢if! (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N ⊢ρ)
 rename-pres {Γ} {Δ} (⊢let ⊢M ⊢N) ⊢ρ =
   ⊢let (rename-pres ⊢M ⊢ρ) (rename-pres ⊢N (λ {x} {A} → ext-pres {Γ} {Δ} ⊢ρ {x} {A}))
 rename-pres (⊢ref ⊢M x) ⊢ρ = ⊢ref (rename-pres ⊢M ⊢ρ) x
 rename-pres (⊢ref? ⊢M) ⊢ρ = ⊢ref? (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢deref ⊢M eq) ⊢ρ = ⊢deref (rename-pres ⊢M ⊢ρ) eq
-rename-pres (⊢deref! ⊢M eq) ⊢ρ = ⊢deref! (rename-pres ⊢M ⊢ρ) eq
+rename-pres (⊢deref! ⊢M) ⊢ρ = ⊢deref! (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢assign ⊢L ⊢M x y) ⊢ρ = ⊢assign (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ) x y
 rename-pres (⊢assign? ⊢L ⊢M) ⊢ρ = ⊢assign? (rename-pres ⊢L ⊢ρ) (rename-pres ⊢M ⊢ρ)
 rename-pres (⊢prot ⊢M ⊢PC x eq) ⊢ρ = ⊢prot (rename-pres ⊢M ⊢ρ) ⊢PC x eq
-rename-pres (⊢prot! ⊢M ⊢PC x eq) ⊢ρ = ⊢prot! (rename-pres ⊢M ⊢ρ) ⊢PC x eq
 rename-pres (⊢cast ⊢M) ⊢ρ = ⊢cast (rename-pres ⊢M ⊢ρ)
 rename-pres ⊢blame ⊢ρ = ⊢blame
 
@@ -76,21 +75,20 @@ subst-pres (⊢var Γ∋x) ⊢σ = ⊢σ Γ∋x
 subst-pres {Γ} {Δ} (⊢lam ⊢N) ⊢σ =
   ⊢lam (subst-pres ⊢N (λ {x} {A} → exts-pres {Γ} {Δ} ⊢σ {x} {A}))
 subst-pres (⊢app  ⊢L ⊢M eq) ⊢σ = ⊢app  (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) eq
-subst-pres (⊢app! ⊢L ⊢M eq) ⊢σ = ⊢app! (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) eq
+subst-pres (⊢app! ⊢L ⊢M) ⊢σ = ⊢app! (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ)
 subst-pres (⊢if ⊢L ⊢M ⊢N eq) ⊢σ =
   ⊢if (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) (subst-pres ⊢N ⊢σ) eq
-subst-pres (⊢if! ⊢L ⊢M ⊢N eq) ⊢σ =
-  ⊢if! (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) (subst-pres ⊢N ⊢σ) eq
+subst-pres (⊢if! ⊢L ⊢M ⊢N) ⊢σ =
+  ⊢if! (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) (subst-pres ⊢N ⊢σ)
 subst-pres {Γ} {Δ} (⊢let ⊢M ⊢N) ⊢σ =
   ⊢let (subst-pres ⊢M ⊢σ) (subst-pres ⊢N (λ {x} {A} → exts-pres {Γ} {Δ} ⊢σ {x} {A}))
 subst-pres (⊢ref ⊢M x) ⊢σ = ⊢ref (subst-pres ⊢M ⊢σ) x
 subst-pres (⊢ref? ⊢M) ⊢σ = ⊢ref? (subst-pres ⊢M ⊢σ)
 subst-pres (⊢deref ⊢M eq) ⊢σ = ⊢deref (subst-pres ⊢M ⊢σ) eq
-subst-pres (⊢deref! ⊢M eq) ⊢σ = ⊢deref! (subst-pres ⊢M ⊢σ) eq
+subst-pres (⊢deref! ⊢M) ⊢σ = ⊢deref! (subst-pres ⊢M ⊢σ)
 subst-pres (⊢assign ⊢L ⊢M x y) ⊢σ = ⊢assign (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ) x y
 subst-pres (⊢assign? ⊢L ⊢M) ⊢σ = ⊢assign? (subst-pres ⊢L ⊢σ) (subst-pres ⊢M ⊢σ)
 subst-pres (⊢prot ⊢M ⊢PC x eq) ⊢σ = ⊢prot (subst-pres ⊢M ⊢σ) ⊢PC x eq
-subst-pres (⊢prot! ⊢M ⊢PC x eq) ⊢σ = ⊢prot! (subst-pres ⊢M ⊢σ) ⊢PC x eq
 subst-pres (⊢cast ⊢M) ⊢σ = ⊢cast (subst-pres ⊢M ⊢σ)
 subst-pres ⊢blame ⊢σ = ⊢blame
 

@@ -54,12 +54,11 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ app L M A B ℓ ⇐ C
 
 
-  ⊢app! : ∀ {Γ Σ gc ℓv A B C L M}
-    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ B of ⋆
+  ⊢app! : ∀ {Γ Σ gc ℓv A T L M}
+    → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
-    → C ≡ stamp B ⋆
       ------------------------------------------------------ App!
-    → Γ ; Σ ; gc ; ℓv ⊢ app! L M A B ⇐ C
+    → Γ ; Σ ; gc ; ℓv ⊢ app! L M A T ⇐ T of ⋆
 
 
   ⊢if : ∀ {Γ Σ ℓc ℓv A B L M N ℓ}
@@ -71,13 +70,12 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ if L A ℓ M N ⇐ B
 
 
-  ⊢if! : ∀ {Γ Σ gc ℓv A B L M N}
+  ⊢if! : ∀ {Γ Σ gc ℓv T L M N}
     → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ` Bool of ⋆
-    → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ M ⇐ A)
-    → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ N ⇐ A)
-    → B ≡ stamp A ⋆
+    → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ M ⇐ T of ⋆)
+    → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ N ⇐ T of ⋆)
       --------------------------------------------------------- If!
-    → Γ ; Σ ; gc ; ℓv ⊢ if! L A M N ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ if! L T M N ⇐ T of ⋆
 
 
   ⊢let : ∀ {Γ Σ gc ℓv M N A B}
@@ -107,11 +105,10 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ ! M A ℓ ⇐ B
 
 
-  ⊢deref! : ∀ {Γ Σ gc ℓv M A B}
-    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref A of ⋆
-    → B ≡ stamp A ⋆
+  ⊢deref! : ∀ {Γ Σ gc ℓv M T}
+    → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref (T of ⋆) of ⋆
       ------------------------------------- Deref!
-    → Γ ; Σ ; gc ; ℓv ⊢ !! M A ⇐ B
+    → Γ ; Σ ; gc ; ℓv ⊢ !! M T ⇐ T of ⋆
 
 
   ⊢assign : ∀ {Γ Σ ℓc ℓv L M T ℓ ℓ̂}
@@ -138,16 +135,6 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → B ≡ stamp A (l ℓ)
       ---------------------------------------------------- Prot
     → Γ ; Σ ; gc ; ℓv ⊢ prot PC vc ℓ M A ⇐ B
-
-
-  ⊢prot! : ∀ {Γ Σ gc gc′ ℓv A B M ℓ} {PC} {vc : LVal PC}
-    → let ℓv′ = ∥ PC ∥ vc in
-       Γ ; Σ ; gc′ ; ℓv′ ⊢ M ⇐ A
-    → ⊢ PC ⇐ gc′
-    → ℓv ⋎ ℓ ≼ ℓv′
-    → B ≡ stamp A ⋆
-      ---------------------------------------------------- Prot!
-    → Γ ; Σ ; gc ; ℓv ⊢ prot! PC vc ℓ M A ⇐ B
 
 
   ⊢cast : ∀ {Γ Σ gc ℓv A B M} {c : Cast A ⇒ B}

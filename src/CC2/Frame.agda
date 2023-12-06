@@ -14,9 +14,9 @@ data Frame : Set where
   -- app  L M A B ℓ
   app□   : (M : Term) → (A B : Type) → StaticLabel → Frame
   app_□  : (V : Term) → Value V → (A B : Type) → StaticLabel → Frame
-  -- app! L M A B
-  app!□  : (M : Term) → (A B : Type) → Frame
-  app!_□ : (V : Term) → Value V → (A B : Type) → Frame
+  -- app! L M A T
+  app!□  : (M : Term) → (A : Type) → (T : RawType) → Frame
+  app!_□ : (V : Term) → Value V → (A : Type) → (T : RawType) → Frame
 
   -- ref⟦ ℓ ⟧ M
   ref⟦_⟧□ : StaticLabel → Frame
@@ -25,8 +25,8 @@ data Frame : Set where
 
   -- ! M A ℓ
   !□ : Type → StaticLabel → Frame
-  -- !! M A
-  !!□ : Type → Frame
+  -- !! M T
+  !!□ : RawType → Frame
 
   -- assign  L M T ℓ̂ ℓ
   assign□   : (M : Term) → RawType → (ℓ̂ ℓ : StaticLabel) → Frame
@@ -40,8 +40,8 @@ data Frame : Set where
 
   -- if  L A ℓ M N
   if□  : Type → StaticLabel → (M N : Term) → Frame
-  -- if! L A M N
-  if!□ : Type → (M N : Term) → Frame
+  -- if! L T M N
+  if!□ : RawType → (M N : Term) → Frame
 
   -- M ⟨ c ⟩
   □⟨_⟩ : ∀ {A B} → (c : Cast A ⇒ B) → Frame
@@ -50,19 +50,19 @@ data Frame : Set where
 plug : Term → Frame → Term
 plug L (app□ M A B ℓ)          = app  L M A B ℓ
 plug M (app V □ v A B ℓ)       = app  V M A B ℓ
-plug L (app!□ M A B)           = app! L M A B
-plug M (app! V □ v A B)        = app! V M A B
+plug L (app!□ M A T)           = app! L M A T
+plug M (app! V □ v A T)        = app! V M A T
 plug M (ref⟦ ℓ ⟧□)             = ref⟦ ℓ ⟧ M
 plug M (ref?⟦ ℓ ⟧□ p)          = ref?⟦ ℓ ⟧ M p
 plug M (!□ A ℓ)                = ! M A ℓ
-plug M (!!□ A)                 = !! M A
+plug M (!!□ T)                 = !! M T
 plug L (assign□ M T ℓ̂ ℓ)       = assign L M T ℓ̂ ℓ
 plug M (assign V □ v T ℓ̂ ℓ)    = assign V M T ℓ̂ ℓ
 plug L (assign?□ M    T ĝ p)   = assign? L M T ĝ p
 plug M (assign? V □ v T ĝ p)   = assign? V M T ĝ p
 plug M (let□ A N)              = `let M A N
 plug L (if□  A ℓ M N)          = if  L A ℓ M N
-plug L (if!□ A M N)            = if! L A M N
+plug L (if!□ T M N)            = if! L T M N
 plug M □⟨ c ⟩                  = M ⟨ c ⟩
 
 

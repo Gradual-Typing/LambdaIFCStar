@@ -26,11 +26,13 @@ stamp-val (V ⟨ c ⟩) (V-cast v i) A ℓ = V ⟨ stamp-ir c i ℓ ⟩
 -- impossible, suppose ⊢ V ⇐ A
 stamp-val V v A ℓ = ●
 
+{-
 stamp-val! : ∀ V → Value V → (A : Type) → StaticLabel → Term
 stamp-val! V         (V-raw v) (T of l ℓ) ℓ′ = V ⟨ cast (coerceᵣ-id T) (stamp!ₗ (id (l ℓ)) id ℓ′) ⟩
 stamp-val! (V ⟨ c ⟩) (V-cast v i)       A ℓ  = V ⟨ stamp-ir! c i ℓ ⟩
 -- impossible, suppose ⊢ V ⇐ A
 stamp-val! V v A ℓ = ●
+-}
 
 stamp-val-wt : ∀ {Σ gc ℓv A V ℓ}
   → (v : Value V)
@@ -51,6 +53,7 @@ stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
 stamp-val-wt {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = ⊢const
 stamp-val-wt {A = A} {V} {ℓ} (V-cast v i) (⊢cast ⊢V) = ⊢cast ⊢V
 
+{-
 stamp-val!-wt : ∀ {Σ gc ℓv A V ℓ}
   → (v : Value V)
   → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
@@ -60,6 +63,7 @@ stamp-val!-wt (V-raw V-addr) (⊢addr a) = ⊢cast (⊢addr a)
 stamp-val!-wt (V-raw V-ƛ) (⊢lam ⊢N) = ⊢cast (⊢lam ⊢N)
 stamp-val!-wt (V-raw V-const) ⊢const = ⊢cast ⊢const
 stamp-val!-wt (V-cast v i) (⊢cast ⊢V) = ⊢cast ⊢V
+-}
 
 
 -- Stamping a value gets a value
@@ -81,6 +85,7 @@ stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) =
 stamp-val-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-raw V-const
 stamp-val-value (V-cast v i) ⊢V = V-cast v (stamp-ir-irreducible i)
 
+{-
 stamp-val!-value : ∀ {Σ gc ℓv A V ℓ}
   → (v : Value V)
   → (⊢V : [] ; Σ ; gc ; ℓv ⊢ V ⇐ A)
@@ -95,6 +100,7 @@ stamp-val!-value {ℓ = low} (V-raw V-const) ⊢const = V-cast V-const (ir-base 
 stamp-val!-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = low}) = V-cast V-const (ir-base (inj (up id)) (λ ()))
 stamp-val!-value {ℓ = high} (V-raw V-const) (⊢const {ℓ = high}) = V-cast V-const (ir-base (inj id) (λ ()))
 stamp-val!-value (V-cast v i) ⊢V = V-cast v (stamp-ir!-irreducible i)
+-}
 
 
 stamp-val-low : ∀ {Σ gc ℓv A V}

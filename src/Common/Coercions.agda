@@ -93,6 +93,7 @@ coerceᵣ-id (⟦ g ⟧ A ⇒ B) = fun (id g) (coerce-id A) (coerce-id B)
 coerce-id (T of g) = cast (coerceᵣ-id T) (id g)
 
 
+-- used in compilation
 coerce-<:ᵣ : ∀ {S T} → S <:ᵣ T → Castᵣ S ⇒ T
 coerce-<:  : ∀ {A B} → A <:  B → Cast  A ⇒ B
 
@@ -102,6 +103,10 @@ coerce-<:ᵣ {Ref A} {Ref B} (<:-ref A<:B B<:A) =
 coerce-<:ᵣ {⟦ g₁ ⟧ A ⇒ B} {⟦ g₂ ⟧ C ⇒ D} (<:-fun g₂<:g₁ C<:A B<:D) =
   fun (coerce-<:ₗ g₂<:g₁) (coerce-<: C<:A) (coerce-<: B<:D)
 coerce-<: (<:-ty g₁<:g₂ S<:T) = cast (coerce-<:ᵣ S<:T) (coerce-<:ₗ g₁<:g₂)
+
+
+inject : ∀ T g → Cast T of g ⇒ T of ⋆
+inject T g = cast (coerceᵣ-id T) (coerce g ⇒⋆)
 
 
 stamp-ir : ∀ {A B} (c : Cast A ⇒ B) → Irreducible c → ∀ ℓ → Cast A ⇒ stamp B (l ℓ)
