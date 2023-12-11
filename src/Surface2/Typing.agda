@@ -64,10 +64,10 @@ data _;_⊢ᴳ_⦂_ : Context → Label → Term → Type → Set where
       --------------------------------------------------------- Ref
     → Γ ; gc ⊢ᴳ ref⟦ ℓ ⟧ M at p ⦂ Ref (T of l ℓ) of l low
 
-  ⊢deref : ∀ {Γ gc M A g}
+  ⊢deref : ∀ {Γ gc M A g p}
     → Γ ; gc ⊢ᴳ M ⦂ (Ref A) of g
       -------------------------------- Deref
-    → Γ ; gc ⊢ᴳ ! M ⦂ stamp A g
+    → Γ ; gc ⊢ᴳ ! M at p ⦂ stamp A g
 
   ⊢assign : ∀ {Γ gc L M A T g ĝ p}
     → Γ ; gc ⊢ᴳ L ⦂ Ref (T of ĝ) of g

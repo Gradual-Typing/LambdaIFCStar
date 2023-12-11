@@ -18,7 +18,7 @@ data Op : Set where
   op-ann    : Type → BlameLabel → Op
   op-let    : Op
   op-ref    : StaticLabel → BlameLabel → Op
-  op-deref  : Op
+  op-deref  : BlameLabel → Op
   op-assign : BlameLabel → Op
 
 sig : Op → List Sig
@@ -29,7 +29,7 @@ sig (op-if p)          = ■ ∷ ■ ∷ ■ ∷ []
 sig (op-ann A p)       = ■ ∷ []
 sig op-let             = ■ ∷ (ν ■) ∷ []
 sig (op-ref ℓ p)       = ■ ∷ []
-sig op-deref           = ■ ∷ []
+sig (op-deref p)       = ■ ∷ []
 sig (op-assign p)      = ■ ∷ ■ ∷ []
 
 open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug; rename) public
@@ -43,5 +43,5 @@ pattern if_then_else_at_ L M N p = (op-if p) ⦅ cons (ast L) (cons (ast M) (con
 pattern _∶_at_ M A p             = (op-ann A p) ⦅ cons (ast M) nil ⦆
 pattern `let_`in_ M N            = op-let ⦅ cons (ast M) (cons (bind (ast N)) nil) ⦆
 pattern ref⟦_⟧_at_ ℓ M p         = (op-ref ℓ p) ⦅ cons (ast M) nil ⦆
-pattern !_ M                     = op-deref ⦅ cons (ast M) nil ⦆
+pattern !_at_ M p                = (op-deref p) ⦅ cons (ast M) nil ⦆
 pattern _:=_at_ L M p            = (op-assign p) ⦅ cons (ast L) (cons (ast M) nil) ⦆
