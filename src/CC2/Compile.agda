@@ -33,11 +33,9 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
           sub = <:-ty <:ₗ-refl (<:-fun (<:-l (ℓ₁⋎ℓ₂≼ℓ pc≼ℓᶜ ℓ≼ℓᶜ)) <:-refl <:-refl) in
       app (compile L ⊢L ⟨ coerce-<: sub ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B ℓ
     ⟨ _ , _ , T of g′ ⟩ →
-      let csub₁ : ⟦ gc′ ⟧ A ⇒ (T of g′) of g ≲ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆
-          csub₁ = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl))
-          csub₂ : T of ⋆ ≲ stamp (T of g′) g
-          csub₂ = ≲-ty ≾-⋆l ≲ᵣ-refl in
-      (app! (compile L ⊢L ⟨ coerce csub₁ p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub₂ p ⟩
+      let csub : T of ⋆ ≲ stamp (T of g′) g
+          csub = ≲-ty ≾-⋆l ≲ᵣ-refl in
+      (app! (compile L ⊢L ⟨ fun-to-⋆ gc′ A T g′ g p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
 compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) =
   case consis-join-≲-inv {A} {B} A∨̃B≡C of λ where
   ⟨ A≲C , B≲C ⟩ →
@@ -47,12 +45,10 @@ compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L 
       case ⟨ gc , g , C ⟩ of λ where
       ⟨ l _ , l ℓ , C ⟩ → if L′ C ℓ M′ N′
       ⟨   _ ,   _ , T of g′ ⟩ →
-        let csub₁ : ` Bool of g ≲ ` Bool of ⋆
-            csub₁ = ≲-ty ≾-⋆r ≲ᵣ-refl in
-        let csub₂ : stamp C ⋆ ≲ stamp C g
-            csub₂ = proj₁ (~→≲ (stamp-~ ~-refl ⋆~)) in
+        let csub : stamp C ⋆ ≲ stamp C g
+            csub = proj₁ (~→≲ (stamp-~ ~-refl ⋆~)) in
         let ⟨ A≲C , B≲C ⟩ = consis-join-≲-inv {A} {B} {C} A∨̃B≡C in
-        (if! (L′ ⟨ coerce csub₁ p ⟩) T (M′ ⟨ inject T g′ ⟩) (N′ ⟨ inject T g′ ⟩)) ⟨ coerce csub₂ p ⟩
+        (if! (L′ ⟨ inject (` Bool) g ⟩) T (M′ ⟨ inject T g′ ⟩) (N′ ⟨ inject T g′ ⟩)) ⟨ coerce csub p ⟩
 compile (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A) = compile M ⊢M ⟨ coerce A′≲A p ⟩
 compile (`let M `in N) (⊢let {A = A} ⊢M ⊢N) = `let (compile M ⊢M) A (compile N ⊢N)
 compile (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ) =
@@ -69,9 +65,7 @@ compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲T
   ⟨ ≾-l {ℓ} {ℓ̂} g≼ĝ , ≾-l gc≼ĝ ⟩ →
       assign (compile L ⊢L) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ℓ̂ ℓ
   ⟨ _ , _ ⟩ →
-    let csub : Ref (T of ĝ) of g ≲ Ref (T of ĝ) of ⋆
-        csub = ≲-ty ≾-⋆r ≲ᵣ-refl in
-      assign? (compile L ⊢L ⟨ coerce csub p ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
+      assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
 
 
 compile-preserve : ∀ {Γ gc A} (M : Term)
