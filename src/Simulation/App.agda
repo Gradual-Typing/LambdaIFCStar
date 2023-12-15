@@ -81,7 +81,7 @@ sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
                    ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
   prec = ⊑-castl (stampₑ-prec vc vc′ PC⊑PC′) d̅⊑gc′
 sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq eq′)
+    (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq′)
     Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
@@ -98,7 +98,7 @@ sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   ⟨ _ , ♣ ,
     ⊑-prot!l (⊑-castl (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑M′ w₁ v′)) d⊑B′)
              PC₁⊑stampPC′
-             (stamp!-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq eq′ (≡→≼ ∥c̅∥≡ℓ) ⟩
+             (stamp!-cast-security vc ⊢PC ↠PC₁ vc₁) (≡→≼ (stampₑ-security vc′)) eq′ (≡→≼ ∥c̅∥≡ℓ) ⟩
   where
   ∥PC∥⋎∥c̅∥≡∥stamp∥ = stampₑ-security {ℓ = ∥ c̅ ∥ₗ 𝓋} vc
   ∥c̅∥≡ℓ = security-prec-left _ 𝓋 c̅⊑g′

@@ -208,18 +208,17 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
          ⇐ ` Unit of l low ⊑ ` Unit of l low
 
 
-  ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {T T′ A A′ g g′ ℓ ℓ′} {vc vc′}
+  ⊑-prot : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {A A′ B B′ g g′ ℓ} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
        let ℓv₂′ = ∥ PC′ ∥ vc′ in
-       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ T of l ℓ ⊑ T′ of l ℓ
+       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
     → PC ⊑ PC′ ⇐ g ⊑ g′
-    → ℓv₁  ⋎ ℓ′ ≼ ℓv₂
-    → ℓv₁′ ⋎ ℓ′ ≼ ℓv₂′
-    → A  ≡ stamp (T  of l ℓ) (l ℓ′)
-    → A′ ≡ stamp (T′ of l ℓ) (l ℓ′)
+    → ℓv₁  ⋎ ℓ ≼ ℓv₂
+    → ℓv₁′ ⋎ ℓ ≼ ℓv₂′
+    → B  ≡ stamp A  (l ℓ)
+    → B′ ≡ stamp A′ (l ℓ)
       ----------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ′ M (T of l ℓ) ⊑ prot PC′ vc′ ℓ′ M′ (T′ of l ℓ)
-          ⇐ A ⊑ A′
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M A ⊑ prot PC′ vc′ ℓ M′ A′ ⇐ B ⊑ B′
 
 
   ⊑-prot! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {T T′ g g′ ℓ ℓ′} {vc vc′}
@@ -230,23 +229,21 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → ℓv₁  ⋎ ℓ  ≼ ℓv₂
     → ℓv₁′ ⋎ ℓ′ ≼ ℓv₂′
     → ℓ ≼ ℓ′
-      ----------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M (T of ⋆) ⊑ prot PC′ vc′ ℓ′ M′ (T′ of ⋆)
-        ⇐ T of ⋆ ⊑ T′ of ⋆
+      --------------------------------------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M (T of ⋆) ⊑ prot PC′ vc′ ℓ′ M′ (T′ of ⋆) ⇐ T of ⋆ ⊑ T′ of ⋆
 
 
-  ⊑-prot!l : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {T T′ A′ g g′ ℓ ℓ′ ℓ″} {vc vc′}
+  ⊑-prot!l : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv₁ ℓv₁′} {M M′ PC PC′} {T A′ B′ g g′ ℓ ℓ′} {vc vc′}
     → let ℓv₂  = ∥ PC  ∥ vc  in
        let ℓv₂′ = ∥ PC′ ∥ vc′ in
-       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ T of ⋆ ⊑ T′ of l ℓ″
+       Γ ; Γ′ ∣ Σ ; Σ′ ∣ g ; g′ ∣ ℓv₂ ; ℓv₂′ ⊢ M ⊑ M′ ⇐ T of ⋆ ⊑ A′
     → PC ⊑ PC′ ⇐ g ⊑ g′
     → ℓv₁  ⋎ ℓ  ≼ ℓv₂
     → ℓv₁′ ⋎ ℓ′ ≼ ℓv₂′
-    → A′ ≡ stamp (T′ of l ℓ″) (l ℓ′)
+    → B′ ≡ stamp A′ (l ℓ′)
     → ℓ ≼ ℓ′
-      ----------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M (T of ⋆) ⊑ prot PC′ vc′ ℓ′ M′ (T′ of l ℓ″)
-          ⇐ T of ⋆ ⊑ A′
+      -----------------------------------------------------------------------------------------------------------
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv₁ ; ℓv₁′ ⊢ prot PC vc ℓ M (T of ⋆) ⊑ prot PC′ vc′ ℓ′ M′ A′ ⇐ T of ⋆ ⊑ B′
 
 
   ⊑-cast : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {A A′ B B′}
@@ -388,10 +385,10 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-assign?l L⊑L′ M⊑M′  ℓc≼ℓ̂ 
 {- Protection -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot M⊑M′ PC⊑PC′ x x′ eq eq′) rewrite eq | eq′ =
   case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
-  ⟨ ⊢M , ⊢M′ , ⊑-ty l⊑l T⊑T′ ⟩ →
+  ⟨ ⊢M , ⊢M′ , A⊑A′ ⟩ →
     let prec = prec→⊑ PC⊑PC′ in
     let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
-    ⟨ ⊢prot ⊢M ⊢PC x refl , ⊢prot ⊢M′ ⊢PC′ x′ refl , ⊑-ty ⊑ₗ-refl T⊑T′ ⟩
+    ⟨ ⊢prot ⊢M ⊢PC x refl , ⊢prot ⊢M′ ⊢PC′ x′ refl , stamp-⊑ A⊑A′ ⊑ₗ-refl ⟩
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-prot! M⊑M′ PC⊑PC′ x x′ ℓ≼ℓ′) =
   case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
   ⟨ ⊢M , ⊢M′ , ⊑-ty _ T⊑T′ ⟩ →

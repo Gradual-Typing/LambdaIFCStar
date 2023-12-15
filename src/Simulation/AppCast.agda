@@ -90,7 +90,7 @@ sim-app-cast {Σ} {Σ′} {.(l _)} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ 
                 eq eq′ ⟩
       ⟨ V-● , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
 sim-app-cast {Σ} {Σ′} {gc} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ = ℓ₁} {ℓ₂} {g₁} {g₂} vc vc′
-  (⊑-app!l L⊑L′ M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
+  (⊑-app!l L⊑L′ M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
   case catchup {μ = μ} {PC} v′ M⊑M′ of λ where
   ⟨ W , w , M↠W , W⊑M′ ⟩ →
     let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
@@ -118,7 +118,7 @@ sim-app-cast {Σ} {Σ′} {gc} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ = �
               ⊑-prot!l (⊑-cast (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑W′ w₁ w′)) d⊑d′)
                 pc-prec′ (stamp!-cast-security vc ⊢PC ↠PC₁ vc₁)
                 (stamp-cast-security vc′ ⊢PC′ ↠PC″ vc″)
-                eq eq′ ∣c̅∣≼ℓ₂ ⟩
+                eq′ ∣c̅∣≼ℓ₂ ⟩
       ⟨ V-● , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
 sim-app-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
   case sim-app-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ of λ where

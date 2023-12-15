@@ -90,36 +90,36 @@ prec-relax-Σ (⊑-lam g⊑g′ A⊑A′ N⊑N′) Σ₂⊇Σ₁ Σ₂′⊇Σ�
   ⊑-lam g⊑g′ A⊑A′ (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
 prec-relax-Σ (⊑-app L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-app (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-app! L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-app! (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-app!l L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-app!l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-app! L⊑L′ M⊑M′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-app! (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
+prec-relax-Σ (⊑-app!l L⊑L′ M⊑M′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-app!l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
 prec-relax-Σ (⊑-if L⊑L′ M⊑M′ N⊑N′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-if (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-if! L⊑L′ M⊑M′ N⊑N′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-if! (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-if!l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-if! L⊑L′ M⊑M′ N⊑N′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-if! (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
+prec-relax-Σ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-if!l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
 prec-relax-Σ (⊑-let M⊑M′ N⊑N′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-let (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ N⊑N′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
 prec-relax-Σ (⊑-ref M⊑M′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-ref (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
 prec-relax-Σ (⊑-ref? M⊑M′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-ref? (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
 prec-relax-Σ (⊑-ref?l M⊑M′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-ref?l (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
 prec-relax-Σ (⊑-deref M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-deref (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-deref! M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-deref! (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-deref!l M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-deref!l (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
+prec-relax-Σ (⊑-deref! M⊑M′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-deref! (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
+prec-relax-Σ (⊑-deref!l M⊑M′ x) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-deref!l (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x
 prec-relax-Σ (⊑-assign L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-assign (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
 prec-relax-Σ (⊑-assign? L⊑L′ M⊑M′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-assign? (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′)
 prec-relax-Σ (⊑-assign?l L⊑L′ M⊑M′ x y) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
   ⊑-assign?l (prec-relax-Σ L⊑L′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) x y
-prec-relax-Σ (⊑-prot M⊑M′ PC⊑PC′ x y z w) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-prot (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) PC⊑PC′ x y z w
-prec-relax-Σ (⊑-prot! M⊑M′ PC⊑PC′ x y eq eq′ z) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-prot! (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) PC⊑PC′ x y eq eq′ z
-prec-relax-Σ (⊑-prot!l M⊑M′ PC⊑PC′ x y eq eq′ z) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
-  ⊑-prot!l (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) PC⊑PC′ x y eq eq′ z
+prec-relax-Σ (⊑-prot M⊑M′ PC⊑PC′ x y eq eq′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-prot (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) PC⊑PC′ x y eq eq′
+prec-relax-Σ (⊑-prot! M⊑M′ PC⊑PC′ x y z) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-prot! (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) PC⊑PC′ x y z
+prec-relax-Σ (⊑-prot!l M⊑M′ PC⊑PC′ x y eq′ z) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ =
+  ⊑-prot!l (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) PC⊑PC′ x y eq′ z
 prec-relax-Σ (⊑-cast M⊑M′ c⊑c′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-cast (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) c⊑c′
 prec-relax-Σ (⊑-castl M⊑M′ c⊑A′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-castl (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) c⊑A′
 prec-relax-Σ (⊑-castr M⊑M′ A⊑c′) Σ₂⊇Σ₁ Σ₂′⊇Σ₁′ = ⊑-castr (prec-relax-Σ M⊑M′ Σ₂⊇Σ₁ Σ₂′⊇Σ₁′) A⊑c′
