@@ -61,7 +61,7 @@ sim-if-true-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
             ⊑-prot M⊑M′ (stampₑ-prec vc vc′ PC⊑PC′)
                    (≡→≼ (stampₑ-security vc)) (≡→≼ (stampₑ-security vc′)) eq eq′ ⟩
 sim-if-true-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-if!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq eq′)
+    (⊑-if!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq′)
     Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
   case catchup {μ = μ} {PC} (V-cast V-const (ir-base (up id) (λ ()))) L⊑L′ of λ where
   ⟨ V , v , L↠V , prec ⟩ →
@@ -76,7 +76,7 @@ sim-if-true-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
             trans-mult (plug-cong (if!□ _ _ _) L↠V)
                        (_ ∣ _ ∣ _ —→⟨ if!-true-cast vc (inj 𝓋) ⟩ _ ∣ _ ∣ _ ∎) ,
             ⊑-prot!l M⊑M′ (stamp!ₑ-left-prec vc vc′ PC⊑PC′ (_ ≼high))
-                   (≡→≼ (stamp!ₑ-security vc)) (≡→≼ (stampₑ-security vc′)) eq eq′ (_ ≼high) ⟩
+                   (≡→≼ (stamp!ₑ-security vc)) (≡→≼ (stampₑ-security vc′)) eq′ (_ ≼high) ⟩
 sim-if-true-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
   case sim-if-true-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq of λ where
   ⟨ N , M↠N , N⊑N′ ⟩ →

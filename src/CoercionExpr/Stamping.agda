@@ -170,6 +170,59 @@ stampₗ-prec (up id) (inj (up id)) (⊑-castl _ () _)
 stampₗ-prec (up id) (inj (up id)) (⊑-castr _ _ ())
 stampₗ-prec (up id) (up id) c̅⊑d̅ = prec-refl _
 
+stamp⋆ₗ-prec : ∀ {ℓ ℓ₁ ℓ₂} {c̅ : CExpr l ℓ ⇒ ⋆} {d̅ : CExpr l ℓ ⇒ ⋆}
+  → (v  : CVal c̅)
+  → (v′ : CVal d̅)
+  → ⊢ c̅ ⊑ d̅
+  → ℓ₁ ≼ ℓ₂
+    ---------------------------------------
+  → ⊢ stampₗ c̅ v ℓ₁ ⊑ stampₗ d̅ v′ ℓ₂
+stamp⋆ₗ-prec (inj id) (inj id) prec l≼l = prec-refl _
+stamp⋆ₗ-prec {low} (inj id) (inj id) prec l≼h = !⊑↑!
+stamp⋆ₗ-prec {high} (inj id) (inj id) prec l≼h = prec-refl _
+stamp⋆ₗ-prec (inj id) (inj id) prec h≼h = prec-refl _
+stamp⋆ₗ-prec (inj id) (inj (up id)) prec l≼l = !⊑↑!
+stamp⋆ₗ-prec (inj id) (inj (up id)) prec l≼h = !⊑↑!
+stamp⋆ₗ-prec (inj id) (inj (up id)) prec h≼h = prec-refl _
+stamp⋆ₗ-prec (inj (up id)) (inj id) (⊑-castr (⊑-castl prec () _) _ _) leq
+stamp⋆ₗ-prec (inj (up id)) (inj (up id)) prec l≼l = prec-refl _
+stamp⋆ₗ-prec (inj (up id)) (inj (up id)) prec l≼h = prec-refl _
+stamp⋆ₗ-prec (inj (up id)) (inj (up id)) prec h≼h = prec-refl _
+
+
+stamp⋆ₗ-left-prec : ∀ {ℓ ℓ₁ ℓ₂ g} {c̅ : CExpr l ℓ ⇒ ⋆} {d̅ : CExpr l ℓ ⇒ g}
+  → (v : CVal c̅)
+  → (v′ : CVal d̅)
+  → ⊢ c̅ ⊑ d̅
+  → ℓ₁ ≼ ℓ₂
+    ------------------------------------
+  → ⊢ stampₗ c̅ v ℓ₁ ⊑ stampₗ d̅ v′ ℓ₂
+stamp⋆ₗ-left-prec {low} (inj id) id prec l≼l = ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ-left-prec {high} (inj id) id prec l≼l = ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ-left-prec {low} (inj id) id (⊑-castl prec l⊑l x₁) l≼h = !⊑↑
+stamp⋆ₗ-left-prec {high} (inj id) id (⊑-castl prec l⊑l x₁) l≼h = ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ-left-prec {low} (inj id) id (⊑-castl prec l⊑l x₁) h≼h = ↑!⊑↑
+stamp⋆ₗ-left-prec {high} (inj id) id (⊑-castl prec l⊑l x₁) h≼h = ⊑-castl (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ-left-prec (inj id) (inj id) prec l≼l = prec-refl _
+stamp⋆ₗ-left-prec {low} (inj id) (inj id) prec l≼h = !⊑↑!
+stamp⋆ₗ-left-prec {high} (inj id) (inj id) prec l≼h = prec-refl _
+stamp⋆ₗ-left-prec (inj (id {l low})) (inj id) prec h≼h = prec-refl _
+stamp⋆ₗ-left-prec (inj (id {l high})) (inj id) prec h≼h = prec
+stamp⋆ₗ-left-prec (inj id) (inj (up id)) prec l≼l = !⊑↑!
+stamp⋆ₗ-left-prec (inj id) (inj (up id)) prec l≼h = !⊑↑!
+stamp⋆ₗ-left-prec (inj id) (inj (up id)) prec h≼h = prec-refl _
+stamp⋆ₗ-left-prec (inj id) (up id) prec l≼l = !⊑↑
+stamp⋆ₗ-left-prec (inj id) (up id) prec l≼h = !⊑↑
+stamp⋆ₗ-left-prec (inj id) (up id) prec h≼h = ↑!⊑↑
+stamp⋆ₗ-left-prec (inj (up id)) id (⊑-castl prec () _) leq
+stamp⋆ₗ-left-prec (inj (up id)) (inj id) (⊑-castr (⊑-castl prec () _) _ _) leq
+stamp⋆ₗ-left-prec (inj (up id)) (inj (up id)) prec l≼l = prec-refl _
+stamp⋆ₗ-left-prec (inj (up id)) (inj (up id)) prec l≼h = prec-refl _
+stamp⋆ₗ-left-prec (inj (up id)) (inj (up id)) prec h≼h = prec-refl _
+stamp⋆ₗ-left-prec (inj (up id)) (up id) prec l≼l = ↑!⊑↑
+stamp⋆ₗ-left-prec (inj (up id)) (up id) prec l≼h = ↑!⊑↑
+stamp⋆ₗ-left-prec (inj (up id)) (up id) prec h≼h = ↑!⊑↑
+
 
 stamp!ₗ-left-prec : ∀ {ℓ ℓ₁ ℓ₂ g₁ g₂} {c̅ : CExpr l ℓ ⇒ g₁} {d̅ : CExpr l ℓ ⇒ g₂}
   → (v : CVal c̅)
@@ -298,3 +351,23 @@ stamp!ₗ⊑ℓ (id (l high) ⨾ _ !) c̅⊑ℓ (inj id) l≼h = ⊑-cast (⊑-i
 stamp!ₗ⊑ℓ (id (l high) ⨾ _ !) c̅⊑ℓ (inj id) h≼h = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
 stamp!ₗ⊑ℓ (id (l low) ⨾ ↑ ⨾ _ !) (⊑-cast _ () _) (inj (up id)) l≼l
 stamp!ₗ⊑ℓ (id .(l low) ⨾ ↑) (⊑-cast _ _ ()) (up id)
+
+
+stamp⋆ₗ⊑↑ : ∀ {ℓ} (c̅ : CExpr l low ⇒ ⋆)
+  → (𝓋 : CVal c̅)
+  → ⊢ stampₗ c̅ 𝓋 ℓ ⊑ id (l low) ⨾ ↑
+stamp⋆ₗ⊑↑ {ℓ = high} (id .(l low) ⨾ (_ !)) (inj id) = ↑!⊑↑
+stamp⋆ₗ⊑↑ {ℓ = low} (id .(l low) ⨾ (_ !)) (inj id) = !⊑↑
+stamp⋆ₗ⊑↑ {ℓ = high} (id .(l low) ⨾ ↑ ⨾ (_ !)) (inj (up id)) = ↑!⊑↑
+stamp⋆ₗ⊑↑ {ℓ = low} (id .(l low) ⨾ ↑ ⨾ (_ !)) (inj (up id)) = ↑!⊑↑
+
+
+stamp⋆ₗ⊑ℓ : ∀ {ℓ ℓ′} (c̅ : CExpr l ℓ ⇒ ⋆)
+  → ⊢l c̅ ⊑ l ℓ
+  → (𝓋 : CVal c̅)
+  → ℓ′ ≼ ℓ
+  → ⊢l stampₗ c̅ 𝓋 ℓ′ ⊑ l ℓ
+stamp⋆ₗ⊑ℓ (id (l low) ⨾ _ !) c̅⊑ℓ (inj id) l≼l = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ⊑ℓ (id (l high) ⨾ _ !) c̅⊑ℓ (inj id) l≼h = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ⊑ℓ (id (l high) ⨾ _ !) c̅⊑ℓ (inj id) h≼h = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
+stamp⋆ₗ⊑ℓ (id (l low) ⨾ ↑ ⨾ _ !) (⊑-cast _ () _) (inj (up id)) l≼l

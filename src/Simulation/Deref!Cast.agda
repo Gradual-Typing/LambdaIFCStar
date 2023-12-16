@@ -33,13 +33,13 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 open import Simulation.SimCast
 
 
-sim-deref!-cast : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ B′ T n ℓ ℓ̂}
-                    {c : Cast B′ ⇒ T of l ℓ̂} {d : Cast T of l ℓ̂ ⇒ B′} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
+sim-deref!-cast : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ T T′ n ℓ ℓ̂}
+                    {c : Cast T′ of ⋆ ⇒ T of l ℓ̂} {d : Cast T of l ℓ̂ ⇒ T′ of ⋆} {c̅ₙ : CExpr l ℓ ⇒ ⋆}
   → (vc  : LVal PC)
   → (vc′ : LVal PC′)
   → let ℓv  = ∥ PC  ∥ vc  in
      let ℓv′ = ∥ PC′ ∥ vc′ in
-     [] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ !! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) B′ ⇐ A ⊑ A′
+     [] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ !! (addr n ⟨ cast (ref c d) c̅ₙ ⟩) T′ ⇐ A ⊑ A′
   → Σ ⊑ₘ Σ′
   → Σ ; Σ′ ⊢ μ ⊑ μ′
   → PC ⊑ PC′ ⇐ gc ⊑ gc′
@@ -51,10 +51,10 @@ sim-deref!-cast : ∀ {Σ Σ′ gc gc′} {M V′ μ μ′ PC PC′} {A A′ B�
   → let ℓ′ = ∥ c̅ₙ ∥ₗ 𝓋′ in
      ∃[ N ] (M ∣ μ ∣ PC —↠ N ∣ μ) ×
             ([] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢
-              N ⊑ prot! (l high) v-l ℓ′ (V′ ⟨ d ⟩) B′
+              N ⊑ prot (l high) v-l ℓ′ (V′ ⟨ d ⟩) (T′ of ⋆)
               ⇐ A ⊑ A′)
 sim-deref!-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-      (⊑-deref! M⊑M′ eq eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ =
+      (⊑-deref! M⊑M′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ =
   case catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) M⊑M′ of λ where
   ⟨ addr _ , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
   ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑c′ ⟩ →
@@ -66,7 +66,7 @@ sim-deref!-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
       case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
       refl →
         let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-        ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼∣c̅′∣ ⟩
+        ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) ∣c̅∣≼∣c̅′∣ ⟩
   ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) A⊑c′) c⊑A′ ⟩ →
     let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
     let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
@@ -76,7 +76,7 @@ sim-deref!-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
       case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
       refl →
         let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-        ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼∣c̅′∣ ⟩
+        ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) ∣c̅∣≼∣c̅′∣ ⟩
   ⟨ _ , V-cast V-const _ , L↠V , ⊑-castl (⊑-castr () _) c⊑A′ ⟩
   ⟨ _ , V-cast V-ƛ _ , L↠V , ⊑-castl (⊑-castr () _) c⊑A′ ⟩
   ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑A′) A⊑c′ ⟩ →
@@ -88,7 +88,7 @@ sim-deref!-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
       case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
       refl →
         let ∣c̅∣≼∣c̅′∣ = security-prec _ _ 𝓋 𝓋′ c̅⊑c̅′ in
-        ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ∣c̅∣≼∣c̅′∣ ⟩
+        ⟨ _ , ♣ , ⊑-prot! (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) ∣c̅∣≼∣c̅′∣ ⟩
 sim-deref!-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋 μ′a≡V′
   with sim-deref!-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋 μ′a≡V′
 ... | ⟨ N , M↠N , N⊑N′ ⟩ =

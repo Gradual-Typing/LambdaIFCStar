@@ -54,7 +54,7 @@ sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   ⟨ $ true ⟨ cast (id ι) c̅ ⟩ , V-cast V-const (ir-base id x) , L↠V , ⊑-castl ⊑-const (⊑-base c̅⊑g′) ⟩ →
     contradiction refl x
 sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-if!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq eq′)
+    (⊑-if!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq′)
     Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
   case catchup {μ = μ} {PC} (V-raw V-const) L⊑L′ of λ where
   ⟨ $ _ , V-raw V-const , L↠V , () ⟩
@@ -64,7 +64,7 @@ sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
       (let ∣c̅∣≼ℓ′ = ≡→≼ (security-prec-left _ (inj 𝓋) c̅⊑g′) in
        ⊑-prot!l M⊑M′ (stamp!ₑ-left-prec vc vc′ PC⊑PC′ ∣c̅∣≼ℓ′)
                (≡→≼ (stamp!ₑ-security vc)) (≡→≼ (stampₑ-security vc′))
-               eq eq′ ∣c̅∣≼ℓ′) ⟩
+               eq′ ∣c̅∣≼ℓ′) ⟩
 sim-if-true vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
   case sim-if-true vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq of λ where
   ⟨ N , M↠N , N⊑N′ ⟩ →
