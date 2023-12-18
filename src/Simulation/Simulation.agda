@@ -50,7 +50,7 @@ open import Simulation.Deref
 open import Simulation.Deref!Cast
 open import Simulation.DerefCast
 open import Simulation.StampValPrec
--- open import Simulation.StampVal!LeftPrec
+open import Simulation.StampVal!LeftPrec
 open import Simulation.StampVal!Prec
 
 
@@ -294,8 +294,7 @@ sim {Σ} {Σ′} {gc} {gc′} {μ₁ = μ} {PC = PC} {PC′} vc vc′
     let ⟨ ⊢V , ⊢V′ , A⊑A′ ⟩ = cc-prec-inv ⊑*-∅ Σ⊑Σ′ V⊑V′ in
     ⟨ Σ , Σ′ , ⊇-refl Σ , ⊇-refl Σ′ , Σ⊑Σ′ , _ , μ ,
       trans-mult (prot-ctx-mult vc₁ M↠V) (_ ∣ _ ∣ _ —→⟨ prot-val v ⟩ _ ∣ _ ∣ _ ∎) ,
-      {!!} ,
-      -- stamp-val!-left-prec ⊑*-∅ Σ⊑Σ′ (value-⊑-pc V⊑V′ v v′) v v′ ℓ≼ℓ′ ,
+      stamp-val!-left-prec ⊑*-∅ Σ⊑Σ′ (value-⊑-pc V⊑V′ v v′) v v′ ℓ≼ℓ′ ,
       μ⊑μ′ , size-eq ⟩
 
 sim {Σ} {Σ′} {μ₁ = μ} vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq prot-blame =
