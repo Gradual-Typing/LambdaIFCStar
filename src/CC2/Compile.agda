@@ -35,7 +35,7 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
     ⟨ _ , _ , T of g′ ⟩ →
       let csub : T of ⋆ ≲ stamp (T of g′) g
           csub = ≲-ty ≾-⋆l ≲ᵣ-refl in
-      (app! (compile L ⊢L ⟨ fun-to-⋆ gc′ A T g′ g p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
+      (app⋆ (compile L ⊢L ⟨ fun-to-⋆ gc′ A T g′ g p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
 compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) =
   case consis-join-≲-inv {A} {B} A∨̃B≡C of λ where
   ⟨ A≲C , B≲C ⟩ →
@@ -48,7 +48,7 @@ compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L 
         let csub : stamp C ⋆ ≲ stamp C g
             csub = proj₁ (~→≲ (stamp-~ ~-refl ⋆~)) in
         let ⟨ A≲C , B≲C ⟩ = consis-join-≲-inv {A} {B} {C} A∨̃B≡C in
-        (if! (L′ ⟨ inject (` Bool) g ⟩) T (M′ ⟨ inject T g′ ⟩) (N′ ⟨ inject T g′ ⟩)) ⟨ coerce csub p ⟩
+        (if⋆ (L′ ⟨ inject (` Bool) g ⟩) T (M′ ⟨ inject T g′ ⟩) (N′ ⟨ inject T g′ ⟩)) ⟨ coerce csub p ⟩
 compile (M ∶ A at p) (⊢ann {A′ = A′} ⊢M A′≲A) = compile M ⊢M ⟨ coerce A′≲A p ⟩
 compile (`let M `in N) (⊢let {A = A} ⊢M ⊢N) = `let (compile M ⊢M) A (compile N ⊢N)
 compile (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ) =
@@ -59,7 +59,7 @@ compile (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ) =
 compile (! M at p) (⊢deref {A = A} {g} ⊢M) =
   case ⟨ g , A ⟩ of λ where
   ⟨ l ℓ , A       ⟩ → !  (compile M ⊢M) A ℓ
-  ⟨ ⋆   , T of g′ ⟩ → !! (compile M ⊢M ⟨ ref-to-⋆ T g′ g p ⟩) T
+  ⟨ ⋆   , T of g′ ⟩ → !⋆ (compile M ⊢M ⟨ ref-to-⋆ T g′ g p ⟩) T
 compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ) =
   case ⟨ g≾ĝ , gc≾ĝ ⟩ of λ where
   ⟨ ≾-l {ℓ} {ℓ̂} g≼ĝ , ≾-l gc≼ĝ ⟩ →
@@ -79,12 +79,12 @@ compile-preserve (L · M at p) (⊢app {A = A} {A′} {B} ⊢L ⊢M A′≲A g�
   with gc≾gc′ | g≾gc′ | B
 ... | ≾-l gc≼gc′ | ≾-l g≼gc′ | T of g =
   ⊢app (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)) refl
-... | ≾-l _ | ≾-⋆l  | T of g = ⊢cast (⊢app! (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆l  | ≾-l _ | T of g = ⊢cast (⊢app! (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆l  | ≾-⋆l  | T of g = ⊢cast (⊢app! (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆l  | ≾-⋆r  | T of g = ⊢cast (⊢app! (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆r  | ≾-⋆l  | T of g = ⊢cast (⊢app! (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆r  | ≾-⋆r  | T of g = ⊢cast (⊢app! (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | ≾-l _ | ≾-⋆l  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | ≾-⋆l  | ≾-l _ | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | ≾-⋆l  | ≾-⋆l  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | ≾-⋆l  | ≾-⋆r  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | ≾-⋆r  | ≾-⋆l  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | ≾-⋆r  | ≾-⋆r  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
 compile-preserve {Γ = Γ} (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) {pc}
   with consis-join-≲-inv {A} {B} A∨̃B≡C
 ... | ⟨ A≲C , B≲C ⟩
@@ -96,30 +96,30 @@ compile-preserve {Γ = Γ} (if L then M else N at p) (⊢if {gc = gc} {A = A} {B
   where
   ♣ : _
   ♣ = subst (λ □ → Γ ; ∅ ; l pc′ ; pc ⊢
-               if! (compile L ⊢L ⟨ coerce (≲-ty {g₁ = ⋆} {S = ` Bool} ≾-⋆r ≲ᵣ-refl) p ⟩) T
+               if⋆ (compile L ⊢L ⟨ coerce (≲-ty {g₁ = ⋆} {S = ` Bool} ≾-⋆r ≲ᵣ-refl) p ⟩) T
                    ((compile M ⊢M ⟨ coerce A≲C p ⟩) ⟨ inject T g′ ⟩)
                    ((compile N ⊢N ⟨ coerce B≲C p ⟩) ⟨ inject T g′ ⟩) ⇐ □) (cong (_ of_) (sym (g⋎̃⋆≡⋆ {g′})))
-            (⊢if! (⊢cast (compile-preserve L ⊢L))
+            (⊢if⋆ (⊢cast (compile-preserve L ⊢L))
               (⊢cast (⊢cast (compile-preserve M ⊢M))) (⊢cast (⊢cast (compile-preserve N ⊢N))))
 ... | ⋆ | l ℓ | T of g′ =
   ⊢cast ♣
   where
   ♣ : _
   ♣ = subst (λ □ → Γ ; ∅ ; ⋆ ; pc ⊢
-               if! (compile L ⊢L ⟨ coerce (≲-ty {g₁ = l ℓ} {S = ` Bool} ≾-⋆r ≲ᵣ-refl) p ⟩) T
+               if⋆ (compile L ⊢L ⟨ coerce (≲-ty {g₁ = l ℓ} {S = ` Bool} ≾-⋆r ≲ᵣ-refl) p ⟩) T
                    ((compile M ⊢M ⟨ coerce A≲C p ⟩) ⟨ inject T g′ ⟩)
                    ((compile N ⊢N ⟨ coerce B≲C p ⟩) ⟨ inject T g′ ⟩) ⇐ □) (cong (_ of_) (sym (g⋎̃⋆≡⋆ {g′})))
-            (⊢if! (⊢cast (compile-preserve L ⊢L))
+            (⊢if⋆ (⊢cast (compile-preserve L ⊢L))
               (⊢cast (⊢cast (compile-preserve M ⊢M))) (⊢cast (⊢cast (compile-preserve N ⊢N))))
 ... | ⋆ | ⋆ | T of g′ =
   ⊢cast ♣
   where
   ♣ : _
   ♣ = subst (λ □ → Γ ; ∅ ; ⋆ ; pc ⊢
-               if! (compile L ⊢L ⟨ coerce (≲-ty {g₁ = ⋆} {S = ` Bool} ≾-⋆r ≲ᵣ-refl) p ⟩) T
+               if⋆ (compile L ⊢L ⟨ coerce (≲-ty {g₁ = ⋆} {S = ` Bool} ≾-⋆r ≲ᵣ-refl) p ⟩) T
                    ((compile M ⊢M ⟨ coerce A≲C p ⟩) ⟨ inject T g′ ⟩)
                    ((compile N ⊢N ⟨ coerce B≲C p ⟩) ⟨ inject T g′ ⟩) ⇐ □) (cong (_ of_) (sym (g⋎̃⋆≡⋆ {g′})))
-            (⊢if! (⊢cast (compile-preserve L ⊢L))
+            (⊢if⋆ (⊢cast (compile-preserve L ⊢L))
               (⊢cast (⊢cast (compile-preserve M ⊢M))) (⊢cast (⊢cast (compile-preserve N ⊢N))))
 compile-preserve (M ∶ A at p) (⊢ann ⊢M A′≲A) = ⊢cast (compile-preserve M ⊢M)
 compile-preserve (`let M `in N) (⊢let ⊢M ⊢N) = ⊢let (compile-preserve M ⊢M) (compile-preserve N ⊢N)
@@ -130,7 +130,7 @@ compile-preserve (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} {T = T} {g} ⊢M Tg�
 compile-preserve (! M at p) (⊢deref {A = A} {g} ⊢M)
   with g | A
 ... | l _ | T of g′ = ⊢deref  (compile-preserve M ⊢M) refl
-... | ⋆   | T of g′ rewrite g⋎̃⋆≡⋆ {g′} = ⊢deref! (⊢cast (compile-preserve M ⊢M))
+... | ⋆   | T of g′ rewrite g⋎̃⋆≡⋆ {g′} = ⊢deref⋆ (⊢cast (compile-preserve M ⊢M))
 compile-preserve (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ)
   with g≾ĝ | gc≾ĝ
 ... | ≾-l g≼ĝ | ≾-l gc≼ĝ =
