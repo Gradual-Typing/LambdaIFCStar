@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security
@@ -81,7 +80,7 @@ sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
                    ⇐ gc₁ ⊑ (gc′ ⋎̃ (l ℓ))
   prec = ⊑-castl (stampₑ-prec vc vc′ PC⊑PC′) d̅⊑gc′
 sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-app!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq′)
+    (⊑-app⋆l {ℓc = ℓc} {L = L} {L′} {M} {M′} {ℓ = ℓ} L⊑L′ M⊑M′ eq′)
     Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′
   with catchup {μ = μ} {PC} (V-raw V-ƛ) L⊑L′
 ... | ⟨ V , V-raw V-ƛ , L↠V , () ⟩
@@ -92,9 +91,9 @@ sim-app {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   with catchup {μ = μ} {PC} v′ (⊑-castl W⊑M′ c⊑A′)
 ...   | ⟨ W₁ , w₁ , W⟨c⟩↠W₁ , W₁⊑M′ ⟩ =
   let ⟨ PC₁ , vc₁ , ↠PC₁ , PC₁⊑stampPC′ ⟩ = catchupₑ (stampₑ-LVal vc′) prec in
-  let ♣ = trans-mult (plug-cong (app!□ M _ _) L↠V)
-              (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-              (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ↠PC₁ vc₁ (cast-reduction-inv w W⟨c⟩↠W₁ refl) w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+  let ♣ = trans-mult (plug-cong (app⋆□ M _ _) L↠V)
+              (trans-mult (plug-cong (app⋆ _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
+              (_ ∣ _ ∣ _ —→⟨ app⋆-cast w vc 𝓋 ↠PC₁ vc₁ (cast-reduction-inv w W⟨c⟩↠W₁ refl) w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
   ⟨ _ , ♣ ,
     ⊑-prot!l (⊑-castl (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑M′ w₁ v′)) d⊑B′)
              PC₁⊑stampPC′

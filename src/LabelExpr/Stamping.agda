@@ -26,19 +26,20 @@ open import LabelExpr.LabelExpr
 
 
 
-{- Normal stamping -}
+{- Stamping on label expressions -}
 stampₑ : ∀ V → LVal V → StaticLabel → LExpr
 stampₑ (l ℓ)       v-l low              = l ℓ
 stampₑ (l low)     v-l high             = l low ⟪ id (l low) ⨾ ↑ ⟫
 stampₑ (l high)    v-l high             = l high
 stampₑ (l ℓ ⟪ c̅ ⟫) (v-cast (ir 𝓋 _)) ℓ′ = l ℓ ⟪ stampₗ c̅ 𝓋 ℓ′ ⟫
 
-{- Injective stamping -}
+{- Stamping with injection -}
 stamp!ₑ : ∀ V → LVal V → StaticLabel → LExpr
 stamp!ₑ (l ℓ      ) v-l               ℓ′ = l ℓ ⟪ stamp!ₗ (id (l ℓ)) id ℓ′ ⟫
 stamp!ₑ (l ℓ ⟪ c̅ ⟫) (v-cast (ir 𝓋 _)) ℓ′ = l ℓ ⟪ stamp!ₗ c̅ 𝓋 ℓ′ ⟫
 
 
+{- Stamping is well-typed -}
 stampₑ-wt : ∀ {V g ℓ}
   → (v : LVal V)
   → ⊢ V ⇐ g
@@ -56,6 +57,7 @@ stamp!ₑ-wt v-l ⊢l                       = ⊢cast ⊢l
 stamp!ₑ-wt (v-cast (ir _ _)) (⊢cast ⊢l) = ⊢cast ⊢l
 
 
+{- Stamping on a label value returns another label value -}
 stampₑ-LVal : ∀ {V ℓ}
   → (v : LVal V)
   → LVal (stampₑ V v ℓ)
@@ -72,67 +74,7 @@ stamp!ₑ-LVal {_} {ℓ} v-l               = v-cast (ir (stamp!ₗ-CVal _ id ℓ
 stamp!ₑ-LVal {V} {ℓ} (v-cast (ir 𝓋 x)) = v-cast (ir (stamp!ₗ-CVal _ 𝓋 ℓ) λ ())
 
 
--- stamp⇒⋆↠LVal : ∀ {g ℓ V}
---   → (v : LVal V)
---   → ⊢ V ⇐ g
---     ----------------------------------------------------------------------
---   → ∃[ V′ ] (stampₑ V v ℓ ⟪ coerce (g ⋎̃ l ℓ) ⇒⋆ ⟫ —↠ₑ V′) × LVal V′
--- stamp⇒⋆↠LVal {ℓ = low} (v-l {ℓ}) ⊢l rewrite ℓ⋎low≡ℓ {ℓ} =
---   ⟨ _ ⟪ _ ⟫ , _ ∎ , v-cast (ir (inj id) (λ ())) ⟩
--- stamp⇒⋆↠LVal {ℓ = high} (v-l {low}) ⊢l =
---   ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = high} (v-l {high}) ⊢l =
---   ⟨ _ , _ ∎ , v-cast (ir (inj id) (λ ())) ⟩
--- stamp⇒⋆↠LVal (v-cast (ir id x)) ⊢V =
---   contradiction refl (recompute (¬? (_ ==? _)) x)
--- stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (inj id) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj id) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (id {l low})) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (id {l high})) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj id) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (inj id) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ id (inj id) ⟩ _ ∎ₗ) (inj id) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (inj (up id)) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (inj (up id)) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (inj (up id)) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ id (inj (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = low} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
---       _ ∎
--- stamp⇒⋆↠LVal {ℓ = high} (v-cast (ir (up id) _)) (⊢cast ⊢l) =
---   ⟨ _ , ♣ , v-cast (ir (inj (up id)) (λ ())) ⟩
---   where
---   ♣ = _ —→⟨ comp (ir (up id) (λ ())) ⟩
---       _ —→⟨ cast (_ —→ₗ⟨ ξ (id (up id)) ⟩ _ ∎ₗ) (inj (up id)) ⟩
---       _ ∎
-
-
+{- Stamping with the same security label preserves precision -}
 stampₑ-prec : ∀ {ℓ} {V V′ g g′}
   → (v  : LVal V)
   → (v′ : LVal V′)
@@ -165,6 +107,8 @@ stampₑ-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′
 ... | ⟨ refl , c̅⊑c̅′ ⟩ =
   ⊑-cast ⊑-l (stampₗ-prec 𝓋 𝓋′ c̅⊑c̅′)
 
+{- Stamping with different security labels preserves precision
+   if the left side stamps with injection -}
 stamp!ₑ-left-prec : ∀ {ℓ₁ ℓ₂} {V V′ g g′}
   → (v  : LVal V)
   → (v′ : LVal V′)
@@ -204,6 +148,8 @@ stamp!ₑ-left-prec (v-cast (ir 𝓋 _ )) (v-cast (ir 𝓋′ _)) M⊑M′ ℓ�
   with prec-inv M⊑M′
 ... | ⟨ refl , c̅⊑c̅′ ⟩ = ⊑-cast ⊑-l (stamp!ₗ-left-prec 𝓋 𝓋′ c̅⊑c̅′ ℓ₁≼ℓ₂)
 
+{- Stamping with injections on both sides preserves precision even
+   using different security labels -}
 stamp!ₑ-prec : ∀ {ℓ ℓ′} {V V′ g g′}
   → (v  : LVal V)
   → (v′ : LVal V′)

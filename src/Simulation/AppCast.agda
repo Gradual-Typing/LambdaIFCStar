@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.Security
 open import LabelExpr.Stamping
@@ -90,7 +89,7 @@ sim-app-cast {Σ} {Σ′} {.(l _)} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ 
                 eq eq′ ⟩
       ⟨ V-● , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
 sim-app-cast {Σ} {Σ′} {gc} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ = ℓ₁} {ℓ₂} {g₁} {g₂} vc vc′
-  (⊑-app!l L⊑L′ M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
+  (⊑-app⋆l L⊑L′ M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
   case catchup {μ = μ} {PC} v′ M⊑M′ of λ where
   ⟨ W , w , M↠W , W⊑M′ ⟩ →
     let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
@@ -111,9 +110,9 @@ sim-app-cast {Σ} {Σ′} {gc} {.(l _)} {μ = μ} {PC = PC} {PC′} {ℓ₁ = �
                 pc-prec = ⊑-cast (stamp!ₑ-left-prec vc vc′ PC⊑PC′ ∣c̅∣≼ℓ₂) d̅⊑d̅′ in
             let ⟨ PC₁ , vc₁ , ↠PC₁ , pc-prec′ ⟩ = sim-mult pc-prec ↠PC″ vc″ in
             let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑M′ w v′ c⊑c′ ↠W′ w′ in
-            let ♣ = trans-mult (plug-cong (app!□ _ _ _) L↠V)
-                    (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-                    (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+            let ♣ = trans-mult (plug-cong (app⋆□ _ _ _) L↠V)
+                    (trans-mult (plug-cong (app⋆ _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
+                    (_ ∣ _ ∣ _ —→⟨ app⋆-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
             ⟨ _ , ♣ ,
               ⊑-prot!l (⊑-cast (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑W′ w₁ w′)) d⊑d′)
                 pc-prec′ (stamp!-cast-security vc ⊢PC ↠PC₁ vc₁)

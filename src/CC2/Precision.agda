@@ -70,21 +70,21 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app L M A B ℓ ⊑ app L′ M′ A′ B′ ℓ ⇐ C ⊑ C′
 
 
-  ⊑-app! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′} {A A′ T T′}
+  ⊑-app⋆ : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′} {A A′ T T′}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆ ⊑ ⟦ ⋆ ⟧ A′ ⇒ (T′ of ⋆) of ⋆
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
       -------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ app! L M A T ⊑ app! L′ M′ A′ T′ ⇐ T of ⋆ ⊑ T′ of ⋆
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ app⋆ L M A T ⊑ app⋆ L′ M′ A′ T′ ⇐ T of ⋆ ⊑ T′ of ⋆
 
 
-  ⊑-app!l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′} {A A′ T B′ C′ ℓ}
+  ⊑-app⋆l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′} {A A′ T B′ C′ ℓ}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆ ⊑ ⟦ l (ℓc ⋎ ℓ) ⟧ A′ ⇒ B′ of l ℓ
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ A ⊑ A′
     → C′ ≡ stamp B′ (l ℓ)
       -------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app! L M A T ⊑ app L′ M′ A′ B′ ℓ ⇐ T of ⋆ ⊑ C′
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ app⋆ L M A T ⊑ app L′ M′ A′ B′ ℓ ⇐ T of ⋆ ⊑ C′
 
 
   ⊑-if : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {L L′ M M′ N N′} {A A′ B B′ ℓ}
@@ -100,7 +100,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ l ℓc ; l ℓc ∣ ℓv ; ℓv′ ⊢ if L A ℓ M N ⊑ if L′ A′ ℓ M′ N′ ⇐ B ⊑ B′
 
 
-  ⊑-if! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′ N N′} {T T′}
+  ⊑-if⋆ : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {L L′ M M′ N N′} {T T′}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ ` Bool of ⋆ ⊑ ` Bool of ⋆
     → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; ⋆ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
@@ -108,10 +108,10 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; ⋆ ∣ ℓv ; ℓv′ ⊢ N ⊑ N′
          ⇐ T of ⋆ ⊑ T′ of ⋆)
       -------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ if! L T M N ⊑ if! L′ T′ M′ N′ ⇐ T of ⋆ ⊑ T′ of ⋆
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ if⋆ L T M N ⊑ if⋆ L′ T′ M′ N′ ⇐ T of ⋆ ⊑ T′ of ⋆
 
 
-  ⊑-if!l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′ N N′} {T A′ B′ ℓ}
+  ⊑-if⋆l : ∀ {Γ Γ′ Σ Σ′ gc ℓc ℓv ℓv′} {L L′ M M′ N N′} {T A′ B′ ℓ}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ L ⊑ L′
          ⇐ ` Bool of ⋆ ⊑ ` Bool of l ℓ
     → (∀ {ℓv ℓv′} → Γ ; Γ′ ∣ Σ ; Σ′ ∣ ⋆ ; l (ℓc ⋎ ℓ) ∣ ℓv ; ℓv′ ⊢ M ⊑ M′
@@ -120,7 +120,7 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
          ⇐ T of ⋆ ⊑ A′)
     → B′ ≡ stamp A′ (l ℓ)
       -------------------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ if! L T M N ⊑ if L′ A′ ℓ M′ N′ ⇐ T of ⋆ ⊑ B′
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; l ℓc ∣ ℓv ; ℓv′ ⊢ if⋆ L T M N ⊑ if L′ A′ ℓ M′ N′ ⇐ T of ⋆ ⊑ B′
 
 
   ⊑-let : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′ N N′} {A A′ B B′}
@@ -163,17 +163,17 @@ data _;_∣_;_∣_;_∣_;_⊢_⊑_⇐_⊑_ : (Γ Γ′ : Context) (Σ Σ′ 
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ ! M A ℓ ⊑ ! M′ A′ ℓ ⇐ B ⊑ B′
 
 
-  ⊑-deref! : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {T T′}
+  ⊑-deref⋆ : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {T T′}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ Ref (T of ⋆) of ⋆ ⊑ Ref (T′ of ⋆) of ⋆
       ----------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ !! M T ⊑ !! M′ T′ ⇐ T of ⋆ ⊑ T′ of ⋆
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ !⋆ M T ⊑ !⋆ M′ T′ ⇐ T of ⋆ ⊑ T′ of ⋆
 
 
-  ⊑-deref!l : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {T A′ B′ ℓ}
+  ⊑-deref⋆l : ∀ {Γ Γ′ Σ Σ′ gc gc′ ℓv ℓv′} {M M′} {T A′ B′ ℓ}
     → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ M′ ⇐ Ref (T of ⋆) of ⋆ ⊑ Ref A′ of l ℓ
     → B′ ≡ stamp A′ (l ℓ)
       ----------------------------------------------------------------------------------
-    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ !! M T ⊑ ! M′ A′ ℓ ⇐ T of ⋆ ⊑ B′
+    → Γ ; Γ′ ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ !⋆ M T ⊑ ! M′ A′ ℓ ⇐ T of ⋆ ⊑ B′
 
 
   ⊑-assign : ∀ {Γ Γ′ Σ Σ′ ℓc ℓv ℓv′} {L L′ M M′} {T T′ ℓ̂ ℓ}
@@ -303,18 +303,18 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app {C = C} {C′} L⊑L′ M⊑M′ eq e
     let C⊑C′ : C ⊑ C′
         C⊑C′ = subst₂ _⊑_ (sym eq) (sym eq′) (stamp-⊑ B⊑B′ l⊑l) in
     ⟨ ⊢app ⊢L ⊢M eq , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app! {T = T} {T′} L⊑L′ M⊑M′) =
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app⋆ {T = T} {T′} L⊑L′ M⊑M′) =
   let ⟨ ⊢L , ⊢L′ , A→B⊑A′→B′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
   let ⟨ ⊢M , ⊢M′ , _           ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   case A→B⊑A′→B′ of λ where
-  (⊑-ty ⋆⊑ (⊑-fun ⋆⊑ A⊑A′ B⊑B′)) → ⟨ ⊢app! ⊢L ⊢M , ⊢app! ⊢L′ ⊢M′ , B⊑B′ ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app!l {T = T} {C′ = C′} L⊑L′ M⊑M′ eq′) =
+  (⊑-ty ⋆⊑ (⊑-fun ⋆⊑ A⊑A′ B⊑B′)) → ⟨ ⊢app⋆ ⊢L ⊢M , ⊢app⋆ ⊢L′ ⊢M′ , B⊑B′ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-app⋆l {T = T} {C′ = C′} L⊑L′ M⊑M′ eq′) =
   let ⟨ ⊢L , ⊢L′ , A→B⊑A′→B′ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
   let ⟨ ⊢M , ⊢M′ , _           ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   case A→B⊑A′→B′ of λ where
   (⊑-ty ⋆⊑ (⊑-fun ⋆⊑ A⊑A′ B⊑B′)) →
     let C⊑C′ = subst (_ ⊑_) (sym eq′) (stamp-⊑ B⊑B′ l⊑l) in
-    ⟨ ⊢app! ⊢L ⊢M , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
+    ⟨ ⊢app⋆ ⊢L ⊢M , ⊢app ⊢L′ ⊢M′ eq′ , C⊑C′ ⟩
 {- If -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if L⊑L′ M⊑M′ N⊑N′ eq eq′) rewrite eq | eq′ =
   let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
@@ -323,20 +323,20 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if L⊑L′ M⊑M′ N⊑N′ eq eq′) r
   ⟨ ⊢if ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) refl ,
     ⊢if ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) refl ,
     stamp-⊑ (proj₂ (proj₂ (ihm low low))) l⊑l ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if! L⊑L′ M⊑M′ N⊑N′) =
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if⋆ L⊑L′ M⊑M′ N⊑N′) =
   let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
   let ihm = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   let ihn = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ N⊑N′ in
   case ihm low low of λ where
   ⟨ _ , _ , T⋆⊑T′⋆ ⟩ →
-    ⟨ ⊢if! ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) ,
-      ⊢if! ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) ,
+    ⟨ ⊢if⋆ ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) ,
+      ⊢if⋆ ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) ,
       T⋆⊑T′⋆ ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ eq′) rewrite eq′ =
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-if⋆l L⊑L′ M⊑M′ N⊑N′ eq′) rewrite eq′ =
   let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in
   let ihm = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ M⊑M′ in
   let ihn = λ ℓv ℓv′ → cc-prec-inv {ℓv = ℓv} {ℓv′} Γ⊑Γ′ Σ⊑Σ′ N⊑N′ in
-  ⟨ ⊢if! ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) ,
+  ⟨ ⊢if⋆ ⊢L (proj₁ (ihm _ low)) (proj₁ (ihn _ low)) ,
     ⊢if  ⊢L′ (proj₁ (proj₂ (ihm low _))) (proj₁ (proj₂ (ihn low _))) refl ,
     stamp-⊑ (proj₂ (proj₂ (ihm low low))) ⋆⊑ ⟩
 {- Let -}
@@ -361,14 +361,14 @@ cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref M⊑M′ eq eq′) rewrite eq | eq�
   case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
   ⟨ ⊢M , ⊢M′ , ⊑-ty _ (⊑-ref A⊑A′) ⟩ →
     ⟨ ⊢deref ⊢M refl , ⊢deref ⊢M′ refl , stamp-⊑ A⊑A′ l⊑l ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref! M⊑M′) =
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref⋆ M⊑M′) =
   case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
   ⟨ ⊢M , ⊢M′ , ⊑-ty _ (⊑-ref T⋆⊑T′⋆) ⟩ →
-    ⟨ ⊢deref! ⊢M , ⊢deref! ⊢M′ , T⋆⊑T′⋆ ⟩
-cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref!l M⊑M′ eq′) rewrite eq′ =
+    ⟨ ⊢deref⋆ ⊢M , ⊢deref⋆ ⊢M′ , T⋆⊑T′⋆ ⟩
+cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-deref⋆l M⊑M′ eq′) rewrite eq′ =
   case cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ M⊑M′ of λ where
   ⟨ ⊢M , ⊢M′ , ⊑-ty _ (⊑-ref A⊑A′) ⟩ →
-    ⟨ ⊢deref! ⊢M , ⊢deref ⊢M′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
+    ⟨ ⊢deref⋆ ⊢M , ⊢deref ⊢M′ refl , stamp-⊑ A⊑A′ ⋆⊑ ⟩
 {- Assignment -}
 cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ (⊑-assign L⊑L′ M⊑M′ ℓc≼ℓ̂ ℓ≼ℓ̂) =
   let ⟨ ⊢L , ⊢L′ , _ ⟩ = cc-prec-inv Γ⊑Γ′ Σ⊑Σ′ L⊑L′ in

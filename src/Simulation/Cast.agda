@@ -17,7 +17,7 @@ open import Common.Utils
 open import Memory.HeapContext
 open import CoercionExpr.CoercionExpr using (det-mult; success; fail)
 open import CoercionExpr.Precision
-  using (coerce⇒⋆-prec; ⊑-right-contract; ⊑-right-expand; ⊑-left-contract; ⊑-left-expand)
+  using (⊑-right-contract; ⊑-right-expand; ⊑-left-contract; ⊑-left-expand)
 open import CoercionExpr.SyntacComp
 open import CoercionExpr.GG renaming (catchup to catchupₗ; catchup-back to catchupₗ-back)
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)

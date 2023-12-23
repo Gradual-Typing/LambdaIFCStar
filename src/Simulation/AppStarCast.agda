@@ -1,4 +1,4 @@
-module Simulation.App!Cast where
+module Simulation.AppStarCast where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.Security
 open import LabelExpr.Stamping
@@ -32,13 +31,13 @@ open import Memory.Heap Term Value hiding (Addr; a⟦_⟧_)
 open import Simulation.SimCast
 
 
-sim-app!-cast : ∀ {Σ Σ′ gc gc′} {M N′ V′ W′ μ μ′ PC PC′ PC″} {A A′ B′ C′ D′ T′} {ℓ g}
+sim-app⋆-cast : ∀ {Σ Σ′ gc gc′} {M N′ V′ W′ μ μ′ PC PC′ PC″} {A A′ B′ C′ D′ T′} {ℓ g}
                     {c : Cast D′ ⇒ B′} {d : Cast C′ ⇒ T′ of ⋆} {d̅ : CExpr ⋆ ⇒ g} {c̅ : CExpr l ℓ ⇒ ⋆}
     → (vc  : LVal PC)
     → (vc′ : LVal PC′)
     → let ℓv  = ∥ PC  ∥ vc  in
        let ℓv′ = ∥ PC′ ∥ vc′ in
-       [] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ app! (ƛ N′ ⟨ cast (fun d̅ c d) c̅ ⟩) V′ D′ T′ ⇐ A ⊑ A′
+       [] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢ M ⊑ app⋆ (ƛ N′ ⟨ cast (fun d̅ c d) c̅ ⟩) V′ D′ T′ ⇐ A ⊑ A′
     → Σ ⊑ₘ Σ′
     → Σ ; Σ′ ⊢ μ ⊑ μ′
     → PC ⊑ PC′ ⇐ gc ⊑ gc′
@@ -55,8 +54,8 @@ sim-app!-cast : ∀ {Σ Σ′ gc gc′} {M N′ V′ W′ μ μ′ PC PC′ PC�
               [] ; [] ∣ Σ ; Σ′ ∣ gc ; gc′ ∣ ℓv ; ℓv′ ⊢
                      N ⊑ prot PC″ vc″ ℓ′ ((N′ [ W′ ]) ⟨ d ⟩) (T′ of ⋆)
                   ⇐ A ⊑ A′
-sim-app!-cast {Σ} {Σ′} {μ = μ} {PC = PC} {PC′} {ℓ = ℓ} {g} vc vc′
-  (⊑-app! L⊑L′ M⊑V′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
+sim-app⋆-cast {Σ} {Σ′} {μ = μ} {PC = PC} {PC′} {ℓ = ℓ} {g} vc vc′
+  (⊑-app⋆ L⊑L′ M⊑V′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
   let ⟨ ⊢PC , ⊢PC′ ⟩ = prec→⊢ PC⊑PC′ in
   case catchup {μ = μ} {PC} v′ M⊑V′ of λ where
   ⟨ W , w , M↠W , W⊑M′ ⟩ →
@@ -75,9 +74,9 @@ sim-app!-cast {Σ} {Σ′} {μ = μ} {PC = PC} {PC′} {ℓ = ℓ} {g} vc vc′
                 pc-prec = ⊑-cast (stamp!ₑ-prec vc vc′ PC⊑PC′ ∣c̅∣≼∣c̅′∣) d̅⊑d̅′ in
             let ⟨ PC₁ , vc₁ , ↠PC₁ , pc-prec′ ⟩ = sim-mult pc-prec ↠PC″ vc″ in
             let ⟨ W₁ , w₁ , ↠W₁ , W₁⊑W′ ⟩ = sim-cast W⊑M′ w v′ c⊑c′ ↠W′ w′ in
-            let ♣ = trans-mult (plug-cong (app!□ _ _ _) L↠V)
-                    (trans-mult (plug-cong (app! _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
-                    (_ ∣ _ ∣ _ —→⟨ app!-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
+            let ♣ = trans-mult (plug-cong (app⋆□ _ _ _) L↠V)
+                    (trans-mult (plug-cong (app⋆ _ □ (V-cast V-ƛ (ir-fun 𝓋)) _ _) M↠W)
+                    (_ ∣ _ ∣ _ —→⟨ app⋆-cast w vc 𝓋 ↠PC₁ vc₁ ↠W₁ w₁ ⟩ _ ∣ _ ∣ _ ∎)) in
             ⟨ _ , ♣ ,
               ⊑-prot! (⊑-cast (substitution-pres-⊑ ⊑*-∅ Σ⊑Σ′ N⊑N′ (value-⊑-pc W₁⊑W′ w₁ w′)) d⊑d′)
                 pc-prec′
@@ -85,7 +84,7 @@ sim-app!-cast {Σ} {Σ′} {μ = μ} {PC = PC} {PC′} {ℓ = ℓ} {g} vc vc′
                 (stamp!-cast-security vc′ ⊢PC′ ↠PC″ vc″)
                 ∣c̅∣≼∣c̅′∣ ⟩
       ⟨ V-● , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
-sim-app!-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
-  case sim-app!-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ of λ where
+sim-app⋆-cast vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ =
+  case sim-app⋆-cast vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ ↠PC″ vc″ ↠W′ w′ of λ where
   ⟨ N , M↠N , N⊑N′ ⟩ →
     ⟨ N ⟨ c ⟩ , plug-cong □⟨ c ⟩ M↠N , ⊑-castl N⊑N′ c⊑A′ ⟩

@@ -1,4 +1,4 @@
-module CoercionExpr.SimBackCast↑ where
+module CoercionExpr.SimBackCastUp where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

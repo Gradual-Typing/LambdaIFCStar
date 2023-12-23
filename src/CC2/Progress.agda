@@ -78,29 +78,29 @@ progress {M = app L M A B ℓ} vc ⊢PC (⊢app ⊢L ⊢M eq) ⊢μ =
             step (app-cast w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠V′ v′)
         ⟨ bl p , ↠blame , fail ⟩ →
           step (app-blame-pc w vc 𝓋 ↠blame)
-progress {M = app! L M A B} vc ⊢PC (⊢app! ⊢L ⊢M) ⊢μ =
+progress {M = app⋆ L M A B} vc ⊢PC (⊢app⋆ ⊢L ⊢M) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
-  (step L→L′)  → step (ξ {F = app!□ M A B} L→L′)
-  (err E-blame) → step (ξ-blame {F = app!□ M A B})
+  (step L→L′)  → step (ξ {F = app⋆□ M A B} L→L′)
+  (err E-blame) → step (ξ-blame {F = app⋆□ M A B})
   (done (V-raw v)) →
     case ⟨ v , ⊢L ⟩ of λ where ⟨ V-ƛ , () ⟩
   (done (V-cast v i)) →
     case ⟨ v , ⊢L , i ⟩ of λ where
     ⟨ V-ƛ , ⊢cast {c = cast (fun d̅ c d) c̅ₙ} (⊢lam ⊢N) , ir-fun 𝓋 ⟩ →
       case progress vc ⊢PC ⊢M ⊢μ of λ where
-      (step M→M′) → step (ξ {F = app! L □ (V-cast v i) A B} M→M′)
-      (err E-blame) → step (ξ-blame {F = app! L □ (V-cast v i) A B})
+      (step M→M′) → step (ξ {F = app⋆ L □ (V-cast v i) A B} M→M′)
+      (err E-blame) → step (ξ-blame {F = app⋆ L □ (V-cast v i) A B})
       (done w) →
         case lexpr-sn (stamp!ₑ _ vc _ ⟪ d̅ ⟫)
                       (⊢cast (stamp!ₑ-wt vc ⊢PC)) of λ where
         ⟨ PC′ , ↠PC′ , success vc′ ⟩ →
           case cast-sn {c = c} w ⊢M of λ where
           ⟨ blame p , V⟨c⟩↠blame , fail ⟩ →
-            step (app!-blame w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠blame)
+            step (app⋆-blame w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠blame)
           ⟨ V′ , V⟨c⟩↠V′ , success v′ ⟩ →
-            step (app!-cast w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠V′ v′)
+            step (app⋆-cast w vc 𝓋 ↠PC′ vc′ V⟨c⟩↠V′ v′)
         ⟨ bl p , ↠blame , fail ⟩ →
-          step (app!-blame-pc w vc 𝓋 ↠blame)
+          step (app⋆-blame-pc w vc 𝓋 ↠blame)
 progress {M = if L A ℓ M N} vc ⊢PC (⊢if ⊢L ⊢M ⊢N eq) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = if□ A ℓ M N} L→L′)
@@ -116,18 +116,18 @@ progress {M = if L A ℓ M N} vc ⊢PC (⊢if ⊢L ⊢M ⊢N eq) ⊢μ =
       step (if-true-cast  vc)
     ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base (up id) x ⟩ →
       step (if-false-cast vc)
-progress {M = if! L A M N} vc ⊢PC (⊢if! ⊢L ⊢M ⊢N) ⊢μ =
+progress {M = if⋆ L A M N} vc ⊢PC (⊢if⋆ ⊢L ⊢M ⊢N) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
-  (step L→L′)  → step (ξ {F = if!□ A M N} L→L′)
-  (err E-blame) → step (ξ-blame {F = if!□ A M N})
+  (step L→L′)  → step (ξ {F = if⋆□ A M N} L→L′)
+  (err E-blame) → step (ξ-blame {F = if⋆□ A M N})
   (done (V-raw v)) →
     case ⟨ v , ⊢L ⟩ of λ where ⟨ V-const , () ⟩  {- impossible -}
   (done (V-cast v i)) →
     case ⟨ v , ⊢L , i ⟩ of λ where
     ⟨ V-const {k =  true} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
-        step (if!-true-cast vc 𝓋)
+        step (if⋆-true-cast vc 𝓋)
     ⟨ V-const {k = false} , ⊢cast ⊢const , ir-base 𝓋 x ⟩ →
-        step (if!-false-cast vc 𝓋)
+        step (if⋆-false-cast vc 𝓋)
 progress {M = `let M A N} vc ⊢PC (⊢let ⊢M ⊢N) ⊢μ =
   case progress vc ⊢PC ⊢M ⊢μ of λ where
   (step M→M′)  → step (ξ {F = let□ A N} M→M′)
@@ -165,16 +165,16 @@ progress {M = ! M A g} {μ} vc ⊢PC (⊢deref ⊢M x) ⊢μ =
     ⟨ V-addr {n} , ⊢cast (⊢addr {ℓ̂ = ℓ̂} eq) , ir-ref 𝓋 ⟩ →
       let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
       step (deref-cast {v = v} 𝓋 eq)
-progress {M = !! M A} {μ} vc ⊢PC (⊢deref! ⊢M) ⊢μ =
+progress {M = !⋆ M A} {μ} vc ⊢PC (⊢deref⋆ ⊢M) ⊢μ =
   case progress vc ⊢PC ⊢M ⊢μ of λ where
-  (step M→M′)  → step (ξ {F = !!□ A} M→M′)
-  (err E-blame) → step (ξ-blame {F = !!□ A})
+  (step M→M′)  → step (ξ {F = !⋆□ A} M→M′)
+  (err E-blame) → step (ξ-blame {F = !⋆□ A})
   (done (V-raw (V-addr {n}))) → case ⊢M of λ where ()  {- impossible -}
   (done (V-cast v i)) →
     case ⟨ v , ⊢M , i ⟩ of λ where
     ⟨ V-addr {n} , ⊢cast (⊢addr {ℓ̂ = ℓ̂} eq) , ir-ref 𝓋 ⟩ →
       let ⟨ wf , V , v , eq , ⊢V ⟩ = ⊢μ n ℓ̂ eq in
-      step (deref!-cast {v = v} 𝓋 eq)
+      step (deref⋆-cast {v = v} 𝓋 eq)
 progress {M = assign L M T ℓ̂ ℓ} {μ} vc ⊢PC (⊢assign ⊢L ⊢M _ _) ⊢μ =
   case progress vc ⊢PC ⊢L ⊢μ of λ where
   (step L→L′)  → step (ξ {F = assign□ M T ℓ̂ ℓ} L→L′)

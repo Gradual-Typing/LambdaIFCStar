@@ -54,11 +54,11 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ app L M A B ℓ ⇐ C
 
 
-  ⊢app! : ∀ {Γ Σ gc ℓv A T L M}
+  ⊢app⋆ : ∀ {Γ Σ gc ℓv A T L M}
     → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ A
       ------------------------------------------------------ App!
-    → Γ ; Σ ; gc ; ℓv ⊢ app! L M A T ⇐ T of ⋆
+    → Γ ; Σ ; gc ; ℓv ⊢ app⋆ L M A T ⇐ T of ⋆
 
 
   ⊢if : ∀ {Γ Σ ℓc ℓv A B L M N ℓ}
@@ -70,12 +70,12 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; l ℓc ; ℓv ⊢ if L A ℓ M N ⇐ B
 
 
-  ⊢if! : ∀ {Γ Σ gc ℓv T L M N}
+  ⊢if⋆ : ∀ {Γ Σ gc ℓv T L M N}
     → Γ ; Σ ; gc ; ℓv ⊢ L ⇐ ` Bool of ⋆
     → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ M ⇐ T of ⋆)
     → (∀ {ℓv} → Γ ; Σ ; ⋆ ; ℓv ⊢ N ⇐ T of ⋆)
       --------------------------------------------------------- If!
-    → Γ ; Σ ; gc ; ℓv ⊢ if! L T M N ⇐ T of ⋆
+    → Γ ; Σ ; gc ; ℓv ⊢ if⋆ L T M N ⇐ T of ⋆
 
 
   ⊢let : ∀ {Γ Σ gc ℓv M N A B}
@@ -105,10 +105,10 @@ data _;_;_;_⊢_⇐_ : Context → HeapContext → Label → StaticLabel → 
     → Γ ; Σ ; gc ; ℓv ⊢ ! M A ℓ ⇐ B
 
 
-  ⊢deref! : ∀ {Γ Σ gc ℓv M T}
+  ⊢deref⋆ : ∀ {Γ Σ gc ℓv M T}
     → Γ ; Σ ; gc ; ℓv ⊢ M ⇐ Ref (T of ⋆) of ⋆
       ------------------------------------- Deref!
-    → Γ ; Σ ; gc ; ℓv ⊢ !! M T ⇐ T of ⋆
+    → Γ ; Σ ; gc ; ℓv ⊢ !⋆ M T ⇐ T of ⋆
 
 
   ⊢assign : ∀ {Γ Σ ℓc ℓv L M T ℓ ℓ̂}

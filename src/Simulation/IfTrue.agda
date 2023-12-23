@@ -54,13 +54,13 @@ sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   ⟨ $ true ⟨ cast (id ι) c̅ ⟩ , V-cast V-const (ir-base id x) , L↠V , ⊑-castl ⊑-const (⊑-base c̅⊑g′) ⟩ →
     contradiction refl x
 sim-if-true {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-if!l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq′)
+    (⊑-if⋆l {ℓc = ℓc} {L = L} {L′} {M} {M′} {N} {N′} {ℓ = ℓ} L⊑L′ M⊑M′ N⊑N′ eq′)
     Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq =
   case catchup {μ = μ} {PC} (V-raw V-const) L⊑L′ of λ where
   ⟨ $ _ , V-raw V-const , L↠V , () ⟩
   ⟨ $ true ⟨ cast (id ι) c̅ ⟩ , V-cast V-const (ir-base (inj 𝓋) x) , L↠V , ⊑-castl ⊑-const (⊑-base c̅⊑g′) ⟩ →
-    ⟨ _ , trans-mult (plug-cong (if!□ _ _ _) L↠V)
-                     (_ ∣ _ ∣ _ —→⟨ if!-true-cast vc (inj 𝓋) ⟩ _ ∣ _ ∣ _ ∎) ,
+    ⟨ _ , trans-mult (plug-cong (if⋆□ _ _ _) L↠V)
+                     (_ ∣ _ ∣ _ —→⟨ if⋆-true-cast vc (inj 𝓋) ⟩ _ ∣ _ ∣ _ ∎) ,
       (let ∣c̅∣≼ℓ′ = ≡→≼ (security-prec-left _ (inj 𝓋) c̅⊑g′) in
        ⊑-prot!l M⊑M′ (stamp!ₑ-left-prec vc vc′ PC⊑PC′ ∣c̅∣≼ℓ′)
                (≡→≼ (stamp!ₑ-security vc)) (≡→≼ (stampₑ-security vc′))

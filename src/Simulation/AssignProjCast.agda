@@ -1,4 +1,4 @@
-module Simulation.Assign?Cast where
+module Simulation.AssignProjCast where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security

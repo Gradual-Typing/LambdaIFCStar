@@ -36,18 +36,18 @@ plug-inv (app□ M A B _) (⊢app ⊢L ⊢M eq) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢app ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) eq) ⟩
 plug-inv (app V □ x A B _) (⊢app ⊢L ⊢M eq) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢app (relax-Σ ⊢L Σ′⊇Σ) ⊢M′ eq) ⟩
-plug-inv (app!□ M A B) (⊢app! ⊢L ⊢M) =
-  ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢app! ⊢L′ (relax-Σ ⊢M Σ′⊇Σ)) ⟩
-plug-inv (app! V □ x A B) (⊢app! ⊢L ⊢M) =
-  ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢app! (relax-Σ ⊢L Σ′⊇Σ) ⊢M′) ⟩
+plug-inv (app⋆□ M A B) (⊢app⋆ ⊢L ⊢M) =
+  ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢app⋆ ⊢L′ (relax-Σ ⊢M Σ′⊇Σ)) ⟩
+plug-inv (app⋆ V □ x A B) (⊢app⋆ ⊢L ⊢M) =
+  ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢app⋆ (relax-Σ ⊢L Σ′⊇Σ) ⊢M′) ⟩
 plug-inv ref⟦ ℓ ⟧□ (⊢ref ⊢M x) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢ref ⊢M′ x) ⟩
 plug-inv (ref?⟦ ℓ ⟧□ p) (⊢ref? ⊢M) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢ref? ⊢M′) ⟩
 plug-inv (!□ A g) (⊢deref ⊢M eq) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢deref ⊢M′ eq) ⟩
-plug-inv (!!□ A) (⊢deref! ⊢M) =
-  ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢deref! ⊢M′) ⟩
+plug-inv (!⋆□ A) (⊢deref⋆ ⊢M) =
+  ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢deref⋆ ⊢M′) ⟩
 plug-inv (assign□ M _ ℓ̂ ℓ) (⊢assign ⊢L ⊢M x y) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢assign ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) x y) ⟩
 plug-inv (assign V □ _ _ ℓ̂ ℓ) (⊢assign ⊢L ⊢M x y) =
@@ -60,8 +60,8 @@ plug-inv (let□ _ _) (⊢let ⊢M ⊢N) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢let ⊢M′ (relax-Σ ⊢N Σ′⊇Σ)) ⟩
 plug-inv (if□ _ _ M N) (⊢if ⊢L ⊢M ⊢N eq) =
   ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢if ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ) eq) ⟩
-plug-inv (if!□ _ M N) (⊢if! ⊢L ⊢M ⊢N) =
-  ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢if! ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)) ⟩
+plug-inv (if⋆□ _ M N) (⊢if⋆ ⊢L ⊢M ⊢N) =
+  ⟨ _ , ⊢L , (λ ⊢L′ Σ′⊇Σ → ⊢if⋆ ⊢L′ (relax-Σ ⊢M Σ′⊇Σ) (relax-Σ ⊢N Σ′⊇Σ)) ⟩
 plug-inv □⟨ c ⟩ (⊢cast ⊢M) =
   ⟨ _ , ⊢M , (λ ⊢M′ Σ′⊇Σ → ⊢cast ⊢M′) ⟩
 
@@ -108,15 +108,15 @@ pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-blame-pc 
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢app (⊢cast (⊢lam ⊢N)) ⊢V eq) ⊢μ (app-blame v vc† 𝓋 ↠PC′ vc′ ↠blame) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V) ⊢μ (app!-cast v vc† 𝓋 ↠PC′ vc′ ↠W w)
+pres {Σ} vc ⊢PC (⊢app⋆ (⊢cast (⊢lam ⊢N)) ⊢V) ⊢μ (app⋆-cast v vc† 𝓋 ↠PC′ vc′ ↠W w)
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ ,
     ⊢prot (⊢cast (substitution-pres ⊢N (⊢value-pc (cast-pres-mult (⊢cast ⊢V) ↠W) w)))
                  (preserve-mult (⊢cast (stamp!ₑ-wt vc† ⊢PC)) ↠PC′)
                  (stamp!-cast-security vc† ⊢PC ↠PC′ vc′) refl , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V) ⊢μ (app!-blame-pc v vc† 𝓋 ↠PC′) =
+pres {Σ} vc ⊢PC (⊢app⋆ (⊢cast (⊢lam ⊢N)) ⊢V) ⊢μ (app⋆-blame-pc v vc† 𝓋 ↠PC′) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢app! (⊢cast (⊢lam ⊢N)) ⊢V) ⊢μ (app!-blame v vc† 𝓋 ↠PC′ vc′ ↠blame) =
+pres {Σ} vc ⊢PC (⊢app⋆ (⊢cast (⊢lam ⊢N)) ⊢V) ⊢μ (app⋆-blame v vc† 𝓋 ↠PC′ vc′ ↠blame) =
   ⟨ Σ , ⊇-refl Σ , ⊢blame , ⊢μ ⟩
 {- If -}
 pres {Σ} vc ⊢PC (⊢if ⊢const ⊢M ⊢N eq) ⊢μ (β-if-true vc†)
@@ -131,10 +131,10 @@ pres {Σ} vc ⊢PC (⊢if (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ (if-true-cast v
 pres {Σ} vc ⊢PC (⊢if (⊢cast ⊢const) ⊢M ⊢N eq) ⊢μ (if-false-cast vc†)
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢N (stampₑ-wt vc† ⊢PC) (≡→≼ (stampₑ-security vc†)) eq , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N) ⊢μ (if!-true-cast vc† 𝓋)
+pres {Σ} vc ⊢PC (⊢if⋆ (⊢cast ⊢const) ⊢M ⊢N) ⊢μ (if⋆-true-cast vc† 𝓋)
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢M (stamp!ₑ-wt vc† ⊢PC) (≡→≼ (stamp!ₑ-security vc†)) refl , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢if! (⊢cast ⊢const) ⊢M ⊢N) ⊢μ (if!-false-cast vc† 𝓋)
+pres {Σ} vc ⊢PC (⊢if⋆ (⊢cast ⊢const) ⊢M ⊢N) ⊢μ (if⋆-false-cast vc† 𝓋)
   rewrite uniq-LVal vc vc† =
   ⟨ Σ , ⊇-refl Σ , ⊢prot ⊢N (stamp!ₑ-wt vc† ⊢PC) (≡→≼ (stamp!ₑ-security vc†)) refl , ⊢μ ⟩
 pres {Σ} vc ⊢PC (⊢let ⊢V ⊢N) ⊢μ (β-let v) =
@@ -156,7 +156,7 @@ pres {Σ} vc ⊢PC (⊢deref (⊢cast (⊢addr hit)) eq) ⊢μ (deref-cast {ℓ�
   let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
   case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
   refl → ⟨ Σ , ⊇-refl Σ , ⊢prot (⊢cast (⊢value-pc ⊢V† v†)) ⊢l (_ ≼high) eq , ⊢μ ⟩
-pres {Σ} vc ⊢PC (⊢deref! (⊢cast (⊢addr hit))) ⊢μ (deref!-cast {ℓ̂ = ℓ̂} {n = n} 𝓋 μa≡V) =
+pres {Σ} vc ⊢PC (⊢deref⋆ (⊢cast (⊢addr hit))) ⊢μ (deref⋆-cast {ℓ̂ = ℓ̂} {n = n} 𝓋 μa≡V) =
   let ⟨ wf , V† , v† , μa≡V† , ⊢V† ⟩ = ⊢μ n ℓ̂ hit in
   case trans (sym μa≡V) μa≡V† of λ where {- V ≡ V† -}
   refl → ⟨ Σ , ⊇-refl Σ , ⊢prot (⊢cast (⊢value-pc ⊢V† v†)) ⊢l (_ ≼high) refl , ⊢μ ⟩

@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security
@@ -65,14 +64,14 @@ sim-deref {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   refl → ⟨ _ , trans-mult (plug-cong (!□ _ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
             ⊑-prot (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq eq′ ⟩
 sim-deref {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-    (⊑-deref!l M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ μ′a≡V′
+    (⊑-deref⋆l M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ μ′a≡V′
   with catchup {μ = μ} {PC} (V-raw V-addr) M⊑M′
 ... | ⟨ addr _ , V-raw V-addr , L↠V , () ⟩
 ... | ⟨ addr _ ⟨ cast (ref c d) c̅ ⟩ , V-cast V-addr (ir-ref 𝓋) ,
         L↠V , ⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ} a b) (⊑-ref c⊑A′ d⊑A′ c̅⊑g′) ⟩ =
   let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ a b in
   case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
-  refl → ⟨ _ , trans-mult (plug-cong (!!□ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
+  refl → ⟨ _ , trans-mult (plug-cong (!⋆□ _) L↠V) (_ ∣ _ ∣ _ —→⟨ deref⋆-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎ ) ,
             ⊑-prot!l (⊑-castl (value-⊑-pc V⊑V′ v v′) d⊑A′) ⊑-l (_ ≼high) (_ ≼high) eq′ (≡→≼ (security-prec-left _ 𝓋 c̅⊑g′)) ⟩
 sim-deref vc vc′ (⊑-castl {c = c} M⊑M′ c⊑A′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ x
   with sim-deref vc vc′ M⊑M′ Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ x

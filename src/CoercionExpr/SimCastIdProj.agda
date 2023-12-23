@@ -1,4 +1,4 @@
-module CoercionExpr.SimCastId? where
+module CoercionExpr.SimCastIdProj where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)

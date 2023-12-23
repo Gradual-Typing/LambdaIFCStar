@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security
 open import CC2.Statics
@@ -48,16 +47,16 @@ rename-pres-⊑ {ρ = ρ} ⊢ρ ⊢ρ′ (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) 
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-addr x y) = ⊑-addr x y
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-app L⊑L′ M⊑M′ eq₁ eq₂) =
   ⊑-app (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) eq₁ eq₂
-rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-app! L⊑L′ M⊑M′) =
-  ⊑-app! (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′)
-rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-app!l L⊑L′ M⊑M′ eq) =
-  ⊑-app!l (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) eq
+rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-app⋆ L⊑L′ M⊑M′) =
+  ⊑-app⋆ (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′)
+rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-app⋆l L⊑L′ M⊑M′ eq) =
+  ⊑-app⋆l (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) eq
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-if L⊑L′ M⊑M′ N⊑N′ eq₁ eq₂) =
   ⊑-if (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) (rename-pres-⊑ ⊢ρ ⊢ρ′ N⊑N′) eq₁ eq₂
-rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-if! L⊑L′ M⊑M′ N⊑N′) =
-  ⊑-if! (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) (rename-pres-⊑ ⊢ρ ⊢ρ′ N⊑N′)
-rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ eq) =
-  ⊑-if!l (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) (rename-pres-⊑ ⊢ρ ⊢ρ′ N⊑N′) eq
+rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-if⋆ L⊑L′ M⊑M′ N⊑N′) =
+  ⊑-if⋆ (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) (rename-pres-⊑ ⊢ρ ⊢ρ′ N⊑N′)
+rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-if⋆l L⊑L′ M⊑M′ N⊑N′ eq) =
+  ⊑-if⋆l (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) (rename-pres-⊑ ⊢ρ ⊢ρ′ N⊑N′) eq
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-let M⊑M′ N⊑N′) =
   ⊑-let (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′)
         (rename-pres-⊑ (λ {x} ∋x → ext-pres ⊢ρ {x} ∋x) (λ {x} ∋x → ext-pres ⊢ρ′ {x} ∋x) N⊑N′)
@@ -69,10 +68,10 @@ rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-ref?l M⊑M′ x) =
   ⊑-ref?l (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) x
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-deref M⊑M′ eq₁ eq₂) =
   ⊑-deref (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) eq₁ eq₂
-rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-deref! M⊑M′) =
-  ⊑-deref! (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′)
-rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-deref!l M⊑M′ eq) =
-  ⊑-deref!l (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) eq
+rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-deref⋆ M⊑M′) =
+  ⊑-deref⋆ (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′)
+rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-deref⋆l M⊑M′ eq) =
+  ⊑-deref⋆l (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) eq
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-assign L⊑L′ M⊑M′ x y) =
   ⊑-assign (rename-pres-⊑ ⊢ρ ⊢ρ′ L⊑L′) (rename-pres-⊑ ⊢ρ ⊢ρ′ M⊑M′) x y
 rename-pres-⊑ ⊢ρ ⊢ρ′ (⊑-assign? L⊑L′ M⊑M′) =
@@ -117,16 +116,16 @@ subst-pres-⊑ {σ = σ} σ⊑σ′ (⊑-lam gc⊑gc′ A⊑A′ N⊑N′) =
 subst-pres-⊑ σ⊑σ′ (⊑-addr x y) = ⊑-addr x y
 subst-pres-⊑ σ⊑σ′ (⊑-app L⊑L′ M⊑M′ eq₁ eq₂) =
   ⊑-app (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
-subst-pres-⊑ σ⊑σ′ (⊑-app! L⊑L′ M⊑M′) =
-  ⊑-app! (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′)
-subst-pres-⊑ σ⊑σ′ (⊑-app!l L⊑L′ M⊑M′ eq) =
-  ⊑-app!l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) eq
+subst-pres-⊑ σ⊑σ′ (⊑-app⋆ L⊑L′ M⊑M′) =
+  ⊑-app⋆ (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′)
+subst-pres-⊑ σ⊑σ′ (⊑-app⋆l L⊑L′ M⊑M′ eq) =
+  ⊑-app⋆l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) eq
 subst-pres-⊑ σ⊑σ′ (⊑-if L⊑L′ M⊑M′ N⊑N′ eq₁ eq₂) =
   ⊑-if (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′) eq₁ eq₂
-subst-pres-⊑ σ⊑σ′ (⊑-if! L⊑L′ M⊑M′ N⊑N′) =
-  ⊑-if! (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′)
-subst-pres-⊑ σ⊑σ′ (⊑-if!l L⊑L′ M⊑M′ N⊑N′ eq) =
-  ⊑-if!l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′) eq
+subst-pres-⊑ σ⊑σ′ (⊑-if⋆ L⊑L′ M⊑M′ N⊑N′) =
+  ⊑-if⋆ (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′)
+subst-pres-⊑ σ⊑σ′ (⊑-if⋆l L⊑L′ M⊑M′ N⊑N′ eq) =
+  ⊑-if⋆l (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) (subst-pres-⊑ σ⊑σ′ N⊑N′) eq
 subst-pres-⊑ σ⊑σ′ (⊑-let M⊑M′ N⊑N′) =
   ⊑-let (subst-pres-⊑ σ⊑σ′ M⊑M′)
         (subst-pres-⊑ (ext-pres-⊑ˢ σ⊑σ′) N⊑N′)
@@ -138,10 +137,10 @@ subst-pres-⊑ σ⊑σ′ (⊑-ref?l M⊑M′ x) =
   ⊑-ref?l (subst-pres-⊑ σ⊑σ′ M⊑M′) x
 subst-pres-⊑ σ⊑σ′ (⊑-deref M⊑M′ eq₁ eq₂) =
   ⊑-deref (subst-pres-⊑ σ⊑σ′ M⊑M′) eq₁ eq₂
-subst-pres-⊑ σ⊑σ′ (⊑-deref! M⊑M′) =
-  ⊑-deref! (subst-pres-⊑ σ⊑σ′ M⊑M′)
-subst-pres-⊑ σ⊑σ′ (⊑-deref!l M⊑M′ eq) =
-  ⊑-deref!l (subst-pres-⊑ σ⊑σ′ M⊑M′) eq
+subst-pres-⊑ σ⊑σ′ (⊑-deref⋆ M⊑M′) =
+  ⊑-deref⋆ (subst-pres-⊑ σ⊑σ′ M⊑M′)
+subst-pres-⊑ σ⊑σ′ (⊑-deref⋆l M⊑M′ eq) =
+  ⊑-deref⋆l (subst-pres-⊑ σ⊑σ′ M⊑M′) eq
 subst-pres-⊑ σ⊑σ′ (⊑-assign L⊑L′ M⊑M′ x y) =
   ⊑-assign (subst-pres-⊑ σ⊑σ′ L⊑L′) (subst-pres-⊑ σ⊑σ′ M⊑M′) x y
 subst-pres-⊑ σ⊑σ′ (⊑-assign? L⊑L′ M⊑M′) =

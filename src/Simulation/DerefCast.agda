@@ -15,7 +15,6 @@ open import Function using (case_of_)
 open import Syntax
 open import Common.Utils
 open import Memory.HeapContext
-open import CoercionExpr.Precision using (coerce⇒⋆-prec)
 open import CoercionExpr.SyntacComp
 open import LabelExpr.CatchUp renaming (catchup to catchupₑ)
 open import LabelExpr.Security
@@ -97,13 +96,13 @@ sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
   ⟨ _ , V-cast V-ƛ _ , L↠V , ⊑-castr (⊑-castl () A⊑c′) c⊑A′ ⟩
   ⟨ ● , V-● , _ , ●⊑ ⟩ → contradiction ●⊑ (●⋤ _)
 sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
-  (⊑-deref!l M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ =
+  (⊑-deref⋆l M⊑M′ eq′) Σ⊑Σ′ μ⊑μ′ PC⊑PC′ size-eq v′ 𝓋′ μ′a≡V′ =
   case catchup {μ = μ} {PC} (V-cast V-addr (ir-ref 𝓋′)) M⊑M′ of λ where
   ⟨ addr _ , V-raw V-addr , L↠V , ⊑-castr () _ ⟩
   ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-cast (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑c′ ⟩ →
     let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
-    let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
-                       (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    let ♣ = trans-mult (plug-cong (!⋆□ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref⋆-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
     case c⊑c′ of λ where
     (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
       case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
@@ -113,8 +112,8 @@ sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
         ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq′ ∣c̅∣≼ℓ₂ ⟩
   ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castl (⊑-castr (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) A⊑c′) c⊑A′ ⟩ →
     let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
-    let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
-                       (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    let ♣ = trans-mult (plug-cong (!⋆□ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref⋆-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
     case (comp-pres-prec-rl A⊑c′ c⊑A′) of λ where
     (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
       case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
@@ -124,8 +123,8 @@ sim-deref-cast {Σ} {Σ′} {gc} {gc′} {μ = μ} {PC = PC} {PC′} vc vc′
         ⟨ _ , ♣ , ⊑-prot!l (⊑-cast (value-⊑-pc V⊑V′ v v′) d⊑d′) ⊑-l (_ ≼high) (_ ≼high) eq′ ∣c̅∣≼ℓ₂ ⟩
   ⟨ _ , V-cast V-addr (ir-ref 𝓋) , L↠V , ⊑-castr (⊑-castl (⊑-addr {n = n} {ℓ̂ = ℓ̂} a b) c⊑A′) A⊑c′ ⟩ →
     let ⟨ _ , _ , V , v , V′ , v′ , μa≡V , μ′a≡V†′ , V⊑V′ ⟩ = μ⊑μ′ n ℓ̂ a b in
-    let ♣ = trans-mult (plug-cong (!!□ _) L↠V)
-                       (_ ∣ _ ∣ _ —→⟨ deref!-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
+    let ♣ = trans-mult (plug-cong (!⋆□ _) L↠V)
+                       (_ ∣ _ ∣ _ —→⟨ deref⋆-cast {v = v} 𝓋 μa≡V ⟩ _ ∣ _ ∣ _ ∎) in
     case (comp-pres-prec-lr c⊑A′ A⊑c′) of λ where
     (⊑-ref c⊑c′ d⊑d′ c̅⊑c̅′) →
       case trans (sym μ′a≡V′) μ′a≡V†′ of λ where
