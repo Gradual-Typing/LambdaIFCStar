@@ -36,6 +36,8 @@ open import CoercionExpr.CoercionExpr
 
 
 {- Properties of erasure -}
+
+-- if a coercion casts a label to high, then its security must be high
 ϵ-high : ∀ {g}
   → (c̅ : CExpr g ⇒ l high)
   → ϵ c̅ ≡ high
@@ -44,6 +46,11 @@ open import CoercionExpr.CoercionExpr
 ϵ-high (c̅ ⨾ ↑)          rewrite ℓ⋎high≡high {ϵ c̅} = refl
 ϵ-high (c̅ ⨾ high ?? p)   rewrite ℓ⋎high≡high {ϵ c̅} = refl
 ϵ-high (⊥ _ (l high) p) = refl
+
+ϵ-ϵ₁-id : ∀ {g} → ϵ (id g) ≡ ϵ₁ (id g)
+ϵ-ϵ₁-id {⋆}      = refl
+ϵ-ϵ₁-id {l high} = refl
+ϵ-ϵ₁-id {l low}  = refl
 
 ϵ-id : ∀ {g₁ g₂}
   → (c̅ : CExpr g₁ ⇒ g₂)
@@ -80,6 +87,7 @@ open import CoercionExpr.SecurityLevel
 ϵ-security-step {c̅ = c̅ ⨾ high ! ⨾ low ?? p} (?-⊥ _)
   rewrite ℓ⋎low≡ℓ {ϵ c̅ ⋎ high} | ℓ⋎high≡high {ϵ c̅} = refl
 
+-- the erasure of a coercion agrees with the security after normalization
 ϵ-security : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g}
   → c̅ —↠ d̅
   → (𝓋 : CVal d̅)
@@ -88,6 +96,11 @@ open import CoercionExpr.SecurityLevel
 ϵ-security (_ —→⟨ r ⟩ r*) v rewrite ϵ-security-step r | ϵ-security r* v = refl
 
 
--- open import CoercionExpr.SyntacComp
+open import CoercionExpr.SyntacComp
 
--- c̅ ⨟ d̅
+-- the erasure of the syntactical composition of two coercions
+-- is equal to the join of their respective erasures
+ϵ-comp : ∀ {g₁ g₂ g₃} (c̅ : CExpr g₁ ⇒ g₂) (d̅ : CExpr g₂ ⇒ g₃) → ϵ (c̅ ⨟ d̅) ≡ (ϵ c̅) ⋎ (ϵ d̅)
+ϵ-comp {g₂ = g₂} c̅ (id _) rewrite ϵ-ϵ₁-id {g₂}                            = refl
+ϵ-comp c̅ (d̅ ⨾ c)          rewrite ϵ-comp c̅ d̅ | ⋎-assoc {ϵ c̅} {ϵ d̅} {ϵ₁ c} = refl
+ϵ-comp c̅ (⊥ _ _ p)        rewrite ℓ⋎high≡high {ϵ c̅}                       = refl
