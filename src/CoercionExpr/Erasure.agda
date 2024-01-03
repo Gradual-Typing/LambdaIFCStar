@@ -66,17 +66,26 @@ open import CoercionExpr.SecurityLevel
 ϵ-security-val        (inj (up id)) = refl
 ϵ-security-val        (up id)       = refl
 
+ϵ-security-step : ∀ {g₁ g₂} {c̅ d̅ : CExpr g₁ ⇒ g₂}
+  → c̅ —→ d̅
+  → ϵ c̅ ≡ ϵ d̅
+ϵ-security-step (ξ r) rewrite ϵ-security-step r = refl
+ϵ-security-step ξ-⊥ = refl
+ϵ-security-step {c̅ = c̅ ⨾ c} (id _) rewrite ϵ-id c̅ = refl
+ϵ-security-step {g₁} {l high} {c̅ = c̅ ⨾ high ! ⨾ high ?? p} (?-id _)
+  rewrite ϵ-high c̅ = refl
+ϵ-security-step {g₁} {l low}  {c̅ = c̅ ⨾ low  ! ⨾ low  ?? p} (?-id _)
+  rewrite ℓ⋎low≡ℓ {ϵ c̅ ⋎ low} | ℓ⋎low≡ℓ {ϵ c̅} = refl
+ϵ-security-step {c̅ = c̅ ⨾ low ! ⨾ high ?? p} (?-↑ _) rewrite ℓ⋎low≡ℓ {ϵ c̅} = refl
+ϵ-security-step {c̅ = c̅ ⨾ high ! ⨾ low ?? p} (?-⊥ _)
+  rewrite ℓ⋎low≡ℓ {ϵ c̅ ⋎ high} | ℓ⋎high≡high {ϵ c̅} = refl
+
 ϵ-security : ∀ {ℓ g} {c̅ d̅ : CExpr l ℓ ⇒ g}
   → c̅ —↠ d̅
   → (𝓋 : CVal d̅)
   → ϵ c̅ ≡ ∥ d̅ ∥ 𝓋
 ϵ-security (_ ∎) 𝓋 = ϵ-security-val 𝓋
-ϵ-security (_ —→⟨ ξ r ⟩ r*) v = {!!}
-ϵ-security (_ —→⟨ ξ-⊥ ⟩ r*) v = {!!}
-ϵ-security (c̅ ⨾ id _ —→⟨ id _ ⟩ r*) v = {!!}
-ϵ-security (_ —→⟨ ?-id _ ⟩ r*) v = {!!}
-ϵ-security (_ —→⟨ ?-↑ _ ⟩ r*) v = {!!}
-ϵ-security (_ —→⟨ ?-⊥ _ ⟩ r*) v = {!!}
+ϵ-security (_ —→⟨ r ⟩ r*) v rewrite ϵ-security-step r | ϵ-security r* v = refl
 
 
 -- open import CoercionExpr.SyntacComp
