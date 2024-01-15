@@ -52,6 +52,10 @@ open import CoercionExpr.CoercionExpr
 ϵ-ϵ₁-id {l high} = refl
 ϵ-ϵ₁-id {l low}  = refl
 
+ϵ₁-id : ∀ {ℓ} → ϵ₁ (id (l ℓ)) ≡ ℓ
+ϵ₁-id {low}  = refl
+ϵ₁-id {high} = refl
+
 ϵ-id : ∀ {g₁ g₂}
   → (c̅ : CExpr g₁ ⇒ g₂)
   → ϵ (c̅ ⨾ id g₂) ≡ ϵ c̅

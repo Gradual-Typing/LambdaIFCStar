@@ -31,3 +31,21 @@ open import LabelExpr.LabelExpr
 ϵₑ-high ⊢l = refl
 ϵₑ-high (⊢cast {M = e} {c̅} ⊢e) rewrite ϵ-high c̅ | ℓ⋎high≡high {ϵₑ e} = refl
 ϵₑ-high ⊢blame = refl
+
+ϵₑ-security-step : ∀ {e₁ e₂}
+  → e₁ —→ₑ e₂
+  → ϵₑ e₁ ≡ ϵₑ e₂
+ϵₑ-security-step (ξ r) rewrite ϵₑ-security-step r = refl
+ϵₑ-security-step ξ-blame = refl
+ϵₑ-security-step (β-id {ℓ = low}) = refl
+ϵₑ-security-step (β-id {ℓ = high}) = refl
+ϵₑ-security-step (cast {c̅ = c̅} {c̅ₙ} c̅→⁺c̅ₙ 𝓋)
+  rewrite ϵ-security (→⁺-impl-↠ c̅→⁺c̅ₙ) 𝓋 | ϵ-security-val 𝓋 = refl
+ϵₑ-security-step (blame x) = {!!}
+ϵₑ-security-step (comp x) = {!!}
+
+ϵₑ-security : ∀ {e₁ e₂}
+  → e₁ —↠ₑ e₂
+  → (v : LVal e₂)
+  → ϵₑ e₁ ≡ ∥ e₂ ∥ v
+ϵₑ-security r* v = {!!}
