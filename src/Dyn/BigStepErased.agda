@@ -139,57 +139,43 @@ V⇓ₑV (⇓ₑ-val _) v = ⟨ refl , refl ⟩
   with V⇓ₑV ●⇓● V-● | V⇓ₑV V⇓V v
 ... | ⟨ refl , refl ⟩ | ⟨ refl , refl ⟩ = ⟨ refl , refl ⟩
 
--- ⇓ₑ-app-inv : ∀ {μ μ′ pc pc′ N V W A}
---   → μ ∣ pc ⊢ ƛ⟦ pc′ ⟧ A ˙ N of low · V ⇓ₑ W ∣ μ′
---   → Value V
---     ------------------------------------------
---   → μ ∣ pc ⊢ N [ V ] ⇓ₑ W ∣ μ′
--- ⇓ₑ-app-inv (⇓ₑ-app ƛN⇓ƛN V⇓V N⟦V⟧⇓W) v
---   with V⇓ₑV ƛN⇓ƛN V-ƛ | V⇓ₑV V⇓V v
--- ... | ⟨ refl , refl ⟩ | ⟨ refl , refl ⟩ = N⟦V⟧⇓W
+⇓ₑ-app-inv : ∀ {μ μ′ pc N V W}
+  → μ ∣ pc ⊢ ƛ N of low · V ⇓ₑ W ∣ μ′
+  → Value V
+    ------------------------------------------
+  → μ ∣ pc ⊢ N [ V ] ⇓ₑ W ∣ μ′
+⇓ₑ-app-inv (⇓ₑ-app ƛN⇓ƛN V⇓V N⟦V⟧⇓W) v
+  with V⇓ₑV ƛN⇓ƛN V-ƛ | V⇓ₑV V⇓V v
+... | ⟨ refl , refl ⟩ | ⟨ refl , refl ⟩ = N⟦V⟧⇓W
 
--- ⇓ₑ-assign-●-inv : ∀ {μ μ′ pc M V}
---   → μ ∣ pc ⊢ ● := M ⇓ₑ V ∣ μ′
---     ---------------------------
---   → V ≡ $ tt of low × ∃[ W ] (μ ∣ pc ⊢ M ⇓ₑ W ∣ μ′)
--- ⇓ₑ-assign-●-inv (⇓ₑ-assign-● ●⇓● M⇓W)
---   with V⇓ₑV ●⇓● V-●
--- ... | ⟨ refl , refl ⟩ = ⟨ refl , _ , M⇓W ⟩
+⇓ₑ-assign?-●-inv : ∀ {μ μ′ pc M V}
+  → μ ∣ pc ⊢ ● :=? M ⇓ₑ V ∣ μ′
+    ---------------------------
+  → V ≡ $ tt of low × ∃[ W ] (μ ∣ pc ⊢ M ⇓ₑ W ∣ μ′)
+⇓ₑ-assign?-●-inv (⇓ₑ-assign?-● ●⇓● M⇓W)
+  with V⇓ₑV ●⇓● V-●
+... | ⟨ refl , refl ⟩ = ⟨ refl , _ , M⇓W ⟩
 
--- ⇓ₑ-assign-inv : ∀ {μ μ′ pc M V n}
---   → μ ∣ pc ⊢ (addr a⟦ low ⟧ n of low) := M ⇓ₑ V ∣ μ′
---     -----------------------------------------------------------
---   → V ≡ $ tt of low × ∃[ W ] ∃[ w ] ∃[ μ″ ] (μ ∣ pc ⊢ M ⇓ₑ W ∣ μ″) × (μ′ ≡ ⟨ n , W & w ⟩ ∷ μ″)
--- ⇓ₑ-assign-inv (⇓ₑ-assign a⇓a M⇓W)
---   with V⇓ₑV a⇓a V-addr
--- ... | ⟨ refl , refl ⟩ = ⟨ refl , _ , ⇓ₑ-value M⇓W , _ , M⇓W , refl ⟩
+⇓ₑ-assign?-inv : ∀ {μ μ′ pc M V n}
+  → μ ∣ pc ⊢ (addr a⟦ low ⟧ n of low) :=? M ⇓ₑ V ∣ μ′
+    -----------------------------------------------------------
+  → V ≡ $ tt of low ×
+     pc ⋎ low ≼ low ×
+     ∃[ W ] ∃[ w ] ∃[ μ″ ] (μ ∣ pc ⊢ M ⇓ₑ W ∣ μ″) × (μ′ ≡ ⟨ n , W & w ⟩ ∷ μ″)
+⇓ₑ-assign?-inv (⇓ₑ-assign? a⇓a M⇓W pc≼low)
+  with V⇓ₑV a⇓a V-addr
+... | ⟨ refl , refl ⟩ = ⟨ refl , pc≼low , _ , ⇓ₑ-value M⇓W , _ , M⇓W , refl ⟩
 
--- ⇓ₑ-assign?-●-inv : ∀ {μ μ′ pc M V}
---   → μ ∣ pc ⊢ ● :=? M ⇓ₑ V ∣ μ′
---     ---------------------------
---   → V ≡ $ tt of low × ∃[ W ] (μ ∣ pc ⊢ M ⇓ₑ W ∣ μ′)
--- ⇓ₑ-assign?-●-inv (⇓ₑ-assign?-● ●⇓● M⇓W)
---   with V⇓ₑV ●⇓● V-●
--- ... | ⟨ refl , refl ⟩ = ⟨ refl , _ , M⇓W ⟩
+⇓ₑ-deref-●-inv : ∀ {μ μ′ pc V}
+  → μ ∣ pc ⊢ ! ● ⇓ₑ V ∣ μ′
+    ---------------------------
+  → V ≡ ● × μ ≡ μ′
+⇓ₑ-deref-●-inv (⇓ₑ-deref-● ●⇓●) with V⇓ₑV ●⇓● V-●
+... | ⟨ refl , refl ⟩ = ⟨ refl , refl ⟩
 
--- ⇓ₑ-assign?-inv : ∀ {μ μ′ pc M V n}
---   → μ ∣ pc ⊢ (addr a⟦ low ⟧ n of low) :=? M ⇓ₑ V ∣ μ′
---     -----------------------------------------------------------
---   → V ≡ $ tt of low × pc ≼ low × ∃[ W ] ∃[ w ] ∃[ μ″ ] (μ ∣ pc ⊢ M ⇓ₑ W ∣ μ″) × (μ′ ≡ ⟨ n , W & w ⟩ ∷ μ″)
--- ⇓ₑ-assign?-inv (⇓ₑ-assign? a⇓a M⇓W pc≼low)
---   with V⇓ₑV a⇓a V-addr
--- ... | ⟨ refl , refl ⟩ = ⟨ refl , pc≼low , _ , ⇓ₑ-value M⇓W , _ , M⇓W , refl ⟩
-
--- ⇓ₑ-deref-●-inv : ∀ {μ μ′ pc V}
---   → μ ∣ pc ⊢ ! ● ⇓ₑ V ∣ μ′
---     ---------------------------
---   → V ≡ ● × μ ≡ μ′
--- ⇓ₑ-deref-●-inv (⇓ₑ-deref-● ●⇓●) with V⇓ₑV ●⇓● V-●
--- ... | ⟨ refl , refl ⟩ = ⟨ refl , refl ⟩
-
--- ⇓ₑ-deref-inv : ∀ {μ μ′ pc V n}
---   → μ ∣ pc ⊢ ! (addr a⟦ low ⟧ n of low) ⇓ₑ V ∣ μ′
---     --------------------------------------------------
---   → (∃[ v ] find _≟_ μ n ≡ just (V & v)) × μ ≡ μ′
--- ⇓ₑ-deref-inv (⇓ₑ-deref {v = v} a⇓a eq) with V⇓ₑV a⇓a V-addr
--- ... | ⟨ refl , refl ⟩ = ⟨ ⟨ v , eq ⟩ , refl ⟩
+⇓ₑ-deref-inv : ∀ {μ μ′ pc V n}
+  → μ ∣ pc ⊢ ! (addr a⟦ low ⟧ n of low) ⇓ₑ V ∣ μ′
+    --------------------------------------------------
+  → (∃[ v ] find _≟_ μ n ≡ just (V & v)) × μ ≡ μ′
+⇓ₑ-deref-inv (⇓ₑ-deref {v = v} a⇓a eq) with V⇓ₑV a⇓a V-addr
+... | ⟨ refl , refl ⟩ = ⟨ ⟨ v , eq ⟩ , refl ⟩
