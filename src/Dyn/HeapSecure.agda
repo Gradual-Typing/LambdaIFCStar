@@ -16,6 +16,7 @@ open import Dyn.Syntax
 open import Dyn.Values
 open import Dyn.BigStep
 open import Dyn.Erasure
+open import Memory.Heap Term Value
 
 
 {- Related heaps under high PC -}
@@ -36,5 +37,12 @@ heap-relate (⇓-deref M⇓a eq) = heap-relate M⇓a
 heap-relate (⇓-assign? L⇓a M⇓V h≼h)
   rewrite heap-relate L⇓a | heap-relate M⇓V = refl
 
--- WF : Heap → Set
--- WF μ = ∀ n → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → erase V 
+Secure : Heap → Set
+Secure μ = ∀ n V v → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → erase V ≡ ●
+
+postulate
+  ⇓-pres-sec : ∀ {μ₁ μ₂ pc M V}
+    → Secure μ₁
+    → μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂
+    → Secure μ₂
+-- ⇓-pres-secure sec M⇓V = {!!}
