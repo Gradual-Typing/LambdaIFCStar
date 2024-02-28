@@ -35,3 +35,6 @@ heap-relate (⇓-ref? M⇓V fresh h≼h {- ℓ ≡ high -})
 heap-relate (⇓-deref M⇓a eq) = heap-relate M⇓a
 heap-relate (⇓-assign? L⇓a M⇓V h≼h)
   rewrite heap-relate L⇓a | heap-relate M⇓V = refl
+
+-- WF : Heap → Set
+-- WF μ = ∀ n → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → erase V 
