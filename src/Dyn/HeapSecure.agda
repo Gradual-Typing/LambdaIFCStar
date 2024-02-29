@@ -40,9 +40,23 @@ heap-relate (⇓-assign? L⇓a M⇓V h≼h)
 Secure : Heap → Set
 Secure μ = ∀ n V v → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → erase V ≡ ●
 
-postulate
-  ⇓-pres-sec : ∀ {μ₁ μ₂ pc M V}
+
+⇓-pres-sec : ∀ {μ₁ μ₂ pc M V}
     → Secure μ₁
     → μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂
     → Secure μ₂
--- ⇓-pres-secure sec M⇓V = {!!}
+⇓-pres-sec sec (⇓-val x) = sec
+⇓-pres-sec sec (⇓-app M⇓V M⇓V₁ M⇓V₂) =
+  ⇓-pres-sec (⇓-pres-sec (⇓-pres-sec sec M⇓V) M⇓V₁) M⇓V₂
+⇓-pres-sec sec (⇓-if-true M⇓V M⇓V₁) =
+  ⇓-pres-sec (⇓-pres-sec sec M⇓V) M⇓V₁
+⇓-pres-sec sec (⇓-if-false M⇓V M⇓V₁) =
+  ⇓-pres-sec (⇓-pres-sec sec M⇓V) M⇓V₁
+⇓-pres-sec sec (⇓-ref? {ℓ = low} M⇓V x _) = ⇓-pres-sec sec M⇓V
+⇓-pres-sec sec (⇓-ref? {M = M} {V} {n} {ℓ = high} M⇓V x _) n′ V′ v′
+  with n′ ≟ n
+... | yes refl = λ { refl → erase-stamp-high (⇓-value M⇓V) }
+... | no _ = (⇓-pres-sec sec M⇓V) _ V′ v′
+⇓-pres-sec sec (⇓-deref M⇓V x) =
+  ⇓-pres-sec sec M⇓V
+⇓-pres-sec sec (⇓-assign? M⇓V M⇓V₁ x) = {!!}
