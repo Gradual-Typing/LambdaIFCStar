@@ -42,9 +42,10 @@ Secure μ = ∀ n V v → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → er
 
 
 ⇓-pres-sec : ∀ {μ₁ μ₂ pc M V}
-    → Secure μ₁
-    → μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂
-    → Secure μ₂
+  → Secure μ₁
+  → μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂
+    -------------------------------
+  → Secure μ₂
 ⇓-pres-sec sec (⇓-val x) = sec
 ⇓-pres-sec sec (⇓-app M⇓V M⇓V₁ M⇓V₂) =
   ⇓-pres-sec (⇓-pres-sec (⇓-pres-sec sec M⇓V) M⇓V₁) M⇓V₂
@@ -59,4 +60,9 @@ Secure μ = ∀ n V v → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → er
 ... | no _ = (⇓-pres-sec sec M⇓V) _ V′ v′
 ⇓-pres-sec sec (⇓-deref M⇓V x) =
   ⇓-pres-sec sec M⇓V
-⇓-pres-sec sec (⇓-assign? M⇓V M⇓V₁ x) = {!!}
+⇓-pres-sec sec (⇓-assign? {L = L} {M} {V} {n} {ℓ} {low} L⇓a M⇓V _) =
+  ⇓-pres-sec (⇓-pres-sec sec L⇓a) M⇓V
+⇓-pres-sec sec (⇓-assign? {L = L} {M} {V} {n} {ℓ} {high} L⇓a M⇓V _) n′ V′ v′
+  with n′ ≟ n
+... | yes refl = λ { refl → erase-stamp-high (⇓-value M⇓V) }
+... | no _ = ⇓-pres-sec (⇓-pres-sec sec L⇓a) M⇓V _ V′ v′
