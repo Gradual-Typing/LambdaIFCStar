@@ -41,6 +41,9 @@ Secure : Heap → Set
 Secure μ = ∀ n V v → lookup-μ μ (a⟦ high ⟧ n) ≡ just (V & v) → erase V ≡ ●
 
 
+∅-sec : Secure ∅
+∅-sec n V v ()
+
 ⇓-pres-sec : ∀ {μ₁ μ₂ pc M V}
   → Secure μ₁
   → μ₁ ∣ pc ⊢ M ⇓ V ∣ μ₂
