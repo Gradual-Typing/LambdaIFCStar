@@ -27,7 +27,6 @@ open import Dyn.Syntax
 
 infix 4 _≤_⇐_
 
--- we only consider values for now
 data _≤_⇐_ : Term → CCTerm → Type → Set where
 
   ≤-var : ∀ {x A}
@@ -71,3 +70,15 @@ data _≤_⇐_ : Term → CCTerm → Type → Set where
     → ℓ′ ≼ ∥ c̅ ∥ₗ 𝓋
       ------------------------------------------------------------
     → (addr (a⟦ ℓ̂ ⟧ n) of ℓ′) ≤ (adrs n) ⟨ cast (ref c d) c̅ ⟩ ⇐ Ref (T of g₁) of g₂
+
+  ≤-app : ∀ {M M′ N N′} {g A B C ℓ}
+    → M′ ≤ M ⇐ ⟦ g ⟧ A ⇒ B of l ℓ
+    → N′ ≤ N ⇐ A
+      ------------------------------------
+    → M′ · N′ ≤ app M N A B ℓ ⇐ C
+
+  ≤-app⋆ : ∀ {M M′ N N′} {A T}
+    → M′ ≤ M ⇐ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆
+    → N′ ≤ N ⇐ A
+      ------------------------------------
+    → M′ · N′ ≤ app⋆ M N A T ⇐ T of ⋆
