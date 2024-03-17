@@ -5,7 +5,7 @@ module Security.SubstPres where
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
 open import Data.Bool using (true; false) renaming (Bool to 𝔹)
-open import Data.List
+open import Data.List hiding ([_])
 open import Data.Product using (_×_; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Maybe
@@ -27,37 +27,21 @@ open import Security.SimRel
 open import CC2.SubstPreserve using (_⊢_⦂_⇒_)
 
 
-infix 4 _≋_
+pc-typing-uniq : ∀ {g₁ g₂} {PC : LExpr} → (v : LVal PC) → ⊢ PC ⇐ g₁ → ⊢ PC ⇐ g₂ → g₁ ≡ g₂
+pc-typing-uniq v-l ⊢l ⊢l = refl
+pc-typing-uniq (v-cast x) (⊢cast ⊢l) (⊢cast ⊢l) = refl
 
-data _≋_ : Type → Type → Set where
-
-  sim-base : ∀ {ι g} → ` ι of g ≋ ` ι of g
-
-  sim-ref : ∀ {A B g}
-    → A ≋ B
-    → Ref A of g ≋ Ref B of g
-
-  sim-fun : ∀ {A₁ A₂ B₁ B₂ g₁ g₂ g}
-    → A₁ ≋ A₂
-    → B₁ ≋ B₂
-    → ⟦ g₁ ⟧ A₁ ⇒ B₁ of g ≋ ⟦ g₂ ⟧ A₂ ⇒ B₂ of g
-
-≋-refl : ∀ {A} → A ≋ A
-≋-refl {` x of x₁} = sim-base
-≋-refl {(Ref A) of g} = sim-ref ≋-refl
-≋-refl {⟦ _ ⟧ A ⇒ B of g} = sim-fun ≋-refl ≋-refl
 
 _≤ˢ_⇐_ : ∀ (σ′ : Dyn.Syntax.Subst) (σ : CC2.Statics.Subst) → (Γ : Context) → Set
 σ′ ≤ˢ σ ⇐ Γ =
-  (∀ x {A B}
+  (∀ x {A}
     → Γ ∋ x ⦂ A
-    → A ≋ B
-    → σ′ x ≤ σ x ⇐ B)
+    → (∀ {g} → g ⊢ σ′ x ≤ σ x ⇐ A))
 
-rename-pres-≤ : ∀ {A} {M M′} {ρ : Rename}
-  → M′ ≤ M ⇐ A
+rename-pres-≤ : ∀ {gc A} {M M′} {ρ : Rename}
+  → gc ⊢ M′ ≤ M ⇐ A
     -----------------------------------------------------------------------------
-  → Dyn.Syntax.rename ρ M′ ≤ CC2.Statics.rename ρ M ⇐ A
+  → gc ⊢ Dyn.Syntax.rename ρ M′ ≤ CC2.Statics.rename ρ M ⇐ A
 rename-pres-≤ ≤-var = ≤-var
 rename-pres-≤ (≤-const x) = ≤-const x
 rename-pres-≤ (≤-wrapped-const x y z) = ≤-wrapped-const x y z
@@ -75,45 +59,58 @@ rename-pres-≤ (≤-deref M′≤M) = ≤-deref (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-deref⋆ M′≤M) = ≤-deref⋆ (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-assign L′≤L M′≤M) = ≤-assign (rename-pres-≤ L′≤L) (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-assign? L′≤L M′≤M) = ≤-assign? (rename-pres-≤ L′≤L) (rename-pres-≤ M′≤M)
-rename-pres-≤ (≤-prot x M′≤M) = ≤-prot x (rename-pres-≤ M′≤M)
+rename-pres-≤ (≤-prot x M′≤M y) = ≤-prot x (rename-pres-≤ M′≤M) y
 
 
 ext-pres-≤ˢ : ∀ {Γ} {A} {σ : CC2.Statics.Subst} {σ′ : Dyn.Syntax.Subst}
   → σ′ ≤ˢ σ ⇐ Γ
     --------------------------------------------------------------------------
   → (ext σ′) ≤ˢ ext σ ⇐ (A ∷ Γ)
-ext-pres-≤ˢ {Γ} σ′≤σ zero Γ∋x⦂A A≋B = ≤-var
-ext-pres-≤ˢ {Γ} σ′≤σ (suc x) Γ∋x⦂A A≋B = rename-pres-≤ (σ′≤σ _ Γ∋x⦂A A≋B)
+ext-pres-≤ˢ {Γ} σ′≤σ zero Γ∋x⦂A = ≤-var
+ext-pres-≤ˢ {Γ} σ′≤σ (suc x) Γ∋x⦂A = rename-pres-≤ (σ′≤σ _ Γ∋x⦂A)
 
 
-subst-pres-≤ : ∀ {Γ Σ g ℓ} {A B} {M M′} {σ : CC2.Statics.Subst} {σ′ : Dyn.Syntax.Subst}
+subst-pres-≤ : ∀ {Γ Σ g ℓ} {A} {M M′} {σ : CC2.Statics.Subst} {σ′ : Dyn.Syntax.Subst}
   → Γ ; Σ ; g ; ℓ ⊢ M ⇐ A
   → σ′ ≤ˢ σ ⇐ Γ
-  → M′ ≤ M ⇐ B
-  → A ≋ B
+  → g ⊢ M′ ≤ M ⇐ A
     --------------------------------------------------------------------
-  → ⟪ σ′ ⟫ M′ ≤ ⦅ σ ⦆ M ⇐ B
-subst-pres-≤ (⊢var Γ∋x⦂A) σ′≤σ ≤-var A≋B = σ′≤σ _ Γ∋x⦂A A≋B
-subst-pres-≤ ⊢M σ′≤σ (≤-const x) _ = ≤-const x
-subst-pres-≤ ⊢M σ′≤σ (≤-wrapped-const x y z) _ = ≤-wrapped-const x y z
-subst-pres-≤ (⊢lam ⊢M) σ′≤σ (≤-lam M′≤M x) (sim-fun _ B₁≋B₂) = ≤-lam (subst-pres-≤ {ℓ = low} ⊢M (ext-pres-≤ˢ σ′≤σ) M′≤M B₁≋B₂) x
-subst-pres-≤ (⊢cast (⊢lam ⊢M)) σ′≤σ (≤-wrapped-lam M′≤M 𝓋 x) sim =
-  ≤-wrapped-lam (subst-pres-≤ {ℓ = low} ⊢M (ext-pres-≤ˢ σ′≤σ) M′≤M ≋-refl) 𝓋 x
-subst-pres-≤ ⊢M σ′≤σ (≤-addr x) sim = ≤-addr x
-subst-pres-≤ ⊢M σ′≤σ (≤-wrapped-addr 𝓋 x) sim = ≤-wrapped-addr 𝓋 x
-subst-pres-≤ (⊢app ⊢M ⊢N _) σ′≤σ (≤-app M′≤M N′≤N) sim =
-  ≤-app (subst-pres-≤ ⊢M σ′≤σ M′≤M (sim-fun ≋-refl ≋-refl)) (subst-pres-≤ ⊢N σ′≤σ N′≤N ≋-refl)
-subst-pres-≤ (⊢app⋆ ⊢M ⊢N) σ′≤σ (≤-app⋆ M′≤M N′≤N) sim = ≤-app⋆ (subst-pres-≤ ⊢M σ′≤σ M′≤M ≋-refl) (subst-pres-≤ ⊢N σ′≤σ N′≤N ≋-refl)
-subst-pres-≤ (⊢if ⊢L ⊢M ⊢N _) σ′≤σ (≤-if L′≤L M′≤M N′≤N) sim =
-  ≤-if (subst-pres-≤ ⊢L σ′≤σ L′≤L ≋-refl) (subst-pres-≤ {ℓ = low} ⊢M σ′≤σ M′≤M ≋-refl) (subst-pres-≤ {ℓ = low} ⊢N σ′≤σ N′≤N ≋-refl)
-subst-pres-≤ (⊢if⋆ ⊢L ⊢M ⊢N) σ′≤σ (≤-if⋆ L′≤L M′≤M N′≤N) sim =
-  ≤-if⋆ (subst-pres-≤ ⊢L σ′≤σ L′≤L ≋-refl) (subst-pres-≤ {ℓ = low} ⊢M σ′≤σ M′≤M ≋-refl) (subst-pres-≤ {ℓ = low} ⊢N σ′≤σ N′≤N ≋-refl)
-subst-pres-≤ (⊢ref ⊢M _) σ′≤σ (≤-ref M′≤M) (sim-ref A≋B) = ≤-ref (subst-pres-≤ ⊢M σ′≤σ M′≤M A≋B)
-subst-pres-≤ (⊢ref? ⊢M) σ′≤σ (≤-ref? M′≤M) (sim-ref A≋B) = ≤-ref? (subst-pres-≤ ⊢M σ′≤σ M′≤M A≋B)
-subst-pres-≤ (⊢deref ⊢M _) σ′≤σ (≤-deref M′≤M) sim = ≤-deref (subst-pres-≤ ⊢M σ′≤σ M′≤M ≋-refl)
-subst-pres-≤ (⊢deref⋆ ⊢M) σ′≤σ (≤-deref⋆ M′≤M) sim = ≤-deref⋆ (subst-pres-≤ ⊢M σ′≤σ M′≤M ≋-refl)
-subst-pres-≤ (⊢assign ⊢L ⊢M _ _) σ′≤σ (≤-assign L′≤L M′≤M) sim =
-  ≤-assign (subst-pres-≤ ⊢L σ′≤σ L′≤L ≋-refl) (subst-pres-≤ ⊢M σ′≤σ M′≤M ≋-refl)
-subst-pres-≤ (⊢assign? ⊢L ⊢M) σ′≤σ (≤-assign? L′≤L M′≤M) sim =
-  ≤-assign? (subst-pres-≤ ⊢L σ′≤σ L′≤L ≋-refl) (subst-pres-≤ ⊢M σ′≤σ M′≤M ≋-refl)
-subst-pres-≤ (⊢prot ⊢M _ _ _) σ′≤σ (≤-prot x M′≤M) sim = ≤-prot x (subst-pres-≤ ⊢M σ′≤σ M′≤M ≋-refl)
+  → g ⊢ ⟪ σ′ ⟫ M′ ≤ ⦅ σ ⦆ M ⇐ A
+subst-pres-≤ (⊢var Γ∋x⦂A) σ′≤σ ≤-var = σ′≤σ _ Γ∋x⦂A
+subst-pres-≤ ⊢M σ′≤σ (≤-const x) = ≤-const x
+subst-pres-≤ ⊢M σ′≤σ (≤-wrapped-const x y z) = ≤-wrapped-const x y z
+subst-pres-≤ (⊢lam ⊢M) σ′≤σ (≤-lam M′≤M x) = ≤-lam (subst-pres-≤ {ℓ = low} ⊢M (ext-pres-≤ˢ σ′≤σ) M′≤M) x
+subst-pres-≤ (⊢cast (⊢lam ⊢M)) σ′≤σ (≤-wrapped-lam M′≤M 𝓋 x) =
+  ≤-wrapped-lam (subst-pres-≤ {ℓ = low} ⊢M (ext-pres-≤ˢ σ′≤σ) M′≤M) 𝓋 x
+subst-pres-≤ ⊢M σ′≤σ (≤-addr x) = ≤-addr x
+subst-pres-≤ ⊢M σ′≤σ (≤-wrapped-addr 𝓋 x) = ≤-wrapped-addr 𝓋 x
+subst-pres-≤ (⊢app ⊢M ⊢N _) σ′≤σ (≤-app M′≤M N′≤N) =
+  ≤-app (subst-pres-≤ ⊢M σ′≤σ M′≤M ) (subst-pres-≤ ⊢N σ′≤σ N′≤N)
+subst-pres-≤ (⊢app⋆ ⊢M ⊢N) σ′≤σ (≤-app⋆ M′≤M N′≤N) = ≤-app⋆ (subst-pres-≤ ⊢M σ′≤σ M′≤M) (subst-pres-≤ ⊢N σ′≤σ N′≤N)
+subst-pres-≤ (⊢if ⊢L ⊢M ⊢N _) σ′≤σ (≤-if L′≤L M′≤M N′≤N) =
+  ≤-if (subst-pres-≤ ⊢L σ′≤σ L′≤L) (subst-pres-≤ {ℓ = low} ⊢M σ′≤σ M′≤M) (subst-pres-≤ {ℓ = low} ⊢N σ′≤σ N′≤N)
+subst-pres-≤ (⊢if⋆ ⊢L ⊢M ⊢N) σ′≤σ (≤-if⋆ L′≤L M′≤M N′≤N) =
+  ≤-if⋆ (subst-pres-≤ ⊢L σ′≤σ L′≤L) (subst-pres-≤ {ℓ = low} ⊢M σ′≤σ M′≤M) (subst-pres-≤ {ℓ = low} ⊢N σ′≤σ N′≤N)
+subst-pres-≤ (⊢ref ⊢M _) σ′≤σ (≤-ref M′≤M) = ≤-ref (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢ref? ⊢M) σ′≤σ (≤-ref? M′≤M) = ≤-ref? (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢deref ⊢M _) σ′≤σ (≤-deref M′≤M) = ≤-deref (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢deref⋆ ⊢M) σ′≤σ (≤-deref⋆ M′≤M) = ≤-deref⋆ (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢assign ⊢L ⊢M _ _) σ′≤σ (≤-assign L′≤L M′≤M) =
+  ≤-assign (subst-pres-≤ ⊢L σ′≤σ L′≤L ) (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢assign? ⊢L ⊢M) σ′≤σ (≤-assign? L′≤L M′≤M) =
+  ≤-assign? (subst-pres-≤ ⊢L σ′≤σ L′≤L) (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢prot {vc = v} ⊢M ⊢PC† _ _) σ′≤σ (≤-prot x M′≤M ⊢PC)
+  rewrite pc-typing-uniq v ⊢PC ⊢PC† = ≤-prot x (subst-pres-≤ ⊢M σ′≤σ M′≤M) ⊢PC†
+
+
+substitution-pres-≤ : ∀ {Γ Σ g ℓ} {A B} {M M′ V V′}
+  → B ∷ Γ ; Σ ; g ; ℓ ⊢ M ⇐ A
+  → g ⊢ M′ ≤ M ⇐ A
+  → (∀ {g} → g ⊢ V′ ≤ V ⇐ B)
+    --------------------------------------------------------------------
+  → g ⊢ (Dyn.Syntax._[_] M′ V′) ≤ (CC2.Statics._[_] M V) ⇐ A
+substitution-pres-≤ ⊢M M′≤M V′≤V = subst-pres-≤ ⊢M ♣ M′≤M
+  where
+  ♣ : _
+  ♣ 0 refl = V′≤V
+  ♣ (suc n) x = ≤-var
