@@ -59,6 +59,7 @@ rename-pres-≤ (≤-deref M′≤M) = ≤-deref (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-deref⋆ M′≤M) = ≤-deref⋆ (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-assign L′≤L M′≤M) = ≤-assign (rename-pres-≤ L′≤L) (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-assign? L′≤L M′≤M) = ≤-assign? (rename-pres-≤ L′≤L) (rename-pres-≤ M′≤M)
+rename-pres-≤ (≤-cast M′≤M) = ≤-cast (rename-pres-≤ M′≤M)
 rename-pres-≤ (≤-prot x M′≤M y) = ≤-prot x (rename-pres-≤ M′≤M) y
 
 
@@ -99,6 +100,7 @@ subst-pres-≤ (⊢assign ⊢L ⊢M _ _) σ′≤σ (≤-assign L′≤L M′≤
   ≤-assign (subst-pres-≤ ⊢L σ′≤σ L′≤L ) (subst-pres-≤ ⊢M σ′≤σ M′≤M)
 subst-pres-≤ (⊢assign? ⊢L ⊢M) σ′≤σ (≤-assign? L′≤L M′≤M) =
   ≤-assign? (subst-pres-≤ ⊢L σ′≤σ L′≤L) (subst-pres-≤ ⊢M σ′≤σ M′≤M)
+subst-pres-≤ (⊢cast ⊢M ) σ′≤σ (≤-cast M′≤M) = ≤-cast (subst-pres-≤ ⊢M σ′≤σ M′≤M)
 subst-pres-≤ (⊢prot {vc = v} ⊢M ⊢PC† _ _) σ′≤σ (≤-prot x M′≤M ⊢PC)
   rewrite pc-typing-uniq v ⊢PC ⊢PC† = ≤-prot x (subst-pres-≤ ⊢M σ′≤σ M′≤M) ⊢PC†
 

@@ -131,6 +131,11 @@ data _⊢_≤_⇐_ : Label → Term → CCTerm → Type → Set where
       ------------------------------------------------
     → gc ⊢ L′ :=? M′ ≤ assign? L M T g p ⇐ ` Unit of l low
 
+  ≤-cast : ∀ {gc M M′ A B} {c : Cast A ⇒ B}
+    → gc ⊢ M′ ≤ M ⇐ A
+      ------------------------------------
+    → gc ⊢ M′ ≤ M ⟨ c ⟩ ⇐ B
+
   ≤-prot : ∀ {g₁ g₂ M M′ ℓ ℓ′ A B} {PC : LExpr} {v : LVal PC}
     → ℓ′ ≼ ℓ
     → g₂ ⊢ M′ ≤ M ⇐ A
