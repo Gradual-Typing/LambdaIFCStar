@@ -35,7 +35,7 @@ erase (if L M N) = if (erase L) (erase M) (erase N)
 erase (ref?⟦ ℓ ⟧ M) = ref?⟦ ℓ ⟧ erase M
 erase (! M) = ! erase M
 erase (L :=? M) = erase L :=? erase M
-erase ● = ●
+erase _ = ●
 
 erase-val-value : ∀ {V} (v : Value V) → Value (erase V)
 erase-val-value (V-addr {a⟦ ℓ₁ ⟧ n} {low}) with ℓ₁

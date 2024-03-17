@@ -19,7 +19,8 @@ data Op : Set where
   op-deref        : Op
   op-assign?      : Op
   -- op-error        : Op
-  op-opaque       : Op  -- only in erasure
+  op-prot         : StaticLabel → Op   -- only in small-step
+  op-opaque       : Op                  -- only in erasure
 
 
 sig : Op → List Sig
@@ -32,6 +33,7 @@ sig (op-ref? ℓ)        = ■ ∷ []
 sig op-deref           = ■ ∷ []
 sig op-assign?         = ■ ∷ ■ ∷ []
 -- sig op-error           = []
+sig (op-prot ℓ)        = ■ ∷ []
 sig op-opaque          = []
 
 open Syntax.OpSig Op sig renaming (ABT to Term) hiding (plug) public
@@ -47,4 +49,5 @@ pattern ref?⟦_⟧_ ℓ M             = (op-ref? ℓ) ⦅ cons (ast M) nil ⦆
 pattern !_ M                     = op-deref ⦅ cons (ast M) nil ⦆
 pattern _:=?_ L M                = op-assign? ⦅ cons (ast L) (cons (ast M) nil) ⦆
 -- pattern error                    = op-error ⦅ nil ⦆
+pattern prot ℓ M                 = (op-prot ℓ) ⦅ cons (ast M) nil ⦆
 pattern ●                       = op-opaque ⦅ nil ⦆            {- opaque value -}

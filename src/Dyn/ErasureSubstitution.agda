@@ -46,6 +46,7 @@ rename-erase ρ (! M) rewrite rename-erase ρ M = refl
 rename-erase ρ (L :=? M)
   rewrite rename-erase ρ L | rename-erase ρ M = refl
 rename-erase ρ ● = refl
+rename-erase ρ (prot _ _) = refl
 
 ext-erase : ∀ σ → ext (erase-σ σ) ≡ erase-σ (ext σ)
 ext-erase σ = extensionality (ext-erase-x σ)
@@ -80,6 +81,7 @@ subst-erase σ (! M) rewrite subst-erase σ M = refl
 subst-erase σ (L :=? M)
   rewrite subst-erase σ L | subst-erase σ M = refl
 subst-erase σ ● = refl
+subst-erase σ (prot _ _) = refl
 
 
 subst-zero-erase : ∀ M → subst-zero (erase M) ≡ erase-σ (subst-zero M)
