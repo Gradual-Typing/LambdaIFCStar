@@ -21,7 +21,9 @@ open import Common.Utils
 
 open import Common.Coercions
 open import Memory.Addr
-open import CC2.Statics renaming (Term to CCTerm; `_ to var; $_ to const; ƛ to lam; addr to adrs)
+open import CC2.Statics
+  renaming (Term to CCTerm; `_ to var; $_ to const; ƛ to lam; addr to adrs; if to `if;
+            ref⟦_⟧ to refer; ref?⟦_⟧ to refer?; prot to protect; ! to deref; !⋆ to deref⋆)
 open import Dyn.Syntax
 
 
@@ -82,3 +84,55 @@ data _≤_⇐_ : Term → CCTerm → Type → Set where
     → N′ ≤ N ⇐ A
       ------------------------------------
     → M′ · N′ ≤ app⋆ M N A T ⇐ T of ⋆
+
+  ≤-if : ∀ {L L′ M M′ N N′} {A B ℓ}
+    → L′ ≤ L ⇐ ` Bool of l ℓ
+    → M′ ≤ M ⇐ A
+    → N′ ≤ N ⇐ A
+      ----------------------------------------
+    → if L′ M′ N′ ≤ `if L A ℓ M N ⇐ B
+
+  ≤-if⋆ : ∀ {L L′ M M′ N N′} {T}
+    → L′ ≤ L ⇐ ` Bool of ⋆
+    → M′ ≤ M ⇐ T of ⋆
+    → N′ ≤ N ⇐ T of ⋆
+      ------------------------------------
+    → if L′ M′ N′ ≤ if⋆ L T M N ⇐ T of ⋆
+
+  ≤-ref : ∀ {M M′ T ℓ}
+    → M′ ≤ M ⇐ T of l ℓ
+      --------------------------------------------------------
+    → ref?⟦ ℓ ⟧ M′ ≤ refer ℓ M ⇐ Ref (T of l ℓ) of l low
+
+  ≤-ref? : ∀ {M M′ T ℓ} {p}
+    → M′ ≤ M ⇐ T of l ℓ
+      -----------------------------------------------------------
+    → ref?⟦ ℓ ⟧ M′ ≤ refer? ℓ M p ⇐ Ref (T of l ℓ) of l low
+
+  ≤-deref : ∀ {M M′ A B ℓ}
+    → M′ ≤ M ⇐ Ref A of l ℓ
+      --------------------------------
+    → ! M′ ≤ deref M A ℓ ⇐ B
+
+  ≤-deref⋆ : ∀ {M M′ T}
+    → M′ ≤ M ⇐ Ref (T of ⋆) of ⋆
+      --------------------------------
+    → ! M′ ≤ deref⋆ M T ⇐ T of ⋆
+
+  ≤-assign : ∀ {L L′ M M′} {T ℓ ℓ̂}
+    → L′ ≤ L ⇐ Ref (T of l ℓ̂) of l ℓ
+    → M′ ≤ M ⇐ T of l ℓ̂
+      ------------------------------------------------
+    → L′ :=? M′ ≤ assign L M T ℓ̂ ℓ ⇐ ` Unit of l low
+
+  ≤-assign? : ∀ {L L′ M M′} {T g p}
+    → L′ ≤ L ⇐ Ref (T of g) of ⋆
+    → M′ ≤ M ⇐ T of g
+      ------------------------------------------------
+    → L′ :=? M′ ≤ assign? L M T g p ⇐ ` Unit of l low
+
+  ≤-prot : ∀ {M M′ ℓ ℓ′ A B} {PC : LExpr} {v : LVal PC}
+    → ℓ′ ≼ ℓ
+    → M′ ≤ M ⇐ A
+      --------------------------------------------
+    → prot ℓ′ M′ ≤ protect PC v ℓ M A ⇐ B
