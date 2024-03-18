@@ -142,3 +142,19 @@ data _⊢_≤_⇐_ : Label → Term → CCTerm → Type → Set where
     → ⊢ PC ⇐ g₂
       --------------------------------------------
     → g₁ ⊢ prot ℓ′ M′ ≤ protect PC v ℓ M A ⇐ B
+
+
+≤-value-pc : ∀ {g₁ g₂ M V A}
+  → g₁ ⊢ M ≤ V ⇐ A
+  → Value V
+    --------------------------------
+  → g₂ ⊢ M ≤ V ⇐ A
+≤-value-pc (≤-addr x) (V-raw V-addr) = ≤-addr x
+≤-value-pc (≤-lam x y) (V-raw V-ƛ) = ≤-lam x y
+≤-value-pc (≤-const x) (V-raw V-const) = ≤-const x
+≤-value-pc (≤-wrapped-addr 𝓋 x) (V-cast V-addr x₁) = ≤-wrapped-addr 𝓋 x
+≤-value-pc (≤-cast (≤-addr x)) (V-cast V-addr i) = ≤-cast (≤-addr x)
+≤-value-pc (≤-wrapped-lam M≤V 𝓋 x) (V-cast V-ƛ i) = ≤-wrapped-lam M≤V 𝓋 x
+≤-value-pc (≤-cast (≤-lam M≤V x)) (V-cast V-ƛ i) = ≤-cast (≤-lam M≤V x)
+≤-value-pc (≤-wrapped-const 𝓋 x y) (V-cast V-const x₁) = ≤-wrapped-const 𝓋 x y
+≤-value-pc (≤-cast (≤-const x)) (V-cast V-const x₁) = ≤-cast (≤-const x)
