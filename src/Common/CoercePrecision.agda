@@ -64,6 +64,13 @@ coerce-prec : ∀ {A A′ B B′} {p q}
     ----------------------------------------
   → ⟨ coerce A≲B p ⟩⊑⟨ coerce A′≲B′ q ⟩
 coerce-prec (⊑-ty g₁⊑g₂ ⊑-ι) (⊑-ty g₃⊑g₄ ⊑-ι) (≲-ty g₁≲g₃ ≲-ι) (≲-ty g₂≲g₄ ≲-ι) =
-  ⊑-base {!!}
-coerce-prec A⊑A′ B⊑B′ (≲-ty x (≲-ref x₁ x₄)) (≲-ty x₂ (≲-ref x₃ x₅)) = {!!}
-coerce-prec A⊑A′ B⊑B′ (≲-ty x (≲-fun x₁ x₄ x₅)) (≲-ty x₂ (≲-fun x₃ x₆ x₇)) = {!!}
+  ⊑-base (coerceₗ-prec g₁⊑g₂ g₃⊑g₄ g₁≲g₃ g₂≲g₄)
+coerce-prec (⊑-ty g₁⊑g₃ (⊑-ref A⊑C)) (⊑-ty g₂⊑g₄ (⊑-ref B⊑D))
+            (≲-ty g₁≲g₂ (≲-ref A≲B B≲A)) (≲-ty g₃≲g₄ (≲-ref C≲D D≲C)) =
+  ⊑-ref (coerce-prec B⊑D A⊑C B≲A D≲C) (coerce-prec A⊑C B⊑D A≲B C≲D) (coerceₗ-prec g₁⊑g₃ g₂⊑g₄ g₁≲g₂ g₃≲g₄)
+coerce-prec (⊑-ty g₁⊑g₂ (⊑-fun gc₁⊑gc₂ A⊑C B⊑D)) (⊑-ty g₃⊑g₄ (⊑-fun gc₃⊑gc₄ A′⊑C′ B′⊑D′))
+            (≲-ty g₁≲g₃ (≲-fun gc₃≲gc₁ A′≲A B≲B′)) (≲-ty g₂≲g₄ (≲-fun gc₄≲gc₂ C′≲C D≲D′)) =
+  ⊑-fun (coerceₗ-prec gc₃⊑gc₄ gc₁⊑gc₂ gc₃≲gc₁ gc₄≲gc₂)
+        (coerce-prec A′⊑C′ A⊑C A′≲A C′≲C)
+        (coerce-prec B⊑D B′⊑D′ B≲B′ D≲D′)
+        (coerceₗ-prec g₁⊑g₂ g₃⊑g₄ g₁≲g₃ g₂≲g₄)
