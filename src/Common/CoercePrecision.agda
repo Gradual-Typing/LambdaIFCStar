@@ -106,3 +106,28 @@ coerce-prec-left (⊑-ty g₁⊑g (⊑-fun gc₁⊑gc A⊑E B⊑F)) (⊑-ty g₂
         (coerce-prec-left C⊑E A⊑E C≲A)
         (coerce-prec-left B⊑F D⊑F B≲D)
         (coerceₗ-prec-left g₁⊑g g₂⊑g g₁≲g₂)
+
+coerce-id-prec-left : ∀ {A B}
+  → A ⊑ B
+    ------------------------
+  → ⟨ coerce-id A ⟩⊑ B
+coerce-id-prec-left (⊑-ty x ⊑-ι) = ⊑-base (⊑-id x)
+coerce-id-prec-left (⊑-ty x (⊑-ref x₁)) =
+  ⊑-ref (coerce-id-prec-left x₁) (coerce-id-prec-left x₁) (⊑-id x)
+coerce-id-prec-left (⊑-ty x (⊑-fun x₁ x₂ x₃)) =
+  ⊑-fun (⊑-id x₁) (coerce-id-prec-left x₂) (coerce-id-prec-left x₃) (⊑-id x)
+
+inject-prec-left : ∀ {T g A}
+  → T of g ⊑ A
+    ----------------------------
+  → ⟨ inject T g ⟩⊑ A
+inject-prec-left (⊑-ty ⋆⊑ ⊑-ι) = ⊑-base (⊑-id ⋆⊑)
+inject-prec-left (⊑-ty l⊑l ⊑-ι ) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+inject-prec-left (⊑-ty ⋆⊑ (⊑-ref x)) =
+  ⊑-ref (coerce-id-prec-left x) (coerce-id-prec-left x) (⊑-id ⋆⊑)
+inject-prec-left (⊑-ty l⊑l (⊑-ref x)) =
+  ⊑-ref (coerce-id-prec-left x) (coerce-id-prec-left x) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+inject-prec-left (⊑-ty ⋆⊑ (⊑-fun x x₁ x₂)) =
+  ⊑-fun (⊑-id x) (coerce-id-prec-left x₁) (coerce-id-prec-left x₂) (⊑-id ⋆⊑)
+inject-prec-left (⊑-ty l⊑l (⊑-fun x x₁ x₂)) =
+  ⊑-fun (⊑-id x) (coerce-id-prec-left x₁) (coerce-id-prec-left x₂) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
