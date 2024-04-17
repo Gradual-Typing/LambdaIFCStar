@@ -398,12 +398,36 @@ l ℓ₁ ⊑ₗ? l ℓ₂ =
   (yes refl) → yes l⊑l
   (no ℓ₁≢ℓ₂) → no λ { l⊑l → contradiction refl ℓ₁≢ℓ₂ }
 
+consis-meet-⊑ₗ : ∀ {g₁ g₁′ g₂ g₂′}
+  → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′ → (g₁ ⋏̃ g₂) ⊑ₗ (g₁′ ⋏̃ g₂′)
+consis-meet-⊑ₗ ⋆⊑  ⋆⊑  = ⋆⊑
+consis-meet-⊑ₗ ⋆⊑  l⊑l = ⋆⊑
+consis-meet-⊑ₗ l⊑l ⋆⊑  = ⋆⊑
+consis-meet-⊑ₗ l⊑l l⊑l = l⊑l
+
 consis-join-⊑ₗ : ∀ {g₁ g₁′ g₂ g₂′}
-  → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′ → g₁ ⋎̃ g₂ ⊑ₗ g₁′ ⋎̃ g₂′
+  → g₁ ⊑ₗ g₁′ → g₂ ⊑ₗ g₂′ → (g₁ ⋎̃ g₂) ⊑ₗ (g₁′ ⋎̃ g₂′)
 consis-join-⊑ₗ ⋆⊑  ⋆⊑  = ⋆⊑
 consis-join-⊑ₗ ⋆⊑  l⊑l = ⋆⊑
 consis-join-⊑ₗ l⊑l ⋆⊑  = ⋆⊑
 consis-join-⊑ₗ l⊑l l⊑l = l⊑l
+
+prec-join-⊑ₗ : ∀ {g₁ g₂ g₃ g₁′ g₂′ g₃′}
+  → g₁ ⊑ₗ g₁′
+  → g₂ ⊑ₗ g₂′
+  → g₁  ⊓ₗ g₂  ≡ just g₃
+  → g₁′ ⊓ₗ g₂′ ≡ just g₃′
+  → g₃ ⊑ₗ g₃′
+prec-join-⊑ₗ ⋆⊑ ⋆⊑ refl eq′ = ⋆⊑
+prec-join-⊑ₗ {g₁′ = ⋆} ⋆⊑ l⊑l refl refl = l⊑l
+prec-join-⊑ₗ {g₁′ = l low} ⋆⊑ (l⊑l {low}) refl refl = l⊑l
+prec-join-⊑ₗ {g₁′ = l high} ⋆⊑ (l⊑l {high}) refl refl = l⊑l
+prec-join-⊑ₗ (l⊑l {low}) (⋆⊑ {l low}) refl refl = l⊑l
+prec-join-⊑ₗ (l⊑l {low}) (⋆⊑ {⋆}) refl refl = l⊑l
+prec-join-⊑ₗ (l⊑l {high}) (⋆⊑ {l high}) refl refl = l⊑l
+prec-join-⊑ₗ (l⊑l {high}) (⋆⊑ {⋆}) refl refl = l⊑l
+prec-join-⊑ₗ (l⊑l {high}) (l⊑l {high}) refl refl = l⊑l
+prec-join-⊑ₗ (l⊑l {low}) (l⊑l {low}) refl refl = l⊑l
 
 
 {- **** Precision-subtyping **** -}

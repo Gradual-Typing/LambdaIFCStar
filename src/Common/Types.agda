@@ -618,6 +618,97 @@ _⊑?_ : (A B : Type) → Dec (A ⊑ B)
 (⟦ _ ⟧ _ ⇒ _ of _) ⊑? (Ref _ of _) = no λ { (⊑-ty _ ()) }
 
 
+
+prec-join-⊑ : ∀ {A A′ B B′ C C′}
+  → A ⊑ A′
+  → B ⊑ B′
+  → A ⊓ B ≡ just C
+  → A′ ⊓ B′ ≡ just C′
+  → C ⊑ C′
+prec-join-⊑ {` Unit of g₁} {` Unit of g₁′} {` Unit of g₂} {` Unit of g₂′}
+            (⊑-ty g₁⊑g₁′ ⊑-ι) (⊑-ty g₂⊑g₂′ ⊑-ι) eq eq′
+  with g₁ ⊓ₗ g₂ in g₁⊓g₂≡g₃ | g₁′ ⊓ₗ g₂′ in g₁′⊓g₂′≡g₃′ | eq | eq′
+... | just g₃ | just g₃′ | refl | refl = ⊑-ty (prec-join-⊑ₗ g₁⊑g₁′ g₂⊑g₂′ g₁⊓g₂≡g₃ g₁′⊓g₂′≡g₃′) ⊑-ι
+prec-join-⊑ {` Bool of g₁} {` Bool of g₁′} {` Bool of g₂} {` Bool of g₂′}
+            (⊑-ty g₁⊑g₁′ ⊑-ι) (⊑-ty g₂⊑g₂′ ⊑-ι) eq eq′
+  with g₁ ⊓ₗ g₂ in g₁⊓g₂≡g₃ | g₁′ ⊓ₗ g₂′ in g₁′⊓g₂′≡g₃′ | eq | eq′
+... | just g₃ | just g₃′ | refl | refl = ⊑-ty (prec-join-⊑ₗ g₁⊑g₁′ g₂⊑g₂′ g₁⊓g₂≡g₃ g₁′⊓g₂′≡g₃′) ⊑-ι
+prec-join-⊑ {` Unit of _} (⊑-ty _ ⊑-ι) (⊑-ty _ (⊑-ref _)) ()
+prec-join-⊑ {` Bool of _} (⊑-ty _ ⊑-ι) (⊑-ty _ (⊑-ref _)) ()
+prec-join-⊑ {` Unit of _} (⊑-ty _ ⊑-ι) (⊑-ty _ (⊑-fun _ _ _)) ()
+prec-join-⊑ {` Bool of _} (⊑-ty _ ⊑-ι) (⊑-ty _ (⊑-fun _ _ _)) ()
+prec-join-⊑ {Ref A of g₁} {Ref A′ of g₁′} {Ref B of g₂} {Ref B′ of g₂′}
+            (⊑-ty g₁⊑g₁′ (⊑-ref A⊑A′)) (⊑-ty g₂⊑g₂′ (⊑-ref B⊑B′)) eq eq′
+  with A ⊓ B in A⊓B≡C | A′ ⊓ B′ in A′⊓B′≡C′
+     | g₁ ⊓ₗ g₂ in g₁⊓g₂≡g₃ | g₁′ ⊓ₗ g₂′ in g₁′⊓g₂′≡g₃′ | eq | eq′
+... | just C | just C′ | just g₃ | just g₃′ | refl | refl =
+  ⊑-ty (prec-join-⊑ₗ g₁⊑g₁′ g₂⊑g₂′ g₁⊓g₂≡g₃ g₁′⊓g₂′≡g₃′) (⊑-ref (prec-join-⊑ A⊑A′ B⊑B′ A⊓B≡C A′⊓B′≡C′))
+prec-join-⊑ {⟦ g₃ ⟧ A ⇒ B of g₁} {⟦ g₃′ ⟧ A′ ⇒ B′ of g₁′} {⟦ g₄ ⟧ C ⇒ D of g₂} {⟦ g₄′ ⟧ C′ ⇒ D′ of g₂′}
+  (⊑-ty g₁⊑g₁′ (⊑-fun g₃⊑g₃′ A⊑A′ B⊑B′)) (⊑-ty g₂⊑g₂′ (⊑-fun g₄⊑g₄′ C⊑C′ D⊑D′)) eq eq′
+  with g₁ ⊓ₗ g₂ in g₁⊓g₂≡g₅ | g₁′ ⊓ₗ g₂′ in g₁′⊓g₂′≡g₅′ | g₃ ⊓ₗ g₄ in g₃⊓g₄≡g₆ | g₃′ ⊓ₗ g₄′ in g₃′⊓g₄′≡g₆′
+     | A ⊓ C in A⊓C≡E | A′ ⊓ C′ in A′⊓C′≡E′ | B ⊓ D in B⊓D≡F | B′ ⊓ D′ in B′⊓D′≡F′ | eq | eq′
+... | just g₅ | just g₅′ | just g₆ | just g₆′
+    | just E | just E′ | just F | just F′ | refl | refl =
+  ⊑-ty (prec-join-⊑ₗ g₁⊑g₁′ g₂⊑g₂′ g₁⊓g₂≡g₅ g₁′⊓g₂′≡g₅′)
+       (⊑-fun (prec-join-⊑ₗ g₃⊑g₃′ g₄⊑g₄′ g₃⊓g₄≡g₆ g₃′⊓g₄′≡g₆′)
+              (prec-join-⊑ A⊑A′ C⊑C′ A⊓C≡E A′⊓C′≡E′)
+              (prec-join-⊑ B⊑B′ D⊑D′ B⊓D≡F B′⊓D′≡F′))
+
+
+consis-meet-⊑ : ∀ {A A′ B B′ C C′}
+  → A ⊑ A′
+  → B ⊑ B′
+  → A  ∧̃ B  ≡ just C
+  → A′ ∧̃ B′ ≡ just C′
+    ----------------------------------------
+  → C ⊑ C′
+consis-join-⊑ : ∀ {A A′ B B′ C C′}
+  → A ⊑ A′
+  → B ⊑ B′
+  → A ∨̃ B ≡ just C
+  → A′ ∨̃ B′ ≡ just C′
+    ----------------------------------------
+  → C ⊑ C′
+consis-meet-⊑ {A = ` Unit of _} {B = ` Unit of _} (⊑-ty g₁⊑g₂ ⊑-ι) (⊑-ty g₃⊑g₄ ⊑-ι) refl refl =
+  ⊑-ty (consis-meet-⊑ₗ g₁⊑g₂ g₃⊑g₄) ⊑-ι
+consis-meet-⊑ {A = ` Bool of _} {B = ` Bool of _} (⊑-ty g₁⊑g₂ ⊑-ι) (⊑-ty g₃⊑g₄ ⊑-ι) refl refl =
+  ⊑-ty (consis-meet-⊑ₗ g₁⊑g₂ g₃⊑g₄) ⊑-ι
+consis-meet-⊑ {A = ` Unit of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-ref x₁)) ()
+consis-meet-⊑ {A = ` Bool of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-ref x₁)) ()
+consis-meet-⊑ {A = ` Unit of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-fun x₁ x₃ x₄)) ()
+consis-meet-⊑ {A = ` Bool of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-fun x₁ x₃ x₄)) ()
+consis-meet-⊑ {Ref A of _} {Ref A′ of _} {Ref B of _} {Ref B′ of _}
+              (⊑-ty g₁⊑g₂ (⊑-ref A⊑A′)) (⊑-ty g₃⊑g₄ (⊑-ref B⊑B′)) eq eq′
+  with A ⊓ B in A⊓B≡C | A′ ⊓ B′ in A′⊓B′≡C | eq | eq′
+... | just C | just C′ | refl | refl =
+  ⊑-ty (consis-meet-⊑ₗ g₁⊑g₂ g₃⊑g₄) (⊑-ref (prec-join-⊑ A⊑A′ B⊑B′ A⊓B≡C A′⊓B′≡C))
+consis-meet-⊑ {⟦ g₃ ⟧ A ⇒ B of g₁} {⟦ g₃′ ⟧ A′ ⇒ B′ of g₁′} {⟦ g₄ ⟧ C ⇒ D of g₂} {⟦ g₄′ ⟧ C′ ⇒ D′ of g₂′}
+              (⊑-ty g₁⊑g₁′ (⊑-fun g₃⊑g₃′ A⊑A′ B⊑B′)) (⊑-ty g₂⊑g₂′ (⊑-fun g₄⊑g₄′ C⊑C′ D⊑D′)) eq eq′
+  with A ∨̃ C in A∨̃C≡E | B ∧̃ D in B∧̃D≡F | A′ ∨̃ C′ in A′∨̃C′≡E′ | B′ ∧̃ D′ in B′∧̃D′≡F′ | eq | eq′
+... | just E | just F | just E′ | just F′ | refl | refl =
+  ⊑-ty (consis-meet-⊑ₗ g₁⊑g₁′ g₂⊑g₂′) (⊑-fun (consis-join-⊑ₗ g₃⊑g₃′ g₄⊑g₄′)
+       (consis-join-⊑ A⊑A′ C⊑C′ A∨̃C≡E A′∨̃C′≡E′) (consis-meet-⊑ B⊑B′ D⊑D′ B∧̃D≡F B′∧̃D′≡F′))
+
+consis-join-⊑ {A = ` Unit of _} {B = ` Unit of _} (⊑-ty g₁⊑g₂ ⊑-ι) (⊑-ty g₃⊑g₄ ⊑-ι) refl refl =
+  ⊑-ty (consis-join-⊑ₗ g₁⊑g₂ g₃⊑g₄) ⊑-ι
+consis-join-⊑ {A = ` Bool of _} {B = ` Bool of _} (⊑-ty g₁⊑g₂ ⊑-ι) (⊑-ty g₃⊑g₄ ⊑-ι) refl refl =
+  ⊑-ty (consis-join-⊑ₗ g₁⊑g₂ g₃⊑g₄) ⊑-ι
+consis-join-⊑ {A = ` Unit of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-ref x₁)) ()
+consis-join-⊑ {A = ` Bool of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-ref x₁)) ()
+consis-join-⊑ {A = ` Unit of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-fun x₁ x₃ x₄)) ()
+consis-join-⊑ {A = ` Bool of _} (⊑-ty x ⊑-ι) (⊑-ty x₂ (⊑-fun x₁ x₃ x₄)) ()
+consis-join-⊑ {Ref A of _} {Ref A′ of _} {Ref B of _} {Ref B′ of _} (⊑-ty g₁⊑g₂ (⊑-ref A⊑A′)) (⊑-ty g₃⊑g₄ (⊑-ref B⊑B′)) eq eq′
+  with A ⊓ B in A⊓B≡C | A′ ⊓ B′ in A′⊓B′≡C | eq | eq′
+... | just C | just C′ | refl | refl =
+  ⊑-ty (consis-join-⊑ₗ g₁⊑g₂ g₃⊑g₄) (⊑-ref (prec-join-⊑ A⊑A′ B⊑B′ A⊓B≡C A′⊓B′≡C))
+consis-join-⊑ {⟦ g₃ ⟧ A ⇒ B of g₁} {⟦ g₃′ ⟧ A′ ⇒ B′ of g₁′} {⟦ g₄ ⟧ C ⇒ D of g₂} {⟦ g₄′ ⟧ C′ ⇒ D′ of g₂′}
+              (⊑-ty g₁⊑g₁′ (⊑-fun g₃⊑g₃′ A⊑A′ B⊑B′)) (⊑-ty g₂⊑g₂′ (⊑-fun g₄⊑g₄′ C⊑C′ D⊑D′)) eq eq′
+  with A ∧̃ C in A∧̃C≡E | B ∨̃ D in B∨̃D≡F | A′ ∧̃ C′ in A′∧̃C′≡E′ | B′ ∨̃ D′ in B′∨̃D′≡F′ | eq | eq′
+... | just E | just F | just E′ | just F′ | refl | refl =
+  ⊑-ty (consis-join-⊑ₗ g₁⊑g₁′ g₂⊑g₂′) (⊑-fun (consis-meet-⊑ₗ g₃⊑g₃′ g₄⊑g₄′)
+       (consis-meet-⊑ A⊑A′ C⊑C′ A∧̃C≡E A′∧̃C′≡E′) (consis-join-⊑ B⊑B′ D⊑D′ B∨̃D≡F B′∨̃D′≡F′))
+
+
 {- **** Precision-subtyping **** -}
 infix 5 _⊑:>ᵣ_
 infix 5 _⊑:>_
