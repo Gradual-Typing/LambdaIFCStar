@@ -23,6 +23,12 @@ open import Common.Coercions
 open import Common.CoercionPrecision
 
 
+private
+  id⋆⊑coerce-to⋆ : ∀ {g} → ⊢ id ⋆ ⊑ coerce g ⇒⋆
+  id⋆⊑coerce-to⋆ {⋆} = ⊑-id ⋆⊑
+  id⋆⊑coerce-to⋆ {l x} = ⊑-castr (⊑-id ⋆⊑) ⋆⊑ ⋆⊑
+
+
 coerceₗ-prec : ∀ {g₁ g₂ g₃ g₄} {p q}
   → g₁ ⊑ₗ g₂
   → g₃ ⊑ₗ g₄
@@ -117,6 +123,16 @@ coerce-id-prec-left (⊑-ty x (⊑-ref x₁)) =
 coerce-id-prec-left (⊑-ty x (⊑-fun x₁ x₂ x₃)) =
   ⊑-fun (⊑-id x₁) (coerce-id-prec-left x₂) (coerce-id-prec-left x₃) (⊑-id x)
 
+coerce-id-prec : ∀ {A B}
+  → A ⊑ B
+    ------------------------
+  → ⟨ coerce-id A ⟩⊑⟨ coerce-id B ⟩
+coerce-id-prec (⊑-ty x ⊑-ι) = ⊑-base (⊑-id x)
+coerce-id-prec (⊑-ty x (⊑-ref x₁)) =
+  ⊑-ref (coerce-id-prec x₁) (coerce-id-prec x₁) (⊑-id x)
+coerce-id-prec (⊑-ty x (⊑-fun x₁ x₂ x₃)) =
+  ⊑-fun (⊑-id x₁) (coerce-id-prec x₂) (coerce-id-prec x₃) (⊑-id x)
+
 inject-prec-left : ∀ {T g A}
   → T of g ⊑ A
     ----------------------------
@@ -131,3 +147,19 @@ inject-prec-left (⊑-ty ⋆⊑ (⊑-fun x x₁ x₂)) =
   ⊑-fun (⊑-id x) (coerce-id-prec-left x₁) (coerce-id-prec-left x₂) (⊑-id ⋆⊑)
 inject-prec-left (⊑-ty l⊑l (⊑-fun x x₁ x₂)) =
   ⊑-fun (⊑-id x) (coerce-id-prec-left x₁) (coerce-id-prec-left x₂) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+
+
+inject-prec : ∀ {S T g g′}
+  → S of g ⊑ T of g′
+    ----------------------------
+  → ⟨ inject S g ⟩⊑⟨ inject T g′ ⟩
+inject-prec (⊑-ty ⋆⊑ ⊑-ι) = ⊑-base id⋆⊑coerce-to⋆
+inject-prec (⊑-ty l⊑l ⊑-ι ) = ⊑-base (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+inject-prec (⊑-ty ⋆⊑ (⊑-ref x)) =
+  ⊑-ref (coerce-id-prec x) (coerce-id-prec x) id⋆⊑coerce-to⋆
+inject-prec (⊑-ty l⊑l (⊑-ref x)) =
+  ⊑-ref (coerce-id-prec x) (coerce-id-prec x) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
+inject-prec (⊑-ty ⋆⊑ (⊑-fun x x₁ x₂)) =
+  ⊑-fun (⊑-id x) (coerce-id-prec x₁) (coerce-id-prec x₂) id⋆⊑coerce-to⋆
+inject-prec (⊑-ty l⊑l (⊑-fun x x₁ x₂)) =
+  ⊑-fun (⊑-id x) (coerce-id-prec x₁) (coerce-id-prec x₂) (⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑)
