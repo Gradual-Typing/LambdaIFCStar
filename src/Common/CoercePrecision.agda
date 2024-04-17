@@ -56,6 +56,19 @@ coerceₗ-prec l⊑l l⊑l (≾-l l≼l) (≾-l l≼l) = ⊑-id l⊑l
 coerceₗ-prec l⊑l l⊑l (≾-l l≼h) (≾-l l≼h) = ⊑-cast (⊑-id l⊑l) l⊑l l⊑l
 coerceₗ-prec l⊑l l⊑l (≾-l h≼h) (≾-l h≼h) = ⊑-id l⊑l
 
+coerceₗ-prec-left : ∀ {g₁ g₂ g} {p}
+  → g₁ ⊑ₗ g
+  → g₂ ⊑ₗ g
+  → (g₁≾g₂ : g₁ ≾ g₂)
+    ----------------------------------------
+  → ⊢l coerceₗ g₁≾g₂ p ⊑ g
+coerceₗ-prec-left ⋆⊑ ⋆⊑ ≾-⋆r = ⊑-id ⋆⊑
+coerceₗ-prec-left ⋆⊑ ⋆⊑ ≾-⋆l = ⊑-id ⋆⊑
+coerceₗ-prec-left ⋆⊑ l⊑l ≾-⋆l = ⊑-cast (⊑-id ⋆⊑) ⋆⊑ l⊑l
+coerceₗ-prec-left l⊑l ⋆⊑ ≾-⋆r = ⊑-cast (⊑-id l⊑l) l⊑l ⋆⊑
+coerceₗ-prec-left l⊑l l⊑l (≾-l l≼l) = ⊑-id l⊑l
+coerceₗ-prec-left l⊑l l⊑l (≾-l h≼h) = ⊑-id l⊑l
+
 coerce-prec : ∀ {A A′ B B′} {p q}
   → A  ⊑ A′
   → B  ⊑ B′
@@ -74,3 +87,22 @@ coerce-prec (⊑-ty g₁⊑g₂ (⊑-fun gc₁⊑gc₂ A⊑C B⊑D)) (⊑-ty g�
         (coerce-prec A′⊑C′ A⊑C A′≲A C′≲C)
         (coerce-prec B⊑D B′⊑D′ B≲B′ D≲D′)
         (coerceₗ-prec g₁⊑g₂ g₃⊑g₄ g₁≲g₃ g₂≲g₄)
+
+
+coerce-prec-left : ∀ {A B C} {p}
+  → A ⊑ C
+  → B ⊑ C
+  → (A≲B : A ≲ B)
+    ----------------------------------------
+  → ⟨ coerce A≲B p ⟩⊑ C
+coerce-prec-left (⊑-ty g₁⊑g ⊑-ι) (⊑-ty g₂⊑g ⊑-ι) (≲-ty g₁≲g₂ ≲-ι) =
+  ⊑-base (coerceₗ-prec-left g₁⊑g g₂⊑g g₁≲g₂)
+coerce-prec-left (⊑-ty g₁⊑g (⊑-ref A⊑C)) (⊑-ty g₂⊑g (⊑-ref B⊑C))
+                 (≲-ty g₁≲g₂ (≲-ref A≲B B≲A)) =
+  ⊑-ref (coerce-prec-left B⊑C A⊑C B≲A) (coerce-prec-left A⊑C B⊑C A≲B) (coerceₗ-prec-left g₁⊑g g₂⊑g g₁≲g₂)
+coerce-prec-left (⊑-ty g₁⊑g (⊑-fun gc₁⊑gc A⊑E B⊑F)) (⊑-ty g₂⊑g (⊑-fun gc₂⊑gc C⊑E D⊑F))
+            (≲-ty g₁≲g₂ (≲-fun gc₂≲gc₁ C≲A B≲D)) =
+  ⊑-fun (coerceₗ-prec-left gc₂⊑gc gc₁⊑gc gc₂≲gc₁)
+        (coerce-prec-left C⊑E A⊑E C≲A)
+        (coerce-prec-left B⊑F D⊑F B≲D)
+        (coerceₗ-prec-left g₁⊑g g₂⊑g g₁≲g₂)
