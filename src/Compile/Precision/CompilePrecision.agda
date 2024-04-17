@@ -1,4 +1,4 @@
-module CC2.CompilePrecision where
+module Compile.Precision.CompilePrecision where
 
 open import Data.Nat
 open import Data.List
