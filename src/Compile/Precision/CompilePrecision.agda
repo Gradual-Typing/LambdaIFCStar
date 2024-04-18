@@ -362,19 +362,26 @@ compile-pres-precision-if Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ M⊑M′ N�
          (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty ⋆⊑ T⊑T′) (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
 
 
+{- Compiling values -}
 compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-const ⊢const ⊢const = ⊑-const
 compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-var (⊢var Γ∋x⦂A) (⊢var Γ′∋x⦂A′) = ⊑-var Γ∋x⦂A Γ′∋x⦂A′
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-lam x x₁ M⊑M′) ⊢M ⊢M′ = {!!}
+compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-lam g₁⊑g₂ A⊑A′ M⊑M′) (⊢lam ⊢M) (⊢lam ⊢M′) =
+  ⊑-lam g₁⊑g₂ A⊑A′ (compile-pres-precision (⊑*-∷ A⊑A′ Γ⊑Γ′) g₁⊑g₂ M⊑M′ ⊢M ⊢M′)
+{- Compiling function application -}
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-app M⊑M′ M⊑M′₁) ⊢M ⊢M′ = {!!}
-{- Compiling If -}
+{- Compiling if-conditional -}
 compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ N₁⊑N₁′ N₂⊑N₂′) ⊢M ⊢M′ =
   compile-pres-precision-if Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ N₁⊑N₁′ N₂⊑N₂′) ⊢M ⊢M′ refl refl
-{- Compiling Type Annotation -}
+{- Compiling type annotation -}
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-ann M⊑M′ A⊑A′) (⊢ann ⊢M B≲A) (⊢ann ⊢M′ B′≲A′) =
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ g⊑g′ M⊑M′ ⊢M ⊢M′ in
   let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ in
   ⊑-cast 𝒞M⊑𝒞M′ (coerce-prec B⊑B′ A⊑A′ B≲A B′≲A′)
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-let M⊑M′ M⊑M′₁) ⊢M ⊢M′ = {!!}
+{- Compiling let-expression -}
+compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-let M⊑M′ N⊑N′) (⊢let ⊢M ⊢N) (⊢let ⊢M′ ⊢N′) =
+  let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ g⊑g′ M⊑M′ ⊢M ⊢M′ in
+  let ⟨ _ , _ , A⊑A′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ in
+  ⊑-let 𝒞M⊑𝒞M′ (compile-pres-precision (⊑*-∷ A⊑A′ Γ⊑Γ′) g⊑g′ N⊑N′ ⊢N ⊢N′)
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-ref M⊑M′) ⊢M ⊢M′ = {!!}
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-deref M⊑M′) ⊢M ⊢M′ = {!!}
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-assign M⊑M′ M⊑M′₁) ⊢M ⊢M′ = {!!}
