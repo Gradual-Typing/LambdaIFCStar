@@ -27,6 +27,7 @@ open import CC2.Precision
 open import CC2.Compile
 
 
+{- Here is the (lemma?) statement of "compilation preserves precision" -}
 compile-pres-precision : ∀ {Γ Γ′ g g′ M M′ A A′}
   → Γ ⊑* Γ′
   → g ⊑ₗ g′
@@ -274,9 +275,92 @@ compile-pres-precision-if Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ M⊑M′ N�
                 (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
                                 (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
                         (inject-prec C⊑C′)))
-         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) {!⊑-ty ⋆⊑ T⊑T′!} (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
-... | ⋆ | ⋆ | l _ | ⋆ | _ | _ | ⋆⊑ | ⋆⊑ = {!!}
-... | ⋆ | ⋆ | ⋆ | ⋆ | _ | _ | ⋆⊑ | ⋆⊑ = {!!}
+         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty ⋆⊑ T⊑T′) (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+
+... | ⋆ | ⋆ | l _ | ⋆ | T of ⋆ | T′ of ⋆ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of ⋆ ⊑ T′ of ⋆
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ L⊑L′ ⊢L ⊢L′) (inject-prec (⊑-ty ⋆⊑ ⊑-ι)))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec C⊑C′ C⊑C′ (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+... | ⋆ | ⋆ | l _ | ⋆ | T of ⋆ | T′ of l ℓ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of ⋆ ⊑ T′ of l ℓ
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  let T⊑T′ : T ⊑ᵣ T′
+      T⊑T′ = case C⊑C′ of λ where (⊑-ty _ T⊑T′) → T⊑T′ in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ L⊑L′ ⊢L ⊢L′) (inject-prec (⊑-ty ⋆⊑ ⊑-ι)))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty ⋆⊑ T⊑T′) (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+... | ⋆ | ⋆ | l _ | ⋆ | T of l ℓ | T′ of ⋆ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of l ℓ ⊑ T′ of ⋆  -- however, C ⊑ C′ is impossible
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  case C⊑C′ of λ where (⊑-ty () _)
+... | ⋆ | ⋆ | l _ | ⋆ | T of l ℓ₁ | T′ of l ℓ₂ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of l ℓ₁ ⊑ T′ of l ℓ₂
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  let T⊑T′ : T ⊑ᵣ T′
+      T⊑T′ = case C⊑C′ of λ where (⊑-ty _ T⊑T′) → T⊑T′ in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ L⊑L′ ⊢L ⊢L′) (inject-prec (⊑-ty ⋆⊑ ⊑-ι)))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty ⋆⊑ T⊑T′) (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+
+... | ⋆ | ⋆ | ⋆ | ⋆ | T of ⋆ | T′ of ⋆ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of ⋆ ⊑ T′ of ⋆
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ L⊑L′ ⊢L ⊢L′) (inject-prec (⊑-ty ⋆⊑ ⊑-ι)))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec C⊑C′ C⊑C′ (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+... | ⋆ | ⋆ | ⋆ | ⋆ | T of ⋆ | T′ of l ℓ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of ⋆ ⊑ T′ of l ℓ
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  let T⊑T′ : T ⊑ᵣ T′
+      T⊑T′ = case C⊑C′ of λ where (⊑-ty _ T⊑T′) → T⊑T′ in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ L⊑L′ ⊢L ⊢L′) (inject-prec (⊑-ty ⋆⊑ ⊑-ι)))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty ⋆⊑ T⊑T′) (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+... | ⋆ | ⋆ | ⋆ | ⋆ | T of l ℓ | T′ of ⋆ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of l ℓ ⊑ T′ of ⋆  -- however, C ⊑ C′ is impossible
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  case C⊑C′ of λ where (⊑-ty () _)
+... | ⋆ | ⋆ | ⋆ | ⋆ | T of l ℓ₁ | T′ of l ℓ₂ | ⋆⊑ | ⋆⊑ =
+  let C⊑C′ : T of l ℓ₁ ⊑ T′ of l ℓ₂
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  let T⊑T′ : T ⊑ᵣ T′
+      T⊑T′ = case C⊑C′ of λ where (⊑-ty _ T⊑T′) → T⊑T′ in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ L⊑L′ ⊢L ⊢L′) (inject-prec (⊑-ty ⋆⊑ ⊑-ι)))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty ⋆⊑ T⊑T′) (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+
 
 compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-const ⊢const ⊢const = ⊑-const
 compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-var (⊢var Γ∋x⦂A) (⊢var Γ′∋x⦂A′) = ⊑-var Γ∋x⦂A Γ′∋x⦂A′
