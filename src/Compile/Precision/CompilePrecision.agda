@@ -35,14 +35,23 @@ compile-pres-precision : ∀ {Γ Γ′ g g′ M M′ A A′}
   → (⊢M′ : Γ′ ; g′ ⊢ᴳ M′ ⦂ A′)
     --------------------------------------------------------------------------------------------
   → (∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ g ; g′ ∣ ℓ ; ℓ′ ⊢ compile M ⊢M ⊑ compile M′ ⊢M′ ⇐ A ⊑ A′)
-compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-const ⊢const ⊢const = ⊑-const
-compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-var (⊢var Γ∋x⦂A) (⊢var Γ′∋x⦂A′) = ⊑-var Γ∋x⦂A Γ′∋x⦂A′
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-lam x x₁ M⊑M′) ⊢M ⊢M′ = {!!}
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-app M⊑M′ M⊑M′₁) ⊢M ⊢M′ = {!!}
-{- Compiling If -}
-compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ M⊑M′ N⊑N′)
+
+
+{- There are quite a few cases about compiling an if-conditional,
+   so let's put them in a separate lemma. -}
+compile-pres-precision-if : ∀ {Γ Γ′ g g′ M M′ L L′ N₁ N₁′ N₂ N₂′ A A′} {p}
+  → Γ ⊑* Γ′
+  → g ⊑ₗ g′
+  → ⊢ M ⊑ᴳ M′
+  → (⊢M  : Γ  ; g  ⊢ᴳ M  ⦂ A )
+  → (⊢M′ : Γ′ ; g′ ⊢ᴳ M′ ⦂ A′)
+  → M  ≡ if L  then N₁  else N₂  at p
+  → M′ ≡ if L′ then N₁′ else N₂′ at p
+    --------------------------------------------------------------------------------------------
+  → (∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ g ; g′ ∣ ℓ ; ℓ′ ⊢ compile M ⊢M ⊑ compile M′ ⊢M′ ⇐ A ⊑ A′)
+compile-pres-precision-if Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ M⊑M′ N⊑N′)
     (⊢if {gc = gc}  {A = A}  {B}  {C}  {g = g}  ⊢L  ⊢M  ⊢N  A∨̃B≡C)
-    (⊢if {gc = gc′} {A = A′} {B′} {C′} {g = g′} ⊢L′ ⊢M′ ⊢N′ A′∨̃B′≡C′)
+    (⊢if {gc = gc′} {A = A′} {B′} {C′} {g = g′} ⊢L′ ⊢M′ ⊢N′ A′∨̃B′≡C′) eq eq′
   with compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′
 ... | 𝒞L⊑𝒞L′
   with cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′
@@ -148,28 +157,51 @@ compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ M⊑M′ N⊑N�
                                 (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
                         (inject-prec C⊑C′)))
          (coerce-prec C⊑C′ C⊑C′ (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
-... | l _ | ⋆ | l _ | ⋆ | T of ⋆ | T′ of l ℓ | ⋆⊑ | l⊑l = {!!}
-  -- let C⊑C′ : T of g₁ ⊑ T′ of g₂
-  --     C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′)
-  --     prec : stamp (T of g₁) ⋆ ⊑ stamp (T′ of g₂) ⋆
-  --     prec = stamp-⊑ C⊑C′ ⋆⊑ in
-  -- ⊑-cast {!⊑-if⋆!} (coerce-prec prec prec _ _)
-... | l _ | ⋆ | l _ | ⋆ | T of l ℓ | T′ of ⋆ | ⋆⊑ | l⊑l = {!!}
-  -- let C⊑C′ : T of g₁ ⊑ T′ of g₂
-  --     C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′)
-  --     prec : stamp (T of g₁) ⋆ ⊑ stamp (T′ of g₂) ⋆
-  --     prec = stamp-⊑ C⊑C′ ⋆⊑ in
-  -- ⊑-cast {!⊑-if⋆!} (coerce-prec prec prec _ _)
-... | l _ | ⋆ | l _ | ⋆ | T of l ℓ₁ | T′ of l ℓ₂ | ⋆⊑ | l⊑l = {!!}
-  -- let C⊑C′ : T of g₁ ⊑ T′ of g₂
-  --     C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′)
-  --     prec : stamp (T of g₁) ⋆ ⊑ stamp (T′ of g₂) ⋆
-  --     prec = stamp-⊑ C⊑C′ ⋆⊑ in
-  -- ⊑-cast {!⊑-if⋆!} (coerce-prec prec prec _ _)
+... | l _ | ⋆ | l _ | ⋆ | T of ⋆ | T′ of l ℓ | ⋆⊑ | l⊑l =
+  let C⊑C′ : T of ⋆ ⊑ T′ of l ℓ
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  let prec : T of ⋆ ⊑ T′ of ⋆
+      prec = case C⊑C′ of λ where
+               (⊑-ty _ T⊑T′) → ⊑-ty ⋆⊑ T⊑T′ in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ l⊑l L⊑L′ ⊢L ⊢L′) (inject-prec ⊑-refl))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec prec prec (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
+... | l _ | ⋆ | l _ | ⋆ | T of l ℓ | T′ of ⋆ | ⋆⊑ | l⊑l =
+  let C⊑C′ : T of l ℓ ⊑ T′ of ⋆  -- however, C ⊑ C′ is impossible
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  case C⊑C′ of λ where (⊑-ty () _)
+... | l _ | ⋆ | l _ | ⋆ | T of l ℓ₁ | T′ of l ℓ₂ | ⋆⊑ | l⊑l =
+  let C⊑C′ : T of l ℓ₁ ⊑ T′ of l ℓ₂
+      C⊑C′ = (consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′) in
+  let prec : T of ⋆ ⊑ T′ of ⋆
+      prec = case C⊑C′ of λ where
+               (⊑-ty _ T⊑T′) → ⊑-ty ⋆⊑ T⊑T′ in
+  ⊑-cast (⊑-if⋆ (⊑-cast (compile-pres-precision Γ⊑Γ′ l⊑l L⊑L′ ⊢L ⊢L′) (inject-prec ⊑-refl))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′)
+                                (coerce-prec A⊑A′ C⊑C′ A≲C A′≲C′))
+                        (inject-prec C⊑C′))
+                (⊑-cast (⊑-cast (compile-pres-precision Γ⊑Γ′ ⋆⊑ N⊑N′ ⊢N ⊢N′)
+                                (coerce-prec B⊑B′ C⊑C′ B≲C B′≲C′))
+                        (inject-prec C⊑C′)))
+         (coerce-prec prec prec (≲-ty ≾-⋆l _) (≲-ty ≾-⋆l _))
 ... | ⋆ | l ℓ | ⋆ | l ℓ′ | _ | _ | l⊑l | ⋆⊑ = {!!}
 ... | ⋆ | ⋆ | ⋆ | l ℓ′ | _ | _ | ⋆⊑ | ⋆⊑ = {!!}
 ... | ⋆ | ⋆ | l _ | ⋆ | _ | _ | ⋆⊑ | ⋆⊑ = {!!}
 ... | ⋆ | ⋆ | ⋆ | ⋆ | _ | _ | ⋆⊑ | ⋆⊑ = {!!}
+
+compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-const ⊢const ⊢const = ⊑-const
+compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-var (⊢var Γ∋x⦂A) (⊢var Γ′∋x⦂A′) = ⊑-var Γ∋x⦂A Γ′∋x⦂A′
+compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-lam x x₁ M⊑M′) ⊢M ⊢M′ = {!!}
+compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-app M⊑M′ M⊑M′₁) ⊢M ⊢M′ = {!!}
+{- Compiling If -}
+compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ N₁⊑N₁′ N₂⊑N₂′) ⊢M ⊢M′ =
+  compile-pres-precision-if Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ N₁⊑N₁′ N₂⊑N₂′) ⊢M ⊢M′ refl refl
+{- Compiling Type Annotation -}
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-ann M⊑M′ A⊑A′) (⊢ann ⊢M B≲A) (⊢ann ⊢M′ B′≲A′) =
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ g⊑g′ M⊑M′ ⊢M ⊢M′ in
   let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ in
