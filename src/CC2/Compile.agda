@@ -43,7 +43,7 @@ compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L 
       let M′ = compile M ⊢M ⟨ coerce A≲C p ⟩ in
       let N′ = compile N ⊢N ⟨ coerce B≲C p ⟩ in
       case all-specific-dec [ gc , g ] of λ where
-      (yes (as-cons (specific _) (as-cons (specific ℓ) as-nil))) →
+      (yes (as-cons (＠ _) (as-cons (＠ ℓ) as-nil))) →
         if L′ C ℓ M′ N′
       (no _) →
         case C of λ where
@@ -65,7 +65,7 @@ compile (! M at p) (⊢deref {A = A} {g} ⊢M) =
   ⟨ ⋆   , T of g′ ⟩ → !⋆ (compile M ⊢M ⟨ ref-to-⋆ T g′ g p ⟩) T
 compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ) =
   case all-specific-dec [ gc , g , ĝ ] of λ where
-  (yes (as-cons (specific _)  (as-cons (specific ℓ)  (as-cons (specific ℓ̂) as-nil)))) →
+  (yes (as-cons (＠ _)  (as-cons (＠ ℓ)  (as-cons (＠ ℓ̂) as-nil)))) →
       assign (compile L ⊢L) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ℓ̂ ℓ
   (no _) → assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
 
@@ -91,7 +91,7 @@ compile-preserve {Γ = Γ} (if L then M else N at p) (⊢if {gc = gc} {A = A} {B
   with consis-join-≲-inv {A} {B} A∨̃B≡C
 ... | ⟨ A≲C , B≲C ⟩
   with all-specific-dec [ gc , g ] | C
-... | yes (as-cons (specific _) (as-cons (specific _) as-nil)) | T of g′ =
+... | yes (as-cons (＠ _) (as-cons (＠ _) as-nil)) | T of g′ =
   ⊢if (compile-preserve L ⊢L) (⊢cast (compile-preserve M ⊢M)) (⊢cast (compile-preserve N ⊢N)) refl
 ... | no ¬as | T of g′ =
   ⊢cast (subst (λ □ → _ ; _ ; _ ; _ ⊢ if⋆ (compile L ⊢L ⟨ inject (` Bool) g ⟩) T
@@ -126,7 +126,7 @@ compile-preserve (! M at p) (⊢deref {A = A} {g} ⊢M)
 ... | ⋆   | T of g′ rewrite g⋎̃⋆≡⋆ {g′} = ⊢deref⋆ (⊢cast (compile-preserve M ⊢M))
 compile-preserve (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ)
   with all-specific-dec [ gc , g , ĝ ] | g≾ĝ | gc≾ĝ
-... | yes (as-cons (specific ℓc)  (as-cons (specific ℓ)  (as-cons (specific ℓ̂) as-nil))) | ≾-l ℓ≼ℓ̂ | ≾-l ℓc≼ℓ̂ =
+... | yes (as-cons (＠ ℓc)  (as-cons (＠ ℓ)  (as-cons (＠ ℓ̂) as-nil))) | ≾-l ℓ≼ℓ̂ | ≾-l ℓc≼ℓ̂ =
   ⊢assign (compile-preserve L ⊢L) (⊢cast (compile-preserve M ⊢M)) ℓc≼ℓ̂ ℓ≼ℓ̂
 ... | no _ | _ | _ = ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
 

@@ -487,7 +487,7 @@ l ℓ₁ ⊑<:ₗ? l ℓ₂ =
 
 
 data Specific : Label → Set where
-  specific : ∀ (ℓ : StaticLabel) → Specific (l ℓ)
+  ＠ : ∀ (ℓ : StaticLabel) → Specific (l ℓ)
 
 
 data AllSpecific : List Label → Set where
@@ -501,7 +501,7 @@ all-specific-dec : ∀ (gs : List Label) → Dec (AllSpecific gs)
 all-specific-dec [] = yes as-nil
 all-specific-dec (⋆ ∷ gs) = no (λ { (as-cons () _) })
 all-specific-dec (l ℓ ∷ gs) with all-specific-dec gs
-... | yes as = yes (as-cons (specific ℓ) as)
+... | yes as = yes (as-cons (＠ ℓ) as)
 ... | no ¬as = no (λ { (as-cons _ as) → ¬as as })
 
 
@@ -510,4 +510,4 @@ consis-join-not-all-specific {⋆} {⋆}   ¬as = refl
 consis-join-not-all-specific {⋆} {l x} ¬as = refl
 consis-join-not-all-specific {l x} {⋆} ¬as = refl
 consis-join-not-all-specific {l ℓ₁} {l ℓ₂} ¬as =
-  contradiction (as-cons (specific ℓ₁) (as-cons (specific ℓ₂) as-nil)) ¬as
+  contradiction (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil)) ¬as
