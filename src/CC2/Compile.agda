@@ -61,11 +61,15 @@ compile (! M at p) (⊢deref {A = A} {g} ⊢M) =
   ⟨ l ℓ , A       ⟩ → !  (compile M ⊢M) A ℓ
   ⟨ ⋆   , T of g′ ⟩ → !⋆ (compile M ⊢M ⟨ ref-to-⋆ T g′ g p ⟩) T
 compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ) =
-  case ⟨ g≾ĝ , gc≾ĝ ⟩ of λ where
-  ⟨ ≾-l {ℓ} {ℓ̂} g≼ĝ , ≾-l gc≼ĝ ⟩ →
+  case all-specific-dec gc g ĝ of λ where
+  (yes ⟨ specific _ , specific ℓ , specific ℓ̂ ⟩) →
       assign (compile L ⊢L) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ℓ̂ ℓ
-  ⟨ _ , _ ⟩ →
-      assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
+  (no _) → assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
+  -- case ⟨ g≾ĝ , gc≾ĝ ⟩ of λ where
+  -- ⟨ ≾-l {ℓ} {ℓ̂} g≼ĝ , ≾-l gc≼ĝ ⟩ →
+  --     assign (compile L ⊢L) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ℓ̂ ℓ
+  -- ⟨ _ , _ ⟩ →
+  --     assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
 
 
 compile-preserve : ∀ {Γ gc A} (M : Term)
@@ -132,21 +136,10 @@ compile-preserve (! M at p) (⊢deref {A = A} {g} ⊢M)
 ... | l _ | T of g′ = ⊢deref  (compile-preserve M ⊢M) refl
 ... | ⋆   | T of g′ rewrite g⋎̃⋆≡⋆ {g′} = ⊢deref⋆ (⊢cast (compile-preserve M ⊢M))
 compile-preserve (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ)
-  with g≾ĝ | gc≾ĝ
-... | ≾-l g≼ĝ | ≾-l gc≼ĝ =
-  ⊢assign (compile-preserve L ⊢L) (⊢cast (compile-preserve M ⊢M)) gc≼ĝ g≼ĝ
-... | ≾-l _ | ≾-⋆l =
-  ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
-... | ≾-⋆r | ≾-⋆r =
-  ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
-... | ≾-⋆r | ≾-⋆l =
-  ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
-... | ≾-⋆l | ≾-l _ =
-  ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
-... | ≾-⋆l | ≾-⋆r =
-  ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
-... | ≾-⋆l | ≾-⋆l =
-  ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
+  with all-specific-dec gc g ĝ | g≾ĝ | gc≾ĝ
+... | yes ⟨ specific ℓc , specific ℓ , specific ℓ̂ ⟩ | ≾-l ℓ≼ℓ̂ | ≾-l ℓc≼ℓ̂ =
+  ⊢assign (compile-preserve L ⊢L) (⊢cast (compile-preserve M ⊢M)) ℓc≼ℓ̂ ℓ≼ℓ̂
+... | no _ | _ | _ = ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))
 
 
 {- Compilation from Surface to CC is type-preserving. -}

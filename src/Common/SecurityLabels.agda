@@ -484,3 +484,17 @@ l ℓ₁ ⊑<:ₗ? l ℓ₂ =
   (yes ℓ₁≼ℓ₂) → yes (⊑:>-l ℓ₁≼ℓ₂)
   (no  ℓ₁⋠ℓ₂) →
     no λ { (⊑:>-l ℓ₁≼ℓ₂) → contradiction ℓ₁≼ℓ₂ ℓ₁⋠ℓ₂ }
+
+
+data Specific : Label → Set where
+  specific : ∀ (ℓ : StaticLabel) → Specific (l ℓ)
+
+AllSpecific : (g₁ g₂ g₃ : Label) → Set
+AllSpecific g₁ g₂ g₃ = Specific g₁ × Specific g₂ × Specific g₃
+
+
+all-specific-dec : ∀ g₁ g₂ g₃ → Dec (AllSpecific g₁ g₂ g₃)
+all-specific-dec ⋆ _ _ = no (λ { ⟨ () , _ ⟩ })
+all-specific-dec (l x) ⋆ _ = no (λ { ⟨ _ , () , _ ⟩ })
+all-specific-dec (l x) (l y) ⋆ = no (λ { ⟨ _ , _ , () ⟩ })
+all-specific-dec (l x) (l y) (l z) = yes ⟨ specific x , specific y , specific z ⟩
