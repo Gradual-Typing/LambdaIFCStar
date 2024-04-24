@@ -62,7 +62,41 @@ compile-pres-precision-if {Γ} {Γ′} Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′
 ... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil))
     | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) = {!!}
 ... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil)) | no _ = {!!}
-... | no _ | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) = {!!}
+... | no ¬as | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ of λ where
+  ⟨ _ , _ , ⊑-ty g⊑g′ ⊑-ι ⟩ →
+    let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ (consis-join-⊑ₗ gc⊑gc′ g⊑g′) M⊑M′ ⊢M ⊢M′ in
+    let 𝒞N⊑𝒞N′ = compile-pres-precision Γ⊑Γ′ (consis-join-⊑ₗ gc⊑gc′ g⊑g′) N⊑N′ ⊢N ⊢N′ in
+    let ⟨ _ , _ , A⊑A′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ in
+    let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞N⊑𝒞N′ in
+    let C⊑C′ : T of g₁ ⊑ T′ of g₂
+        C⊑C′ = consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′ in
+    let ◆ₘ : ∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ ⋆ ; _ ∣ ℓ ; ℓ′ ⊢ _ ⊑ _ ⇐ A ⊑ A′
+        ◆ₘ = subst (λ □ →
+                       ∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ □ ; _ ∣ ℓ ; ℓ′ ⊢ compile _ ⊢M ⊑ compile _ ⊢M′ ⇐ A ⊑ A′)
+                     (consis-join-not-all-specific ¬as) 𝒞M⊑𝒞M′ in
+    let ◆ₙ : ∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ ⋆ ; _ ∣ ℓ ; ℓ′ ⊢ _ ⊑ _ ⇐ B ⊑ B′
+        ◆ₙ = subst (λ □ →
+                       ∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ □ ; _ ∣ ℓ ; ℓ′ ⊢ compile _ ⊢N ⊑ compile _ ⊢N′ ⇐ B ⊑ B′)
+                     (consis-join-not-all-specific ¬as) 𝒞N⊑𝒞N′ in
+    case C⊑C′ of λ where
+    (⊑-ty g₁⊑g₂ T⊑T′) →
+      let ♥ = ⊑-if⋆l (⊑-castl 𝒞L⊑𝒞L′ (inject-prec-left (⊑-ty g⊑g′ ⊑-ι)))
+                     (⊑-castl (⊑-cast ◆ₘ (coerce-prec A⊑A′ C⊑C′ _ _)) (inject-prec-left (⊑-ty g₁⊑g₂ T⊑T′)))
+                     (⊑-castl (⊑-cast ◆ₙ (coerce-prec B⊑B′ C⊑C′ _ _)) (inject-prec-left (⊑-ty g₁⊑g₂ T⊑T′)))
+                     refl in
+      ⊑-castl (subst (λ □ →
+                        Γ ; Γ′ ∣ ∅ ; ∅ ∣ gc ; gc′ ∣ _ ; _ ⊢
+                          if⋆ (compile _ ⊢L ⟨ inject (` Bool) g ⟩) T
+                              ((compile _ ⊢M ⟨ coerce A≲C p ⟩) ⟨ inject T g₁ ⟩)
+                              ((compile _ ⊢N ⟨ coerce B≲C p ⟩) ⟨ inject T g₁ ⟩) ⊑
+                          if  (compile _ ⊢L′) (T′ of g₂) ℓ₂′
+                              (compile _ ⊢M′ ⟨ coerce A′≲C′ p ⟩)
+                              (compile _ ⊢N′ ⟨ coerce B′≲C′ p ⟩) ⇐ _ of □ ⊑ _)
+               (sym g⋎̃⋆≡⋆) ♥)
+              (coerce-prec-left (⊑-ty (consis-join-⊑ₗ g₁⊑g₂ ⋆⊑) T⊑T′)
+                                (⊑-ty (consis-join-⊑ₗ g₁⊑g₂ g⊑g′) T⊑T′) _)
 ... | no ¬as | no ¬as′ =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ of λ where
