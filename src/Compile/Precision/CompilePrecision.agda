@@ -60,8 +60,25 @@ compile-pres-precision-if {Γ} {Γ′} Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′
 ... | T of g₁ | T′ of g₂
   with all-specific-dec [ gc , g ] | all-specific-dec [ gc′ , g′ ]
 ... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil))
-    | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) = {!!}
-... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil)) | no _ = {!!}
+    | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  case ⟨ gc⊑gc′ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ ⟩ of λ where
+  ⟨ l⊑l , _ , _ , ⊑-ty l⊑l ⊑-ι ⟩ →
+    let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ ⊑ₗ-refl M⊑M′ ⊢M ⊢M′ in
+    let 𝒞N⊑𝒞N′ = compile-pres-precision Γ⊑Γ′ ⊑ₗ-refl N⊑N′ ⊢N ⊢N′ in
+    let ⟨ _ , _ , A⊑A′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ in
+    let ⟨ _ , _ , B⊑B′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞N⊑𝒞N′ in
+    let C⊑C′ : T of g₁ ⊑ T′ of g₂
+        C⊑C′ = consis-join-⊑ A⊑A′ B⊑B′ A∨̃B≡C A′∨̃B′≡C′ in
+    ⊑-if 𝒞L⊑𝒞L′
+         (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A⊑A′ C⊑C′ _ _))
+         (⊑-cast 𝒞N⊑𝒞N′ (coerce-prec B⊑B′ C⊑C′ _ _)) refl refl
+... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil)) | no ¬as =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  case ⟨ gc⊑gc′ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ ⟩ of λ where
+  ⟨ l⊑l {.ℓ₁} , _ , _ , ⊑-ty (l⊑l {.ℓ₂}) ⊑-ι ⟩ →
+    let as = as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil) in
+    contradiction as ¬as
 ... | no ¬as | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ of λ where
