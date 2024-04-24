@@ -5,7 +5,7 @@ open import Data.Bool renaming (Bool to 𝔹; _≟_ to _≟ᵇ_)
 open import Data.Unit using (⊤; tt)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
-open import Data.List using (List)
+open import Data.List using (List; []; _∷_)
 open import Function using (case_of_)
 open import Relation.Nullary using (¬_; Dec; yes; no)
 open import Relation.Nullary.Negation using (contradiction)
@@ -489,12 +489,25 @@ l ℓ₁ ⊑<:ₗ? l ℓ₂ =
 data Specific : Label → Set where
   specific : ∀ (ℓ : StaticLabel) → Specific (l ℓ)
 
-AllSpecific : (g₁ g₂ g₃ : Label) → Set
-AllSpecific g₁ g₂ g₃ = Specific g₁ × Specific g₂ × Specific g₃
+
+data AllSpecific : List Label → Set where
+
+  as-nil : AllSpecific []
+
+  as-cons : ∀ {g gs} → Specific g → AllSpecific gs → AllSpecific (g ∷ gs)
 
 
-all-specific-dec : ∀ g₁ g₂ g₃ → Dec (AllSpecific g₁ g₂ g₃)
-all-specific-dec ⋆ _ _ = no (λ { ⟨ () , _ ⟩ })
-all-specific-dec (l x) ⋆ _ = no (λ { ⟨ _ , () , _ ⟩ })
-all-specific-dec (l x) (l y) ⋆ = no (λ { ⟨ _ , _ , () ⟩ })
-all-specific-dec (l x) (l y) (l z) = yes ⟨ specific x , specific y , specific z ⟩
+all-specific-dec : ∀ (gs : List Label) → Dec (AllSpecific gs)
+all-specific-dec [] = yes as-nil
+all-specific-dec (⋆ ∷ gs) = no (λ { (as-cons () _) })
+all-specific-dec (l ℓ ∷ gs) with all-specific-dec gs
+... | yes as = yes (as-cons (specific ℓ) as)
+... | no ¬as = no (λ { (as-cons _ as) → ¬as as })
+
+
+consis-join-not-all-specific : ∀ {g₁ g₂} → ¬ (AllSpecific [ g₁ , g₂ ]) → g₁ ⋎̃ g₂ ≡ ⋆
+consis-join-not-all-specific {⋆} {⋆}   ¬as = refl
+consis-join-not-all-specific {⋆} {l x} ¬as = refl
+consis-join-not-all-specific {l x} {⋆} ¬as = refl
+consis-join-not-all-specific {l ℓ₁} {l ℓ₂} ¬as =
+  contradiction (as-cons (specific ℓ₁) (as-cons (specific ℓ₂) as-nil)) ¬as

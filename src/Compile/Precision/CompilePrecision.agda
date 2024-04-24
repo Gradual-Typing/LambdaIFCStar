@@ -5,6 +5,7 @@ open import Data.List
 open import Data.Product using (_×_; ∃; ∃-syntax; proj₁; proj₂) renaming (_,_ to ⟨_,_⟩)
 open import Data.Maybe
 open import Relation.Nullary using (¬_; Dec; yes; no)
+open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; subst; sym)
 open import Function using (case_of_)
 
@@ -376,8 +377,8 @@ compile-pres-precision-assign : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′
 compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′)
     (⊢assign {gc = gc } {g = g } {ĝ } ⊢L  ⊢M  A≲Tĝ   g≾ĝ   gc≾ĝ  )
     (⊢assign {gc = gc′} {g = g′} {ĝ′} ⊢L′ ⊢M′ A′≲Tĝ′ g′≾ĝ′ gc′≾ĝ′) _ _
-  with all-specific-dec gc g ĝ | all-specific-dec gc′ g′ ĝ′
-... | no _ | yes ⟨ specific _ , specific _ , specific _ ⟩ =
+  with all-specific-dec [ gc , g , ĝ ] | all-specific-dec [ gc′ , g′ , ĝ′ ]
+... | no _ | yes (as-cons (specific ℓ₁)  (as-cons (specific ℓ₂)  (as-cons (specific ℓ₃) as-nil))) =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
   case ⟨ g′≾ĝ′ , gc′≾ĝ′ ⟩ of λ where
@@ -389,7 +390,12 @@ compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑
         ⊑-assign?l (⊑-castl 𝒞L⊑𝒞L′ (inject-prec-left (⊑-ty g⊑g′ (⊑-ref B⊑B′))))
                    (⊑-cast  𝒞M⊑𝒞M′ (coerce-prec A⊑A′ B⊑B′ A≲Tĝ A′≲Tĝ′))
                    gc′≼ĝ′ g′≼ĝ′
-... | yes _ | no _ = {!!}
+... | yes (as-cons (specific ℓ₁)  (as-cons (specific ℓ₂)  (as-cons (specific ℓ₃) as-nil))) | no ¬as =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  case ⟨ gc⊑gc′ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ ⟩ of λ where
+  ⟨ l⊑l {.ℓ₁} , _ , _ , ⊑-ty (l⊑l {.ℓ₂}) (⊑-ref (⊑-ty (l⊑l {.ℓ₃}) T⊑T′)) ⟩ →
+    let as = as-cons (specific ℓ₁) (as-cons (specific ℓ₂) (as-cons (specific ℓ₃) as-nil)) in
+    contradiction as ¬as
 ... | no _ | no _ =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
@@ -397,8 +403,10 @@ compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑
     ⟨ _ , _ , ⊑-ty g⊑g′ (⊑-ref B⊑B′) ⟩ →
       case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ of λ where
       ⟨ _ , _ , A⊑A′ ⟩ →
-        ⊑-assign? (⊑-cast 𝒞L⊑𝒞L′ (inject-prec (⊑-ty g⊑g′ (⊑-ref B⊑B′)))) (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A⊑A′ B⊑B′ A≲Tĝ A′≲Tĝ′))
-... | yes ⟨ specific _ , specific _ , specific _ ⟩ | yes ⟨ specific _ , specific _ , specific _ ⟩
+        ⊑-assign? (⊑-cast 𝒞L⊑𝒞L′ (inject-prec (⊑-ty g⊑g′ (⊑-ref B⊑B′))))
+                  (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A⊑A′ B⊑B′ A≲Tĝ A′≲Tĝ′))
+... | yes (as-cons (specific ℓ₁ )  (as-cons (specific ℓ₂ )  (as-cons (specific ℓ₃ ) as-nil)))
+    | yes (as-cons (specific ℓ₁′)  (as-cons (specific ℓ₂′)  (as-cons (specific ℓ₃′) as-nil)))
   with gc⊑gc′ | g≾ĝ     | gc≾ĝ
 ...  | l⊑l    | ≾-l g≼ĝ | ≾-l gc≼ĝ =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
