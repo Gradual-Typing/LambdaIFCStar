@@ -27,12 +27,16 @@ compile ($ᴳ k of ℓ) ⊢const = $ k
 compile (`ᴳ x) (⊢var x∈Γ)  = ` x
 compile (ƛ g , A ˙ N of ℓ) (⊢lam ⊢N) = ƛ (compile N ⊢N)
 compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′) =
-    case ⟨ g≾gc′ , gc≾gc′ , B ⟩ of λ where
-    ⟨ ≾-l {ℓ} {ℓᶜ} ℓ≼ℓᶜ , ≾-l {pc} {.ℓᶜ} pc≼ℓᶜ , B ⟩ →
-      let sub : ⟦ l ℓᶜ ⟧ A ⇒ B of l ℓ <: ⟦ l (pc ⋎ ℓ) ⟧ A ⇒ B of l ℓ
+  case all-specific? [ gc , g , gc′ ] of λ where
+  (yes (as-cons (＠ ℓ₁)  (as-cons (＠ ℓ₂)  (as-cons (＠ ℓ₃) as-nil)))) →
+    case ⟨ g≾gc′ , gc≾gc′ ⟩ of λ where
+    ⟨ ≾-l ℓ≼ℓᶜ , ≾-l pc≼ℓᶜ ⟩ →
+      let sub : ⟦ l ℓ₃ ⟧ A ⇒ B of l ℓ₂ <: ⟦ l (ℓ₁ ⋎ ℓ₂) ⟧ A ⇒ B of l ℓ₂
           sub = <:-ty <:ₗ-refl (<:-fun (<:-l (ℓ₁⋎ℓ₂≼ℓ pc≼ℓᶜ ℓ≼ℓᶜ)) <:-refl <:-refl) in
-      app (compile L ⊢L ⟨ coerce-<: sub ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B ℓ
-    ⟨ _ , _ , T of g′ ⟩ →
+      app (compile L ⊢L ⟨ coerce-<: sub ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B ℓ₂
+  (no _) →
+    case B of λ where
+    (T of g′) →
       let csub : T of ⋆ ≲ stamp (T of g′) g
           csub = ≲-ty ≾-⋆l ≲ᵣ-refl in
       (app⋆ (compile L ⊢L ⟨ fun-to-⋆ gc′ A T g′ g p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
@@ -42,7 +46,7 @@ compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L 
       let L′ = compile L ⊢L in
       let M′ = compile M ⊢M ⟨ coerce A≲C p ⟩ in
       let N′ = compile N ⊢N ⟨ coerce B≲C p ⟩ in
-      case all-specific-dec [ gc , g ] of λ where
+      case all-specific? [ gc , g ] of λ where
       (yes (as-cons (＠ _) (as-cons (＠ ℓ) as-nil))) →
         if L′ C ℓ M′ N′
       (no _) →
@@ -64,10 +68,11 @@ compile (! M at p) (⊢deref {A = A} {g} ⊢M) =
   ⟨ l ℓ , A       ⟩ → !  (compile M ⊢M) A ℓ
   ⟨ ⋆   , T of g′ ⟩ → !⋆ (compile M ⊢M ⟨ ref-to-⋆ T g′ g p ⟩) T
 compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ) =
-  case all-specific-dec [ gc , g , ĝ ] of λ where
+  case all-specific? [ gc , g , ĝ ] of λ where
   (yes (as-cons (＠ _)  (as-cons (＠ ℓ)  (as-cons (＠ ℓ̂) as-nil)))) →
       assign (compile L ⊢L) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ℓ̂ ℓ
-  (no _) → assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
+  (no _) →
+    assign? (compile L ⊢L ⟨ inject (Ref (T of ĝ)) g ⟩) (compile M ⊢M ⟨ coerce A≲Tĝ p ⟩) T ĝ p
 
 
 compile-preserve : ∀ {Γ gc A} (M : Term)
@@ -77,20 +82,16 @@ compile-preserve : ∀ {Γ gc A} (M : Term)
 compile-preserve ($ᴳ k of ℓ) ⊢const = ⊢const
 compile-preserve (`ᴳ x) (⊢var Γ∋x) = ⊢var Γ∋x
 compile-preserve (ƛ pc , A ˙ N of ℓ) (⊢lam ⊢N) = ⊢lam (compile-preserve N ⊢N)
-compile-preserve (L · M at p) (⊢app {A = A} {A′} {B} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′)
-  with gc≾gc′ | g≾gc′ | B
-... | ≾-l gc≼gc′ | ≾-l g≼gc′ | T of g =
+compile-preserve (L · M at p) (⊢app {gc = gc} {gc′} {A} {A′} {B} {g = g} ⊢L ⊢M A′≲A g≾gc′ gc≾gc′)
+  with all-specific? [ gc , g , gc′ ] | g≾gc′ | gc≾gc′
+... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil))) | ≾-l ℓ≼ℓᶜ | ≾-l pc≼ℓᶜ =
   ⊢app (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)) refl
-... | ≾-l _ | ≾-⋆l  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆l  | ≾-l _ | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆l  | ≾-⋆l  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆l  | ≾-⋆r  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆r  | ≾-⋆l  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
-... | ≾-⋆r  | ≾-⋆r  | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
+... | no ¬as | _ | _ with B
+...   | T of g = ⊢cast (⊢app⋆ (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M)))
 compile-preserve {Γ = Γ} (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) {pc}
   with consis-join-≲-inv {A} {B} A∨̃B≡C
 ... | ⟨ A≲C , B≲C ⟩
-  with all-specific-dec [ gc , g ] | C
+  with all-specific? [ gc , g ] | C
 ... | yes (as-cons (＠ _) (as-cons (＠ _) as-nil)) | T of g′ =
   ⊢if (compile-preserve L ⊢L) (⊢cast (compile-preserve M ⊢M)) (⊢cast (compile-preserve N ⊢N)) refl
 ... | no ¬as | T of g′ =
@@ -125,7 +126,7 @@ compile-preserve (! M at p) (⊢deref {A = A} {g} ⊢M)
 ... | l _ | T of g′ = ⊢deref  (compile-preserve M ⊢M) refl
 ... | ⋆   | T of g′ rewrite g⋎̃⋆≡⋆ {g′} = ⊢deref⋆ (⊢cast (compile-preserve M ⊢M))
 compile-preserve (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ)
-  with all-specific-dec [ gc , g , ĝ ] | g≾ĝ | gc≾ĝ
+  with all-specific? [ gc , g , ĝ ] | g≾ĝ | gc≾ĝ
 ... | yes (as-cons (＠ ℓc)  (as-cons (＠ ℓ)  (as-cons (＠ ℓ̂) as-nil))) | ≾-l ℓ≼ℓ̂ | ≾-l ℓc≼ℓ̂ =
   ⊢assign (compile-preserve L ⊢L) (⊢cast (compile-preserve M ⊢M)) ℓc≼ℓ̂ ℓ≼ℓ̂
 ... | no _ | _ | _ = ⊢assign? (⊢cast (compile-preserve L ⊢L)) (⊢cast (compile-preserve M ⊢M))

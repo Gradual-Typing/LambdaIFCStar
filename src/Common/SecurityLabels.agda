@@ -497,10 +497,10 @@ data AllSpecific : List Label → Set where
   as-cons : ∀ {g gs} → Specific g → AllSpecific gs → AllSpecific (g ∷ gs)
 
 
-all-specific-dec : ∀ (gs : List Label) → Dec (AllSpecific gs)
-all-specific-dec [] = yes as-nil
-all-specific-dec (⋆ ∷ gs) = no (λ { (as-cons () _) })
-all-specific-dec (l ℓ ∷ gs) with all-specific-dec gs
+all-specific? : ∀ (gs : List Label) → Dec (AllSpecific gs)
+all-specific? [] = yes as-nil
+all-specific? (⋆ ∷ gs) = no (λ { (as-cons () _) })
+all-specific? (l ℓ ∷ gs) with all-specific? gs
 ... | yes as = yes (as-cons (＠ ℓ) as)
 ... | no ¬as = no (λ { (as-cons _ as) → ¬as as })
 
