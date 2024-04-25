@@ -58,7 +58,7 @@ compile-pres-precision-if {Γ} {Γ′} Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′
 ... | ⟨ A≲C , B≲C ⟩ | ⟨ A′≲C′ , B′≲C′ ⟩
   with C | C′
 ... | T of g₁ | T′ of g₂
-  with all-specific-dec [ gc , g ] | all-specific-dec [ gc′ , g′ ]
+  with all-specific? [ gc , g ] | all-specific? [ gc′ , g′ ]
 ... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) as-nil))
     | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) as-nil)) =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
@@ -166,7 +166,7 @@ compile-pres-precision-assign : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′
 compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′)
     (⊢assign {gc = gc } {g = g } {ĝ } ⊢L  ⊢M  A≲Tĝ   g≾ĝ   gc≾ĝ  )
     (⊢assign {gc = gc′} {g = g′} {ĝ′} ⊢L′ ⊢M′ A′≲Tĝ′ g′≾ĝ′ gc′≾ĝ′) _ _
-  with all-specific-dec [ gc , g , ĝ ] | all-specific-dec [ gc′ , g′ , ĝ′ ]
+  with all-specific? [ gc , g , ĝ ] | all-specific? [ gc′ , g′ , ĝ′ ]
 ... | no _ | yes (as-cons (＠ ℓ₁)  (as-cons (＠ ℓ₂)  (as-cons (＠ ℓ₃) as-nil))) =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
@@ -232,6 +232,5 @@ compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-let M⊑M′ N⊑N′) (⊢le
   ⊑-let 𝒞M⊑𝒞M′ (compile-pres-precision (⊑*-∷ A⊑A′ Γ⊑Γ′) g⊑g′ N⊑N′ ⊢N ⊢N′)
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-ref M⊑M′) ⊢M ⊢M′ = {!!}
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-deref M⊑M′) ⊢M ⊢M′ = {!!}
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-assign L⊑L′ M⊑M′)
-                       (⊢assign {gc = gc } {g = g } {ĝ } ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ)
-                       (⊢assign {gc = gc′} {g = g′} {ĝ′} ⊢L′ ⊢M′ A′≲Tĝ′ g′≾ĝ′ gc′≾ĝ′) = {!!}
+compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′) ⊢M ⊢M′ =
+  compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′) ⊢M ⊢M′ refl refl
