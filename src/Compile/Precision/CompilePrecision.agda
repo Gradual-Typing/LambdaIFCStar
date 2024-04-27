@@ -28,7 +28,7 @@ open import CC2.Precision
 open import CC2.Compile
 
 
-{- Here is the (lemma?) statement of "compilation preserves precision" -}
+{- Here is the lemma statement of "compilation preserves precision" -}
 compile-pres-precision : ∀ {Γ Γ′ g g′ M M′ A A′}
   → Γ ⊑* Γ′
   → g ⊑ₗ g′
@@ -39,8 +39,48 @@ compile-pres-precision : ∀ {Γ Γ′ g g′ M M′ A A′}
   → (∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ g ; g′ ∣ ℓ ; ℓ′ ⊢ compile M ⊢M ⊑ compile M′ ⊢M′ ⇐ A ⊑ A′)
 
 
-{- There are quite a few cases about compiling an if-conditional,
-   so let's put them in a separate lemma. -}
+compile-pres-precision-app : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′} {p}
+    → Γ ⊑* Γ′
+    → g ⊑ₗ g′
+    → ⊢ M ⊑ᴳ M′
+    → (⊢M  : Γ  ; g  ⊢ᴳ M  ⦂ A )
+    → (⊢M′ : Γ′ ; g′ ⊢ᴳ M′ ⦂ A′)
+    → M  ≡ L  · N  at p
+    → M′ ≡ L′ · N′ at p
+      --------------------------------------------------------------------------------------------
+    → (∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ g ; g′ ∣ ℓ ; ℓ′ ⊢ compile M ⊢M ⊑ compile M′ ⊢M′ ⇐ A ⊑ A′)
+compile-pres-precision-app Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-app L⊑L′ M⊑M′)
+  (⊢app {gc = gc} {gc′ = g₂} {A = A₁} {A₂} {B} {g = g₁} ⊢L ⊢M A₂≲A₁ g₁≾g₂ gc≾g₂)
+  (⊢app {gc = gc′} {gc′ = g₂′} {A = A₁′} {A₂′} {B′} {g = g₁′} ⊢L′ ⊢M′ A₂′≲A₁′ g₁′≾g₂′ gc′≾g₂′) eq eq′
+  with all-specific? [ gc , g₁ , g₂ ] | all-specific? [ gc′ , g₁′ , g₂′ ]
+     | g₁≾g₂ | gc≾g₂ | g₁′≾g₂′ | gc′≾g₂′
+... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil)))
+    | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) (as-cons (＠ ℓ₃′) as-nil)))
+    | ≾-l ℓ₂≼ℓ₃ | ≾-l ℓ₁≼ℓ₃ | ≾-l ℓ₂′≼ℓ₃′ | ≾-l ℓ₁′≼ℓ₃′ =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
+  case ⟨ gc⊑gc′ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ ⟩ of λ where
+  ⟨ l⊑l , _ , _ , ⊑-ty l⊑l (⊑-fun l⊑l A₁⊑A₁′ B⊑B′) ⟩ →
+    case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ of λ where
+    ⟨ _ , _ , A₂⊑A₂′ ⟩ →
+      ⊑-app (⊑-cast 𝒞L⊑𝒞L′ {!coerce-prec!}) (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A₂⊑A₂′ A₁⊑A₁′ A₂≲A₁ A₂′≲A₁′)) refl refl
+... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil))) | no _ | _ | _ | _ | _ = {!!}
+... | no _ | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) (as-cons (＠ ℓ₃′) as-nil))) | _ | _ | _ | _ = {!!}
+... | no ¬as | no ¬as′ | _ | _ | _ | _
+  with B | B′
+... | T of g₃ | T′ of g₃′ =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
+  case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ of λ where
+  ⟨ _ , _ , ⊑-ty g₁⊑g₁′ (⊑-fun g₂⊑g₂′ A₁⊑A₁′ (⊑-ty g₃⊑g₃′ T⊑T′)) ⟩ →
+    case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ of λ where
+    ⟨ _ , _ , A₂⊑A₂′ ⟩ →
+      ⊑-cast (⊑-app⋆ (⊑-cast 𝒞L⊑𝒞L′ {!!}) (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A₂⊑A₂′ A₁⊑A₁′ A₂≲A₁ A₂′≲A₁′)))
+        (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty (consis-join-⊑ₗ g₃⊑g₃′ g₁⊑g₁′) T⊑T′) _ _)
+
+{- There are four cases about compiling an if-conditional,
+   depending on whether the labels on the two sides are all specific.
+   So let's put them in a separate lemma. -}
 compile-pres-precision-if : ∀ {Γ Γ′ g g′ M M′ L L′ N₁ N₁′ N₂ N₂′ A A′} {p}
     → Γ ⊑* Γ′
     → g ⊑ₗ g′
@@ -216,7 +256,8 @@ compile-pres-precision Γ⊑Γ′ g⊑g′ ⊑ᴳ-var (⊢var Γ∋x⦂A) (⊢va
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-lam g₁⊑g₂ A⊑A′ M⊑M′) (⊢lam ⊢M) (⊢lam ⊢M′) =
   ⊑-lam g₁⊑g₂ A⊑A′ (compile-pres-precision (⊑*-∷ A⊑A′ Γ⊑Γ′) g₁⊑g₂ M⊑M′ ⊢M ⊢M′)
 {- Compiling function application -}
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-app M⊑M′ M⊑M′₁) ⊢M ⊢M′ = {!!}
+compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-app L⊑L′ N⊑N′) ⊢M ⊢M′ =
+  compile-pres-precision-app Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-app L⊑L′ N⊑N′) ⊢M ⊢M′ refl refl
 {- Compiling if-conditional -}
 compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ N₁⊑N₁′ N₂⊑N₂′) ⊢M ⊢M′ =
   compile-pres-precision-if Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′ N₁⊑N₁′ N₂⊑N₂′) ⊢M ⊢M′ refl refl
