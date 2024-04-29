@@ -175,6 +175,10 @@ _≾high : ∀ g → g ≾ l high
 ≾-antisym (≾-l ℓ₁≼ℓ₂) (≾-l ℓ₂≼ℓ₂)
   rewrite ≼-antisym ℓ₁≼ℓ₂ ℓ₂≼ℓ₂ = ~ₗ-refl
 
+<:ₗ→≾ : ∀ {g₁ g₂} → g₁ <:ₗ g₂ → g₁ ≾ g₂
+<:ₗ→≾ <:-⋆ = ≾-⋆l
+<:ₗ→≾ (<:-l ℓ₁≼ℓ₂) = ≾-l ℓ₁≼ℓ₂
+
 -- Properties of label consistent subtyping
 ≾-prop : ∀ {g₁ g₂ : Label}
   → g₁ ≾ g₂

@@ -288,6 +288,13 @@ data _≲_ where
 ≲-antisym (≲-ty g₁≾g₂ S≲T) (≲-ty g₂≾g₁ T≲S) =
   ~-ty (≾-antisym g₁≾g₂ g₂≾g₁) (≲ᵣ-antisym S≲T T≲S)
 
+<:→≲ : ∀ {A B} → A <: B → A ≲ B
+<:→≲ (<:-ty g₁<:g₂ <:-ι) = ≲-ty (<:ₗ→≾ g₁<:g₂) ≲-ι
+<:→≲ (<:-ty g₁<:g₂ (<:-ref A<:B B<:A)) =
+  ≲-ty (<:ₗ→≾ g₁<:g₂) (≲-ref (<:→≲ A<:B) (<:→≲ B<:A))
+<:→≲ (<:-ty g₁<:g₂ (<:-fun gc₂<:gc₁ C<:A B<:D)) =
+  ≲-ty (<:ₗ→≾ g₁<:g₂) (≲-fun (<:ₗ→≾ gc₂<:gc₁) (<:→≲ C<:A) (<:→≲ B<:D))
+
 A≲Tg→A≲T⋆ : ∀ {A T g} → A ≲ T of g → A ≲ T of ⋆
 A≲Tg→A≲T⋆ {T₁ of g₁} {T₂} {g₂} (≲-ty g₁≾g₂ T₁≲T₂) =
   ≲-ty ≾-⋆r T₁≲T₂

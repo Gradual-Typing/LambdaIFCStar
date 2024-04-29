@@ -43,11 +43,6 @@ coerceₗ {g}    {⋆}    _           _ = coerce g ⇒⋆
 coerceₗ {l ℓ₁} {l ℓ₂} (≾-l ℓ₁≼ℓ₂) _ = coerce-≼ ℓ₁≼ℓ₂
 coerceₗ {⋆}    {l ℓ}  ≾-⋆l        p = id ⋆ ⨾ ℓ ?? p
 
-coerce-<:ₗ : ∀ {g₁ g₂} → g₁ <:ₗ g₂ → CExpr g₁ ⇒ g₂
-coerce-<:ₗ <:-⋆ = id ⋆
-coerce-<:ₗ (<:-l ℓ₁≼ℓ₂) = coerce-≼ ℓ₁≼ℓ₂
-
-
 -- data CVal : ∀ {g₁ g₂} → CExpr g₁ ⇒ g₂ → Set where
 
 --   id : ∀ {g} → CVal (id g)

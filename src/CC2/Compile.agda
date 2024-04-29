@@ -33,7 +33,7 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
     ⟨ ≾-l ℓ≼ℓᶜ , ≾-l pc≼ℓᶜ ⟩ →
       let sub : ⟦ l ℓ₃ ⟧ A ⇒ B of l ℓ₂ <: ⟦ l (ℓ₁ ⋎ ℓ₂) ⟧ A ⇒ B of l ℓ₂
           sub = <:-ty <:ₗ-refl (<:-fun (<:-l (ℓ₁⋎ℓ₂≼ℓ pc≼ℓᶜ ℓ≼ℓᶜ)) <:-refl <:-refl) in
-      app (compile L ⊢L ⟨ coerce-<: sub ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B ℓ₂
+      app (compile L ⊢L ⟨ coerce (<:→≲ sub) p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A B ℓ₂
   (no _) →
     case B of λ where
     (T of g′) →
