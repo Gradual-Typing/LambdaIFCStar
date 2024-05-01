@@ -37,9 +37,11 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
   (no _) →
     case B of λ where
     (T of g′) →
+      let csub₁ : ⟦ gc′ ⟧ A ⇒ (T of g′) of g ≲ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆
+          csub₁ = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl)) in
       let csub : T of ⋆ ≲ stamp (T of g′) g
           csub = ≲-ty ≾-⋆l ≲ᵣ-refl in
-      (app⋆ (compile L ⊢L ⟨ fun-to-⋆ gc′ A T g′ g p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
+      (app⋆ (compile L ⊢L ⟨ coerce csub₁ p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
 compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) =
   case consis-join-≲-inv {A} {B} A∨̃B≡C of λ where
   ⟨ A≲C , B≲C ⟩ →
