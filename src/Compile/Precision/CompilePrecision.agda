@@ -53,22 +53,35 @@ compile-pres-precision-app Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-app L⊑L′ M⊑M′)
   (⊢app {gc = gc} {gc′ = g₂} {A = A₁} {A₂} {B} {g = g₁} ⊢L ⊢M A₂≲A₁ g₁≾g₂ gc≾g₂)
   (⊢app {gc = gc′} {gc′ = g₂′} {A = A₁′} {A₂′} {B′} {g = g₁′} ⊢L′ ⊢M′ A₂′≲A₁′ g₁′≾g₂′ gc′≾g₂′) eq eq′
   with all-specific? [ gc , g₁ , g₂ ] | all-specific? [ gc′ , g₁′ , g₂′ ]
-     | g₁≾g₂ | gc≾g₂ | g₁′≾g₂′ | gc′≾g₂′
+     | g₁≾g₂ | gc≾g₂ | g₁′≾g₂′ | gc′≾g₂′ | B | B′
 ... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil)))
     | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) (as-cons (＠ ℓ₃′) as-nil)))
-    | ≾-l ℓ₂≼ℓ₃ | ≾-l ℓ₁≼ℓ₃ | ≾-l ℓ₂′≼ℓ₃′ | ≾-l ℓ₁′≼ℓ₃′ =
+    | ≾-l ℓ₂≼ℓ₃ | ≾-l ℓ₁≼ℓ₃ | ≾-l ℓ₂′≼ℓ₃′ | ≾-l ℓ₁′≼ℓ₃′ | B | B′ =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
   case ⟨ gc⊑gc′ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ ⟩ of λ where
   ⟨ l⊑l , _ , _ , ⊑-ty l⊑l (⊑-fun l⊑l A₁⊑A₁′ B⊑B′) ⟩ →
     case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ of λ where
     ⟨ _ , _ , A₂⊑A₂′ ⟩ →
-      ⊑-app (⊑-cast 𝒞L⊑𝒞L′ {!coerce-prec!}) (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A₂⊑A₂′ A₁⊑A₁′ A₂≲A₁ A₂′≲A₁′)) refl refl
-... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil))) | no _ | _ | _ | _ | _ = {!!}
-... | no _ | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) (as-cons (＠ ℓ₃′) as-nil))) | _ | _ | _ | _ = {!!}
-... | no ¬as | no ¬as′ | _ | _ | _ | _
-  with B | B′
-... | T of g₃ | T′ of g₃′ =
+      let sub : ⟦ l ℓ₃ ⟧ A₁ ⇒ B of l ℓ₂ <: ⟦ l (ℓ₁ ⋎ ℓ₂) ⟧ A₁ ⇒ B of l ℓ₂
+          sub = <:-ty <:ₗ-refl (<:-fun (<:-l (ℓ₁⋎ℓ₂≼ℓ ℓ₁≼ℓ₃ ℓ₂≼ℓ₃)) <:-refl <:-refl) in
+      let sub′ : ⟦ l ℓ₃′ ⟧ A₁′ ⇒ B′ of l ℓ₂′ <: ⟦ l (ℓ₁′ ⋎ ℓ₂′) ⟧ A₁′ ⇒ B′ of l ℓ₂′
+          sub′ = <:-ty <:ₗ-refl (<:-fun (<:-l (ℓ₁⋎ℓ₂≼ℓ ℓ₁′≼ℓ₃′ ℓ₂′≼ℓ₃′)) <:-refl <:-refl) in
+      ⊑-app (⊑-cast 𝒞L⊑𝒞L′ (coerce-prec (⊑-ty l⊑l (⊑-fun l⊑l A₁⊑A₁′ B⊑B′)) (⊑-ty l⊑l (⊑-fun l⊑l A₁⊑A₁′ B⊑B′)) (<:→≲ sub) (<:→≲ sub′)))
+            (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A₂⊑A₂′ A₁⊑A₁′ A₂≲A₁ A₂′≲A₁′)) refl refl
+... | yes (as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil))) | no ¬as | _ | _ | _ | _ | _ | _ =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  case ⟨ gc⊑gc′ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ ⟩ of λ where
+  ⟨ l⊑l {.ℓ₁} , _ , _ , ⊑-ty l⊑l (⊑-fun l⊑l A₁⊑A₁′ B⊑B′) ⟩ →
+    let as = as-cons (＠ ℓ₁) (as-cons (＠ ℓ₂) (as-cons (＠ ℓ₃) as-nil)) in
+    contradiction as ¬as
+... | no _ | yes (as-cons (＠ ℓ₁′) (as-cons (＠ ℓ₂′) (as-cons (＠ ℓ₃′) as-nil))) | _ | _ | ≾-l ℓ₂′≼ℓ₃′ | ≾-l ℓ₁′≼ℓ₃′ | T of g₃ | T′ of g₃′ =
+  let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
+  case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ of λ where
+  ⟨ _ , _ , ⊑-ty g₁⊑g₁′ (⊑-fun g₂⊑g₂′ A₁⊑A₁′ B⊑B′) ⟩ →
+    let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
+    ⊑-castl (⊑-app⋆l {!!} {!!} {!!}) {!!}
+... | no ¬as | no ¬as′ | _ | _ | _ | _ | T of g₃ | T′ of g₃′ =
   let 𝒞L⊑𝒞L′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ L⊑L′ ⊢L ⊢L′ in
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ gc⊑gc′ M⊑M′ ⊢M ⊢M′ in
   case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞L⊑𝒞L′ of λ where
