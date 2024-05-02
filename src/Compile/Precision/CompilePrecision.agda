@@ -300,7 +300,23 @@ compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-let M⊑M′ N⊑N′) (⊢le
   let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ g⊑g′ M⊑M′ ⊢M ⊢M′ in
   let ⟨ _ , _ , A⊑A′ ⟩ = cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ in
   ⊑-let 𝒞M⊑𝒞M′ (compile-pres-precision (⊑*-∷ A⊑A′ Γ⊑Γ′) g⊑g′ N⊑N′ ⊢N ⊢N′)
-compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-ref M⊑M′) ⊢M ⊢M′ = {!!}
+compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-ref M⊑M′) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ) (⊢ref {gc = gc′} ⊢M′ T′g′≲T′ℓ gc′≾ℓ) with gc | gc′ | gc⊑gc′
+... | l ℓc | l .ℓc | l⊑l =
+  let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ l⊑l M⊑M′ ⊢M ⊢M′ in
+  case ⟨ gc′≾ℓ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ ⟩ of λ where
+  ⟨ ≾-l ℓc≼ℓ , _ , _ , ⊑-ty g⊑g′ T⊑T′ ⟩ →
+    ⊑-ref (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec (⊑-ty g⊑g′ T⊑T′) (⊑-ty l⊑l T⊑T′) Tg≲Tℓ T′g′≲T′ℓ)) ℓc≼ℓ
+... | ⋆ | ⋆ | ⋆⊑ =
+  let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′ in
+  case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ of λ where
+  ⟨ _ , _ , ⊑-ty g⊑g′ T⊑T′ ⟩ →
+    ⊑-ref? (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec (⊑-ty g⊑g′ T⊑T′) (⊑-ty l⊑l T⊑T′) Tg≲Tℓ T′g′≲T′ℓ))
+... | ⋆ | l ℓc′ | ⋆⊑ =
+  let 𝒞M⊑𝒞M′ = compile-pres-precision Γ⊑Γ′ ⋆⊑ M⊑M′ ⊢M ⊢M′ in
+  case ⟨ gc′≾ℓ , cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ ⟩ of λ where
+  ⟨ ≾-l ℓc′≼ℓ , _ , _ , ⊑-ty g⊑g′ T⊑T′ ⟩ →
+    ⊑-ref?l (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec (⊑-ty g⊑g′ T⊑T′) (⊑-ty l⊑l T⊑T′) Tg≲Tℓ T′g′≲T′ℓ)) ℓc′≼ℓ
+... | l ℓc | ⋆ | ()
 compile-pres-precision Γ⊑Γ′ g⊑g′ (⊑ᴳ-deref M⊑M′) ⊢M ⊢M′ = {!!}
 compile-pres-precision Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′) ⊢M ⊢M′ =
   compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′) ⊢M ⊢M′ refl refl
