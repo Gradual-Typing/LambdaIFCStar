@@ -98,7 +98,13 @@ compile-pres-precision-app Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-app L⊑L′ M⊑M′)
   ⟨ _ , _ , ⊑-ty g₁⊑g₁′ (⊑-fun g₂⊑g₂′ A₁⊑A₁′ (⊑-ty g₃⊑g₃′ T⊑T′)) ⟩ →
     case cc-prec-inv {ℓv = low} {low} Γ⊑Γ′ ⟨ ⊑-∅ , ⊑-∅ ⟩ 𝒞M⊑𝒞M′ of λ where
     ⟨ _ , _ , A₂⊑A₂′ ⟩ →
-      ⊑-cast (⊑-app⋆ (⊑-cast 𝒞L⊑𝒞L′ {!!}) (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A₂⊑A₂′ A₁⊑A₁′ A₂≲A₁ A₂′≲A₁′)))
+      let prec-src = ⊑-ty g₁⊑g₁′ (⊑-fun g₂⊑g₂′ A₁⊑A₁′ (⊑-ty g₃⊑g₃′ T⊑T′))
+          prec-tgt = ⊑-ty ⋆⊑ (⊑-fun ⋆⊑ A₁⊑A₁′ (⊑-ty ⋆⊑ T⊑T′)) in
+      let csub : ⟦ g₂ ⟧ A₁ ⇒ (T of g₃) of g₁ ≲ ⟦ ⋆ ⟧ A₁ ⇒ (T of ⋆) of ⋆
+          csub = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl)) in
+      let csub′ : ⟦ g₂′ ⟧ A₁′ ⇒ (T′ of g₃′) of g₁′ ≲ ⟦ ⋆ ⟧ A₁′ ⇒ (T′ of ⋆) of ⋆
+          csub′ = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl)) in
+      ⊑-cast (⊑-app⋆ (⊑-cast 𝒞L⊑𝒞L′ (coerce-prec prec-src prec-tgt csub csub′)) (⊑-cast 𝒞M⊑𝒞M′ (coerce-prec A₂⊑A₂′ A₁⊑A₁′ A₂≲A₁ A₂′≲A₁′)))
         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty (consis-join-⊑ₗ g₃⊑g₃′ g₁⊑g₁′) T⊑T′) _ _)
 
 {- There are four cases about compiling an if-conditional,
