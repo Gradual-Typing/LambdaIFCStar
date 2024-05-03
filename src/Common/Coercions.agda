@@ -96,8 +96,6 @@ coerce-id (T of g) = cast (coerceᵣ-id T) (id g)
 inject : ∀ T g → Cast T of g ⇒ T of ⋆
 inject T g = cast (coerceᵣ-id T) (coerce g ⇒⋆)
 
-ref-to-⋆ : ∀ T g₁ g₂ → (p : BlameLabel) → Cast (Ref (T of g₁) of g₂) ⇒ (Ref (T of ⋆) of ⋆)
-ref-to-⋆ T g₁ g₂ p = cast (ref (cast (coerceᵣ-id T) (coerceₗ ≾-⋆l p)) (cast (coerceᵣ-id T) (coerce g₁ ⇒⋆))) (coerce g₂ ⇒⋆)
 
 stamp-ir : ∀ {A B} (c : Cast A ⇒ B) → Irreducible c → ∀ ℓ → Cast A ⇒ stamp B (l ℓ)
 stamp-ir (cast cᵣ c̅) (ir-base 𝓋 _) ℓ = cast cᵣ (stampₗ c̅ 𝓋 ℓ)

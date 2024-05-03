@@ -39,9 +39,9 @@ compile (L · M at p) (⊢app {gc = gc} {gc′} {A = A} {A′} {B} {g = g} ⊢L 
     (T of g′) →
       let csub₁ : ⟦ gc′ ⟧ A ⇒ (T of g′) of g ≲ ⟦ ⋆ ⟧ A ⇒ (T of ⋆) of ⋆
           csub₁ = ≲-ty ≾-⋆r (≲-fun ≾-⋆l ≲-refl (≲-ty ≾-⋆r ≲ᵣ-refl)) in
-      let csub : T of ⋆ ≲ stamp (T of g′) g
-          csub = ≲-ty ≾-⋆l ≲ᵣ-refl in
-      (app⋆ (compile L ⊢L ⟨ coerce csub₁ p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub p ⟩
+      let csub₂ : T of ⋆ ≲ stamp (T of g′) g
+          csub₂ = ≲-ty ≾-⋆l ≲ᵣ-refl in
+      (app⋆ (compile L ⊢L ⟨ coerce csub₁ p ⟩) (compile M ⊢M ⟨ coerce A′≲A p ⟩) A T) ⟨ coerce csub₂ p ⟩
 compile (if L then M else N at p) (⊢if {gc = gc} {A = A} {B} {C} {g = g} ⊢L ⊢M ⊢N A∨̃B≡C) =
   case consis-join-≲-inv {A} {B} A∨̃B≡C of λ where
   ⟨ A≲C , B≲C ⟩ →
@@ -66,9 +66,14 @@ compile (ref⟦ ℓ ⟧ M at p) (⊢ref {gc = gc} ⊢M Tg≲Tℓ gc≾ℓ) =
   (l ℓᶜ) →  ref⟦ ℓ ⟧ M′
   ⋆      → ref?⟦ ℓ ⟧ M′ p
 compile (! M at p) (⊢deref {A = A} {g} ⊢M) =
-  case ⟨ g , A ⟩ of λ where
-  ⟨ l ℓ , A       ⟩ → !  (compile M ⊢M) A ℓ
-  ⟨ ⋆   , T of g′ ⟩ → !⋆ (compile M ⊢M ⟨ ref-to-⋆ T g′ g p ⟩) T
+  case g of λ where
+  (l ℓ) → !  (compile M ⊢M) A ℓ
+  ⋆     →
+    case A of λ where
+    (T of g′) →
+      let csub : Ref (T of g′) of g ≲ Ref (T of ⋆) of ⋆
+          csub = ≲-ty ≾-⋆r (≲-ref (≲-ty ≾-⋆r ≲ᵣ-refl) (≲-ty ≾-⋆l ≲ᵣ-refl)) in
+      !⋆ (compile M ⊢M ⟨ coerce csub p ⟩) T
 compile (L := M at p) (⊢assign {gc = gc} {A = A} {T} {g} {ĝ} ⊢L ⊢M A≲Tĝ g≾ĝ gc≾ĝ) =
   case all-specific? [ gc , g , ĝ ] of λ where
   (yes (as-cons (＠ _)  (as-cons (＠ ℓ)  (as-cons (＠ ℓ̂) as-nil)))) →
