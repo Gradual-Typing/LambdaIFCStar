@@ -25,7 +25,7 @@ open import Surface2.Precision
 open import CC2.Syntax public  renaming (Term to CCTerm)
 open import CC2.Typing public
 open import CC2.Precision
-open import CC2.Compile
+open import Compile.Compile
 
 
 {- Here is the lemma statement of "compilation preserves precision" -}

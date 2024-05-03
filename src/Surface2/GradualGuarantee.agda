@@ -13,9 +13,9 @@ open import CC2.Statics
 open import CC2.MultiStep
 open import CC2.Precision
 open import CC2.HeapPrecision using (∅⊑∅)
-open import CC2.Compile
 open import CC2.GG using (gg)
 
+open import Compile.Compile
 open import Compile.Precision.CompilationPresPrecision
 
 

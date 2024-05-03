@@ -7,8 +7,8 @@ open import Common.Types
 open import Surface2.Typing
 open import Surface2.Precision
 open import CC2.Precision
-open import CC2.Compile
 
+open import Compile.Compile
 open import Compile.Precision.CompilePrecision using (compile-pres-precision)
 
 
