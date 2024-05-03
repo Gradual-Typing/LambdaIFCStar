@@ -35,6 +35,10 @@ _;_⊢_⊑_ : ∀ (Σ Σ′ : HeapContext) (μ μ′ : Heap) → Set
        [] ; [] ∣ Σ ; Σ′ ∣ l low ; l low ∣ low ; low ⊢ V ⊑ V′ ⇐ T of l ℓ ⊑ T′ of l ℓ)
 
 
+∅⊑∅ : ∅ ; ∅ ⊢ ∅ ⊑ ∅
+∅⊑∅ n low  ()
+∅⊑∅ n high ()
+
 
 ⊑μ→⊢μ : ∀ {Σ Σ′} {μ μ′}
   → Σ ⊑ₘ Σ′

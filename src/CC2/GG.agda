@@ -1,4 +1,4 @@
-module CC2.GradualGuarantee where
+module CC2.GG where
 
 open import Data.Nat
 open import Data.Unit using (⊤; tt)
