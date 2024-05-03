@@ -1,12 +1,96 @@
-#+TITLE: About LambdaIFCStar
+#+TITLE: Documentation of LambdaIFCStar
 #+AUTHOR: Tianyu Chen
 
 #+OPTIONS: toc:nil num:nil
 
-* $\lambda_{\mathtt{IFC}}^\star$, A Gradual Security-Typed Programming Language
+#+MACRO: surface $\lambda_{\mathtt{IFC}}^\star$
+#+MACRO: cc $\lambda_{\mathtt{IFC}}^{c}$
+#+MACRO: surface_old $\lambda_{\mathtt{SEC}}^\star$
+#+MACRO: cc_old $\lambda_{\mathtt{SEC}}^{c}$
+#+MACRO: dynifc $\lambda_{\mathtt{SEC}}$
 
-$\lambda_{\mathtt{IFC}}^\star$ is an experimental gradual security-typed
-programming language. $\lambda_{\mathtt{IFC}}^\star$ is /gradual/, in that it
-provides the programmer with the freedom of choice between runtime versus
-compile-time enforcement. $\lambda_{\mathtt{IFC}}^\star$ is /secure/, because it
-enforces information-flow security and satisfies noninterference.
+* {{{surface}}}, A Gradual Security-Typed Programming Language
+
+{{{surface}}} is an experimental gradual security-typed programming language.
+{{{surface}}} is /gradual/, in that it provides the programmer with the freedom
+of choice between runtime versus compile-time enforcement. {{{surface}}} is
+/secure/, because it enforces information-flow security and satisfies
+noninterference.
+
+On the technical side, {{{surface}}} is the only programming language design
+that combines gradual typing with information-flow control (IFC) without making any
+sacrifices. {{{surface}}} (1) satisfies noninterference (the security
+guarantee), (2) satisfies the gradual guarantee, (3) enjoys type-guided
+classification, and (4) utilizes NSU checking to enforce implicit flows through
+the heap with no static analysis required. The semantics of {{{surface}}} is the
+first gradual security-typed language to be specified using /coercion calculi/
+(a la Henglein).
+
+* A Tale of Two Gradual Security Languages
+
+This repository contains the [[https://wiki.portal.chalmers.se/agda][Agda]] mechanization of two gradual security-typed
+languages:
+
+1. {{{surface_old}}} is a gradual security language that is vigilant (that is, a
+   runtime error is triggered if inconsistent type annotations are detected) but
+   does not enable type-guided classification (that is, type annotations do not
+   affect the security level of runtime values). The development of
+   {{{surface_old}}} is reported in our Arxiv draft
+   [[https://arxiv.org/abs/2211.15745][Mechanized Noninterference for Gradual Security]]
+   (*Chen and Siek [2022]*). The semantics of
+   {{{surface_old}}} is given by compiling to the cast calculus {{{cc_old}}},
+   which utilizes type-based casts as its cast representation.
+2. {{{surface}}} is a gradual security language that enjoys /both/ vigilance as
+   well as type-guided classification, thus enabling type-based reasoning for
+   both explicit and implicit information flows. The development of
+   {{{surface}}} is reported in our upcoming [[https://pldi24.sigplan.org/details/pldi-2024-papers/66/Quest-Complete-The-Holy-Grail-of-Gradual-Security][PLDI 2024]] paper
+   [[https://homes.luddy.indiana.edu/chen512/lambdaifcstarv2.pdf][Quest Complete: The Holy Grail of Gradual Security]]
+   (*Chen and Siek [2024]*). The semantics of {{{surface}}} is given by compiling
+   to another cast calculus {{{cc}}}, in which we adapt ideas from
+   the Coercion Calculus of Henglein [1994] to IFC.
+
+Both cast calculi, {{{cc}}} and {{{cc_old}}}, support blame-tracking. Casts are
+inserted on-demand, only when there is insufficient information during
+compilation to decide whether a security policy is enforced or not.
+
+* Quick Start Guide
+
+** Software prerequisites
+
+*** Software dependencies for checking proofs:
+
++ [[https://wiki.portal.chalmers.se/agda][Agda]] =2.6.4=
++ [[https://github.com/agda/agda-stdlib][Agda standard library]] =v1.7.3 (0817da6)=
++ [[https://github.com/jsiek/abstract-binding-trees/][The Abstract Binding Trees library]]
++ [[https://www.gnu.org/software/make/][GNU Make]]
+
+*** Software dependencies for running demos:
+
++ [[https://www.haskell.org/ghc/][GHC]] with [[https://wiki.portal.chalmers.se/agda/Docs/MAlonzo][MAlonzo]]
+
+*** Software dependencies for drawing simulation diagrams:
+
+- [[https://tug.org/xetex/][XeLaTeX]] and =latexmk=
+- [[https://graphviz.org/][GraphViz]] (specifically, =dot=)
+- [[https://dot2tex.readthedocs.io/en/latest/][Dot2TeX]]
+- [[https://www.zsh.org/][Zsh]] (for running plotting scripts)
+
+** Building the project
+
++ To build everything, simply run =make= at the top level of this repository.
+   This will build the proofs, the runnable demo, and a simulation explorer.
+
++ Alternatively, to check the proofs only, run ~make proofs~.
+   The type-checker of Agda makes sure all the proofs are correct.
+
++ Alternatively, to build the simulator only, run ~make sim~.
+
+** Running the demo programs of {{{surface_old}}}
+
+We include example programs written in {{{surface_old}}}. To get a taste of
+{{{surface_old}}} running in action, please build everything first and then run
+~bin/RunDemo~.
+
+* Selected Project Code Structure
+
+All Agda source files are located in the [[./src]] directory and end with =.agda=.
