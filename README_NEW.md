@@ -93,5 +93,7 @@ $\lambda_{\mathtt{SEC}}^\star$ running in action, please build everything first 
 
 # Selected Project Code Structure
 
-All Agda source files are located in the <./src> directory and end with `.agda`.
+All Agda source files are located in the [src](./src) directory and end with `.agda`. A
+(fairly) large part of the code-base is shared between $\lambda_{\mathtt{IFC}}^\star$ and
+$\lambda_{\mathtt{SEC}}^\star$.
 
