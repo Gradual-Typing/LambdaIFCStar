@@ -1,0 +1,12 @@
+#+TITLE: About LambdaIFCStar
+#+AUTHOR: Tianyu Chen
+
+#+OPTIONS: toc:nil num:nil
+
+* $\lambda_{\mathtt{IFC}}^\star$, A Gradual Security-Typed Programming Language
+
+$\lambda_{\mathtt{IFC}}^\star$ is an experimental gradual security-typed
+programming language. $\lambda_{\mathtt{IFC}}^\star$ is /gradual/, in that it
+provides the programmer with the freedom of choice between runtime versus
+compile-time enforcement. $\lambda_{\mathtt{IFC}}^\star$ is /secure/, because it
+enforces information-flow security and satisfies noninterference.

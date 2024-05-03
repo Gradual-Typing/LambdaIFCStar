@@ -1,3 +1,3 @@
-name: lambda-sec-star
+name: lambda-ifc-star
 depend: standard-library abt
 include: src/
