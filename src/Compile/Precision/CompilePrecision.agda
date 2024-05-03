@@ -42,7 +42,8 @@ compile-pres-precision : ∀ {Γ Γ′ g g′ M M′ A A′}
 {- There are four cases about compiling an if-conditional,
    depending on whether the labels on the two sides are all specific.
    So let's put them in a separate lemma. -}
-compile-pres-precision-if : ∀ {Γ Γ′ g g′ M M′ L L′ N₁ N₁′ N₂ N₂′ A A′} {p}
+private
+  compile-pres-precision-if : ∀ {Γ Γ′ g g′ M M′ L L′ N₁ N₁′ N₂ N₂′ A A′} {p}
     → Γ ⊑* Γ′
     → g ⊑ₗ g′
     → ⊢ M ⊑ᴳ M′
@@ -153,8 +154,8 @@ compile-pres-precision-if {Γ} {Γ′} Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-if L⊑L′
              (coerce-prec (⊑-ty (consis-join-⊑ₗ g₁⊑g₂ ⋆⊑  ) T⊑T′)
                           (⊑-ty (consis-join-⊑ₗ g₁⊑g₂ g⊑g′) T⊑T′) _ _)
 
-
-compile-pres-precision-app : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′} {p}
+private
+  compile-pres-precision-app : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′} {p}
     → Γ ⊑* Γ′
     → g ⊑ₗ g′
     → ⊢ M ⊑ᴳ M′
@@ -223,16 +224,17 @@ compile-pres-precision-app Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-app L⊑L′ M⊑M′)
         (coerce-prec (⊑-ty ⋆⊑ T⊑T′) (⊑-ty (consis-join-⊑ₗ g₃⊑g₃′ g₁⊑g₁′) T⊑T′) _ _)
 
 
-compile-pres-precision-assign : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′} {p}
-  → Γ ⊑* Γ′
-  → g ⊑ₗ g′
-  → ⊢ M ⊑ᴳ M′
-  → (⊢M  : Γ  ; g  ⊢ᴳ M  ⦂ A )
-  → (⊢M′ : Γ′ ; g′ ⊢ᴳ M′ ⦂ A′)
-  → M  ≡ L  := N  at p
-  → M′ ≡ L′ := N′ at p
-    --------------------------------------------------------------------------------------------
-  → (∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ g ; g′ ∣ ℓ ; ℓ′ ⊢ compile M ⊢M ⊑ compile M′ ⊢M′ ⇐ A ⊑ A′)
+private
+  compile-pres-precision-assign : ∀ {Γ Γ′ g g′ M M′ L L′ N N′ A A′} {p}
+    → Γ ⊑* Γ′
+    → g ⊑ₗ g′
+    → ⊢ M ⊑ᴳ M′
+    → (⊢M  : Γ  ; g  ⊢ᴳ M  ⦂ A )
+    → (⊢M′ : Γ′ ; g′ ⊢ᴳ M′ ⦂ A′)
+    → M  ≡ L  := N  at p
+    → M′ ≡ L′ := N′ at p
+      --------------------------------------------------------------------------------------------
+    → (∀ {ℓ ℓ′} → Γ ; Γ′ ∣ ∅ ; ∅ ∣ g ; g′ ∣ ℓ ; ℓ′ ⊢ compile M ⊢M ⊑ compile M′ ⊢M′ ⇐ A ⊑ A′)
 compile-pres-precision-assign Γ⊑Γ′ gc⊑gc′ (⊑ᴳ-assign L⊑L′ M⊑M′)
     (⊢assign {gc = gc } {g = g } {ĝ } ⊢L  ⊢M  A≲Tĝ   g≾ĝ   gc≾ĝ  )
     (⊢assign {gc = gc′} {g = g′} {ĝ′} ⊢L′ ⊢M′ A′≲Tĝ′ g′≾ĝ′ gc′≾ĝ′) _ _
