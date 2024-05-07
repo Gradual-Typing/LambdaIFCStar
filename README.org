@@ -99,11 +99,13 @@ All Agda source files are located in the [[./src][=src/=]] directory and end wit
 (fairly) large part of the code-base is shared between {{{surface}}} and
 {{{surface_old}}}.
 
+** Meta-theoretical results and demo programs
+
 There are three top-level modules in the [[./src][=src/=]] directory:
 
-+ [[./src/Proofs.agda][=Proofs=]]: sources the proofs of important meta-theoretical results
+1. [[./src/Proofs.agda][*=Proofs=*]]: sources the proofs of important *meta-theoretical results*
   in the following modules:
-  * Here are some meta-theoretic results for {{{surface_old}}} and its cast
+  * Here are some meta-theoretical results for {{{surface_old}}} and its cast
     calculus {{{cc_old}}}:
     * [[./src/CC/TypeSafety.agda][=CC.TypeSafety=]]: {{{cc_old}}} is type safe by satisfying progress and
       preservation.
@@ -115,7 +117,7 @@ There are three top-level modules in the [[./src][=src/=]] directory:
       noninterference (TINI).
     * [[./src/CC/Compile.agda][=CC.Compile=]]: The compilation from {{{surface_old}}} to {{{cc_old}}}
       preserves types.
-  * Here are meta-theoretic results for {{{surface}}} and its cast calculus
+  * Here are meta-theoretical results for {{{surface}}} and its cast calculus
     {{{cc}}}:
     * [[./src/CC2/Progress.agda][=CC2.Progress=]]: {{{cc}}} satisfies progress, so that a well-typed {{{cc}}}
       term is either a value or a blame, which does not reduce, or the term
@@ -126,7 +128,7 @@ There are three top-level modules in the [[./src][=src/=]] directory:
       {{{cc}}} preserves types.
     * [[./src/Surface2/GradualGuarantee.agda][=Surface2.GradualGuarantee=]]: {{{surface}}} satisfies the gradual
       guarantee.
-+ [[./src/RunDemo.agda][=RunDemo=]]: The program runs a stepper on the following {{{surface_old}}}
+2. [[./src/RunDemo.agda][*=RunDemo=*]]: The program runs a stepper on the following {{{surface_old}}}
   programs and pretty-prints their reduction sequences to command line using [[./src/PrettyPrinter/Console/PP.agda][the
   Console pretty-printer backend]]:
   * The stepper that generates reduction sequences for {{{cc_old}}} in string
@@ -145,7 +147,7 @@ There are three top-level modules in the [[./src][=src/=]] directory:
   - [[./src/ExamplePrograms/Demo/Example3.agda][=ExamplePrograms.Demo.Example3=]]: This example shows that moving type
     annotations to be less precise (more dynamic) does not change the runtime
     behavior of a {{{surface_old}}} program.
-+ [[./src/RunSimulation.agda][=RunSimulation=]]: The program runs a simulator that simulates between
+3. [[./src/RunSimulation.agda][*=RunSimulation=*]]: The program runs a simulator that simulates between
   {{{cc_old}}} terms of different precision. The output defaults to
   [[./src/PrettyPrinter/GraphViz][the GraphViz pretty-printer backend]], which
   will place =*.dot= files that represent the simulation diagrams in the [[./plot][=plot/=]]
@@ -155,3 +157,34 @@ There are three top-level modules in the [[./src][=src/=]] directory:
     [[./src/ExamplePrograms/Simulation/Examples.agda][=ExamplePrograms.Simulation.Examples=]].
   * Please refer to the =README= file in [[./plot][=plot/=]] for the instructions of
     generating the simulation diagrams in PDF format.
+
+** Noteworthy technical definitions
+
+*** General technical definitions in directory =Common/=
+
++ [[./src/Common/SecurityLabels.agda][=Common.SecurityLabels=]]: Definitions of /security labels/ as well as
+  predicates, relations and operators on security labels.
++ [[./src/Common/Types.agda][=Common.Types=]]: Definitions of /(security) types/ as well as predicates,
+  relations and operators on types.
++ [[./src/Common/BlameLabels.agda][=Common.BlameLabels=]]: This module defines /blame labels/, which are
+  identifiers of casts. In case a cast fails, it raises a cast error, called
+  blame, that contains its blame label. In this way, the programmer knows which
+  cast is causing the problem.
++ [[./src/Common/TypeBasedCast.agda][=Common.TypeBasedCast=]]: This module defines /type-based casts/ between two
+  security types. In particular, {{{cc_old}}} uses type-based cast as its
+  cast representation.
++ [[./src/Common/Coercions.agda][=Common.Coercions=]]: This modules defines the coercion-based cast
+  representation used by {{{cc}}}; in particular, it defines the /security
+  coercions on values/ of {{{cc}}}.
+
+*** Technical definitions of the surface language {{{surface_old}}} in =Surface/=
+
+*** Technical definitions of the cast calculus {{{cc_old}}} in =CC/=
+
+*** Technical definitions of the surface language {{{surface}}} in =Surface2/=
+
+*** Technical definitions of the cast calculus {{{cc}}} in =CC2/=
+
+**** The coercion calculus for security labels
+
+**** Security label expressions that represent PC
