@@ -9,6 +9,8 @@
 #+MACRO: cc_old $\lambda_{\mathtt{SEC}}^{c}$
 #+MACRO: dynifc $\lambda_{\mathtt{SEC}}$
 
+#+EXPORT_FILE_NAME: README_NEW
+
 * {{{surface}}}, A Gradual Security-Typed Programming Language
 
 {{{surface}}} is an experimental gradual security-typed programming language.
@@ -28,8 +30,8 @@ first gradual security-typed language to be specified using /coercion calculi/
 
 * A Tale of Two Gradual Security Languages
 
-This repository contains the [[https://wiki.portal.chalmers.se/agda][Agda]] mechanization of two gradual security-typed
-languages:
+This repository contains the [[https://wiki.portal.chalmers.se/agda][Agda]] mechanization of {{{surface}}} as well as its
+sibling gradual security-typed language, {{{surface_old}}}:
 
 1. {{{surface_old}}} is a gradual security language that is vigilant (that is, a
    runtime error is triggered if inconsistent type annotations are detected) but
@@ -93,4 +95,63 @@ We include example programs written in {{{surface_old}}}. To get a taste of
 
 * Selected Project Code Structure
 
-All Agda source files are located in the [[./src]] directory and end with =.agda=.
+All Agda source files are located in the [[./src][=src/=]] directory and end with =.agda=. A
+(fairly) large part of the code-base is shared between {{{surface}}} and
+{{{surface_old}}}.
+
+There are three top-level modules in the [[./src][=src/=]] directory:
+
++ [[./src/Proofs.agda][=Proofs=]]: sources the proofs of important meta-theoretical results
+  in the following modules:
+  * Here are some meta-theoretic results for {{{surface_old}}} and its cast
+    calculus {{{cc_old}}}:
+    * [[./src/CC/TypeSafety.agda][=CC.TypeSafety=]]: {{{cc_old}}} is type safe by satisfying progress and
+      preservation.
+    * [[./src/CC/BigStepPreservation.agda][=CC.BigStepPreservation=]]: The big-step semantics of {{{cc_old}}} also
+      preserves types. The big-step semantics
+    * [[./src/CC/BigStepErasedDeterministic.agda][=CC.BigStepErasedDeterministic=]]: The big-step evaluation of erased
+      {{{cc_old}}} is deterministic.
+    * [[./src/CC/Noninterference.agda][=CC.Noninterference=]]: {{{cc_old}}} satisfies termination-insensitive
+      noninterference (TINI).
+    * [[./src/CC/Compile.agda][=CC.Compile=]]: The compilation from {{{surface_old}}} to {{{cc_old}}}
+      preserves types.
+  * Here are meta-theoretic results for {{{surface}}} and its cast calculus
+    {{{cc}}}:
+    * [[./src/CC2/Progress.agda][=CC2.Progress=]]: {{{cc}}} satisfies progress, so that a well-typed {{{cc}}}
+      term is either a value or a blame, which does not reduce, or the term
+      takes one reduction step.
+    * [[./src/CC2/Preservation.agda][=CC2.Preservation=]]: The operational semantics of {{{cc}}} preserves types
+      and the well-typedness of heap.
+    * [[./src/Compile/CompilationPresTypes.agda][=Compile.CompilationPresTypes=]]: The compilation from {{{surface}}} to
+      {{{cc}}} preserves types.
+    * [[./src/Surface2/GradualGuarantee.agda][=Surface2.GradualGuarantee=]]: {{{surface}}} satisfies the gradual
+      guarantee.
++ [[./src/RunDemo.agda][=RunDemo=]]: The program runs a stepper on the following {{{surface_old}}}
+  programs and pretty-prints their reduction sequences to command line using [[./src/PrettyPrinter/Console/PP.agda][the
+  Console pretty-printer backend]]:
+  * The stepper that generates reduction sequences for {{{cc_old}}} in string
+    format is defined in [[./src/CC/Interp.agda][=CC.Interp=]].
+  * [[./src/ExamplePrograms/Demo/Example1.agda][=ExamplePrograms.Demo.Example1=]]: This example shows that {{{surface_old}}}
+    indeed facilitates both compile-time (static) and runtime (dynamic)
+    information-flow control. If a {{{surface_old}}} program is fully
+    statically-typed, the type system of {{{surface_old}}} alone guarantees
+    security. If type information is insufficient, the runtime of
+    {{{surface_old}}} performs security checks during program execution. The
+    transition between static and dynamic IFC enforcement is controlled by the
+    programmer, depending on the precision of type annotations.
+  - [[./src/ExamplePrograms/Demo/Example2.agda][=ExamplePrograms.Demo.Example2=]]: This example establishes the intuition that
+    even if the programmer opts for dynamic IFC enforcement, {{{surface_old}}}
+    still guards against any possible information leak through the heap.
+  - [[./src/ExamplePrograms/Demo/Example3.agda][=ExamplePrograms.Demo.Example3=]]: This example shows that moving type
+    annotations to be less precise (more dynamic) does not change the runtime
+    behavior of a {{{surface_old}}} program.
++ [[./src/RunSimulation.agda][=RunSimulation=]]: The program runs a simulator that simulates between
+  {{{cc_old}}} terms of different precision. The output defaults to
+  [[./src/PrettyPrinter/GraphViz][the GraphViz pretty-printer backend]], which
+  will place =*.dot= files that represent the simulation diagrams in the [[./plot][=plot/=]]
+  directory.
+  * The simulator is defined in [[./src/Simulator/Simulator.agda][=Simulator.Simulator=]].
+  * The list of example {{{cc_old}}} terms to run can be found in
+    [[./src/ExamplePrograms/Simulation/Examples.agda][=ExamplePrograms.Simulation.Examples=]].
+  * Please refer to the =README= file in [[./plot][=plot/=]] for the instructions of
+    generating the simulation diagrams in PDF format.
