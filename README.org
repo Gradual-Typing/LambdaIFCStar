@@ -9,7 +9,7 @@
 #+MACRO: cc_old $\lambda_{\mathtt{SEC}}^{c}$
 #+MACRO: dynifc $\lambda_{\mathtt{SEC}}$
 
-#+EXPORT_FILE_NAME: README_NEW
+# #+EXPORT_FILE_NAME: README_NEW
 
 * {{{surface}}}, A Gradual Security-Typed Programming Language
 
@@ -95,8 +95,8 @@ We include example programs written in {{{surface_old}}}. To get a taste of
 
 * Selected Project Code Structure
 
-All Agda source files are located in the [[./src][=src/=]] directory and end with =.agda=. A
-(fairly) large part of the code-base is shared between {{{surface}}} and
+All Agda source files are located in the [[./src][=src/=]] directory and end with dot Agda.
+A (fairly) large part of the code-base is shared between {{{surface}}} and
 {{{surface_old}}}.
 
 ** Meta-theoretical results and demo programs
@@ -160,7 +160,7 @@ There are three top-level modules in the [[./src][=src/=]] directory:
 
 ** Noteworthy technical definitions
 
-*** General technical definitions in directory =Common/=
+*** General technical definitions [[./src/Common][in directory =Common/=]]
 
 + [[./src/Common/SecurityLabels.agda][=Common.SecurityLabels=]]: Definitions of /security labels/ as well as
   predicates, relations and operators on security labels.
@@ -177,9 +177,85 @@ There are three top-level modules in the [[./src][=src/=]] directory:
   representation used by {{{cc}}}; in particular, it defines the /security
   coercions on values/ of {{{cc}}}.
 
+*** The shared heap model [[./src/Memory][in directory =Memory/=]]
+
++ [[./src/Memory/Addr.agda][=Memory.Addr=]]: Definition of memory addresses.
++ [[./src/Memory/Heap.agda][=Memory.Heap=]]: Definition and helper methods of the split-heap model, where
+  low and high addresses are indexed separately. For example, heap lookup has
+  the form $\mu(\ell, n) = V$, where $\ell$ is the security level of the memory
+  cell, $n$ is the index of the part of the memory where all cells are
+  labeled $\ell$, and $V$ is the value stored at $(\ell, n)$.
++ [[./src/Memory/HeapTyping.agda][=Memory.HeapTyping=]]: Definition of heap well-typedness. It is defined
+  point-wise. The typing judgment has the form $\Sigma \vdash \mu$, where
+  $\Sigma$ is the heap context and $\mu$ is the (well-typed) heap.
+
 *** Technical definitions of the surface language {{{surface_old}}} in =Surface/=
 
++ [[./src/Surface/SurfaceSyntax.agda][=Surface.SurfaceSyntax=]]: The syntax definition of {{{surface_old}}}. It uses
+  [[https://github.com/jsiek/abstract-binding-trees][the Abstract Binding Tree (ABT) library]]. For example, the term of function
+  application has the signature ~sig (op-app p) = ■ ∷ ■ ∷ []~, because it
+  contains two sub-terms and introduces no binder. On the other hand, the term
+  for $\lambda$ abstraction has the signature ~sig (op-lam pc A ℓ) = (ν ■) ∷
+  []~, because there is one free variable in the body of a $\lambda$ (indicated
+  by ~(ν ■)~).
++ [[./src/Surface/SurfaceTyping.agda][=Surface.SurfaceTyping=]]: The typing rules for {{{surface_old}}}. The typing
+  judgment takes the form $\Gamma ; g \vdash M : A$, where $\Gamma$ is the
+  typing context, $g$ is the static program counter (PC) label, $M$ is a surface
+  language program, and $A$ is the security type that $M$ is typed at.
+
 *** Technical definitions of the cast calculus {{{cc_old}}} in =CC/=
+
++ [[./src/CC/CCSyntax.agda][=CC.CCSyntax=]]: The syntax definition of {{{cc_old}}}. Again, the module uses
+  the ABT library. There are a few terms that arise during runtime, including
+  memory addresses, casts, PC casts (~cast-pc~), protection terms (~prot~), and
+  runtime errors (~error~). The opaque term (●) is used in the erasure-based
+  noninterference proof.
++ [[./src/CC/CCTyping.agda][=CC.CCTyping=]]: The typing judgment is of form $\Gamma ; \Sigma ; g ; \ell
+  \vdash M : A$. It contains 6 field: $\Gamma$ is the typing context; $\Sigma$
+  is the heap context; $g$ is the static PC, which can be viewed as the
+  compile-time approximation of the runtime PC; $\ell$ is the dynamic (runtime)
+  PC; $M$ is a {{{cc_old}}} term; $A$ is the type of $M$.
++ [[./src/CC/HeapTyping.agda][=CC.HeapTyping=]]: Lemmas about heap well-typedness for {{{cc_old}}}. These
+  lemmas are used in the type safety proof.
++ [[./src/CC/Values.agda][=CC.Values=]]: The definition of values in {{{cc_old}}}. A value can be (1) a
+  constant (2) an address (3) a $\lambda$ abstraction or (4) a value wrapped
+  with an irreducible (~Inert~) cast. The opaque term is also a value in the
+  semantics of erased {{{cc_old}}}. There are canonical-form lemmas for
+  constants, functions, and memory addresses in this model: for example, a value
+  of function type must be either a $\lambda$ or a function proxy (a $\lambda$
+  wrapped with at least one inert function cast).
++ [[./src/CC/Reduction.agda][=CC.Reduction=]]: The operational semantics for {{{cc_old}}}. The relation
+  $M \mid \mu \mid \ell \longrightarrow N \mid \mu'$ says that {{{cc_old}}}
+  term $M$ reduces with heap $\mu$ under PC label $\ell$ (by one step) to
+  term $N$ and heap $\mu'$.
+  + The rule ~cast~ turns to the ~ApplyCast~ relation defined in the following
+    module:
+    * [[./src/CC/ApplyCast.agda][=CC.ApplyCast=]]: The cast-application relation has the form
+      $\mathtt{ApplyCast}\;V , c \leadsto M$, where $V$ is a value and $c$ is
+      the cast to apply; $M$ can be either a value, or a cast error (~blame~) if
+      the cast application fails.
+  + The rule ~fun-cast~, ~assign?-cast~, and ~assign-cast~ turn to the
+    proxy-elimination helpers that are defined in the following module:
+    * [[./src/CC/ProxyElimination.agda][=CC.ProxyElimination=]]: The module defines two helper functions:
+      ~elim-fun-proxy~ works on a function proxy and ~elim-ref-proxy~ works on a
+      reference proxy. The helpers check the well-formedness of the outermost
+      inert cast, generate proper casts that preserve types if well-formed and
+      signal errors if ill-formed.
++ [[./src/CC/Interp.agda][=CC.Interp=]]: A stepper that replies on the progress proof to generate a
+  reduction sequence of $k$ steps for a well-typed {{{cc_old}}} term.
++ [[./src/CC/Compile.agda][=CC.Compile=]]: Compilation from {{{surface_old}}} to {{{cc_old}}}. The module
+  also contains a proof that the compilation preserves types
+  (~compilation-preserves-type~).
+
+The noninterference proof of {{{cc_old}}} is erasure-based. It uses the
+following auxiliary definitions:
++ [[./src/CC/BigStep.agda][=CC.BigStep=]]: The big-step semantics for {{{cc_old}}}. It is a direct
+  mechanical translation from the semantics in [[./src/CC/Reduction.agda][CC.Reduction]].
++ [[./src/CC/Erasure.agda][=CC.Erasure=]]: Definition of the erasure functions for {{{cc_old}}} terms
+  (~erase~) and heaps (~erase-μ~). Note that the memory cells of high security
+  are completely erased, because the values read from those cells are always
+  of high security and thus appear to be opaque for a low observer.
++ [[./src/CC/BigStepErased.agda][=CC.BigStepErased=]]: The big-step semantics for erased {{{cc_old}}}.
 
 *** Technical definitions of the surface language {{{surface}}} in =Surface2/=
 
