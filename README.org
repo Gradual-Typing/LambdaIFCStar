@@ -266,9 +266,41 @@ following auxiliary definitions:
 + [[./src/Surface2/Precision.agda][=Surface2.Precision=]]: The precision rules for {{{surface}}}. The precision
   relation is used in the definition and the proof of the gradual guarantee.
 
-*** The coercion calculus for security labels [[./src/CoercionExpr][in directory =CoercionExpr=]]
+*** The coercion calculus for security labels [[./src/CoercionExpr][in directory =CoercionExpr/=]]
 
-*** Security label expressions [[./src/LabelExpr][in directory =LabelExpr=]]
+This directory contains the definition of and lemmas about the /coercion calculus
+on security labels/.
+
++ [[./src/CoercionExpr/Coercions.agda][=CoercionExpr.Coercions=]]: One single coercion on security labels can either
+   be identity ($\mathbf{id}$), subtype ($\uparrow$), injection from $\ell$ ($\ell!$),
+   or projection to $\ell$ with blame label $p$ ($\ell?^p$).
++ [[./src/CoercionExpr/CoercionExpr.agda][=CoercionExpr.CoercionExpr=]]: The syntax, typing, reduction, and normal forms
+  of coercion sequences (formed by sequencing single coercions). We only care
+  about well-typed coercion sequences, so the coercion sequences are
+  intrinsically typed. Coercion sequences strongly normalize (~cexpr-sn~) and
+  the normalization is deterministic (~det-mult~), so coercion sequences can be
+  used to model information-flow checks.
++ [[./src/CoercionExpr/SyntacComp.agda][=CoercionExpr.SyntacComp=]]: Syntactical composition of coercion sequences.
+  Sequencing and composing coercions model explicit information flow.
++ [[./src/CoercionExpr/Stamping.agda][=CoercionExpr.Stamping=]]: The stamping operation for coercion sequences.
+  Stamping label $\ell$ on a coercion sequence in normal form $\bar{c}$ results
+  in a new coercion sequence in normal form whose security level is promoted by
+  $\ell$. Stamping models implicit information flow.
++ [[./src/CoercionExpr/SecurityLevel.agda][=CoercionExpr.SecurityLevel.agda=]]: The $|\bar{c}|$ operator retrieves the
+  security level from the coercion sequence in normal form $\bar{c}$.
++ [[./src/CoercionExpr/Precision.agda][=CoercionExpr.Precision=]]: The precision relation between two coercion
+  sequences takes the form $\vdash \bar{c} \sqsubseteq \bar{d}$. The gradual
+  guarantee states that replacing type annotations with $\star$ (decreasing type
+  precision) should result in the same value for a correctly running program
+  while adding annotations (increasing type precision) may trigger more runtime
+  errors. The precision relation is a syntactical characterization of the
+  runtime behaviors of programs of different type precision.
+
+One key to the proof of the gradual guarantee is that "security is monotonic
+with respect to precision", which states that if $\vdash \bar{c} \sqsubseteq \bar{d}$
+then $|\bar{c}| \preccurlyeq |\bar{d}|$.
+
+*** Security label expressions [[./src/LabelExpr][in directory =LabelExpr/=]]
 
 
 *** Technical definitions of the cast calculus {{{cc}}} [[./src/CC2][in directory =CC2/=]]
@@ -284,9 +316,9 @@ following auxiliary definitions:
   same meanings as those of {{{cc_old}}}. The main difference is that the typing
   of {{{cc}}} stays in checking mode, so the type $A$ is considered an input of
   the judgment.
-+ [[./src/CC2/HeapTyping.agda][=CC2.HeapTyping=]]: Lemmas about heap
-  well-typedness for {{{cc}}}. They are similar to those of {{{cc_old}}} because
-  {{{cc}}} shares the same heap model as {{{cc_old}}}.
++ [[./src/CC2/HeapTyping.agda][=CC2.HeapTyping=]]: Lemmas about heap well-typedness for {{{cc}}}. They are
+  similar to those of {{{cc_old}}} because {{{cc}}} shares the same heap model
+  as {{{cc_old}}}.
 + [[./src/CC2/Values.agda][=CC2.Values=]]: The definition of values in {{{cc}}}.
   A raw value can be (1) a constant (2) an address or (3) a $\lambda$
   abstraction. A value can be either a raw value, or a raw value wrapped with an
@@ -296,4 +328,20 @@ following auxiliary definitions:
   {{{cc_old}}}, the relation $M \mid \mu \mid \ell \longrightarrow N \mid \mu'$
   says that {{{cc}}} term $M$ reduces with heap $\mu$ under PC label $\ell$ to
   term $N$ and heap $\mu'$.
+  * The reduction of PC depends on the operational semantics of label
+    expressions.
+  * [[./src/CC2/CastReduction.agda][=CC2.CastReduction=]]: The rules for cast are grouped in the relation $V
+    \langle c \rangle \longrightarrow M$. The relation states that applying the
+    coercion on values $c$ on value $V$ results in $M$. We use this relation in
+    rule ~cast~ of {{{cc}}}.
+  * [[./src/CC2/Stamping.agda][=CC2.Stamping=]]: The ~stamp-val~ function defines the stamping operation on
+    {{{cc}}} values. The lemma ~stamp-val-value~ states that stamping a value
+    results in another value and the lemma ~stamp-val-wt~ states that stamping
+    preserves types, so the value after stamping is well-typed.
++ [[./src/CC2/Precision.agda][=CC2.Precison=]]: The precision relation of {{{cc}}}.
++ [[./src/CC2/HeapContextPrecision.agda][=CC2.HeapContextPrecision=]]: The precision between two heap typing contexts has
+  the form $\Sigma \sqsubseteq_m \Sigma'$ and is defined point-wise.
++ [[./src/CC2/HeapPrecision.agda][=CC2.HeapPrecision=]]: The precision relation between two heaps takes the form
+  $\Sigma ; \Sigma' \vdash \mu \sqsubseteq \mu'$. It is defined point-wise,
+  similar to the definition of heap well-typedness.
 + [[./src/Compile/Compile.agda][=Compile.Compile=]]: The compilation function from {{{surface}}} to {{{cc}}}.
