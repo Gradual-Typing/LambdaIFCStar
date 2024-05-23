@@ -192,7 +192,7 @@ There are three top-level modules in the [`src/`](./src) directory:
     $\Sigma$ is the heap context and $\mu$ is the (well-typed) heap.
 
 
-### Technical definitions of the surface language $\lambda_{\mathtt{SEC}}^\star$ in `Surface/`
+### Technical definitions of the surface language $\lambda_{\mathtt{SEC}}^\star$ [in directory `Surface/`](./src/Surface)
 
 -   [`Surface.SurfaceSyntax`](./src/Surface/SurfaceSyntax.agda): The syntax definition of $\lambda_{\mathtt{SEC}}^\star$. It uses
     [the Abstract Binding Tree (ABT) library](https://github.com/jsiek/abstract-binding-trees). For example, the term of function
@@ -207,7 +207,7 @@ There are three top-level modules in the [`src/`](./src) directory:
     language program, and $A$ is the security type that $M$ is typed at.
 
 
-### Technical definitions of the cast calculus $\lambda_{\mathtt{SEC}}^{c}$ in `CC/`
+### Technical definitions of the cast calculus $\lambda_{\mathtt{SEC}}^{c}$ [in directory `CC/`](./src/CC)
 
 -   [`CC.CCSyntax`](./src/CC/CCSyntax.agda): The syntax definition of $\lambda_{\mathtt{SEC}}^{c}$. Again, the module uses
     the ABT library. There are a few terms that arise during runtime, including
@@ -263,12 +263,46 @@ following auxiliary definitions:
 -   [`CC.BigStepErased`](./src/CC/BigStepErased.agda): The big-step semantics for erased $\lambda_{\mathtt{SEC}}^{c}$.
 
 
-### Technical definitions of the surface language $\lambda_{\mathtt{IFC}}^\star$ in `Surface2/`
+### Technical definitions of the surface language $\lambda_{\mathtt{IFC}}^\star$ [in directory `Surface2/`](./src/Surface2)
+
+-   [`Surface2.Syntax`](./src/Surface2/Syntax.agda): The syntax of $\lambda_{\mathtt{IFC}}^\star$. The most noteworthy difference
+    from $\lambda_{\mathtt{SEC}}^\star$ is that in $\lambda_{\mathtt{IFC}}^\star$, the PC annotation on a $\lambda$
+    is treated as a type annotation, which means that it can be $\star$.
+-   [`Surface2.Typing`](./src/Surface2/Typing.agda): The typing rules for $\lambda_{\mathtt{IFC}}^\star$.
+-   [`Surface2.Precision`](./src/Surface2/Precision.agda): The precision rules for $\lambda_{\mathtt{IFC}}^\star$. The precision
+    relation is used in the definition and the proof of the gradual guarantee.
 
 
-### Technical definitions of the cast calculus $\lambda_{\mathtt{IFC}}^{c}$ in `CC2/`
+### The coercion calculus for security labels [in directory `CoercionExpr`](./src/CoercionExpr)
 
--   The coercion calculus for security labels
 
--   Security label expressions that represent PC
+### Security label expressions [in directory `LabelExpr`](./src/LabelExpr)
+
+
+### Technical definitions of the cast calculus $\lambda_{\mathtt{IFC}}^{c}$ [in directory `CC2/`](./src/CC2)
+
+-   [`CC2.Syntax`](./src/CC2/Syntax.agda): As usual, the cast calculus $\lambda_{\mathtt{IFC}}^{c}$ is a statically-typed
+    language that includes an explicit term for casts. Many of the operators in
+    $\lambda_{\mathtt{IFC}}^{c}$ have two variants, a "static" one for when the pertinent security
+    label is statically known (such as `ref`) and the "dynamic" one for when the
+    security label is statically unknown (such as `ref?`). The operational
+    semantics of the "dynamic" variants involve runtime checking.
+-   [`CC2.Typing`](./src/CC2/Typing.agda): The typing judgment is of form
+    $\Gamma ; \Sigma ; g ; \ell \vdash M \Leftarrow A$. The six fields are of the
+    same meanings as those of $\lambda_{\mathtt{SEC}}^{c}$. The main difference is that the typing
+    of $\lambda_{\mathtt{IFC}}^{c}$ stays in checking mode, so the type $A$ is considered an input of
+    the judgment.
+-   [`CC2.HeapTyping`](./src/CC2/HeapTyping.agda): Lemmas about heap
+    well-typedness for $\lambda_{\mathtt{IFC}}^{c}$. They are similar to those of $\lambda_{\mathtt{SEC}}^{c}$ because
+    $\lambda_{\mathtt{IFC}}^{c}$ shares the same heap model as $\lambda_{\mathtt{SEC}}^{c}$.
+-   [`CC2.Values`](./src/CC2/Values.agda): The definition of values in $\lambda_{\mathtt{IFC}}^{c}$.
+    A raw value can be (1) a constant (2) an address or (3) a $\lambda$
+    abstraction. A value can be either a raw value, or a raw value wrapped with an
+    irreducible cast. A cast is irreducible if its top-level security label
+    coercion is in normal form and the cast is not identity.
+-   [`CC2.Reduction`](./src/CC2/Reduction.agda): The operational semantics for $\lambda_{\mathtt{IFC}}^{c}$. Similar to the one of
+    $\lambda_{\mathtt{SEC}}^{c}$, the relation $M \mid \mu \mid \ell \longrightarrow N \mid \mu'$
+    says that $\lambda_{\mathtt{IFC}}^{c}$ term $M$ reduces with heap $\mu$ under PC label $\ell$ to
+    term $N$ and heap $\mu'$.
+-   [`Compile.Compile`](./src/Compile/Compile.agda): The compilation function from $\lambda_{\mathtt{IFC}}^\star$ to $\lambda_{\mathtt{IFC}}^{c}$.
 

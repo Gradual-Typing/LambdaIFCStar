@@ -189,7 +189,7 @@ There are three top-level modules in the [[./src][=src/=]] directory:
   point-wise. The typing judgment has the form $\Sigma \vdash \mu$, where
   $\Sigma$ is the heap context and $\mu$ is the (well-typed) heap.
 
-*** Technical definitions of the surface language {{{surface_old}}} in =Surface/=
+*** Technical definitions of the surface language {{{surface_old}}} [[./src/Surface][in directory =Surface/=]]
 
 + [[./src/Surface/SurfaceSyntax.agda][=Surface.SurfaceSyntax=]]: The syntax definition of {{{surface_old}}}. It uses
   [[https://github.com/jsiek/abstract-binding-trees][the Abstract Binding Tree (ABT) library]]. For example, the term of function
@@ -203,7 +203,7 @@ There are three top-level modules in the [[./src][=src/=]] directory:
   typing context, $g$ is the static program counter (PC) label, $M$ is a surface
   language program, and $A$ is the security type that $M$ is typed at.
 
-*** Technical definitions of the cast calculus {{{cc_old}}} in =CC/=
+*** Technical definitions of the cast calculus {{{cc_old}}} [[./src/CC][in directory =CC/=]]
 
 + [[./src/CC/CCSyntax.agda][=CC.CCSyntax=]]: The syntax definition of {{{cc_old}}}. Again, the module uses
   the ABT library. There are a few terms that arise during runtime, including
@@ -257,10 +257,43 @@ following auxiliary definitions:
   of high security and thus appear to be opaque for a low observer.
 + [[./src/CC/BigStepErased.agda][=CC.BigStepErased=]]: The big-step semantics for erased {{{cc_old}}}.
 
-*** Technical definitions of the surface language {{{surface}}} in =Surface2/=
+*** Technical definitions of the surface language {{{surface}}} [[./src/Surface2][in directory =Surface2/=]]
 
-*** Technical definitions of the cast calculus {{{cc}}} in =CC2/=
++ [[./src/Surface2/Syntax.agda][=Surface2.Syntax=]]: The syntax of {{{surface}}}. The most noteworthy difference
+  from {{{surface_old}}} is that in {{{surface}}}, the PC annotation on a $\lambda$
+  is treated as a type annotation, which means that it can be $\star$.
++ [[./src/Surface2/Typing.agda][=Surface2.Typing=]]: The typing rules for {{{surface}}}.
++ [[./src/Surface2/Precision.agda][=Surface2.Precision=]]: The precision rules for {{{surface}}}. The precision
+  relation is used in the definition and the proof of the gradual guarantee.
 
-**** The coercion calculus for security labels
+*** The coercion calculus for security labels [[./src/CoercionExpr][in directory =CoercionExpr=]]
 
-**** Security label expressions that represent PC
+*** Security label expressions [[./src/LabelExpr][in directory =LabelExpr=]]
+
+
+*** Technical definitions of the cast calculus {{{cc}}} [[./src/CC2][in directory =CC2/=]]
+
++ [[./src/CC2/Syntax.agda][=CC2.Syntax=]]: As usual, the cast calculus {{{cc}}} is a statically-typed
+  language that includes an explicit term for casts. Many of the operators in
+  {{{cc}}} have two variants, a "static" one for when the pertinent security
+  label is statically known (such as ~ref~) and the "dynamic" one for when the
+  security label is statically unknown (such as ~ref?~). The operational
+  semantics of the "dynamic" variants involve runtime checking.
++ [[./src/CC2/Typing.agda][=CC2.Typing=]]: The typing judgment is of form
+  $\Gamma ; \Sigma ; g ; \ell \vdash M \Leftarrow A$. The six fields are of the
+  same meanings as those of {{{cc_old}}}. The main difference is that the typing
+  of {{{cc}}} stays in checking mode, so the type $A$ is considered an input of
+  the judgment.
++ [[./src/CC2/HeapTyping.agda][=CC2.HeapTyping=]]: Lemmas about heap
+  well-typedness for {{{cc}}}. They are similar to those of {{{cc_old}}} because
+  {{{cc}}} shares the same heap model as {{{cc_old}}}.
++ [[./src/CC2/Values.agda][=CC2.Values=]]: The definition of values in {{{cc}}}.
+  A raw value can be (1) a constant (2) an address or (3) a $\lambda$
+  abstraction. A value can be either a raw value, or a raw value wrapped with an
+  irreducible cast. A cast is irreducible if its top-level security label
+  coercion is in normal form and the cast is not identity.
++ [[./src/CC2/Reduction.agda][=CC2.Reduction=]]: The operational semantics for {{{cc}}}. Similar to the one of
+  {{{cc_old}}}, the relation $M \mid \mu \mid \ell \longrightarrow N \mid \mu'$
+  says that {{{cc}}} term $M$ reduces with heap $\mu$ under PC label $\ell$ to
+  term $N$ and heap $\mu'$.
++ [[./src/Compile/Compile.agda][=Compile.Compile=]]: The compilation function from {{{surface}}} to {{{cc}}}.
