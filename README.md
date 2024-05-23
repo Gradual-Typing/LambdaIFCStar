@@ -293,7 +293,7 @@ on security labels*.
     Stamping label $\ell$ on a coercion sequence in normal form $\bar{c}$ results
     in a new coercion sequence in normal form whose security level is promoted by
     $\ell$. Stamping models implicit information flow.
--   [`CoercionExpr.SecurityLevel.agda`](./src/CoercionExpr/SecurityLevel.agda): The $|\bar{c}|$ operator retrieves the
+-   [`CoercionExpr.SecurityLevel`](./src/CoercionExpr/SecurityLevel.agda): The $|\bar{c}|$ operator retrieves the
     security level from the coercion sequence in normal form $\bar{c}$.
 -   [`CoercionExpr.Precision`](./src/CoercionExpr/Precision.agda): The precision relation between two coercion
     sequences takes the form $\vdash \bar{c} \sqsubseteq \bar{d}$. The gradual
@@ -309,6 +309,11 @@ then $|\bar{c}| \preccurlyeq |\bar{d}|$.
 
 
 ### Security label expressions [in directory `LabelExpr/`](./src/LabelExpr)
+
+-   [`LabelExpr.LabelExpr`](./src/LabelExpr/LabelExpr.agda): The syntax, typing, reduction, normal forms, precision,
+    and security of label expressions.
+-   [`LabelExpr.Stamping`](./src/LabelExpr/Stamping.agda): The stamping operation for label expressions.
+-   [`LabelExpr.Security`](./src/LabelExpr/Security.agda): Lemmas about security level for label expressions.
 
 
 ### Technical definitions of the cast calculus $\lambda_{\mathtt{IFC}}^{c}$ [in directory `CC2/`](./src/CC2)
@@ -353,4 +358,16 @@ then $|\bar{c}| \preccurlyeq |\bar{d}|$.
     $\Sigma ; \Sigma' \vdash \mu \sqsubseteq \mu'$. It is defined point-wise,
     similar to the definition of heap well-typedness.
 -   [`Compile.Compile`](./src/Compile/Compile.agda): The compilation function from $\lambda_{\mathtt{IFC}}^\star$ to $\lambda_{\mathtt{IFC}}^{c}$.
+
+
+### The dynamic extreme $\lambda_{\mathtt{SEC}}$ of $\lambda_{\mathtt{SEC}}^\star$ and $\lambda_{\mathtt{IFC}}^\star$ [in directory `Dyn/`](./src/Dyn)
+
+This directory contains the formalization of the dynamic extreme for
+$\lambda_{\mathtt{SEC}}^\star$ and $\lambda_{\mathtt{IFC}}^\star$. We call this dynamic IFC language with
+labeled heap (that is, each memory cell is associated with a security label)
+$\lambda_{\mathtt{SEC}}$. $\lambda_{\mathtt{SEC}}$ is used in Section 11 of the Appendix of Chen and
+Siek [2024], where noninterference of $\lambda_{\mathtt{IFC}}^\star$ is proved by simulation
+between $\lambda_{\mathtt{IFC}}^{c}$ and $\lambda_{\mathtt{SEC}}$.
+
+-   [`Dyn.Noninterference`](./src/Dyn/Noninterference.agda): Noninterference (TINI) for $\lambda_{\mathtt{SEC}}$.
 

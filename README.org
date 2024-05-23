@@ -1,4 +1,4 @@
-#+TITLE: Documentation of LambdaIFCStar
+#+TITLE: The Agda Development of LambdaIFCStar
 #+AUTHOR: Tianyu Chen
 
 #+OPTIONS: toc:nil num:nil
@@ -286,7 +286,7 @@ on security labels/.
   Stamping label $\ell$ on a coercion sequence in normal form $\bar{c}$ results
   in a new coercion sequence in normal form whose security level is promoted by
   $\ell$. Stamping models implicit information flow.
-+ [[./src/CoercionExpr/SecurityLevel.agda][=CoercionExpr.SecurityLevel.agda=]]: The $|\bar{c}|$ operator retrieves the
++ [[./src/CoercionExpr/SecurityLevel.agda][=CoercionExpr.SecurityLevel=]]: The $|\bar{c}|$ operator retrieves the
   security level from the coercion sequence in normal form $\bar{c}$.
 + [[./src/CoercionExpr/Precision.agda][=CoercionExpr.Precision=]]: The precision relation between two coercion
   sequences takes the form $\vdash \bar{c} \sqsubseteq \bar{d}$. The gradual
@@ -302,6 +302,10 @@ then $|\bar{c}| \preccurlyeq |\bar{d}|$.
 
 *** Security label expressions [[./src/LabelExpr][in directory =LabelExpr/=]]
 
++ [[./src/LabelExpr/LabelExpr.agda][=LabelExpr.LabelExpr=]]: The syntax, typing, reduction, normal forms, precision,
+  and security of label expressions.
++ [[./src/LabelExpr/Stamping.agda][=LabelExpr.Stamping=]]: The stamping operation for label expressions.
++ [[./src/LabelExpr/Security.agda][=LabelExpr.Security=]]: Lemmas about security level for label expressions.
 
 *** Technical definitions of the cast calculus {{{cc}}} [[./src/CC2][in directory =CC2/=]]
 
@@ -345,3 +349,14 @@ then $|\bar{c}| \preccurlyeq |\bar{d}|$.
   $\Sigma ; \Sigma' \vdash \mu \sqsubseteq \mu'$. It is defined point-wise,
   similar to the definition of heap well-typedness.
 + [[./src/Compile/Compile.agda][=Compile.Compile=]]: The compilation function from {{{surface}}} to {{{cc}}}.
+
+*** The dynamic extreme {{{dynifc}}} of {{{surface_old}}} and {{{surface}}} [[./src/Dyn][in directory =Dyn/=]]
+
+This directory contains the formalization of the dynamic extreme for
+{{{surface_old}}} and {{{surface}}}. We call this dynamic IFC language with
+labeled heap (that is, each memory cell is associated with a security label)
+{{{dynifc}}}. {{{dynifc}}} is used in Section 11 of the Appendix of Chen and
+Siek [2024], where noninterference of {{{surface}}} is proved by simulation
+between {{{cc}}} and {{{dynifc}}}.
+
++ [[./src/Dyn/Noninterference.agda][=Dyn.Noninterference=]]: Noninterference (TINI) for {{{dynifc}}}.
