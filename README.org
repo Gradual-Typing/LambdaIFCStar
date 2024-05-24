@@ -99,26 +99,26 @@ All Agda source files are located in the [[./src][=src/=]] directory and end wit
 A (fairly) large part of the code-base is shared between {{{surface}}} and
 {{{surface_old}}}.
 
-** Meta-theoretical results and demo programs
+** Top-level modules of meta-theoretical results and demo programs
 
 There are three top-level modules in the [[./src][=src/=]] directory:
 
-1. [[./src/Proofs.agda][*=Proofs=*]]: sources the proofs of important *meta-theoretical results*
-  in the following modules:
-  * Here are some meta-theoretical results for {{{surface_old}}} and its cast
-    calculus {{{cc_old}}}:
+1. [[./src/Proofs.agda][*=Proofs=*]]: The module sources the proofs of important *meta-theoretical
+   results* in the following files:
+  * Meta-theoretical results for {{{surface_old}}} and its cast calculus
+    {{{cc_old}}}:
     * [[./src/CC/TypeSafety.agda][=CC.TypeSafety=]]: {{{cc_old}}} is type safe by satisfying progress and
       preservation.
     * [[./src/CC/BigStepPreservation.agda][=CC.BigStepPreservation=]]: The big-step semantics of {{{cc_old}}} also
-      preserves types. The big-step semantics
+      preserves types. This big-step semantics is used in the erasure-based
+      noninterference proof.
     * [[./src/CC/BigStepErasedDeterministic.agda][=CC.BigStepErasedDeterministic=]]: The big-step evaluation of erased
       {{{cc_old}}} is deterministic.
     * [[./src/CC/Noninterference.agda][=CC.Noninterference=]]: {{{cc_old}}} satisfies termination-insensitive
       noninterference (TINI).
     * [[./src/CC/Compile.agda][=CC.Compile=]]: The compilation from {{{surface_old}}} to {{{cc_old}}}
       preserves types.
-  * Here are meta-theoretical results for {{{surface}}} and its cast calculus
-    {{{cc}}}:
+  * Meta-theoretical results for {{{surface}}} and its cast calculus {{{cc}}}:
     * [[./src/CC2/Progress.agda][=CC2.Progress=]]: {{{cc}}} satisfies progress, so that a well-typed {{{cc}}}
       term is either a value or a blame, which does not reduce, or the term
       takes one reduction step.
@@ -171,13 +171,13 @@ There are three top-level modules in the [[./src][=src/=]] directory:
   blame, that contains its blame label. In this way, the programmer knows which
   cast is causing the problem.
 + [[./src/Common/TypeBasedCast.agda][=Common.TypeBasedCast=]]: This module defines /type-based casts/ between two
-  security types. In particular, {{{cc_old}}} uses type-based cast as its
+  security types. In particular, {{{cc_old}}} uses type-based casts as its
   cast representation.
 + [[./src/Common/Coercions.agda][=Common.Coercions=]]: This modules defines the coercion-based cast
-  representation used by {{{cc}}}; in particular, it defines the /security
+  representation used by {{{cc}}}. In particular, it defines the /security
   coercions on values/ of {{{cc}}}.
 
-*** The shared heap model [[./src/Memory][in directory =Memory/=]]
+*** The heap model of {{{surface_old}}} and {{{surface}}} [[./src/Memory][in directory =Memory/=]]
 
 + [[./src/Memory/Addr.agda][=Memory.Addr=]]: Definition of memory addresses.
 + [[./src/Memory/Heap.agda][=Memory.Heap=]]: Definition and helper methods of the split-heap model, where
@@ -220,9 +220,9 @@ There are three top-level modules in the [[./src][=src/=]] directory:
 + [[./src/CC/Values.agda][=CC.Values=]]: The definition of values in {{{cc_old}}}. A value can be (1) a
   constant (2) an address (3) a $\lambda$ abstraction or (4) a value wrapped
   with an irreducible (~Inert~) cast. The opaque term is also a value in the
-  semantics of erased {{{cc_old}}}. There are canonical-form lemmas for
-  constants, functions, and memory addresses in this model: for example, a value
-  of function type must be either a $\lambda$ or a function proxy (a $\lambda$
+  semantics of erased {{{cc_old}}}. In this module, there are canonical-form
+  lemmas for constants, functions, and memory addresses. For example, a value of
+  function type must be either a $\lambda$ or a function proxy (a $\lambda$
   wrapped with at least one inert function cast).
 + [[./src/CC/Reduction.agda][=CC.Reduction=]]: The operational semantics for {{{cc_old}}}. The relation
   $M \mid \mu \mid \ell \longrightarrow N \mid \mu'$ says that {{{cc_old}}}
@@ -244,34 +244,37 @@ There are three top-level modules in the [[./src][=src/=]] directory:
 + [[./src/CC/Interp.agda][=CC.Interp=]]: A stepper that replies on the progress proof to generate a
   reduction sequence of $k$ steps for a well-typed {{{cc_old}}} term.
 + [[./src/CC/Compile.agda][=CC.Compile=]]: Compilation from {{{surface_old}}} to {{{cc_old}}}. The module
-  also contains a proof that the compilation preserves types
+  also contains a proof that this compilation function preserves types
   (~compilation-preserves-type~).
 
 The noninterference proof of {{{cc_old}}} is erasure-based. It uses the
 following auxiliary definitions:
 + [[./src/CC/BigStep.agda][=CC.BigStep=]]: The big-step semantics for {{{cc_old}}}. It is a direct
-  mechanical translation from the semantics in [[./src/CC/Reduction.agda][CC.Reduction]].
-+ [[./src/CC/Erasure.agda][=CC.Erasure=]]: Definition of the erasure functions for {{{cc_old}}} terms
-  (~erase~) and heaps (~erase-μ~). Note that the memory cells of high security
-  are completely erased, because the values read from those cells are always
-  of high security and thus appear to be opaque for a low observer.
+  mechanical translation from the semantics in [[./src/CC/Reduction.agda][=CC.Reduction=]].
++ [[./src/CC/Erasure.agda][=CC.Erasure=]]: Definition of the erasure functions for terms (~erase~) and
+  heaps (~erase-μ~) in {{{cc_old}}}. Note that the memory cells of high security
+  are completely erased, because the values read from those cells are always of
+  high security and thus appear to be opaque from a low-observer's point of
+  view.
 + [[./src/CC/BigStepErased.agda][=CC.BigStepErased=]]: The big-step semantics for erased {{{cc_old}}}.
 
 *** Technical definitions of the surface language {{{surface}}} [[./src/Surface2][in directory =Surface2/=]]
 
 + [[./src/Surface2/Syntax.agda][=Surface2.Syntax=]]: The syntax of {{{surface}}}. The most noteworthy difference
-  from {{{surface_old}}} is that in {{{surface}}}, the PC annotation on a $\lambda$
-  is treated as a type annotation, which means that it can be $\star$.
+  from {{{surface_old}}} is that in {{{surface}}}, the PC annotation on a
+  $\lambda$ is treated as a type annotation instead of a value annotation, which
+  means that it is allowed to be $\star$ in {{{surface}}} (but not in
+  {{{surface_old}}}).
 + [[./src/Surface2/Typing.agda][=Surface2.Typing=]]: The typing rules for {{{surface}}}.
 + [[./src/Surface2/Precision.agda][=Surface2.Precision=]]: The precision rules for {{{surface}}}. The precision
   relation is used in the definition and the proof of the gradual guarantee.
 
 *** The coercion calculus for security labels [[./src/CoercionExpr][in directory =CoercionExpr/=]]
 
-This directory contains the definition of and lemmas about the /coercion calculus
-on security labels/.
+This directory contains the definition of and the lemmas about the /coercion
+calculus on security labels/.
 
-+ [[./src/CoercionExpr/Coercions.agda][=CoercionExpr.Coercions=]]: One single coercion on security labels can either
++ [[./src/CoercionExpr/Coercions.agda][=CoercionExpr.Coercions=]]: A single coercion on security labels can either
    be identity ($\mathbf{id}$), subtype ($\uparrow$), injection from $\ell$ ($\ell!$),
    or projection to $\ell$ with blame label $p$ ($\ell?^p$).
 + [[./src/CoercionExpr/CoercionExpr.agda][=CoercionExpr.CoercionExpr=]]: The syntax, typing, reduction, and normal forms

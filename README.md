@@ -98,26 +98,26 @@ A (fairly) large part of the code-base is shared between $\lambda_{\mathtt{IFC}}
 $\lambda_{\mathtt{SEC}}^\star$.
 
 
-## Meta-theoretical results and demo programs
+## Top-level modules of meta-theoretical results and demo programs
 
 There are three top-level modules in the [`src/`](./src) directory:
 
-1.  [**`Proofs`**](./src/Proofs.agda): sources the proofs of important **meta-theoretical results**
-    in the following modules:
-    -   Here are some meta-theoretical results for $\lambda_{\mathtt{SEC}}^\star$ and its cast
-        calculus $\lambda_{\mathtt{SEC}}^{c}$:
+1.  [**`Proofs`**](./src/Proofs.agda): The module sources the proofs of important **meta-theoretical
+    results** in the following files:
+    -   Meta-theoretical results for $\lambda_{\mathtt{SEC}}^\star$ and its cast calculus
+        $\lambda_{\mathtt{SEC}}^{c}$:
         -   [`CC.TypeSafety`](./src/CC/TypeSafety.agda): $\lambda_{\mathtt{SEC}}^{c}$ is type safe by satisfying progress and
             preservation.
         -   [`CC.BigStepPreservation`](./src/CC/BigStepPreservation.agda): The big-step semantics of $\lambda_{\mathtt{SEC}}^{c}$ also
-            preserves types. The big-step semantics
+            preserves types. This big-step semantics is used in the erasure-based
+            noninterference proof.
         -   [`CC.BigStepErasedDeterministic`](./src/CC/BigStepErasedDeterministic.agda): The big-step evaluation of erased
             $\lambda_{\mathtt{SEC}}^{c}$ is deterministic.
         -   [`CC.Noninterference`](./src/CC/Noninterference.agda): $\lambda_{\mathtt{SEC}}^{c}$ satisfies termination-insensitive
             noninterference (TINI).
         -   [`CC.Compile`](./src/CC/Compile.agda): The compilation from $\lambda_{\mathtt{SEC}}^\star$ to $\lambda_{\mathtt{SEC}}^{c}$
             preserves types.
-    -   Here are meta-theoretical results for $\lambda_{\mathtt{IFC}}^\star$ and its cast calculus
-        $\lambda_{\mathtt{IFC}}^{c}$:
+    -   Meta-theoretical results for $\lambda_{\mathtt{IFC}}^\star$ and its cast calculus $\lambda_{\mathtt{IFC}}^{c}$:
         -   [`CC2.Progress`](./src/CC2/Progress.agda): $\lambda_{\mathtt{IFC}}^{c}$ satisfies progress, so that a well-typed $\lambda_{\mathtt{IFC}}^{c}$
             term is either a value or a blame, which does not reduce, or the term
             takes one reduction step.
@@ -172,14 +172,14 @@ There are three top-level modules in the [`src/`](./src) directory:
     blame, that contains its blame label. In this way, the programmer knows which
     cast is causing the problem.
 -   [`Common.TypeBasedCast`](./src/Common/TypeBasedCast.agda): This module defines *type-based casts* between two
-    security types. In particular, $\lambda_{\mathtt{SEC}}^{c}$ uses type-based cast as its
+    security types. In particular, $\lambda_{\mathtt{SEC}}^{c}$ uses type-based casts as its
     cast representation.
 -   [`Common.Coercions`](./src/Common/Coercions.agda): This modules defines the coercion-based cast
-    representation used by $\lambda_{\mathtt{IFC}}^{c}$; in particular, it defines the *security
+    representation used by $\lambda_{\mathtt{IFC}}^{c}$. In particular, it defines the *security
     coercions on values* of $\lambda_{\mathtt{IFC}}^{c}$.
 
 
-### The shared heap model [in directory `Memory/`](./src/Memory)
+### The heap model of $\lambda_{\mathtt{SEC}}^\star$ and $\lambda_{\mathtt{IFC}}^\star$ [in directory `Memory/`](./src/Memory)
 
 -   [`Memory.Addr`](./src/Memory/Addr.agda): Definition of memory addresses.
 -   [`Memory.Heap`](./src/Memory/Heap.agda): Definition and helper methods of the split-heap model, where
@@ -224,9 +224,9 @@ There are three top-level modules in the [`src/`](./src) directory:
 -   [`CC.Values`](./src/CC/Values.agda): The definition of values in $\lambda_{\mathtt{SEC}}^{c}$. A value can be (1) a
     constant (2) an address (3) a $\lambda$ abstraction or (4) a value wrapped
     with an irreducible (`Inert`) cast. The opaque term is also a value in the
-    semantics of erased $\lambda_{\mathtt{SEC}}^{c}$. There are canonical-form lemmas for
-    constants, functions, and memory addresses in this model: for example, a value
-    of function type must be either a $\lambda$ or a function proxy (a $\lambda$
+    semantics of erased $\lambda_{\mathtt{SEC}}^{c}$. In this module, there are canonical-form
+    lemmas for constants, functions, and memory addresses. For example, a value of
+    function type must be either a $\lambda$ or a function proxy (a $\lambda$
     wrapped with at least one inert function cast).
 -   [`CC.Reduction`](./src/CC/Reduction.agda): The operational semantics for $\lambda_{\mathtt{SEC}}^{c}$. The relation
     $M \mid \mu \mid \ell \longrightarrow N \mid \mu'$ says that $\lambda_{\mathtt{SEC}}^{c}$
@@ -248,26 +248,29 @@ There are three top-level modules in the [`src/`](./src) directory:
 -   [`CC.Interp`](./src/CC/Interp.agda): A stepper that replies on the progress proof to generate a
     reduction sequence of $k$ steps for a well-typed $\lambda_{\mathtt{SEC}}^{c}$ term.
 -   [`CC.Compile`](./src/CC/Compile.agda): Compilation from $\lambda_{\mathtt{SEC}}^\star$ to $\lambda_{\mathtt{SEC}}^{c}$. The module
-    also contains a proof that the compilation preserves types
+    also contains a proof that this compilation function preserves types
     (`compilation-preserves-type`).
 
 The noninterference proof of $\lambda_{\mathtt{SEC}}^{c}$ is erasure-based. It uses the
 following auxiliary definitions:
 
 -   [`CC.BigStep`](./src/CC/BigStep.agda): The big-step semantics for $\lambda_{\mathtt{SEC}}^{c}$. It is a direct
-    mechanical translation from the semantics in [CC.Reduction](./src/CC/Reduction.agda).
--   [`CC.Erasure`](./src/CC/Erasure.agda): Definition of the erasure functions for $\lambda_{\mathtt{SEC}}^{c}$ terms
-    (`erase`) and heaps (`erase-μ`). Note that the memory cells of high security
-    are completely erased, because the values read from those cells are always
-    of high security and thus appear to be opaque for a low observer.
+    mechanical translation from the semantics in [`CC.Reduction`](./src/CC/Reduction.agda).
+-   [`CC.Erasure`](./src/CC/Erasure.agda): Definition of the erasure functions for terms (`erase`) and
+    heaps (`erase-μ`) in $\lambda_{\mathtt{SEC}}^{c}$. Note that the memory cells of high security
+    are completely erased, because the values read from those cells are always of
+    high security and thus appear to be opaque from a low-observer's point of
+    view.
 -   [`CC.BigStepErased`](./src/CC/BigStepErased.agda): The big-step semantics for erased $\lambda_{\mathtt{SEC}}^{c}$.
 
 
 ### Technical definitions of the surface language $\lambda_{\mathtt{IFC}}^\star$ [in directory `Surface2/`](./src/Surface2)
 
 -   [`Surface2.Syntax`](./src/Surface2/Syntax.agda): The syntax of $\lambda_{\mathtt{IFC}}^\star$. The most noteworthy difference
-    from $\lambda_{\mathtt{SEC}}^\star$ is that in $\lambda_{\mathtt{IFC}}^\star$, the PC annotation on a $\lambda$
-    is treated as a type annotation, which means that it can be $\star$.
+    from $\lambda_{\mathtt{SEC}}^\star$ is that in $\lambda_{\mathtt{IFC}}^\star$, the PC annotation on a
+    $\lambda$ is treated as a type annotation instead of a value annotation, which
+    means that it is allowed to be $\star$ in $\lambda_{\mathtt{IFC}}^\star$ (but not in
+    $\lambda_{\mathtt{SEC}}^\star$).
 -   [`Surface2.Typing`](./src/Surface2/Typing.agda): The typing rules for $\lambda_{\mathtt{IFC}}^\star$.
 -   [`Surface2.Precision`](./src/Surface2/Precision.agda): The precision rules for $\lambda_{\mathtt{IFC}}^\star$. The precision
     relation is used in the definition and the proof of the gradual guarantee.
@@ -275,10 +278,10 @@ following auxiliary definitions:
 
 ### The coercion calculus for security labels [in directory `CoercionExpr/`](./src/CoercionExpr)
 
-This directory contains the definition of and lemmas about the *coercion calculus
-on security labels*.
+This directory contains the definition of and the lemmas about the *coercion
+calculus on security labels*.
 
--   [`CoercionExpr.Coercions`](./src/CoercionExpr/Coercions.agda): One single coercion on security labels can either
+-   [`CoercionExpr.Coercions`](./src/CoercionExpr/Coercions.agda): A single coercion on security labels can either
     be identity ($\mathbf{id}$), subtype ($\uparrow$), injection from $\ell$ ($\ell!$),
     or projection to $\ell$ with blame label $p$ ($\ell?^p$).
 -   [`CoercionExpr.CoercionExpr`](./src/CoercionExpr/CoercionExpr.agda): The syntax, typing, reduction, and normal forms
