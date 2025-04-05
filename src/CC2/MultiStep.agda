@@ -66,27 +66,19 @@ prot-ctx-mult vc′ (_ ∣ _ ∣ _ ∎) = _ ∣ _ ∣ _ ∎
 prot-ctx-mult {PC = PC} {PC′} vc′ (L ∣ μ ∣ .PC′ —→⟨ L→M ⟩ M↠N) =
   _ ∣ μ ∣ PC —→⟨ prot-ctx L→M ⟩ prot-ctx-mult vc′ M↠N
 
--- prot!-ctx-mult : ∀ {M N μ μ′ PC PC′} {A ℓ}
---   → (vc′ : LVal PC′)
---   → M ∣ μ ∣ PC′ —↠ N ∣ μ′
---   → prot! PC′ vc′ ℓ M A ∣ μ ∣ PC —↠ prot! PC′ vc′ ℓ N A ∣ μ′
--- prot!-ctx-mult vc′ (_ ∣ _ ∣ _ ∎) = _ ∣ _ ∣ _ ∎
--- prot!-ctx-mult {PC = PC} {PC′} vc′ (L ∣ μ ∣ .PC′ —→⟨ L→M ⟩ M↠N) =
---   _ ∣ μ ∣ PC —→⟨ prot!-ctx L→M ⟩ prot!-ctx-mult vc′ M↠N
 
-
--- pres-mult : ∀ {Σ gc pc M M′ A μ μ′}
---   → [] ; Σ ; gc ; pc ⊢ M ⦂ A
---   → Σ ⊢ μ
---   → M ∣ μ ∣ pc —↠ M′ ∣ μ′
---     ---------------------------------------------------------------
---   → ∃[ Σ′ ] (Σ′ ⊇ Σ) × ([] ; Σ′ ; gc ; pc ⊢ M′ ⦂ A) × (Σ′ ⊢ μ′)
--- pres-mult {Σ} ⊢M ⊢μ pc≲gc (_ ∣ _ ∣ _ ∎) =
---   ⟨ Σ , ⊇-refl Σ , ⊢M , ⊢μ ⟩
--- pres-mult ⊢M ⊢μ pc≲gc (M ∣ μ ∣ pc —→⟨ M→N ⟩ N↠M′) =
---   let ⟨ Σ′ , Σ′⊇Σ , ⊢N , ⊢μ′ ⟩ = preserve ⊢M ⊢μ pc≲gc M→N in
---   let ⟨ Σ″ , Σ″⊇Σ′ , ⊢M′ , ⊢μ″ ⟩ = pres-mult ⊢N ⊢μ′ pc≲gc N↠M′ in
---   ⟨ Σ″ , ⊇-trans Σ″⊇Σ′ Σ′⊇Σ , ⊢M′ , ⊢μ″ ⟩
+pres-mult : ∀ {Σ M M′ A μ μ′}
+  → [] ; Σ ; l low ; low ⊢ M ⇐ A
+  → Σ ⊢ μ
+  → M ∣ μ ∣ l low —↠ M′ ∣ μ′
+    ---------------------------------------------------------------
+  → ∃[ Σ′ ] (Σ′ ⊇ Σ) × ([] ; Σ′ ; l low ; low ⊢ M′ ⇐ A) × (Σ′ ⊢ μ′)
+pres-mult {Σ} ⊢M ⊢μ (_ ∣ _ ∣ _ ∎) =
+  ⟨ Σ , ⊇-refl Σ , ⊢M , ⊢μ ⟩
+pres-mult ⊢M ⊢μ (M ∣ μ ∣ pc —→⟨ M→N ⟩ N↠M′) =
+  let ⟨ Σ′ , Σ′⊇Σ ,  ⊢N ,  ⊢μ′ ⟩ = pres v-l ⊢l ⊢M ⊢μ M→N in
+  let ⟨ Σ″ , Σ″⊇Σ′ , ⊢M′ , ⊢μ″ ⟩ = pres-mult ⊢N ⊢μ′ N↠M′ in
+  ⟨ Σ″ , ⊇-trans Σ″⊇Σ′ Σ′⊇Σ , ⊢M′ , ⊢μ″ ⟩
 
 
 cast-reduction-inv : ∀ {A B M V W μ PC} {c : Cast A ⇒ B}
